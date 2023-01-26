@@ -1,0 +1,8 @@
+@import 'styles/theme/theme';
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .content {
+    margin: 0 12px;
+  }
+}
