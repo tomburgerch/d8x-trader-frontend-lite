@@ -1,0 +1,21 @@
+@import 'styles/theme/theme';
+
+.root {
+  max-width: 770px;
+  display: flex;
+  justify-content: space-evenly;
+  background-color: var(--d8x-color-white);
+  border-radius: $d8x-border-radius;
+  padding: 0.5rem 0;
+}
+
+.statContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.statValue {
+  color: var(--d8x-color-purple);
+}
