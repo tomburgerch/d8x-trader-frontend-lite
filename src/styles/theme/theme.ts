@@ -208,9 +208,9 @@ theme.typography.bodyMedium = {
 };
 
 theme.typography.bodySmall = {
-  fontSize: 16,
+  fontSize: 14,
   fontWeight: 400,
-  lineHeight: '22px',
+  lineHeight: '20px',
   [theme.breakpoints.down('sm')]: {
     fontSize: 11,
     lineHeight: '13px',

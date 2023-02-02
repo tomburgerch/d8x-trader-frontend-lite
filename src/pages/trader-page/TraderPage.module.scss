@@ -1,8 +1,19 @@
 @import 'styles/theme/theme';
 
+.rootBox {
+  height: 100vh;
+  min-height: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentContainer {
+  flex: 1;
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
 
-  .content {
+  .rootBox {
     margin: 0 12px;
   }
 }

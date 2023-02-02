@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import { memo } from 'react';
 
+import { Box } from '@mui/material';
+
 import { Container } from 'components/container/Container';
 import { Header } from 'components/header/Header';
 import { Footer } from 'components/footer/Footer';
@@ -13,13 +15,13 @@ export const TraderPage: FC = memo(() => {
   return (
     <>
       <StaticBackground />
-      <div className={styles.content}>
+      <Box className={styles.rootBox}>
         <Header />
-        <Container style={{ height: '60vh' }}>
+        <Container className={styles.contentContainer}>
           <PerpetualStats />
         </Container>
         <Footer />
-      </div>
+      </Box>
     </>
   );
 });

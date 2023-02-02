@@ -13,23 +13,14 @@ export const Footer: FC = memo(() => {
   return (
     <footer>
       <Container>
-        <Box py={6} display="flex" flexWrap="wrap" alignItems="center" className={styles.rootBox}>
-          <Box component="nav" className={styles.footerNav}>
-            {/*<Link href="#" color="textPrimary" className={styles.footerLink}>*/}
-            {/*  Imprint*/}
-            {/*</Link>*/}
-            {/*<Link href="#" color="textPrimary" className={styles.footerLink}>*/}
-            {/*  GTC*/}
-            {/*</Link>*/}
-            {/*<Link href="#" color="textPrimary" className={styles.footerLink}>*/}
-            {/*  Privacy Policy*/}
-            {/*</Link>*/}
-            <Typography color="textSecondary" variant="caption" gutterBottom={false} className={styles.footerCopyright}>
+        <Box className={styles.rootBox}>
+          <Box component="nav">
+            <Typography color="textSecondary" variant="caption" gutterBottom={false}>
               © Copyright 2023 D8X
             </Typography>
           </Box>
-          <Link href="#" color="inherit" underline="none" className={styles.footerLogo}>
-            <Logo />
+          <Link href="/" color="inherit" underline="none" className={styles.footerLogoWrapper}>
+            <Logo className={styles.footerLogo} />
           </Link>
         </Box>
       </Container>
