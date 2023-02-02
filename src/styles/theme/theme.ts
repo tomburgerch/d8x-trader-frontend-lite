@@ -71,6 +71,15 @@ export const theme = createTheme({
         },
       },
     },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          fontSize: 14,
+          fontWeight: 400,
+          whiteSpace: 'nowrap',
+        },
+      },
+    },
     MuiLink: {
       styleOverrides: {
         root: {
@@ -133,6 +142,20 @@ export const theme = createTheme({
     },
   },
 });
+
+// Define table responsive typography
+
+if (theme.components?.MuiTableCell?.styleOverrides?.root) {
+  theme.components.MuiTableCell.styleOverrides.root = {
+    fontSize: 14,
+    fontWeight: 400,
+    whiteSpace: 'nowrap',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 11,
+      lineHeight: '13px',
+    },
+  };
+}
 
 // The following typography configs are taken from Figma styleguide
 // The sm breakpoint handles mobile screen sizes

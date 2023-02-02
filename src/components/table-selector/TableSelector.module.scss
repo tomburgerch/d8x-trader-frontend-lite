@@ -1,0 +1,28 @@
+@import 'styles/theme/theme';
+
+.root {
+  max-width: 770px;
+  margin-top: 2rem;
+}
+
+.selectorTabs {
+  display: flex;
+  gap: 2px;
+}
+
+.tabLabelWrapper {
+  background-color: var(--d8x-color-white);
+  padding: 0.4rem 0.8rem;
+  border-radius: $d8x-border-radius $d8x-border-radius 0 0;
+  cursor: default;
+}
+
+.inactiveTabLabel {
+  color: var(--d8x-color-black-opac);
+
+  &:hover {
+    background-color: var(--d8x-color-white-opac);
+    cursor: pointer;
+    transition: 150ms;
+  }
+}

@@ -1,6 +1,8 @@
-import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { Box, Typography } from '@mui/material';
+
+import { formatToUSD } from 'utils/formatToUSD';
 
 import { MOCK_PERPETUAL_STATS } from './mock';
 
@@ -8,16 +10,17 @@ import styles from './PerpetualStats.module.scss';
 
 const perpetualStatsHeaders = ['Mid Price', 'Mark Price', 'Index Price', 'Funding Rate', 'Open Interest'];
 
-export const PerpetualStats: FC = () => {
+export const PerpetualStats = () => {
+  const perpetualStats = useMemo(() => MOCK_PERPETUAL_STATS, []);
   return (
     <Box className={styles.root}>
-      {Object.values(MOCK_PERPETUAL_STATS)
+      {Object.values(perpetualStats)
         .slice(0, 3)
         .map((value: number, index) => (
           <Box key={value} className={styles.statContainer}>
             <Typography variant="bodySmall">{perpetualStatsHeaders[index]}</Typography>
             <Typography variant="bodySmall" className={styles.statValue}>
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)}
+              {formatToUSD(value)}
             </Typography>
           </Box>
         ))}
