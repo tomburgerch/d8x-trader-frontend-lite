@@ -104,7 +104,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: D8-X/devops
-          token: ${{ secrets.GITHUB_TOKEN }}
+        #  token: ${{ secrets.GITHUB_TOKEN }}
     #Substitute the values on the service app
       - name: Render Deployment YAML
         uses: nowactions/envsubst@v1
