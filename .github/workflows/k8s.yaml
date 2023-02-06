@@ -99,12 +99,12 @@ jobs:
           git fetch --prune --unshallow
           echo "TAG_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
-    #Checkout DevOps repo with GITHUB_TOKEN token that expires on 90days
+    #Checkout DevOps repo with PAT_TOKEN token that expires on 90days
       - name: Checkout DevOpsArgoCD
         uses: actions/checkout@v3
         with:
           repository: D8-X/devops
-        #  token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
     #Substitute the values on the service app
       - name: Render Deployment YAML
         uses: nowactions/envsubst@v1
