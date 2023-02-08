@@ -1,14 +1,7 @@
 import type { FC } from 'react';
 import { memo, useState } from 'react';
 
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { Container } from '../container/Container';
@@ -26,7 +19,6 @@ interface PropsI {
 
 const drawerWidth = 240;
 
-
 export const Header: FC<PropsI> = memo(({ window }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -40,7 +32,6 @@ export const Header: FC<PropsI> = memo(({ window }) => {
         <InteractiveLogo />
       </Typography>
       <Divider />
-
     </Box>
   );
 
