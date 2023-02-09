@@ -1,3 +1,4 @@
+import { Provider as JotaiProvider } from 'jotai';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -17,13 +18,15 @@ if (container) {
 
   root.render(
     <StrictMode>
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <JotaiProvider>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ThemeProvider>
+        </StyledEngineProvider>
+      </JotaiProvider>
     </StrictMode>
   );
 }
