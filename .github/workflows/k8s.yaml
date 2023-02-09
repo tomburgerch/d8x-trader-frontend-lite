@@ -36,8 +36,10 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: frontend
         IMAGE_TAG: d8x-frontend-${{ github.sha }}
+        REACT_APP_API_URL: http://d8x-trader.frontend:3001/api/v1
+        REACT_APP_WEBSOCKET_URL: ws://d8x-trader.frontend:8080/
       run: |
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   Version:
@@ -99,12 +101,12 @@ jobs:
           git fetch --prune --unshallow
           echo "TAG_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
-    #Checkout DevOps repo with PAT_TOKEN token that expires on 90days
+    #Checkout DevOps repo with GITHUB_TOKEN token that expires on 90days
       - name: Checkout DevOpsArgoCD
         uses: actions/checkout@v3
         with:
           repository: D8-X/devops
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
     #Substitute the values on the service app
       - name: Render Deployment YAML
         uses: nowactions/envsubst@v1
