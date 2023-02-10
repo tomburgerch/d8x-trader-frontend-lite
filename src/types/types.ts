@@ -12,6 +12,18 @@ export interface PerpetualI {
   maxPositionBC: number;
 }
 
+export interface PerpetualStatisticsI {
+  id: number;
+  baseCurrency: string;
+  quoteCurrency: string;
+  poolName: string;
+  midPrice: number;
+  markPrice: number;
+  indexPrice: number;
+  currentFundingRateBps: number;
+  openInterestBC: number;
+}
+
 export interface PoolI {
   isRunning: boolean;
   poolSymbol: string;

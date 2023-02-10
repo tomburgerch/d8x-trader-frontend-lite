@@ -2,9 +2,11 @@ import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import type { PoolI } from 'types/types';
+import { PerpetualStatisticsI } from 'types/types';
 
 export const poolsAtom = atom<PoolI[]>([]);
 export const oracleFactoryAddrAtom = atom('');
+export const perpetualStatisticsAtom = atom<PerpetualStatisticsI | null>(null);
 
 const selectedPoolNameLSAtom = atomWithStorage<string>('d8x_selectedPoolName', '');
 
