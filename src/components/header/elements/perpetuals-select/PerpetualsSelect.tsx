@@ -1,11 +1,11 @@
 import { useAtom } from 'jotai/index';
 import type { SyntheticEvent } from 'react';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { perpetualStatisticsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -27,6 +27,23 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 export const PerpetualsSelect = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
+
+  useEffect(() => {
+    if (selectedPool && selectedPerpetual) {
+      setPerpetualStatistics({
+        id: selectedPerpetual.id,
+        baseCurrency: selectedPerpetual.baseCurrency,
+        quoteCurrency: selectedPerpetual.quoteCurrency,
+        poolName: selectedPool.poolSymbol,
+        midPrice: selectedPerpetual.midPrice,
+        markPrice: selectedPerpetual.markPrice,
+        indexPrice: selectedPerpetual.indexPrice,
+        currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
+        openInterestBC: selectedPerpetual.openInterestBC,
+      });
+    }
+  }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);
