@@ -1,4 +1,3 @@
-import type { FC } from 'react';
 import { memo } from 'react';
 
 import { Box, Link, Typography } from '@mui/material';
@@ -9,7 +8,7 @@ import { Container } from '../container/Container';
 
 import styles from './Footer.module.scss';
 
-export const Footer: FC = memo(() => {
+export const Footer = memo(() => {
   return (
     <footer>
       <Container>

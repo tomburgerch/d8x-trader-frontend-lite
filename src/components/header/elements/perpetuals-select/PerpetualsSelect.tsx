@@ -11,6 +11,8 @@ import { PerpetualI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from './PerpetualsSelect.module.scss';
+import { useWebSocketContext } from '../../../../context/websocket-context/useWebSocketContext';
+import { createSymbol } from '../../../../helpers/createSymbol';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -29,6 +31,8 @@ export const PerpetualsSelect = memo(() => {
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
 
+  const { isConnected, send } = useWebSocketContext();
+
   useEffect(() => {
     if (selectedPool && selectedPerpetual) {
       setPerpetualStatistics({
@@ -44,6 +48,21 @@ export const PerpetualsSelect = memo(() => {
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
+
+  useEffect(() => {
+    if (selectedPool && selectedPerpetual && isConnected) {
+      send(
+        JSON.stringify({
+          traderAddr: '',
+          symbol: createSymbol({
+            baseCurrency: selectedPerpetual.baseCurrency,
+            quoteCurrency: selectedPerpetual.quoteCurrency,
+            poolSymbol: selectedPool.poolSymbol,
+          }),
+        })
+      );
+    }
+  }, [selectedPool, selectedPerpetual, isConnected, send]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);

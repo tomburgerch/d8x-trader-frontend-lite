@@ -1,4 +1,3 @@
-import type { FC } from 'react';
 import { memo } from 'react';
 
 import styles from './StaticBackground.module.scss';
@@ -18,7 +17,7 @@ const FIGURES_ARRAY = [
   'right-center-3',
 ];
 
-export const StaticBackground: FC = memo(() => {
+export const StaticBackground = memo(() => {
   return (
     <div className={styles.root}>
       <ul className={styles.figures}>

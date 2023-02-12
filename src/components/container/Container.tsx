@@ -1,11 +1,11 @@
-import type { FC, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
 
 import { CommonProps } from '@mui/material/OverridableComponent';
 
 import { PageContainer } from './Container.styles';
 
-export const Container: FC<CommonProps & PropsWithChildren> = memo(({ children, ...rest }) => {
+export const Container = memo(({ children, ...rest }: CommonProps & PropsWithChildren) => {
   return (
     <PageContainer maxWidth="xl" {...rest}>
       {children}

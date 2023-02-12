@@ -1,5 +1,4 @@
 import { useAtom } from 'jotai';
-import type { FC } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 
 import { Box, Divider, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
@@ -27,7 +26,7 @@ interface PropsI {
 
 const drawerWidth = 240;
 
-export const Header: FC<PropsI> = memo(({ window }) => {
+export const Header = memo(({ window }: PropsI) => {
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
 
