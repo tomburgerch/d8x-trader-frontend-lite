@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 
+import { WebSocketContextProvider } from 'context/websocket-context/WebSocketContextProvider';
 import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
@@ -19,13 +20,15 @@ if (container) {
   root.render(
     <StrictMode>
       <JotaiProvider>
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </ThemeProvider>
-        </StyledEngineProvider>
+        <WebSocketContextProvider>
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ThemeProvider>
+          </StyledEngineProvider>
+        </WebSocketContextProvider>
       </JotaiProvider>
     </StrictMode>
   );

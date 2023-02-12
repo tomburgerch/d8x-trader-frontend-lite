@@ -1,9 +1,8 @@
-import type { FC } from 'react';
 import { memo } from 'react';
 
 import styles from './InteractiveLogo.module.scss';
 
-export const InteractiveLogo: FC = memo(() => {
+export const InteractiveLogo = memo(() => {
   return (
     <svg
       width="221"

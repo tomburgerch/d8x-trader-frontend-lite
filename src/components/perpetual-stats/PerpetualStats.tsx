@@ -16,7 +16,7 @@ export const PerpetualStats = () => {
         <Typography variant="bodySmall">Mid Price</Typography>
         <Typography variant="bodySmall" className={styles.statValue}>
           {perpetualStatistics
-            ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency)
+            ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency)
             : '--'}
         </Typography>
       </Box>
@@ -24,7 +24,7 @@ export const PerpetualStats = () => {
         <Typography variant="bodySmall">Mark Price</Typography>
         <Typography variant="bodySmall" className={styles.statValue}>
           {perpetualStatistics
-            ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency)
+            ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency)
             : '--'}
         </Typography>
       </Box>
