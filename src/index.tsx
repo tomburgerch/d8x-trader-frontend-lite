@@ -1,9 +1,11 @@
+import { Provider as JotaiProvider } from 'jotai';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 
+import { WebSocketContextProvider } from 'context/websocket-context/WebSocketContextProvider';
 import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
@@ -17,13 +19,17 @@ if (container) {
 
   root.render(
     <StrictMode>
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <JotaiProvider>
+        <WebSocketContextProvider>
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ThemeProvider>
+          </StyledEngineProvider>
+        </WebSocketContextProvider>
+      </JotaiProvider>
     </StrictMode>
   );
 }

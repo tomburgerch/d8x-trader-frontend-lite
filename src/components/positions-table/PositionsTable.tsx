@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { TableContainer, Table as MuiTable, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 
-import { formatToUSD } from 'utils/formatToUSD';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { MOCK_POSITIONS } from './mock';
 
@@ -15,10 +15,10 @@ export const PositionsTable = () => {
     () =>
       MOCK_POSITIONS.map((position) => ({
         ...position,
-        entryPrice: formatToUSD(position.entryPrice),
-        liqPrice: formatToUSD(position.liqPrice),
-        margin: formatToUSD(position.margin),
-        unrealizedPnl: formatToUSD(position.unrealizedPnl),
+        entryPrice: formatToCurrency(position.entryPrice),
+        liqPrice: formatToCurrency(position.liqPrice),
+        margin: formatToCurrency(position.margin),
+        unrealizedPnl: formatToCurrency(position.unrealizedPnl),
       })),
     []
   );

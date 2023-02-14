@@ -1,20 +1,20 @@
-import type { FC } from 'react';
-import { memo, useState } from 'react';
+import { useAtom } from 'jotai';
+import { memo, useEffect, useRef, useState } from 'react';
 
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+
+import { getExchangeInfo } from 'network/network';
+import { oracleFactoryAddrAtom, poolsAtom } from 'store/pools.store';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
 
+import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
+import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect';
+
 import { PageAppBar } from './Header.styles';
+import styles from './Header.module.scss';
 
 interface PropsI {
   /**
@@ -26,9 +26,23 @@ interface PropsI {
 
 const drawerWidth = 240;
 
+export const Header = memo(({ window }: PropsI) => {
+  const [, setPools] = useAtom(poolsAtom);
+  const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
 
-export const Header: FC<PropsI> = memo(({ window }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const requestRef = useRef(false);
+
+  useEffect(() => {
+    if (!requestRef.current) {
+      requestRef.current = true;
+      getExchangeInfo().then(({ data }) => {
+        setPools(data.pools);
+        setOracleFactoryAddr(data.oracleFactoryAddr);
+      });
+    }
+  }, [setPools, setOracleFactoryAddr]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -40,7 +54,6 @@ export const Header: FC<PropsI> = memo(({ window }) => {
         <InteractiveLogo />
       </Typography>
       <Divider />
-
     </Box>
   );
 
@@ -50,11 +63,15 @@ export const Header: FC<PropsI> = memo(({ window }) => {
     <Container>
       <Box sx={{ display: 'flex' }}>
         <PageAppBar position="static">
-          <Toolbar>
+          <Toolbar className={styles.toolbar}>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <a href="/">
+              <a href="/" className={styles.logoLink}>
                 <InteractiveLogo />
               </a>
+            </Typography>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 2 }} className={styles.selectBoxes}>
+              <CollateralsSelect />
+              <PerpetualsSelect />
             </Typography>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { sm: 'none' } }} />
             <IconButton

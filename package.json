@@ -11,6 +11,13 @@
     "eslint-fix": "eslint src --ext \".js,.jsx,.ts,.tsx\" --fix",
     "stylelint": "npx stylelint \"src/**/*.scss\" --color",
     "stylelint-fix": "npx stylelint \"src/**/*.scss\" --color --fix",
+    "lint:staged": "lint-staged",
+    "lint:ts": "npm run eslint",
+    "lint:format": "prettier --check './{src,cypress}/**/*.{ts,tsx}'",
+    "lint:format:fix": "prettier --write './{src,cypress}/**/*.{ts,tsx}'",
+    "lint:ts:fix": "npm run lint:ts -- --fix",
+    "lint:css": "npm run stylelint",
+    "lint": "npm run lint:ts && npm run lint:css",
     "prepare": "husky install"
   },
   "eslintConfig": {
@@ -51,6 +58,7 @@
     "@mui/icons-material": "5.11.0",
     "@mui/material": "5.11.6",
     "classnames": "2.3.2",
+    "jotai": "2.0.0",
     "node-sass": "8.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -86,5 +94,6 @@
     "stylelint-config-standard-scss": "6.1.0",
     "stylelint-order": "6.0.1",
     "typescript": "4.9.4"
-  }
+  },
+  "proxy": "http://localhost:3001"
 }

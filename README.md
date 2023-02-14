@@ -57,3 +57,8 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 **Note: run this once!**
 
 Creates configuration files for git hooks to work.
+
+Note: In case `.husky/pre-commit` file is not created, run this command:
+```
+npx husky add .husky/pre-commit "npm run lint:staged"
+```
