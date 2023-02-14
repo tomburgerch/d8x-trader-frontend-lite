@@ -1,0 +1,57 @@
+name: Release or Prerelease Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Create a "release" that is the default input else fill in the version box "prerelease"' 
+        default: 'release'
+        required: true
+
+
+jobs:
+  Version:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - run : |
+          git fetch --prune --unshallow
+          git describe --tags --abbrev=0
+          echo "TAG_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: "${{ github.event.inputs.version == 'release' }}"  
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.TAG_VERSION }}
+          release_name: Release ${{ env.TAG_VERSION }}
+          body: ${{steps.github_release.outputs.changelog}}
+          draft: false
+          prerelease: false
+      
+      - name: Create PreRelease
+        if: "${{ github.event.inputs.version == 'prerelease' }}"  
+        id: create_prerelease
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.TAG_VERSION }}
+          release_name: PreRelease ${{ env.TAG_VERSION }}
+          body: ${{steps.github_release.outputs.changelog}}
+          draft: false
+          prerelease: true
+
+      
