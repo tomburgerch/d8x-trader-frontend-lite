@@ -41,7 +41,25 @@ declare module '@mui/material/Typography' {
     bodySmall: true;
   }
 }
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    primary: true;
+    secondary: true;
+    success: true;
+    warning: true;
+  }
+}
 /* eslint-enable */
+
+const MuiButtonSharedStyle = {
+  minWidth: '140px',
+  transition: 'ease-in-out 250ms',
+  borderRadius: '26px',
+  padding: '10px 20px',
+  fontSize: '17px',
+  fontWeight: 700,
+};
 
 export const theme = createTheme({
   breakpoints: {
@@ -132,6 +150,56 @@ export const theme = createTheme({
           },
         },
       },
+      variants: [
+        {
+          props: { variant: 'primary' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-color-purple)',
+            border: '1px solid var(--d8x-color-purple)',
+            color: 'var(--d8x-color-white)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.6)',
+            },
+          },
+        },
+        {
+          props: { variant: 'secondary' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-color-white)',
+            border: '1px solid var(--d8x-color-purple)',
+            color: 'var(--d8x-color-purple)',
+            ':hover': {
+              backgroundColor: 'var(--d8x-color-white-opac)',
+            },
+          },
+        },
+        {
+          props: { variant: 'success' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-color-purple)',
+            border: 0,
+            color: 'var(--d8x-color-white)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
+            },
+          },
+        },
+        {
+          props: { variant: 'warning' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-color-yellow)',
+            border: '1px solid var(--d8x-color-rose)',
+            color: 'var(--d8x-text-color)',
+            ':hover': {
+              backgroundColor: 'var(--d8x-color-rose)',
+            },
+          },
+        },
+      ],
     },
     MuiCard: {
       styleOverrides: {
