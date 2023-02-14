@@ -1,13 +1,15 @@
-name: K8s AWS Dev Deployment
+name: K8s AWS Stage Deployment
 
 on:
-  pull_request:
-    branches: [ main ]
-    types: [closed]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Stage Enviroment deploy' 
+        default: 'stage'
+        required: true
 
 
 jobs:
-  
   
   build:
     
@@ -35,58 +37,16 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: frontend
-        IMAGE_TAG: d8x-frontend-${{ github.sha }}
+        IMAGE_TAG: d8x-frontend-stage-${{ github.sha }}
+        REACT_APP_API_URL: https://app.testnet.d8x.exchange/api/v1
+        REACT_APP_WEBSOCKET_URL: wss://app.testnet.d8x.exchange/ws/
       run: |
         docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  Version:
-
-    needs: build 
-
-    name: Bump Version
-    runs-on: ubuntu-latest
-      
-    steps:
-
-    - name: Checkout ${{ github.sha }}
-      uses: actions/checkout@v3          
-
-    # sets up the nodejs
-    - name: Set up Node.js and Bump version
-      uses: actions/setup-node@master
-      with:
-          node-version: 18.x
-          registry-url: 'https://npm.pkg.github.com'
-    # Configuring git to push on the repo and bump the version that tags the commit
-      
-    - name: Tag commit and Push with skip CI 
-      if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'feature/') 
-      run: |
-        git config --global push.followTags true
-        git config --global user.email ""
-        git config --global user.name "GITHUB CI"
-        npm version minor  --no-git-tag-version > TAG_VERSION
-        TAG=$(cat TAG_VERSION)
-        git tag $TAG
-        git commit -am "Update ${{ github.sha }} [ci skip]"
-        git push origin main --tags
-
-    - name: Tag commit and Push with skip CI 
-      if:  github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'bugfix/') 
-      run: |
-        git config --global push.followTags true
-        git config --global user.email ""
-        git config --global user.name "GITHUB CI"
-        npm version patch --no-git-tag-version > TAG_VERSION
-        TAG=$(cat TAG_VERSION)
-        git tag $TAG
-        git commit -am "Update ${{ github.sha }} [ci skip]"
-        git push origin main --tags
-
   deploy:
 
-    needs: Version
+    needs: build
     name: Deploy app to Kubernetes
     runs-on: ubuntu-latest
     steps:
@@ -110,9 +70,9 @@ jobs:
         uses: nowactions/envsubst@v1
         with:
           input: ./charts/frontend/d8x-frontend/versions.tpl
-          output: ./charts/frontend/d8x-frontend/versions.yaml
+          output: ./charts/frontend/d8x-frontend/versions-stage.yaml
         env:
-          IMAGE_VERSION: d8x-frontend-${{ github.sha }}
+          IMAGE_VERSION: d8x-frontend-stage-${{ github.sha }}
           RELEASE_VERSION: ${{ env.TAG_VERSION }}
 
       - name: Push 
@@ -120,5 +80,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git commit -m "Image version dev ${{ github.sha }}"
+          git commit -m "Image version stage ${{ github.sha }}"
           git push
