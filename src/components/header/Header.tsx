@@ -9,6 +9,7 @@ import { oracleFactoryAddrAtom, poolsAtom } from 'store/pools.store';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
+import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect';
@@ -72,6 +73,9 @@ export const Header = memo(({ window }: PropsI) => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 2 }} className={styles.selectBoxes}>
               <CollateralsSelect />
               <PerpetualsSelect />
+            </Typography>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} className={styles.walletConnect}>
+              <WalletConnectButton />
             </Typography>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { sm: 'none' } }} />
             <IconButton
