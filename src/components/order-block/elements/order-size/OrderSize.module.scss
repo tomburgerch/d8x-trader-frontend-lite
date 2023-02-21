@@ -1,0 +1,18 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $d8x-spacing;
+
+  :global(.MuiButtonBase-root) {
+    padding: 9px 15px;
+    border-radius: $d8x-border-radius;
+
+    &.selected {
+      font-weight: bold;
+      background-color: var(--d8x-background-purple);
+    }
+  }
+}

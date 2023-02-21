@@ -1,0 +1,23 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $d8x-spacing;
+}
+
+.stopLossOptions {
+  display: flex;
+  justify-content: center;
+
+  :global(.MuiButtonBase-root) {
+    flex: 1;
+    width: 70px;
+
+    &.selected {
+      font-weight: bold;
+      background-color: var(--d8x-background-purple);
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 export interface PerpetualI {
   id: number;
   state: string;
@@ -46,4 +48,20 @@ export interface ValidatedResponseI<T> {
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
+}
+
+export interface PerpetualStaticInfoI {
+  id: number;
+  limitOrderBookAddr: string;
+  initialMarginRate: number;
+  maintenanceMarginRate: number;
+  S2Symbol: string;
+  S3Symbol: string;
+  lotSizeBC: number;
+}
+
+// Taken from node_modules/@mui/base/SliderUnstyled/useSlider.types.d.ts. Cannot be imported without new library in deps
+export interface MarkI {
+  value: number;
+  label?: React.ReactNode;
 }
