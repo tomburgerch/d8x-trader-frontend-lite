@@ -48,6 +48,7 @@ declare module '@mui/material/Button' {
     secondary: true;
     success: true;
     warning: true;
+    action: true;
   }
 }
 /* eslint-enable */
@@ -146,7 +147,7 @@ export const theme = createTheme({
           borderColor: 'var(--d8x-color-purple)',
           '&:hover': {
             borderColor: 'var(--d8x-color-purple)',
-            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
+            backgroundColor: 'var(--d8x-background-purple)',
           },
         },
       },
@@ -183,7 +184,7 @@ export const theme = createTheme({
             border: 0,
             color: 'var(--d8x-color-white)',
             ':hover': {
-              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
+              backgroundColor: 'var(--d8x-background-purple)',
             },
           },
         },
@@ -199,7 +200,43 @@ export const theme = createTheme({
             },
           },
         },
+        {
+          props: { variant: 'action' },
+          style: {
+            ...MuiButtonSharedStyle,
+            borderRadius: '16px',
+            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
+            border: 0,
+            width: '100%',
+            color: 'var(--d8x-color-purple)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+            },
+          },
+        },
       ],
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: '16px',
+          backgroundColor: 'var(--d8x-background-purple)',
+          width: '150px',
+          ':hover': {
+            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+          },
+          ':focus': {
+            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+          },
+          ':active': {
+            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+          },
+        },
+        input: {
+          padding: '8px 10px',
+          width: 'auto',
+        },
+      },
     },
     MuiCard: {
       styleOverrides: {

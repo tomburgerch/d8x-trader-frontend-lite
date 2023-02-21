@@ -1,0 +1,32 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  margin-top: $d8x-spacing;
+  align-items: center;
+}
+
+.label {
+  padding-right: $d8x-spacing;
+}
+
+.sliderHolder {
+  flex: 1;
+  padding-right: 2 * $d8x-spacing;
+  padding-left: 2 * $d8x-spacing;
+}
+
+.inputHolder {
+
+  :global(.MuiInputBase-root) {
+    width: 85px;
+
+    input {
+      text-align: right;
+    }
+  }
+
+  :global(.MuiInputAdornment-root) {
+    margin-left: 0;
+  }
+}

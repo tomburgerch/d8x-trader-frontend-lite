@@ -1,19 +1,25 @@
 import { useAtom } from 'jotai/index';
 import type { SyntheticEvent } from 'react';
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { perpetualStatisticsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
+import { createSymbol } from 'helpers/createSymbol';
+import { getPerpetualStaticInfo } from 'network/network';
+import {
+  perpetualStaticInfoAtom,
+  perpetualStatisticsAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
+} from 'store/pools.store';
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from './PerpetualsSelect.module.scss';
-import { useWebSocketContext } from '../../../../context/websocket-context/useWebSocketContext';
-import { createSymbol } from '../../../../helpers/createSymbol';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -31,10 +37,24 @@ export const PerpetualsSelect = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
 
   const { address } = useAccount();
 
   const { isConnected, send } = useWebSocketContext();
+
+  const requestRef = useRef(false);
+
+  const symbol = useMemo(() => {
+    if (selectedPool && selectedPerpetual) {
+      return createSymbol({
+        baseCurrency: selectedPerpetual.baseCurrency,
+        quoteCurrency: selectedPerpetual.quoteCurrency,
+        poolSymbol: selectedPool.poolSymbol,
+      });
+    }
+    return '';
+  }, [selectedPool, selectedPerpetual]);
 
   useEffect(() => {
     if (selectedPool && selectedPerpetual) {
@@ -53,19 +73,25 @@ export const PerpetualsSelect = memo(() => {
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
   useEffect(() => {
-    if (selectedPool && selectedPerpetual && isConnected) {
+    if (!requestRef.current && symbol) {
+      requestRef.current = true;
+      getPerpetualStaticInfo(symbol).then(({ data }) => {
+        setPerpetualStaticInfo(data);
+        requestRef.current = false;
+      });
+    }
+  }, [symbol, setPerpetualStaticInfo]);
+
+  useEffect(() => {
+    if (symbol && isConnected) {
       send(
         JSON.stringify({
           traderAddr: address ?? '',
-          symbol: createSymbol({
-            baseCurrency: selectedPerpetual.baseCurrency,
-            quoteCurrency: selectedPerpetual.quoteCurrency,
-            poolSymbol: selectedPool.poolSymbol,
-          }),
+          symbol,
         })
       );
     }
-  }, [selectedPool, selectedPerpetual, isConnected, send, address]);
+  }, [symbol, isConnected, send, address]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);

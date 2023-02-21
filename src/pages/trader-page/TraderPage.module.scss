@@ -8,7 +8,19 @@
 }
 
 .contentContainer {
+  display: flex;
+  justify-content: space-between;
   flex: 1;
+}
+
+.leftBlock {
+  flex: 1;
+}
+
+.rightBlock {
+  flex: 1;
+  max-width: 600px;
+  margin-left: 80px;
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {

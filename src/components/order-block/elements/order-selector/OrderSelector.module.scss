@@ -1,0 +1,19 @@
+.root {
+  padding: 0;
+  background-color: var(--d8x-background-purple);
+}
+
+.rootOptions {
+  display: flex;
+  justify-content: center;
+
+  :global(.MuiButtonBase-root) {
+    flex: 1;
+    border-radius: 0;
+    padding: 10px 8px;
+
+    &.selected {
+      font-weight: bold;
+    }
+  }
+}
