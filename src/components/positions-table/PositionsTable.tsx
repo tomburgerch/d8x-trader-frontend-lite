@@ -1,6 +1,14 @@
 import { useMemo } from 'react';
 
-import { TableContainer, Table as MuiTable, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import {
+  TableContainer,
+  Table as MuiTable,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+} from '@mui/material';
 
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -30,7 +38,7 @@ export const PositionsTable = () => {
           <TableRow>
             {positionsHeaders.map((header, i) => (
               <TableCell key={header} align={i === 0 ? 'center' : 'right'}>
-                {header}
+                <Typography variant="bodySmall">{header}</Typography>
               </TableCell>
             ))}
           </TableRow>
@@ -38,12 +46,24 @@ export const PositionsTable = () => {
         <TableBody className={styles.tableBody}>
           {positions.map((position) => (
             <TableRow key={position.id}>
-              <TableCell align="center">{position.symbol}</TableCell>
-              <TableCell align="right">{position.positionSize}</TableCell>
-              <TableCell align="right">{position.entryPrice}</TableCell>
-              <TableCell align="right">{position.liqPrice}</TableCell>
-              <TableCell align="right">{position.margin}</TableCell>
-              <TableCell align="right">{position.unrealizedPnl}</TableCell>
+              <TableCell align="center">
+                <Typography variant="bodySmall">{position.symbol}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="bodySmall">{position.positionSize}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="bodySmall">{position.entryPrice}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="bodySmall">{position.liqPrice}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="bodySmall">{position.margin}</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="bodySmall">{position.unrealizedPnl}</Typography>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

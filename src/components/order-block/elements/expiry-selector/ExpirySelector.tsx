@@ -4,13 +4,18 @@ import { memo } from 'react';
 
 import { Box, Button, ButtonGroup } from '@mui/material';
 
-import { expireDaysAtom } from 'store/order-block.store';
-import { ExpiryE } from 'types/enums';
+import { expireDaysAtom, orderTypeAtom } from 'store/order-block.store';
+import { ExpiryE, OrderTypeE } from 'types/enums';
 
 import styles from './ExpirySelector.module.scss';
 
 export const ExpirySelector = memo(() => {
+  const [orderType] = useAtom(orderTypeAtom);
   const [expireDays, setExpireDays] = useAtom(expireDaysAtom);
+
+  if (orderType === OrderTypeE.Market) {
+    return null;
+  }
 
   return (
     <Box className={styles.root}>
