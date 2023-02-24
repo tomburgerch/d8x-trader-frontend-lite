@@ -1,11 +1,13 @@
 import { useAtom } from 'jotai';
 import type { SyntheticEvent } from 'react';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
+import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { getPoolFee } from 'network/network';
+import { poolFeeAtom, poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -25,9 +27,21 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 };
 
 export const CollateralsSelect = memo(() => {
+  const { address } = useAccount();
+
   const [pools] = useAtom(poolsAtom);
+  const [, setPoolFee] = useAtom(poolFeeAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+
+  useEffect(() => {
+    if (selectedPool !== null) {
+      setPoolFee(0);
+      getPoolFee(selectedPool.poolSymbol, address).then(({ data }) => {
+        setPoolFee(data);
+      });
+    }
+  }, [selectedPool, setPoolFee, address]);
 
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);

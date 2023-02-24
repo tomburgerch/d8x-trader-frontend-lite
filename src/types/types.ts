@@ -1,4 +1,7 @@
-import * as React from 'react';
+import { BigNumberish, BytesLike } from 'ethers';
+import type { ReactNode } from 'react';
+
+import { ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
 
 export interface PerpetualI {
   id: number;
@@ -63,5 +66,68 @@ export interface PerpetualStaticInfoI {
 // Taken from node_modules/@mui/base/SliderUnstyled/useSlider.types.d.ts. Cannot be imported without new library in deps
 export interface MarkI {
   value: number;
-  label?: React.ReactNode;
+  label?: ReactNode;
+}
+
+export interface OrderInfoI {
+  symbol: string;
+  poolName: string;
+  baseCurrency: string;
+  quoteCurrency: string;
+  orderType: OrderTypeE;
+  orderBlock: OrderBlockE;
+  leverage: number;
+  size: number;
+  price: number;
+  tradingFee: number;
+  collateral: number;
+  maxEntryPrice?: number;
+  limitPrice?: number | null;
+  triggerPrice?: number;
+  expireDays?: ExpiryE;
+  stopLoss: StopLossE | null;
+  takeProfit: TakeProfitE | null;
+}
+
+export interface OrderI {
+  symbol: string;
+  side: string;
+  type: string;
+  quantity: number;
+  reduceOnly?: boolean | undefined;
+  limitPrice?: number | undefined;
+  keepPositionLvg?: boolean | undefined;
+  brokerFeeTbps?: number | undefined;
+  brokerAddr?: string | undefined;
+  brokerSignature?: BytesLike | undefined;
+  stopPrice?: number | undefined;
+  leverage?: number | undefined;
+  deadline?: number | undefined;
+  timestamp: number;
+  submittedBlock?: number;
+}
+
+export interface SmartContractOrderI {
+  flags: BigNumberish;
+  iPerpetualId: BigNumberish;
+  brokerFeeTbps: BigNumberish;
+  traderAddr: string;
+  brokerAddr: string;
+  referrerAddr: string;
+  brokerSignature: BytesLike;
+  fAmount: BigNumberish;
+  fLimitPrice: BigNumberish;
+  fTriggerPrice: BigNumberish;
+  fLeverage: BigNumberish;
+  iDeadline: BigNumberish;
+  createdTimestamp: BigNumberish;
+  submittedBlock: BigNumberish;
+}
+
+export interface OrderDigestI {
+  digest?: string;
+  orderId: string;
+  OrderBookAddr: string;
+  abi: string;
+  SCOrder?: SmartContractOrderI;
 }

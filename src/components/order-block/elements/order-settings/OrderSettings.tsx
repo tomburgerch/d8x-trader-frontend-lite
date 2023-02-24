@@ -15,7 +15,7 @@ import {
 
 import { ReactComponent as SettingsIcon } from 'assets/icons/settingsIcon.svg';
 import { Dialog } from 'components/dialog/Dialog';
-import { orderTypeAtom, toleranceSliderAtom } from 'store/order-block.store';
+import { keepPositionLeverageAtom, orderTypeAtom, reduceOnlyAtom, toleranceSliderAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom } from 'store/pools.store';
 import { OrderTypeE, ToleranceE } from 'types/enums';
 import { MarkI } from 'types/types';
@@ -52,6 +52,8 @@ export const OrderSettings = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
   const [tolerance, setTolerance] = useAtom(toleranceSliderAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
+  const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
   const [updatedTolerance, setUpdatedTolerance] = useState(2);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -78,7 +80,18 @@ export const OrderSettings = memo(() => {
     <>
       <Box className={styles.root}>
         <Box className={styles.keepPosLeverage}>
-          <FormControlLabel value="true" control={<Checkbox />} label="Keep pos. leverage" labelPlacement="start" />
+          <FormControlLabel
+            id="keep-position-leverage"
+            value="true"
+            control={
+              <Checkbox
+                defaultChecked={keepPositionLeverage}
+                onChange={(event) => setKeepPositionLeverage(event.target.checked)}
+              />
+            }
+            label="Keep pos. leverage"
+            labelPlacement="start"
+          />
         </Box>
         <Box className={styles.settings}>
           {orderType === OrderTypeE.Market && (
@@ -88,7 +101,15 @@ export const OrderSettings = memo(() => {
             </>
           )}
           {orderType !== OrderTypeE.Market && (
-            <FormControlLabel value="true" control={<Checkbox />} label="Reduce only" labelPlacement="start" />
+            <FormControlLabel
+              id="reduce-only"
+              value="true"
+              control={
+                <Checkbox defaultChecked={reduceOnly} onChange={(event) => setReduceOnly(event.target.checked)} />
+              }
+              label="Reduce only"
+              labelPlacement="start"
+            />
           )}
         </Box>
       </Box>
@@ -113,10 +134,10 @@ export const OrderSettings = memo(() => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeSettingsModal} variant="secondary">
+          <Button onClick={closeSettingsModal} variant="secondaryAction">
             Cancel
           </Button>
-          <Button onClick={handleSettingsConfirm} variant="primary">
+          <Button onClick={handleSettingsConfirm} variant="action">
             Confirm
           </Button>
         </DialogActions>

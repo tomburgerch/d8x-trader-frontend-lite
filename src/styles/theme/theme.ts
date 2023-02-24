@@ -49,6 +49,7 @@ declare module '@mui/material/Button' {
     success: true;
     warning: true;
     action: true;
+    secondaryAction: true;
   }
 }
 /* eslint-enable */
@@ -207,10 +208,21 @@ export const theme = createTheme({
             borderRadius: '16px',
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
             border: 0,
-            width: '100%',
             color: 'var(--d8x-color-purple)',
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+            },
+          },
+        },
+        {
+          props: { variant: 'secondaryAction' },
+          style: {
+            ...MuiButtonSharedStyle,
+            borderRadius: '16px',
+            border: '1px solid rgb(var(--d8x-color-purple-rgb), 0.1)',
+            color: 'var(--d8x-color-purple)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
             },
           },
         },
@@ -242,6 +254,21 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: 'none',
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          textAlign: 'center',
+        },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          justifyContent: 'center',
         },
       },
     },

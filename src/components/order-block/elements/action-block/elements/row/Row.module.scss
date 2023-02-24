@@ -1,0 +1,9 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $d8x-spacing / 2;
+}

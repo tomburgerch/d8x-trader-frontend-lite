@@ -4,3 +4,44 @@
   display: flex;
   margin-top: $d8x-spacing;
 }
+
+.buyButton {
+  width: 100%;
+}
+
+.dialog {
+
+  :global(.MuiPaper-root) {
+    max-width: 400px;
+    width: 100%;
+  }
+}
+
+.centered {
+  display: block;
+  text-align: center;
+}
+
+.orderDetails {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.newPositionHeader {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.newPositionDetails {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.validityMessages {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 2;
+}
+
+.goMessage {
+  color: var(--d8x-color-black-opac);
+}
