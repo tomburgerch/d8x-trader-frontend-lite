@@ -15,7 +15,7 @@ export const InfoBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.row}>
-        <Typography variant="body2">Position size</Typography>
+        <Typography variant="body2">Order size</Typography>
         <Typography variant="body2">
           {orderSize} {perpetualStatistics?.baseCurrency}
         </Typography>
@@ -27,10 +27,6 @@ export const InfoBlock = memo(() => {
       <Box className={styles.row}>
         <Typography variant="body2">Fees</Typography>
         <Typography variant="body2">2 {perpetualStatistics?.poolName}</Typography>
-      </Box>
-      <Box className={styles.row}>
-        <Typography variant="body2">Liq price</Typography>
-        <Typography variant="body2">19 000 {perpetualStatistics?.quoteCurrency}</Typography>
       </Box>
     </Box>
   );

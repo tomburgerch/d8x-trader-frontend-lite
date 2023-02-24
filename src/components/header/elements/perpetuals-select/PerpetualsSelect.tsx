@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai/index';
 import type { SyntheticEvent } from 'react';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
@@ -8,7 +8,7 @@ import { PaperProps } from '@mui/material/Paper/Paper';
 
 import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
-import { getPerpetualStaticInfo } from 'network/network';
+import { getPerpetualStaticInfo, getPositionRisk } from 'network/network';
 import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
@@ -43,8 +43,6 @@ export const PerpetualsSelect = memo(() => {
 
   const { isConnected, send } = useWebSocketContext();
 
-  const requestRef = useRef(false);
-
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
       return createSymbol({
@@ -73,14 +71,21 @@ export const PerpetualsSelect = memo(() => {
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
   useEffect(() => {
-    if (!requestRef.current && symbol) {
-      requestRef.current = true;
+    if (symbol) {
       getPerpetualStaticInfo(symbol).then(({ data }) => {
         setPerpetualStaticInfo(data);
-        requestRef.current = false;
       });
     }
   }, [symbol, setPerpetualStaticInfo]);
+
+  useEffect(() => {
+    if (symbol) {
+      getPositionRisk(symbol, address).then((data) => {
+        // TODO: Save data to atom
+        console.log(data);
+      });
+    }
+  }, [symbol, address]);
 
   useEffect(() => {
     if (symbol && isConnected) {
