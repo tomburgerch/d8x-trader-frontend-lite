@@ -38,7 +38,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const takeProfit = get(takeProfitAtom);
 
   const collateral = 0; // TODO: newPositionRisk.collateralCC
-  const tradingFee = (poolFee * size) / 100_000; // TODO: add info about brokerFeeTbps
+  const tradingFee = (poolFee * size) / 100_000;
 
   let maxEntryPrice;
   if (orderType === OrderTypeE.Market) {

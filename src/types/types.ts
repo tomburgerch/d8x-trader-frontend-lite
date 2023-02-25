@@ -51,6 +51,7 @@ export interface ValidatedResponseI<T> {
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
+  proxyAddr: string;
 }
 
 export interface PerpetualStaticInfoI {
