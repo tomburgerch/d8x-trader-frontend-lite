@@ -5,7 +5,7 @@ import { Box, Divider, Drawer, IconButton, Toolbar, Typography } from '@mui/mate
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { getExchangeInfo } from 'network/network';
-import { oracleFactoryAddrAtom, poolsAtom } from 'store/pools.store';
+import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom } from 'store/pools.store';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -30,6 +30,7 @@ const drawerWidth = 240;
 export const Header = memo(({ window }: PropsI) => {
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
+  const [, setProxyAddr] = useAtom(proxyAddrAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -41,9 +42,10 @@ export const Header = memo(({ window }: PropsI) => {
       getExchangeInfo().then(({ data }) => {
         setPools(data.pools);
         setOracleFactoryAddr(data.oracleFactoryAddr);
+        setProxyAddr(data.proxyAddr);
       });
     }
-  }, [setPools, setOracleFactoryAddr]);
+  }, [setPools, setOracleFactoryAddr, setProxyAddr]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

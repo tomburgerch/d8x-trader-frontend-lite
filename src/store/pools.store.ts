@@ -7,6 +7,7 @@ import { PerpetualStatisticsI } from 'types/types';
 export const poolsAtom = atom<PoolI[]>([]);
 export const poolFeeAtom = atom<number>(0);
 export const oracleFactoryAddrAtom = atom('');
+export const proxyAddrAtom = atom('');
 export const perpetualStatisticsAtom = atom<PerpetualStatisticsI | null>(null);
 export const perpetualStaticInfoAtom = atom<PerpetualStaticInfoI | null>(null);
 

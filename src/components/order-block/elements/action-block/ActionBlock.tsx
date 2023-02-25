@@ -1,17 +1,24 @@
+import { ContractTransaction } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
+import { approveMarginToken } from 'blockchain-api/approveMarginToken';
+import { getSigner } from 'blockchain-api/getSigner';
+import { postOrder } from 'blockchain-api/postOrder';
+import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { orderDigest } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
+import { proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
+import { OrderI } from 'types/types';
+
+import { Row } from './elements/row/Row';
 
 import styles from './ActionBlock.module.scss';
-import { Row } from './elements/row/Row';
-import { OrderI } from '../../../../types/types';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -22,6 +29,8 @@ export const ActionBlock = memo(() => {
   const { address } = useAccount();
 
   const [orderInfo] = useAtom(orderInfoAtom);
+  const [proxyAddr] = useAtom(proxyAddrAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -39,7 +48,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    if (!address || !orderInfo || !orderInfo.size) {
+    if (!address || !orderInfo || !orderInfo.size || !selectedPool) {
       return;
     }
 
@@ -59,14 +68,29 @@ export const ActionBlock = memo(() => {
     requestSentRef.current = true;
     orderDigest(order, address)
       .then((data) => {
-        // TODO: finalize data, sent for sign to MetaMask
-        console.log(data);
+        console.log('orderDigest', data);
+
+        if (data.data.digest) {
+          const signer = getSigner();
+
+          signMessage(signer, data.data.digest).then((signature) => {
+            console.log('signMessage', signature);
+
+            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then((data2: ContractTransaction) => {
+              console.log('approve', data2);
+
+              postOrder(signer, signature, data.data).then((data3: ContractTransaction) => {
+                console.log('postOrder', data3);
+              });
+            });
+          });
+        }
       })
       .finally(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [orderInfo, address, requestSent]);
+  }, [orderInfo, selectedPool, address, proxyAddr, requestSent]);
 
   return (
     <Box className={styles.root}>
