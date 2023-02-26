@@ -30,7 +30,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const orderType = get(orderTypeAtom);
   const leverage = get(leverageAtom);
   const size = get(orderSizeAtom);
-  const limitPriceSaved = get(limitPriceAtom);
+  const limitPrice = get(limitPriceAtom);
   const triggerPrice = get(triggerPriceAtom);
   const slippage = get(toleranceSliderAtom);
   const expireDays = get(expireDaysAtom);
@@ -40,14 +40,9 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const collateral = 0; // TODO: newPositionRisk.collateralCC
   const tradingFee = (poolFee * size) / 100_000;
 
-  let maxEntryPrice;
+  let maxEntryPrice = null;
   if (orderType === OrderTypeE.Market) {
     maxEntryPrice = perpetualStatistics.midPrice * (1 + slippage * (OrderBlockE.Short === orderBlock ? -1 : 1));
-  }
-
-  let limitPrice;
-  if (orderType !== OrderTypeE.Market) {
-    limitPrice = limitPriceSaved === 0 ? null : limitPriceSaved;
   }
 
   return {
@@ -67,9 +62,9 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     tradingFee,
     collateral,
     maxEntryPrice,
-    expireDays: orderType !== OrderTypeE.Market ? expireDays : undefined,
-    limitPrice,
-    triggerPrice: orderType === OrderTypeE.Stop ? triggerPrice : undefined,
+    expireDays: orderType !== OrderTypeE.Market ? expireDays : null,
+    limitPrice: orderType !== OrderTypeE.Market ? limitPrice : null,
+    triggerPrice: orderType === OrderTypeE.Stop ? triggerPrice : null,
     stopLoss,
     takeProfit,
   };
