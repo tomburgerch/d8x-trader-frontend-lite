@@ -82,10 +82,10 @@ export interface OrderInfoI {
   price: number;
   tradingFee: number;
   collateral: number;
-  maxEntryPrice?: number;
-  limitPrice?: number | null;
-  triggerPrice?: number;
-  expireDays?: ExpiryE;
+  maxEntryPrice: number | null;
+  limitPrice: number | null;
+  triggerPrice: number | null;
+  expireDays: ExpiryE | null;
   stopLoss: StopLossE | null;
   takeProfit: TakeProfitE | null;
 }

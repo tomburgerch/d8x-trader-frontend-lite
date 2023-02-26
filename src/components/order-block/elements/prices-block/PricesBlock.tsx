@@ -24,7 +24,8 @@ export const PricesBlock = memo(() => {
 
   const handleLimitPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setLimitPrice(+event.target.value);
+      const limitPriceStr = event.target.value;
+      setLimitPrice(limitPriceStr === '' || +limitPriceStr < 0 ? -1 : +limitPriceStr);
     },
     [setLimitPrice]
   );
@@ -40,7 +41,7 @@ export const PricesBlock = memo(() => {
           <>
             <Box className={styles.label}>Trigger Price</Box>
             <OutlinedInput
-              id="order-size"
+              id="trigger-size"
               endAdornment={<InputAdornment position="end">{perpetualStatistics?.quoteCurrency}</InputAdornment>}
               inputProps={{ step: 1, min: 0 }}
               type="number"
@@ -53,12 +54,13 @@ export const PricesBlock = memo(() => {
       <Box className={styles.limitPrice}>
         <Box className={styles.label}>Limit Price</Box>
         <OutlinedInput
-          id="order-size"
+          id="limit-size"
           endAdornment={<InputAdornment position="end">{perpetualStatistics?.quoteCurrency}</InputAdornment>}
-          inputProps={{ step: 1, min: 0 }}
+          inputProps={{ step: 1, min: -1 }}
           type="number"
-          defaultValue={limitPrice}
+          placeholder="-"
           onChange={handleLimitPriceChange}
+          value={limitPrice === -1 ? '' : limitPrice}
         />
       </Box>
     </Box>

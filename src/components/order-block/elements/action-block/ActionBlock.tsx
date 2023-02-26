@@ -1,6 +1,6 @@
 import { ContractTransaction } from 'ethers';
 import { useAtom } from 'jotai';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -43,20 +43,43 @@ export const ActionBlock = memo(() => {
     setShowReviewOrderModal(false);
   }, []);
 
+  const isBuySellButtonActive = useMemo(() => {
+    if (!orderInfo || !address) {
+      return false;
+    }
+    if (!orderInfo.size) {
+      return false;
+    }
+    if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice < 0)) {
+      return false;
+    }
+    return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice < 0));
+  }, [orderInfo, address]);
+
   const handleOrderConfirm = useCallback(() => {
     if (requestSentRef.current || requestSent) {
       return;
     }
 
-    if (!address || !orderInfo || !orderInfo.size || !selectedPool) {
+    if (!isBuySellButtonActive) {
       return;
+    }
+
+    if (!address || !orderInfo || !selectedPool) {
+      return;
+    }
+
+    let orderType = orderInfo.orderType.toUpperCase();
+    if (orderInfo.orderType === OrderTypeE.Stop) {
+      orderType = orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? 'STOP_LIMIT' : 'STOP_MARKET';
     }
 
     const order: OrderI = {
       symbol: orderInfo.symbol,
       side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
-      type: orderInfo.orderType.toUpperCase(),
-      limitPrice: orderInfo.limitPrice != null ? orderInfo.limitPrice : undefined,
+      type: orderType,
+      limitPrice: orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? orderInfo.limitPrice : undefined,
+      stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
       quantity: orderInfo.size,
       leverage: orderInfo.leverage,
       timestamp: Math.floor(Date.now() / 1000),
@@ -90,13 +113,13 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [orderInfo, selectedPool, address, proxyAddr, requestSent]);
+  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
   return (
     <Box className={styles.root}>
       <Button
         variant="action"
-        disabled={!orderInfo || !orderInfo.size || !address}
+        disabled={!isBuySellButtonActive}
         onClick={openReviewOrderModal}
         className={styles.buyButton}
       >
@@ -118,23 +141,23 @@ export const ActionBlock = memo(() => {
             <Box className={styles.orderDetails}>
               <Row leftSide="Trading fee:" rightSide={`${orderInfo.tradingFee} ${orderInfo.poolName}`} />
               <Row leftSide="Collateral:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
-              {orderInfo.maxEntryPrice !== undefined && (
+              {orderInfo.maxEntryPrice !== null && (
                 <Row
                   leftSide="Max entry price:"
                   rightSide={`${orderInfo.maxEntryPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
                 />
               )}
-              {orderInfo.triggerPrice !== undefined && (
+              {orderInfo.triggerPrice !== null && (
                 <Row
                   leftSide="Trigger price:"
                   rightSide={`${orderInfo.triggerPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
                 />
               )}
-              {orderInfo.limitPrice !== undefined && (
+              {orderInfo.limitPrice !== null && (
                 <Row
                   leftSide="Limit price:"
                   rightSide={
-                    orderInfo.limitPrice ? `${orderInfo.limitPrice.toFixed(2)} ${orderInfo.quoteCurrency}` : '-'
+                    orderInfo.limitPrice > -1 ? `${orderInfo.limitPrice.toFixed(2)} ${orderInfo.quoteCurrency}` : '-'
                   }
                 />
               )}
