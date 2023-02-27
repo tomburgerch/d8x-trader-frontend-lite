@@ -24,8 +24,7 @@ export const PricesBlock = memo(() => {
 
   const handleLimitPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const limitPriceStr = event.target.value;
-      setLimitPrice(limitPriceStr === '' || +limitPriceStr < 0 ? -1 : +limitPriceStr);
+      setLimitPrice(event.target.value);
     },
     [setLimitPrice]
   );
@@ -60,7 +59,7 @@ export const PricesBlock = memo(() => {
           type="number"
           placeholder="-"
           onChange={handleLimitPriceChange}
-          value={limitPrice === -1 ? '' : limitPrice}
+          value={limitPrice === null ? '' : limitPrice}
         />
       </Box>
     </Box>
