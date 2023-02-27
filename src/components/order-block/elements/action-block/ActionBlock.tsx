@@ -89,23 +89,26 @@ export const ActionBlock = memo(() => {
 
     setRequestSent(true);
     requestSentRef.current = true;
-    orderDigest(order, address)
+    orderDigest([order], address)
       .then((data) => {
         console.log('orderDigest', data);
 
-        if (data.data.digest) {
+        if (data.data.digests.length > 0) {
           const signer = getSigner();
 
-          signMessage(signer, data.data.digest).then((signature) => {
+          signMessage(signer, data.data.digests[0]).then((signature) => {
             console.log('signMessage', signature);
 
-            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then((data2: ContractTransaction) => {
-              console.log('approve', data2);
+            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then(
+              (approvedTransaction: ContractTransaction) => {
+                console.log('approve', approvedTransaction);
 
-              postOrder(signer, signature, data.data).then((data3: ContractTransaction) => {
-                console.log('postOrder', data3);
-              });
-            });
+                postOrder(signer, signature, data.data).then((postOrderTransaction: ContractTransaction) => {
+                  console.log('postOrder', postOrderTransaction);
+                  setShowReviewOrderModal(false);
+                });
+              }
+            );
           });
         }
       })

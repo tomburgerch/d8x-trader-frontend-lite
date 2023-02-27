@@ -10,7 +10,6 @@ export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
 export const orderTypeAtom = atom<OrderTypeE>(OrderTypeE.Market);
 export const orderSizeAtom = atom(0);
 export const triggerPriceAtom = atom(0);
-export const limitPriceAtom = atom(0);
 export const leverageAtom = atom(1);
 export const toleranceSliderAtom = atom(2);
 export const keepPositionLeverageAtom = atom(false);
@@ -18,6 +17,28 @@ export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(ExpiryE['60D']);
 export const stopLossAtom = atom(StopLossE.None);
 export const takeProfitAtom = atom(TakeProfitE.None);
+
+const limitPriceValueAtom = atom(-1);
+
+export const limitPriceAtom = atom(
+  (get) => {
+    const orderType = get(orderTypeAtom);
+
+    if (orderType === OrderTypeE.Market) {
+      return null;
+    }
+
+    const limitPrice = get(limitPriceValueAtom);
+    if (orderType === OrderTypeE.Limit) {
+      return limitPrice < 0 ? 0 : limitPrice;
+    }
+
+    return limitPrice < 0 ? null : limitPrice;
+  },
+  (get, set, newLimitPrice: string) => {
+    set(limitPriceValueAtom, newLimitPrice === '' || +newLimitPrice < 0 ? -1 : +newLimitPrice);
+  }
+);
 
 export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const perpetualStatistics = get(perpetualStatisticsAtom);

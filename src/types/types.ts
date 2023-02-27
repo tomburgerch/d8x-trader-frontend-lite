@@ -126,9 +126,9 @@ export interface SmartContractOrderI {
 }
 
 export interface OrderDigestI {
-  digest?: string;
-  orderId: string;
+  digests: string[];
+  orderIds: string[];
   OrderBookAddr: string;
   abi: string;
-  SCOrder?: SmartContractOrderI;
+  SCOrders: SmartContractOrderI[];
 }

@@ -51,11 +51,11 @@ export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<Val
   );
 }
 
-export function orderDigest(order: OrderI, traderAddr: string): Promise<ValidatedResponseI<OrderDigestI>> {
+export function orderDigest(orders: OrderI[], traderAddr: string): Promise<ValidatedResponseI<OrderDigestI>> {
   const requestOptions = {
     ...getRequestOptions(RequestMethodE.Post),
     body: JSON.stringify({
-      order,
+      orders,
       traderAddr,
     }),
   };
