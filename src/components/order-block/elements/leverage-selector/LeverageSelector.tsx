@@ -64,7 +64,7 @@ export const LeverageSelector = memo(() => {
           value={leverage}
           min={1}
           max={maxLeverage}
-          step={1}
+          step={(maxLeverage / 2) % 10 ? 0.5 : 1}
           getAriaValueText={valueLabelFormat}
           valueLabelFormat={valueLabelFormat}
           valueLabelDisplay="auto"
