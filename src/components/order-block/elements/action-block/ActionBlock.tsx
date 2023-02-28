@@ -74,14 +74,21 @@ export const ActionBlock = memo(() => {
       orderType = orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? 'STOP_LIMIT' : 'STOP_MARKET';
     }
 
+    let limitPrice = orderInfo.limitPrice;
+    if (orderInfo.orderType === OrderTypeE.Market) {
+      limitPrice = orderInfo.maxEntryPrice;
+    }
+
     const order: OrderI = {
       symbol: orderInfo.symbol,
       side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
       type: orderType,
-      limitPrice: orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? orderInfo.limitPrice : undefined,
+      limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
       stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
       quantity: orderInfo.size,
       leverage: orderInfo.leverage,
+      reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+      keepPositionLvg: orderInfo.keepPositionLeverage,
       timestamp: Math.floor(Date.now() / 1000),
       // TODO: calculate based on expire for LIMIT and STOP
       deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now

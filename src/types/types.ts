@@ -83,6 +83,8 @@ export interface OrderInfoI {
   tradingFee: number;
   collateral: number;
   maxEntryPrice: number | null;
+  keepPositionLeverage: boolean;
+  reduceOnly: boolean | null;
   limitPrice: number | null;
   triggerPrice: number | null;
   expireDays: ExpiryE | null;
