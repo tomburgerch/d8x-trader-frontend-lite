@@ -79,7 +79,7 @@ export interface OrderInfoI {
   orderBlock: OrderBlockE;
   leverage: number;
   size: number;
-  price: number;
+  midPrice: number;
   tradingFee: number;
   collateral: number;
   maxEntryPrice: number | null;
@@ -89,7 +89,9 @@ export interface OrderInfoI {
   triggerPrice: number | null;
   expireDays: ExpiryE | null;
   stopLoss: StopLossE | null;
+  stopLossLimitPrice: number | null;
   takeProfit: TakeProfitE | null;
+  takeProfitStopPrice: number | null;
 }
 
 export interface OrderI {

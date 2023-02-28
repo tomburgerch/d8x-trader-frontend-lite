@@ -79,7 +79,8 @@ export const ActionBlock = memo(() => {
       limitPrice = orderInfo.maxEntryPrice;
     }
 
-    const order: OrderI = {
+    const orders: OrderI[] = [];
+    orders.push({
       symbol: orderInfo.symbol,
       side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
       type: orderType,
@@ -92,11 +93,45 @@ export const ActionBlock = memo(() => {
       timestamp: Math.floor(Date.now() / 1000),
       // TODO: calculate based on expire for LIMIT and STOP
       deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now
-    };
+    });
+
+    if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossLimitPrice) {
+      orders.push({
+        // Changed values comparing to main Order
+        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        type: OrderTypeE.Limit.toUpperCase(),
+        limitPrice: orderInfo.stopLossLimitPrice,
+
+        // Same as for main Order
+        symbol: orderInfo.symbol,
+        quantity: orderInfo.size,
+        leverage: orderInfo.leverage,
+        reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+        keepPositionLvg: orderInfo.keepPositionLeverage,
+        timestamp: Math.floor(Date.now() / 1000),
+      });
+    }
+
+    if (orderInfo.takeProfit !== TakeProfitE.None && orderInfo.takeProfitStopPrice) {
+      orders.push({
+        // Changed values comparing to main Order
+        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        type: 'STOP_MARKET',
+        stopPrice: orderInfo.takeProfitStopPrice,
+
+        // Same as for main Order
+        symbol: orderInfo.symbol,
+        quantity: orderInfo.size,
+        leverage: orderInfo.leverage,
+        reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+        keepPositionLvg: orderInfo.keepPositionLeverage,
+        timestamp: Math.floor(Date.now() / 1000),
+      });
+    }
 
     setRequestSent(true);
     requestSentRef.current = true;
-    orderDigest([order], address)
+    orderDigest(orders, address)
       .then((data) => {
         console.log('orderDigest', data);
 
@@ -145,7 +180,7 @@ export const ActionBlock = memo(() => {
                 {orderInfo.leverage.toFixed(2)}x {orderInfo.orderType} {orderBlockMap[orderInfo.orderBlock]}
               </Typography>
               <Typography variant="bodySmall" className={styles.centered}>
-                {orderInfo.size} {orderInfo.baseCurrency} @ {orderInfo.price.toFixed(2)} {orderInfo.quoteCurrency}
+                {orderInfo.size} {orderInfo.baseCurrency} @ {orderInfo.midPrice.toFixed(2)} {orderInfo.quoteCurrency}
               </Typography>
             </Box>
             <Box className={styles.orderDetails}>
