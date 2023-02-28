@@ -83,12 +83,9 @@ export const OrderSettings = memo(() => {
           <FormControlLabel
             id="keep-position-leverage"
             value="true"
-            control={
-              <Checkbox
-                defaultChecked={keepPositionLeverage}
-                onChange={(event) => setKeepPositionLeverage(event.target.checked)}
-              />
-            }
+            defaultChecked={keepPositionLeverage}
+            onChange={(_event, checked) => setKeepPositionLeverage(checked)}
+            control={keepPositionLeverage ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
             label="Keep pos. leverage"
             labelPlacement="start"
           />
@@ -104,9 +101,9 @@ export const OrderSettings = memo(() => {
             <FormControlLabel
               id="reduce-only"
               value="true"
-              control={
-                <Checkbox defaultChecked={reduceOnly} onChange={(event) => setReduceOnly(event.target.checked)} />
-              }
+              defaultChecked={reduceOnly}
+              onChange={(_event, checked) => setReduceOnly(checked)}
+              control={reduceOnly ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
               label="Reduce only"
               labelPlacement="start"
             />

@@ -1,4 +1,3 @@
-import { ContractTransaction } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -133,24 +132,14 @@ export const ActionBlock = memo(() => {
     requestSentRef.current = true;
     orderDigest(orders, address)
       .then((data) => {
-        console.log('orderDigest', data);
-
         if (data.data.digests.length > 0) {
           const signer = getSigner();
-
-          signMessage(signer, data.data.digests[0]).then((signature) => {
-            console.log('signMessage', signature);
-
-            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then(
-              (approvedTransaction: ContractTransaction) => {
-                console.log('approve', approvedTransaction);
-
-                postOrder(signer, signature, data.data).then((postOrderTransaction: ContractTransaction) => {
-                  console.log('postOrder', postOrderTransaction);
-                  setShowReviewOrderModal(false);
-                });
-              }
-            );
+          signMessage(signer, data.data.digests).then((signatures) => {
+            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then(() => {
+              postOrder(signer, signatures, data.data).then(() => {
+                setShowReviewOrderModal(false);
+              });
+            });
           });
         }
       })
