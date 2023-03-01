@@ -70,38 +70,38 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     maxEntryPrice = perpetualStatistics.midPrice * (1 + (slippage / 100) * (OrderBlockE.Short === orderBlock ? -1 : 1));
   }
 
-  let stopLossLimitPrice = null;
+  let stopLossPrice = null;
   if (stopLoss !== StopLossE.None) {
     const stopLossMultiplier =
       (1 - Math.abs(mapStopLossToNumber(stopLoss)) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
 
     if (orderType === OrderTypeE.Market && maxEntryPrice) {
-      stopLossLimitPrice = maxEntryPrice * stopLossMultiplier;
+      stopLossPrice = maxEntryPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
-      stopLossLimitPrice = limitPrice * stopLossMultiplier;
+      stopLossPrice = limitPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
       if (limitPrice !== null && limitPrice > -1) {
-        stopLossLimitPrice = limitPrice * stopLossMultiplier;
+        stopLossPrice = limitPrice * stopLossMultiplier;
       } else {
-        stopLossLimitPrice = triggerPrice * stopLossMultiplier;
+        stopLossPrice = triggerPrice * stopLossMultiplier;
       }
     }
   }
 
-  let takeProfitStopPrice = null;
+  let takeProfitPrice = null;
   if (takeProfit !== TakeProfitE.None) {
     const takeProfitMultiplier =
       (1 + mapTakeProfitToNumber(takeProfit) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
 
     if (orderType === OrderTypeE.Market && maxEntryPrice) {
-      takeProfitStopPrice = maxEntryPrice * takeProfitMultiplier;
+      takeProfitPrice = maxEntryPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
-      takeProfitStopPrice = limitPrice * takeProfitMultiplier;
+      takeProfitPrice = limitPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
       if (limitPrice !== null && limitPrice > -1) {
-        takeProfitStopPrice = limitPrice * takeProfitMultiplier;
+        takeProfitPrice = limitPrice * takeProfitMultiplier;
       } else {
-        takeProfitStopPrice = triggerPrice * takeProfitMultiplier;
+        takeProfitPrice = triggerPrice * takeProfitMultiplier;
       }
     }
   }
@@ -129,8 +129,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     limitPrice: orderType !== OrderTypeE.Market ? limitPrice : null,
     triggerPrice: orderType === OrderTypeE.Stop ? triggerPrice : null,
     stopLoss,
-    stopLossLimitPrice,
+    stopLossPrice,
     takeProfit,
-    takeProfitStopPrice,
+    takeProfitPrice,
   };
 });

@@ -94,12 +94,12 @@ export const ActionBlock = memo(() => {
       deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now
     });
 
-    if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossLimitPrice) {
+    if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossPrice) {
       orders.push({
         // Changed values comparing to main Order
         side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
-        type: OrderTypeE.Limit.toUpperCase(),
-        limitPrice: orderInfo.stopLossLimitPrice,
+        type: 'STOP_MARKET',
+        stopPrice: orderInfo.stopLossPrice,
 
         // Same as for main Order
         symbol: orderInfo.symbol,
@@ -111,12 +111,12 @@ export const ActionBlock = memo(() => {
       });
     }
 
-    if (orderInfo.takeProfit !== TakeProfitE.None && orderInfo.takeProfitStopPrice) {
+    if (orderInfo.takeProfit !== TakeProfitE.None && orderInfo.takeProfitPrice) {
       orders.push({
         // Changed values comparing to main Order
         side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
-        type: 'STOP_MARKET',
-        stopPrice: orderInfo.takeProfitStopPrice,
+        type: OrderTypeE.Limit.toUpperCase(),
+        limitPrice: orderInfo.takeProfitPrice,
 
         // Same as for main Order
         symbol: orderInfo.symbol,

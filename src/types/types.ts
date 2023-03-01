@@ -89,9 +89,9 @@ export interface OrderInfoI {
   triggerPrice: number | null;
   expireDays: ExpiryE | null;
   stopLoss: StopLossE | null;
-  stopLossLimitPrice: number | null;
+  stopLossPrice: number | null;
   takeProfit: TakeProfitE | null;
-  takeProfitStopPrice: number | null;
+  takeProfitPrice: number | null;
 }
 
 export interface OrderI {
