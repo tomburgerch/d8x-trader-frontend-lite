@@ -1,18 +1,31 @@
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
+import { useAccount } from 'wagmi';
 
-import { perpetualStatisticsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { parseSymbol } from 'helpers/parseSymbol';
+import { getOpenOrders, getPositionRisk } from 'network/network';
+import {
+  openOrdersAtom,
+  perpetualStatisticsAtom,
+  positionsAtom,
+  removeOpenOrderAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
+} from 'store/pools.store';
+import { PerpetualStatisticsI } from 'types/types';
 
 import {
   CommonWsMessageI,
   // ConnectWsMessageI,
   // ErrorWsMessageI,
   MessageTypeE,
+  OnLimitOrderCreatedWsMessageI,
+  OnPerpetualLimitOrderCancelledWsMessageI,
+  OnTradeWsMessageI,
+  OnUpdateMarginAccountWsMessageI,
   OnUpdateMarkPriceWsMessageI,
   SubscriptionWsMessageI,
 } from './types';
-import { PerpetualStatisticsI } from '../../types/types';
-import { parseSymbol } from '../../helpers/parseSymbol';
 
 // function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
 //   return message.type === MessageTypeE.Connect;
@@ -30,10 +43,33 @@ function isUpdateMarkPriceMessage(message: CommonWsMessageI): message is OnUpdat
   return message.type === MessageTypeE.OnUpdateMarkPrice;
 }
 
+function isUpdateMarginAccountMessage(message: CommonWsMessageI): message is OnUpdateMarginAccountWsMessageI {
+  return message.type === MessageTypeE.OnUpdateMarginAccount;
+}
+
+function isPerpetualLimitOrderCancelledMessage(
+  message: CommonWsMessageI
+): message is OnPerpetualLimitOrderCancelledWsMessageI {
+  return message.type === MessageTypeE.OnPerpetualLimitOrderCancelled;
+}
+
+function isTradeMessage(message: CommonWsMessageI): message is OnTradeWsMessageI {
+  return message.type === MessageTypeE.OnTrade;
+}
+
+function isLimitOrderCreatedMessage(message: CommonWsMessageI): message is OnLimitOrderCreatedWsMessageI {
+  return message.type === MessageTypeE.OnLimitOrderCreated;
+}
+
 export function useWsMessageHandler() {
+  const { address } = useAccount();
+
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [, setPositions] = useAtom(positionsAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -97,8 +133,41 @@ export function useWsMessageHandler() {
           currentFundingRateBps,
           openInterestBC,
         });
+      } else if (isUpdateMarginAccountMessage(parsedMessage)) {
+        if (!address || address !== parsedMessage.data.obj.traderAddr) {
+          return;
+        }
+
+        // TODO: Replace with data update from WebSocket
+        // ...
+
+        getPositionRisk(parsedMessage.data.obj.symbol, address).then(({ data }) => {
+          setPositions(data);
+        });
+      } else if (isLimitOrderCreatedMessage(parsedMessage)) {
+        if (!address || address !== parsedMessage.data.obj.traderAddr) {
+          return;
+        }
+
+        getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
+          setOpenOrders(data);
+        });
+      } else if (isPerpetualLimitOrderCancelledMessage(parsedMessage)) {
+        if (!address || address !== parsedMessage.data.obj.traderAddr) {
+          return;
+        }
+
+        removeOpenOrder(parsedMessage.data.obj.orderId);
+      } else if (isTradeMessage(parsedMessage)) {
+        if (!address || address !== parsedMessage.data.obj.traderAddr) {
+          return;
+        }
+
+        getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
+          setOpenOrders(data);
+        });
       }
     },
-    [updatePerpetualStats]
+    [updatePerpetualStats, setPositions, setOpenOrders, removeOpenOrder, address]
   );
 }

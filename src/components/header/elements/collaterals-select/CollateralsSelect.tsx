@@ -39,8 +39,8 @@ export const CollateralsSelect = memo(() => {
 
   const [pools] = useAtom(poolsAtom);
   const [, setPoolFee] = useAtom(poolFeeAtom);
-  const [, setPositionsAtom] = useAtom(positionsAtom);
-  const [, setOpenOrdersAtom] = useAtom(openOrdersAtom);
+  const [, setPositions] = useAtom(positionsAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
 
@@ -62,14 +62,14 @@ export const CollateralsSelect = memo(() => {
           poolSymbol: selectedPool.poolSymbol,
         });
         getOpenOrders(symbol, address).then(({ data }) => {
-          setOpenOrdersAtom(data);
+          setOpenOrders(data);
         });
         getPositionRisk(symbol, address).then(({ data }) => {
-          setPositionsAtom(data);
+          setPositions(data);
         });
       });
     }
-  }, [selectedPool, address, setOpenOrdersAtom, setPositionsAtom]);
+  }, [selectedPool, address, setOpenOrders, setPositions]);
 
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);

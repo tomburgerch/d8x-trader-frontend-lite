@@ -98,3 +98,11 @@ export const openOrdersAtom = atom(
     });
   }
 );
+
+export const removeOpenOrderAtom = atom(null, (get, set, orderIdToRemove: string) => {
+  set(ordersAtom, (prev) => {
+    const updatedOpenOrders = { ...prev };
+    delete updatedOpenOrders[orderIdToRemove];
+    return updatedOpenOrders;
+  });
+});
