@@ -8,7 +8,7 @@ import { PaperProps } from '@mui/material/Paper/Paper';
 
 import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
-import { getPerpetualStaticInfo, getPositionRisk } from 'network/network';
+import { getPerpetualStaticInfo } from 'network/network';
 import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
@@ -77,15 +77,6 @@ export const PerpetualsSelect = memo(() => {
       });
     }
   }, [symbol, setPerpetualStaticInfo]);
-
-  useEffect(() => {
-    if (symbol) {
-      getPositionRisk(symbol, address).then((data) => {
-        // TODO: Save data to atom
-        console.log(data);
-      });
-    }
-  }, [symbol, address]);
 
   useEffect(() => {
     if (symbol && isConnected) {

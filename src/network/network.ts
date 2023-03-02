@@ -1,8 +1,15 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
-import type { ExchangeInfoI, OrderDigestI, PerpetualStaticInfoI, ValidatedResponseI } from 'types/types';
-import { OrderI } from 'types/types';
-import { RequestMethodE } from '../types/enums';
+import type {
+  ExchangeInfoI,
+  MarginAccountI,
+  OrderDigestI,
+  OrderI,
+  PerpetualOpenOrdersI,
+  PerpetualStaticInfoI,
+  ValidatedResponseI,
+} from 'types/types';
+import { RequestMethodE } from 'types/enums';
 
 export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
@@ -24,11 +31,20 @@ export function getPerpetualStaticInfo(symbol: string): Promise<ValidatedRespons
   });
 }
 
-export function getPositionRisk(
-  symbol: string,
-  traderAddr?: string
-): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
+export function getPositionRisk(symbol: string, traderAddr: string): Promise<ValidatedResponseI<MarginAccountI>> {
   return fetch(`${config.apiUrl}/positionRisk?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
+    (data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    }
+  );
+}
+
+export function getOpenOrders(symbol: string, traderAddr: string): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
+  return fetch(`${config.apiUrl}/openOrders?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
       if (!data.ok) {
         console.error({ data });

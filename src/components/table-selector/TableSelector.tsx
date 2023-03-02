@@ -16,6 +16,7 @@ interface TableSelectorPropsI {
 
 export const TableSelector = ({ selectorItems }: TableSelectorPropsI) => {
   const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <Box className={styles.root}>
       <>
