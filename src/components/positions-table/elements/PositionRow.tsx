@@ -13,12 +13,12 @@ export const PositionRow = ({ position }: PositionRowPropsI) => {
 
   return (
     <TableRow>
-      <TableCell align="center">
+      <TableCell align="left">
         <Typography variant="cellSmall">
           {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}
         </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {formatToCurrency(position.positionNotionalBaseCCY, parsedSymbol?.baseCurrency)}
         </Typography>
@@ -26,27 +26,29 @@ export const PositionRow = ({ position }: PositionRowPropsI) => {
       <TableCell align="left">
         <Typography variant="cellSmall">{position.side}</Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {formatToCurrency(position.entryPrice, parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {position.liquidationPrice[0] < 0
             ? `- ${parsedSymbol?.quoteCurrency}`
             : formatToCurrency(position.liquidationPrice[0], parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>
-      <TableCell align="left">
-        <Typography variant="cellSmall">{formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol)}</Typography>
+      <TableCell align="right">
+        <Typography variant="cellSmall">
+          {formatToCurrency(position.collateralCC, '')}({Math.round(position.leverage * 100) / 100}x)
+        </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="center">
         <Button variant="primary" size="small">
           Modify
         </Button>

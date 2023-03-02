@@ -16,8 +16,9 @@ import { openOrdersAtom } from 'store/pools.store';
 import { OpenOrderRow } from './elements/OpenOrderRow';
 
 import styles from './OpenOrdersTable.module.scss';
+import { EmptyTableRow } from '../empty-table-row/EmptyTableRow';
 
-const positionsHeaders = [
+const openOrdersHeaders = [
   'Symbol',
   'Side',
   'Type',
@@ -37,7 +38,7 @@ export const OpenOrdersTable = memo(() => {
       <MuiTable>
         <TableHead className={styles.tableHead}>
           <TableRow>
-            {positionsHeaders.map((header) => (
+            {openOrdersHeaders.map((header) => (
               <TableCell key={header} align="left">
                 <Typography variant="bodySmall">{header}</Typography>
               </TableCell>
@@ -48,6 +49,7 @@ export const OpenOrdersTable = memo(() => {
           {openOrders.map((order) => (
             <OpenOrderRow key={order.id} order={order} />
           ))}
+          {openOrders.length === 0 && <EmptyTableRow colSpan={openOrdersHeaders.length} text="No open orders" />}
         </TableBody>
       </MuiTable>
     </TableContainer>
