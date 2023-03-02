@@ -17,7 +17,7 @@ import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
 
-const positionsHeaders = ['Symbol', 'Pos. size', 'Side', 'Entry Price', 'Liq. prices', 'Margin', 'Unr. PnL', ''];
+const positionsHeaders = ['Symbol', 'Pos. size', 'Side', 'Entry Price', 'Liq. price', 'Margin', 'Unr. PnL', ''];
 
 export const PositionsTable = memo(() => {
   const [positions] = useAtom(positionsAtom);
