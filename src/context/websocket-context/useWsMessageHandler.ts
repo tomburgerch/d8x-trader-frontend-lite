@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useAccount } from 'wagmi';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { getOpenOrders, getPositionRisk } from 'network/network';
+import { getOpenOrders } from 'network/network';
 import {
   openOrdersAtom,
   perpetualStatisticsAtom,
@@ -138,12 +138,7 @@ export function useWsMessageHandler() {
           return;
         }
 
-        // TODO: Replace with data update from WebSocket
-        // ...
-
-        getPositionRisk(parsedMessage.data.obj.symbol, address).then(({ data }) => {
-          setPositions(data);
-        });
+        setPositions(parsedMessage.data.obj);
       } else if (isLimitOrderCreatedMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
