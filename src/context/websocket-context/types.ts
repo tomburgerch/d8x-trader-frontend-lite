@@ -1,3 +1,5 @@
+import { MarginAccountI } from 'types/types';
+
 export enum MessageTypeE {
   Connect = 'connect',
   Error = 'error',
@@ -64,26 +66,23 @@ export interface OnUpdateMarkPriceWsMessageI extends CommonWsMessageI {
   };
 }
 
+export interface UpdateMarginAccountI extends MarginAccountI {
+  // id of the perpetual
+  perpetualId: number;
+  // address of the trader
+  traderAddr: string;
+  // id of position
+  positionId: string;
+  // funding payment paid when
+  // margin account was changed
+  fundingPaymentCC: number;
+}
+
 export interface OnUpdateMarginAccountWsMessageI extends CommonWsMessageI {
   type: MessageTypeE.OnUpdateMarginAccount;
   data: {
     name: MessageNameE.UpdateMarginAccount;
-    obj: {
-      symbol: string;
-      perpetualId: number;
-      traderAddr: string;
-      // id of position
-      positionId: string;
-      // position size in base currency
-      positionBC: number;
-      // margin collateral in collateral currency
-      cashCC: number;
-      // average price * position size
-      lockedInValueQC: number;
-      // funding payment paid when
-      // margin account was changed
-      fundingPaymentCC: number;
-    };
+    obj: UpdateMarginAccountI;
   };
 }
 
