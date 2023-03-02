@@ -64,6 +64,27 @@ export interface PerpetualStaticInfoI {
   lotSizeBC: number;
 }
 
+// Taken from `@d8x/perpetuals-sdk/src/nodeSDKTypes.ts`
+export interface MarginAccountI {
+  symbol: string;
+  positionNotionalBaseCCY: number;
+  side: string;
+  entryPrice: number;
+  leverage: number;
+  markPrice: number;
+  unrealizedPnlQuoteCCY: number;
+  unrealizedFundingCollateralCCY: number;
+  collateralCC: number;
+  liquidationPrice: [number, number | undefined];
+  liquidationLvg: number;
+  collToQuoteConversion: number;
+}
+
+export interface PerpetualOpenOrdersI {
+  orders: OrderI[];
+  orderIds: string[];
+}
+
 // Taken from node_modules/@mui/base/SliderUnstyled/useSlider.types.d.ts. Cannot be imported without new library in deps
 export interface MarkI {
   value: number;

@@ -3,8 +3,8 @@ export function parseSymbol(symbol: string) {
   if (parts.length === 3) {
     return {
       baseCurrency: parts[0],
-      quoteCurrency: parts[0],
-      poolSymbol: parts[0],
+      quoteCurrency: parts[1],
+      poolSymbol: parts[2],
     };
   }
   return null;

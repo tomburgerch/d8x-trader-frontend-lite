@@ -6,8 +6,16 @@ import { useAccount } from 'wagmi';
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { getPoolFee } from 'network/network';
-import { poolFeeAtom, poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { createSymbol } from 'helpers/createSymbol';
+import { getOpenOrders, getPoolFee, getPositionRisk } from 'network/network';
+import {
+  openOrdersAtom,
+  poolFeeAtom,
+  poolsAtom,
+  positionsAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
+} from 'store/pools.store';
 import { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -31,6 +39,8 @@ export const CollateralsSelect = memo(() => {
 
   const [pools] = useAtom(poolsAtom);
   const [, setPoolFee] = useAtom(poolFeeAtom);
+  const [, setPositionsAtom] = useAtom(positionsAtom);
+  const [, setOpenOrdersAtom] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
 
@@ -42,6 +52,24 @@ export const CollateralsSelect = memo(() => {
       });
     }
   }, [selectedPool, setPoolFee, address]);
+
+  useEffect(() => {
+    if (selectedPool !== null && address) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        getOpenOrders(symbol, address).then(({ data }) => {
+          setOpenOrdersAtom(data);
+        });
+        getPositionRisk(symbol, address).then(({ data }) => {
+          setPositionsAtom(data);
+        });
+      });
+    }
+  }, [selectedPool, address, setOpenOrdersAtom, setPositionsAtom]);
 
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);

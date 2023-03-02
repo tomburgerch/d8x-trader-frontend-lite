@@ -11,16 +11,26 @@ import {
   Typography,
 } from '@mui/material';
 
-import { positionsAtom } from 'store/pools.store';
+import { openOrdersAtom } from 'store/pools.store';
 
-import { PositionRow } from './elements/PositionRow';
+import { OpenOrderRow } from './elements/OpenOrderRow';
 
-import styles from './PositionsTable.module.scss';
+import styles from './OpenOrdersTable.module.scss';
 
-const positionsHeaders = ['Symbol', 'Pos. size', 'Side', 'Entry Price', 'Liq. prices', 'Margin', 'Unr. PnL', ''];
+const positionsHeaders = [
+  'Symbol',
+  'Side',
+  'Type',
+  'Position Size',
+  'Limit Price',
+  'Stop Price',
+  'Leverage',
+  'Good until',
+  '',
+];
 
-export const PositionsTable = memo(() => {
-  const [positions] = useAtom(positionsAtom);
+export const OpenOrdersTable = memo(() => {
+  const [openOrders] = useAtom(openOrdersAtom);
 
   return (
     <TableContainer className={styles.root}>
@@ -28,15 +38,15 @@ export const PositionsTable = memo(() => {
         <TableHead className={styles.tableHead}>
           <TableRow>
             {positionsHeaders.map((header) => (
-              <TableCell key={header.toString()} align="left">
+              <TableCell key={header} align="left">
                 <Typography variant="bodySmall">{header}</Typography>
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody className={styles.tableBody}>
-          {positions.map((position) => (
-            <PositionRow key={position.symbol} position={position} />
+          {openOrders.map((order) => (
+            <OpenOrderRow key={order.id} order={order} />
           ))}
         </TableBody>
       </MuiTable>

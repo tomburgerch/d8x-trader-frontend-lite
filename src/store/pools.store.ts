@@ -1,8 +1,14 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import type { PerpetualStaticInfoI, PoolI } from 'types/types';
-import { PerpetualStatisticsI } from 'types/types';
+import type {
+  MarginAccountI,
+  PerpetualOpenOrdersI,
+  PerpetualStatisticsI,
+  PerpetualStaticInfoI,
+  PoolI,
+  OrderI,
+} from 'types/types';
 
 export const poolsAtom = atom<PoolI[]>([]);
 export const poolFeeAtom = atom<number>(0);
@@ -10,6 +16,9 @@ export const oracleFactoryAddrAtom = atom('');
 export const proxyAddrAtom = atom('');
 export const perpetualStatisticsAtom = atom<PerpetualStatisticsI | null>(null);
 export const perpetualStaticInfoAtom = atom<PerpetualStaticInfoI | null>(null);
+
+const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
+const ordersAtom = atom<Record<string, OrderI>>({});
 
 const selectedPoolNameLSAtom = atomWithStorage<string>('d8x_selectedPoolName', '');
 
@@ -30,6 +39,9 @@ export const selectedPoolAtom = atom(
   },
   (get, set, newPool: string) => {
     set(selectedPoolNameLSAtom, newPool);
+    // Clear data about previous stats and orders
+    set(perpetualsStatsAtom, {});
+    set(ordersAtom, {});
   }
 );
 
@@ -57,5 +69,32 @@ export const selectedPerpetualAtom = atom(
   },
   (get, set, perpetualId: number) => {
     set(selectedPerpetualIdLSAtom, perpetualId);
+  }
+);
+
+export const positionsAtom = atom(
+  (get) => {
+    const perpetualsStats = get(perpetualsStatsAtom);
+    return Object.values(perpetualsStats).filter(({ side }) => side !== 'CLOSED');
+  },
+  (_get, set, perpetualInfo: MarginAccountI) => {
+    set(perpetualsStatsAtom, (prev) => ({
+      ...prev,
+      [perpetualInfo.symbol]: perpetualInfo,
+    }));
+  }
+);
+
+export const openOrdersAtom = atom(
+  (get) => {
+    const orders = get(ordersAtom);
+    return Object.entries(orders).map(([key, value]) => ({ id: key, ...value }));
+  },
+  (_get, set, openOrders: PerpetualOpenOrdersI) => {
+    set(ordersAtom, (prev) => {
+      const updatedOpenOrders = { ...prev };
+      openOrders.orderIds.forEach((orderId, index) => (updatedOpenOrders[orderId] = openOrders.orders[index]));
+      return updatedOpenOrders;
+    });
   }
 );

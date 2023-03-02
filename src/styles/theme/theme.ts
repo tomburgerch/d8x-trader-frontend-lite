@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 import { createTheme } from '@mui/material/styles';
 
 // Disable eslint as @mui does not follow same linting convention for interface suffixes.
@@ -17,18 +19,20 @@ declare module '@mui/material/styles' {
   }
 
   interface TypographyVariants {
-    bodyBig: React.CSSProperties;
-    bodyLarge: React.CSSProperties;
-    bodyMedium: React.CSSProperties;
-    bodySmall: React.CSSProperties;
+    bodyBig: CSSProperties;
+    bodyLarge: CSSProperties;
+    bodyMedium: CSSProperties;
+    bodySmall: CSSProperties;
+    cellSmall: CSSProperties;
   }
 
   // allow configuration using `createTheme`
   interface TypographyVariantsOptions {
-    bodyBig?: React.CSSProperties;
-    bodyLarge?: React.CSSProperties;
-    bodyMedium?: React.CSSProperties;
-    bodySmall?: React.CSSProperties;
+    bodyBig?: CSSProperties;
+    bodyLarge?: CSSProperties;
+    bodyMedium?: CSSProperties;
+    bodySmall?: CSSProperties;
+    cellSmall?: CSSProperties;
   }
 }
 
@@ -39,6 +43,7 @@ declare module '@mui/material/Typography' {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    cellSmall: true;
   }
 }
 
@@ -226,6 +231,15 @@ export const theme = createTheme({
             },
           },
         },
+        {
+          props: { size: 'small' },
+          style: {
+            ...MuiButtonSharedStyle,
+            padding: '2px 16px',
+            fontSize: '14px',
+            minWidth: '50px',
+          },
+        },
       ],
     },
     MuiOutlinedInput: {
@@ -369,6 +383,16 @@ theme.typography.bodySmall = {
   [theme.breakpoints.down('sm')]: {
     fontSize: 11,
     lineHeight: '13px',
+  },
+};
+
+theme.typography.cellSmall = {
+  fontSize: 13,
+  fontWeight: 400,
+  lineHeight: '16px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: 13,
+    lineHeight: '16px',
   },
 };
 
