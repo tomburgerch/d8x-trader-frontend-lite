@@ -36,10 +36,6 @@ export const PositionRow = ({ position }: PositionRowPropsI) => {
           {position.liquidationPrice[0] < 0
             ? `- ${parsedSymbol?.quoteCurrency}`
             : formatToCurrency(position.liquidationPrice[0], parsedSymbol?.quoteCurrency)}
-          /
-          {!position.liquidationPrice[1] || position.liquidationPrice[1] < 0
-            ? `- ${parsedSymbol?.quoteCurrency}`
-            : formatToCurrency(position.liquidationPrice[1], parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>
       <TableCell align="left">
