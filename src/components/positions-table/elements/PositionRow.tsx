@@ -1,14 +1,15 @@
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
+import { parseSymbol } from 'helpers/parseSymbol';
+import type { MarginAccountI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { MarginAccountI } from '../../../types/types';
-import { parseSymbol } from '../../../helpers/parseSymbol';
 
 interface PositionRowPropsI {
   position: MarginAccountI;
+  handlePositionModify: (symbol: string) => void;
 }
 
-export const PositionRow = ({ position }: PositionRowPropsI) => {
+export const PositionRow = ({ position, handlePositionModify }: PositionRowPropsI) => {
   const parsedSymbol = parseSymbol(position.symbol);
 
   return (
@@ -49,7 +50,7 @@ export const PositionRow = ({ position }: PositionRowPropsI) => {
         </Typography>
       </TableCell>
       <TableCell align="center">
-        <Button variant="primary" size="small">
+        <Button variant="primary" size="small" onClick={() => handlePositionModify(position.symbol)}>
           Modify
         </Button>
       </TableCell>
