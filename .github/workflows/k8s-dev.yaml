@@ -36,6 +36,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: frontend
         IMAGE_TAG: d8x-frontend-${{ github.sha }}
+        # test:
         REACT_APP_API_URL: http://139.177.194.24
         REACT_APP_WEBSOCKET_URL: ws://139.177.194.24
         #REACT_APP_API_URL: https://dev.testnet.d8x.exchange/api/v1
