@@ -6,7 +6,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 
 interface PositionRowPropsI {
   position: MarginAccountI;
-  handlePositionModify: (symbol: string) => void;
+  handlePositionModify: (position: MarginAccountI) => void;
 }
 
 export const PositionRow = ({ position, handlePositionModify }: PositionRowPropsI) => {
@@ -50,7 +50,7 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
         </Typography>
       </TableCell>
       <TableCell align="center">
-        <Button variant="primary" size="small" onClick={() => handlePositionModify(position.symbol)}>
+        <Button variant="primary" size="small" onClick={() => handlePositionModify(position)}>
           Modify
         </Button>
       </TableCell>

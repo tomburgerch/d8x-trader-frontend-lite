@@ -3,12 +3,12 @@ import { format } from 'date-fns';
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import type { OrderI } from 'types/types';
+import type { OrderWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 interface OpenOrderRowPropsI {
-  order: OrderI & { id: string };
-  handleOrderCancel: (orderId: string) => void;
+  order: OrderWithIdI;
+  handleOrderCancel: (order: OrderWithIdI) => void;
 }
 
 const typeToLabelMap: Record<string, string> = {
@@ -55,7 +55,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
         <Typography variant="cellSmall">{deadlineDate}</Typography>
       </TableCell>
       <TableCell align="left">
-        <Button variant="primary" size="small" onClick={() => handleOrderCancel(order.id)}>
+        <Button variant="primary" size="small" onClick={() => handleOrderCancel(order)}>
           Cancel
         </Button>
       </TableCell>

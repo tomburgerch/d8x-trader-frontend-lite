@@ -133,6 +133,10 @@ export interface OrderI {
   submittedBlock?: number;
 }
 
+export interface OrderWithIdI extends OrderI {
+  id: string;
+}
+
 export interface SmartContractOrderI {
   flags: BigNumberish;
   iPerpetualId: BigNumberish;
@@ -156,4 +160,17 @@ export interface OrderDigestI {
   OrderBookAddr: string;
   abi: string;
   SCOrders: SmartContractOrderI[];
+}
+
+export interface CancelOrderResponseI {
+  OrderBookAddr: string;
+  abi: string;
+  digest: string;
+}
+
+export interface CollateralChangeResponseI {
+  perpId: number;
+  proxyAddr: string;
+  abi: string;
+  amountHex: string;
 }

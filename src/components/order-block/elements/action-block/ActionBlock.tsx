@@ -5,8 +5,8 @@ import { useAccount } from 'wagmi';
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
+import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { getSigner } from 'blockchain-api/getSigner';
-import { postOrder } from 'blockchain-api/postOrder';
 import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -63,7 +63,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    if (!address || !orderInfo || !selectedPool) {
+    if (!address || !orderInfo || !selectedPool || !proxyAddr) {
       return;
     }
 
@@ -133,16 +133,38 @@ export const ActionBlock = memo(() => {
       .then((data) => {
         if (data.data.digests.length > 0) {
           const signer = getSigner();
-          signMessage(signer, data.data.digests).then((signatures) => {
-            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr).then(() => {
-              postOrder(signer, signatures, data.data).then(() => {
-                setShowReviewOrderModal(false);
-              });
+          signMessage(signer, data.data.digests)
+            .then((signatures) => {
+              approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr)
+                .then(() => {
+                  postOrder(signer, signatures, data.data)
+                    .then(() => {
+                      setShowReviewOrderModal(false);
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+                    });
+                })
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .catch((error: any) => {
+                  console.error(error);
+                  requestSentRef.current = false;
+                  setRequestSent(false);
+                });
+            })
+            .catch((error) => {
+              console.error(error);
+              requestSentRef.current = false;
+              setRequestSent(false);
             });
-          });
         }
       })
-      .finally(() => {
+      .catch((error) => {
+        console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
       });
