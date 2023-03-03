@@ -1,14 +1,14 @@
 import { Box, Typography } from '@mui/material';
 
-import styles from './Row.module.scss';
+import styles from './SidesRow.module.scss';
 import { ReactNode } from 'react';
 
-interface RowPropsI {
+interface SidesRowPropsI {
   leftSide: ReactNode;
   rightSide: ReactNode;
 }
 
-export const Row = ({ leftSide, rightSide }: RowPropsI) => {
+export const SidesRow = ({ leftSide, rightSide }: SidesRowPropsI) => {
   return (
     <Box className={styles.root}>
       <Typography variant="bodySmall">{leftSide}</Typography>

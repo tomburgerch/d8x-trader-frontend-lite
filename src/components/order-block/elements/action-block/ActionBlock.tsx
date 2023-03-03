@@ -9,13 +9,12 @@ import { getSigner } from 'blockchain-api/getSigner';
 import { postOrder } from 'blockchain-api/postOrder';
 import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
+import { SidesRow } from 'components/sides-row/SidesRow';
 import { orderDigest } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
 import { proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { OrderI } from 'types/types';
-
-import { Row } from './elements/row/Row';
 
 import styles from './ActionBlock.module.scss';
 
@@ -173,30 +172,33 @@ export const ActionBlock = memo(() => {
               </Typography>
             </Box>
             <Box className={styles.orderDetails}>
-              <Row leftSide="Trading fee:" rightSide={`${orderInfo.tradingFee} ${orderInfo.poolName}`} />
-              <Row leftSide="Collateral:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
+              <SidesRow leftSide="Trading fee:" rightSide={`${orderInfo.tradingFee} ${orderInfo.poolName}`} />
+              <SidesRow leftSide="Collateral:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
               {orderInfo.maxEntryPrice !== null && (
-                <Row
+                <SidesRow
                   leftSide="Max entry price:"
                   rightSide={`${orderInfo.maxEntryPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
                 />
               )}
               {orderInfo.triggerPrice !== null && (
-                <Row
+                <SidesRow
                   leftSide="Trigger price:"
                   rightSide={`${orderInfo.triggerPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
                 />
               )}
               {orderInfo.limitPrice !== null && (
-                <Row
+                <SidesRow
                   leftSide="Limit price:"
                   rightSide={
                     orderInfo.limitPrice > -1 ? `${orderInfo.limitPrice.toFixed(2)} ${orderInfo.quoteCurrency}` : '-'
                   }
                 />
               )}
-              <Row leftSide="Stop-loss:" rightSide={orderInfo.stopLoss === StopLossE.None ? '-' : orderInfo.stopLoss} />
-              <Row
+              <SidesRow
+                leftSide="Stop-loss:"
+                rightSide={orderInfo.stopLoss === StopLossE.None ? '-' : orderInfo.stopLoss}
+              />
+              <SidesRow
                 leftSide="Take-profit:"
                 rightSide={orderInfo.takeProfit === TakeProfitE.None ? '-' : orderInfo.takeProfit}
               />
@@ -207,10 +209,10 @@ export const ActionBlock = memo(() => {
               </Typography>
             </Box>
             <Box className={styles.newPositionDetails}>
-              <Row leftSide="Position size:" rightSide={`+${orderInfo.size} ${orderInfo.baseCurrency}`} />
-              <Row leftSide="Margin:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
-              <Row leftSide="Leverage:" rightSide={`${orderInfo.leverage.toFixed(2)}x`} />
-              <Row leftSide="Liquidation price:" rightSide={`??? ${orderInfo.quoteCurrency}`} />
+              <SidesRow leftSide="Position size:" rightSide={`+${orderInfo.size} ${orderInfo.baseCurrency}`} />
+              <SidesRow leftSide="Margin:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
+              <SidesRow leftSide="Leverage:" rightSide={`${orderInfo.leverage.toFixed(2)}x`} />
+              <SidesRow leftSide="Liquidation price:" rightSide={`??? ${orderInfo.quoteCurrency}`} />
             </Box>
             <Box className={styles.validityMessages}>
               <Typography variant="bodyMedium" className={styles.centered}>
