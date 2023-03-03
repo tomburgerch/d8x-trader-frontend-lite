@@ -15,13 +15,18 @@ import {
   DialogContent,
 } from '@mui/material';
 
+import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
+import { getSigner } from 'blockchain-api/getSigner';
+import { signMessage } from 'blockchain-api/signMessage';
+import { Dialog } from 'components/dialog/Dialog';
+import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { getCancelOrder } from 'network/network';
 import { openOrdersAtom } from 'store/pools.store';
+import { OrderWithIdI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 
 import styles from './OpenOrdersTable.module.scss';
-import { EmptyTableRow } from '../empty-table-row/EmptyTableRow';
-import { Dialog } from '../dialog/Dialog';
 
 const openOrdersHeaders = [
   'Symbol',
@@ -39,23 +44,58 @@ export const OpenOrdersTable = memo(() => {
   const [openOrders] = useAtom(openOrdersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
-  const [, /*selectedOrderId*/ setSelectedOrderId] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
+  const [requestSent, setRequestSent] = useState(false);
 
-  const handleOrderCancel = useCallback((orderId: string) => {
+  const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
-    setSelectedOrderId(orderId);
+    setSelectedOrder(order);
   }, []);
 
   const closeCancelModal = useCallback(() => {
     setCancelModalOpen(false);
-    setSelectedOrderId('');
+    setSelectedOrder(null);
   }, []);
 
   const handleCancelOrderConfirm = useCallback(() => {
-    // TODO: ...
-    setCancelModalOpen(false);
-    setSelectedOrderId('');
-  }, []);
+    if (!selectedOrder) {
+      return;
+    }
+
+    if (requestSent) {
+      return;
+    }
+
+    setRequestSent(true);
+    getCancelOrder(selectedOrder.symbol, selectedOrder.id)
+      .then((data) => {
+        if (data.data.digest) {
+          const signer = getSigner();
+          signMessage(signer, [data.data.digest])
+            .then((signatures) => {
+              cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
+                .then(() => {
+                  setCancelModalOpen(false);
+                  setSelectedOrder(null);
+                  setRequestSent(false);
+                })
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .catch((error: any) => {
+                  console.error(error);
+                  setRequestSent(false);
+                });
+            })
+            .catch((error) => {
+              console.error(error);
+              setRequestSent(false);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setRequestSent(false);
+      });
+  }, [selectedOrder, requestSent]);
 
   return (
     <>

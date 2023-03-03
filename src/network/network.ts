@@ -10,6 +10,7 @@ import type {
   ValidatedResponseI,
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
+import { CancelOrderResponseI, CollateralChangeResponseI } from 'types/types';
 
 export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
@@ -82,4 +83,57 @@ export function orderDigest(orders: OrderI[], traderAddr: string): Promise<Valid
     }
     return data.json();
   });
+}
+
+export function getCancelOrder(symbol: string, orderId: string): Promise<ValidatedResponseI<CancelOrderResponseI>> {
+  return fetch(`${config.apiUrl}/cancelOrder?symbol=${symbol}&orderId=${orderId}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
+export function getAddCollateral(
+  symbol: string,
+  amount: number
+): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
+  return fetch(`${config.apiUrl}/addCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
+export function getAvailableMargin(
+  symbol: string,
+  traderAddr: string
+): Promise<ValidatedResponseI<{ amount: number }>> {
+  return fetch(`${config.apiUrl}/availableMargin?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
+    (data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    }
+  );
+}
+
+export function getRemoveCollateral(
+  symbol: string,
+  amount: number
+): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
+  return fetch(`${config.apiUrl}/removeCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
+    (data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    }
+  );
 }
