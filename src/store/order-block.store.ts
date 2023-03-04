@@ -1,19 +1,20 @@
 import { atom } from 'jotai';
 
+import { createSymbol } from 'helpers/createSymbol';
 import { ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { OrderInfoI } from 'types/types';
+import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
+import { mapStopLossToNumber } from 'utils/mapStopLossToNumber';
+import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 
-import { perpetualStatisticsAtom, poolFeeAtom } from './pools.store';
-import { createSymbol } from '../helpers/createSymbol';
-import { mapStopLossToNumber } from '../utils/mapStopLossToNumber';
-import { mapTakeProfitToNumber } from '../utils/mapTakeProfitToNumber';
+import { newPositionRiskAtom, perpetualStatisticsAtom, poolFeeAtom, positionsAtom } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
 export const orderTypeAtom = atom<OrderTypeE>(OrderTypeE.Market);
 export const orderSizeAtom = atom(0);
 export const triggerPriceAtom = atom(0);
 export const leverageAtom = atom(1);
-export const toleranceSliderAtom = atom(2);
+export const slippageSliderAtom = atom(2);
 export const keepPositionLeverageAtom = atom(false);
 export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(ExpiryE['60D']);
@@ -48,6 +49,9 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     return null;
   }
 
+  const newPositionRisk = get(newPositionRiskAtom);
+  const positions = get(positionsAtom);
+
   const poolFee = get(poolFeeAtom);
   const orderBlock = get(orderBlockAtom);
   const orderType = get(orderTypeAtom);
@@ -57,17 +61,33 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const triggerPrice = get(triggerPriceAtom);
   const keepPositionLeverage = get(keepPositionLeverageAtom);
   const reduceOnly = get(reduceOnlyAtom);
-  const slippage = get(toleranceSliderAtom);
+  const slippage = get(slippageSliderAtom);
   const expireDays = get(expireDaysAtom);
   const stopLoss = get(stopLossAtom);
   const takeProfit = get(takeProfitAtom);
 
-  const collateral = 0; // TODO: newPositionRisk.collateralCC
-  const tradingFee = (poolFee * size) / 100_000;
+  const symbol = createSymbol({
+    baseCurrency: perpetualStatistics.baseCurrency,
+    quoteCurrency: perpetualStatistics.quoteCurrency,
+    poolSymbol: perpetualStatistics.poolName,
+  });
 
-  let maxEntryPrice = null;
+  const positionBySymbol = positions.find((position) => position.symbol === symbol);
+
+  const collateral =
+    !newPositionRisk || !positionBySymbol ? 0 : newPositionRisk.collateralCC - positionBySymbol.collateralCC;
+
+  let tradingFee = (poolFee * size) / 100_000;
+  if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
+    tradingFee = tradingFee * 3;
+  } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
+    tradingFee = tradingFee * 2;
+  }
+
+  let maxMinEntryPrice = null;
   if (orderType === OrderTypeE.Market) {
-    maxEntryPrice = perpetualStatistics.midPrice * (1 + (slippage / 100) * (OrderBlockE.Short === orderBlock ? -1 : 1));
+    maxMinEntryPrice =
+      perpetualStatistics.midPrice * (1 + mapSlippageToNumber(slippage) * (OrderBlockE.Short === orderBlock ? -1 : 1));
   }
 
   let stopLossPrice = null;
@@ -75,8 +95,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     const stopLossMultiplier =
       (1 - Math.abs(mapStopLossToNumber(stopLoss)) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
 
-    if (orderType === OrderTypeE.Market && maxEntryPrice) {
-      stopLossPrice = maxEntryPrice * stopLossMultiplier;
+    if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
+      stopLossPrice = maxMinEntryPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
       stopLossPrice = limitPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
@@ -93,8 +113,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     const takeProfitMultiplier =
       (1 + mapTakeProfitToNumber(takeProfit) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
 
-    if (orderType === OrderTypeE.Market && maxEntryPrice) {
-      takeProfitPrice = maxEntryPrice * takeProfitMultiplier;
+    if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
+      takeProfitPrice = maxMinEntryPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
       takeProfitPrice = limitPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
@@ -107,11 +127,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   }
 
   return {
-    symbol: createSymbol({
-      baseCurrency: perpetualStatistics.baseCurrency,
-      quoteCurrency: perpetualStatistics.quoteCurrency,
-      poolSymbol: perpetualStatistics.poolName,
-    }),
+    symbol,
     poolName: perpetualStatistics.poolName,
     baseCurrency: perpetualStatistics.baseCurrency,
     quoteCurrency: perpetualStatistics.quoteCurrency,
@@ -122,7 +138,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     midPrice: perpetualStatistics.midPrice,
     tradingFee,
     collateral,
-    maxEntryPrice,
+    maxMinEntryPrice,
     keepPositionLeverage,
     reduceOnly: orderType !== OrderTypeE.Market ? reduceOnly : null,
     expireDays: orderType !== OrderTypeE.Market ? expireDays : null,

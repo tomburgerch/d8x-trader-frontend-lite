@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import {
   Box,
@@ -15,10 +15,18 @@ import {
 
 import { ReactComponent as SettingsIcon } from 'assets/icons/settingsIcon.svg';
 import { Dialog } from 'components/dialog/Dialog';
-import { keepPositionLeverageAtom, orderTypeAtom, reduceOnlyAtom, toleranceSliderAtom } from 'store/order-block.store';
+import {
+  keepPositionLeverageAtom,
+  orderBlockAtom,
+  orderTypeAtom,
+  reduceOnlyAtom,
+  slippageSliderAtom,
+} from 'store/order-block.store';
 import { perpetualStatisticsAtom } from 'store/pools.store';
-import { OrderTypeE, ToleranceE } from 'types/enums';
+import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
 import { MarkI } from 'types/types';
+import { formatToCurrency } from 'utils/formatToCurrency';
+import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
 import styles from './OrderSettings.module.scss';
 
@@ -49,32 +57,43 @@ function valueLabelFormat(value: number) {
 }
 
 export const OrderSettings = memo(() => {
+  const [orderBlock] = useAtom(orderBlockAtom);
   const [orderType] = useAtom(orderTypeAtom);
-  const [tolerance, setTolerance] = useAtom(toleranceSliderAtom);
+  const [slippage, setSlippage] = useAtom(slippageSliderAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
   const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
-  const [updatedTolerance, setUpdatedTolerance] = useState(2);
+  const [updatedSlippage, setUpdatedSlippage] = useState(2);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const openSettingsModal = useCallback(() => setShowSettingsModal(true), []);
 
   const closeSettingsModal = useCallback(() => {
-    setUpdatedTolerance(tolerance);
+    setUpdatedSlippage(slippage);
     setShowSettingsModal(false);
-  }, [tolerance]);
+  }, [slippage]);
 
   const handleSettingsConfirm = useCallback(() => {
     setShowSettingsModal(false);
-    setTolerance(updatedTolerance);
-  }, [updatedTolerance, setTolerance]);
+    setSlippage(updatedSlippage);
+  }, [updatedSlippage, setSlippage]);
 
   const handleToleranceChange = useCallback((_event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
-      setUpdatedTolerance(newValue);
+      setUpdatedSlippage(newValue);
     }
   }, []);
+
+  const entryPrice = useMemo(() => {
+    if (perpetualStatistics) {
+      return (
+        perpetualStatistics.midPrice *
+        (1 + mapSlippageToNumber(updatedSlippage) * (orderBlock === OrderBlockE.Long ? 1 : -1))
+      );
+    }
+    return 0;
+  }, [orderBlock, updatedSlippage, perpetualStatistics]);
 
   return (
     <>
@@ -116,7 +135,7 @@ export const OrderSettings = memo(() => {
           <Typography variant="body1">Slippage tolerance</Typography>
           <Slider
             aria-label="Slippage tolerance values"
-            value={updatedTolerance}
+            value={updatedSlippage}
             min={1}
             max={8}
             step={1}
@@ -127,7 +146,8 @@ export const OrderSettings = memo(() => {
             onChange={handleToleranceChange}
           />
           <Typography variant="body2" className={styles.maxEntryPrice}>
-            Max entry price: 19000 {perpetualStatistics?.quoteCurrency}
+            {orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:{' '}
+            {formatToCurrency(entryPrice, perpetualStatistics?.quoteCurrency)}
           </Typography>
         </DialogContent>
         <DialogActions>

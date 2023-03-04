@@ -44,6 +44,26 @@ export function getPositionRisk(symbol: string, traderAddr: string): Promise<Val
   );
 }
 
+export function positionRiskOnTrade(
+  order: OrderI,
+  traderAddr: string
+): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI }>> {
+  const requestOptions = {
+    ...getRequestOptions(RequestMethodE.Post),
+    body: JSON.stringify({
+      order,
+      traderAddr,
+    }),
+  };
+  return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
 export function getOpenOrders(symbol: string, traderAddr: string): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
   return fetch(`${config.apiUrl}/openOrders?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
