@@ -23,6 +23,7 @@ declare module '@mui/material/styles' {
     bodyLarge: CSSProperties;
     bodyMedium: CSSProperties;
     bodySmall: CSSProperties;
+    adornment: CSSProperties;
     cellSmall: CSSProperties;
   }
 
@@ -32,6 +33,7 @@ declare module '@mui/material/styles' {
     bodyLarge?: CSSProperties;
     bodyMedium?: CSSProperties;
     bodySmall?: CSSProperties;
+    adornment?: CSSProperties;
     cellSmall?: CSSProperties;
   }
 }
@@ -43,6 +45,7 @@ declare module '@mui/material/Typography' {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    adornment: true;
     cellSmall: true;
   }
 }
@@ -247,7 +250,7 @@ export const theme = createTheme({
         root: {
           borderRadius: '16px',
           backgroundColor: 'var(--d8x-background-purple)',
-          width: '150px',
+          width: '180px',
           ':hover': {
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
           },
@@ -386,6 +389,12 @@ theme.typography.bodySmall = {
   },
 };
 
+theme.typography.adornment = {
+  fontSize: 14,
+  fontWeight: 400,
+  lineHeight: '17px',
+};
+
 theme.typography.cellSmall = {
   fontSize: 13,
   fontWeight: 400,
@@ -395,119 +404,3 @@ theme.typography.cellSmall = {
     lineHeight: '16px',
   },
 };
-
-// Responsive Typography
-
-// TODO: MJO: Consider to remove / update
-
-// theme.typography.h1 = {
-//   fontSize: 120,
-//   lineHeight: '145px',
-//   [theme.breakpoints.down('sm')]: {
-//     fontSize: '40px',
-//     lineHeight: '48px',
-//   },
-//   [theme.breakpoints.up('sm')]: {
-//     fontSize: '7vw',
-//     lineHeight: '7.5vw',
-//   },
-//   [theme.breakpoints.up('xl')]: {
-//     fontSize: '120px',
-//     lineHeight: '145px',
-//   },
-// };
-// theme.typography.h2 = {
-//   fontSize: 90,
-//   lineHeight: '109px',
-//   [theme.breakpoints.up('xl')]: {
-//     fontSize: '90px',
-//     lineHeight: '109px',
-//   },
-// };
-// theme.typography.h3 = {
-//   fontSize: 32,
-//   lineHeight: '39px',
-//   [theme.breakpoints.up('sm')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-//   [theme.breakpoints.up('md')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-//   [theme.breakpoints.up('lg')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-//   [theme.breakpoints.up('xl')]: {
-//     fontSize: '48px',
-//     lineHeight: '58px',
-//   },
-// };
-// theme.typography.h4 = {
-//   fontSize: 32,
-//   lineHeight: '39px',
-//   [theme.breakpoints.up('xs')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-//   [theme.breakpoints.up('md')]: {
-//     fontSize: '30px',
-//     lineHeight: '36px',
-//   },
-//   [theme.breakpoints.up('lg')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-// };
-// theme.typography.body1 = {
-//   fontSize: 24,
-//   lineHeight: '32px',
-//   [theme.breakpoints.up('md')]: {
-//     fontSize: '24px',
-//     lineHeight: '32px',
-//   },
-//   [theme.breakpoints.up('xl')]: {
-//     fontSize: '32px',
-//     lineHeight: '39px',
-//   },
-// };
-// theme.typography.body2 = {
-//   fontSize: 24,
-//   lineHeight: '32px',
-//   [theme.breakpoints.up('xs')]: {
-//     fontSize: '20px',
-//     lineHeight: '28px',
-//   },
-//   [theme.breakpoints.up('md')]: {
-//     fontSize: '22px',
-//     lineHeight: '30px',
-//   },
-//   [theme.breakpoints.up('xl')]: {
-//     fontSize: '24px',
-//     lineHeight: '32px',
-//   },
-// };
-
-// TODO: VOV: Investigate possibility to change UI here
-// // Responsive components
-// if (theme.components) {
-//   // AppBar
-//   theme.components.MuiAppBar = {
-//     ...theme.components.MuiAppBar,
-//     styleOverrides: {
-//       ...theme.components.MuiAppBar?.styleOverrides,
-//       root: {
-//         [theme.breakpoints.up('sm')]: {
-//           marginLeft: '12px',
-//         },
-//         [theme.breakpoints.up('md')]: {
-//           marginLeft: '24px',
-//         },
-//         [theme.breakpoints.up('lg')]: {
-//           marginLeft: '48px',
-//         },
-//       },
-//     },
-//   };
-// }

@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 
-import { Box, InputAdornment, OutlinedInput, Slider } from '@mui/material';
+import { Box, InputAdornment, OutlinedInput, Slider, Typography } from '@mui/material';
 
 import { leverageAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom } from 'store/pools.store';
@@ -77,7 +77,11 @@ export const LeverageSelector = memo(() => {
           id="leverage"
           type="number"
           inputProps={{ min: 1, max: maxLeverage }}
-          endAdornment={<InputAdornment position="end">x</InputAdornment>}
+          endAdornment={
+            <InputAdornment position="end">
+              <Typography variant="adornment">x</Typography>
+            </InputAdornment>
+          }
           onChange={handleInputChange}
           value={leverage}
         />

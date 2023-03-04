@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback } from 'react';
 
-import { Box, InputAdornment, OutlinedInput } from '@mui/material';
+import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { orderSizeAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom } from 'store/pools.store';
@@ -25,7 +25,11 @@ export const OrderSize = memo(() => {
       <Box className={styles.label}>Order Size</Box>
       <OutlinedInput
         id="order-size"
-        endAdornment={<InputAdornment position="end">{perpetualStatistics?.baseCurrency}</InputAdornment>}
+        endAdornment={
+          <InputAdornment position="end">
+            <Typography variant="adornment">{perpetualStatistics?.baseCurrency}</Typography>
+          </InputAdornment>
+        }
         type="number"
         inputProps={{ step: 0.1, min: 0 }}
         defaultValue={orderSize}

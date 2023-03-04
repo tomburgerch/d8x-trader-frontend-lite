@@ -261,7 +261,7 @@ export const ActionBlock = memo(() => {
                 leftSide="Position size:"
                 rightSide={
                   newPositionRisk
-                    ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY + orderInfo.size, orderInfo.baseCurrency)
+                    ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
                     : '-'
                 }
               />
