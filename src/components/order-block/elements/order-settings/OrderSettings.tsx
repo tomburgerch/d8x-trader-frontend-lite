@@ -22,13 +22,14 @@ import {
   reduceOnlyAtom,
   slippageSliderAtom,
 } from 'store/order-block.store';
-import { perpetualStatisticsAtom } from 'store/pools.store';
+import { perpetualStatisticsAtom, positionsAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
 import { MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
 import styles from './OrderSettings.module.scss';
+import { createSymbol } from '../../../../helpers/createSymbol';
 
 const marks: MarkI[] = [
   { value: 1, label: '0.1%' },
@@ -57,6 +58,7 @@ function valueLabelFormat(value: number) {
 }
 
 export const OrderSettings = memo(() => {
+  const [positions] = useAtom(positionsAtom);
   const [orderBlock] = useAtom(orderBlockAtom);
   const [orderType] = useAtom(orderTypeAtom);
   const [slippage, setSlippage] = useAtom(slippageSliderAtom);
@@ -95,6 +97,19 @@ export const OrderSettings = memo(() => {
     return 0;
   }, [orderBlock, updatedSlippage, perpetualStatistics]);
 
+  const isKeepPosLeverageDisabled = useMemo(() => {
+    if (perpetualStatistics) {
+      const symbol = createSymbol({
+        baseCurrency: perpetualStatistics.baseCurrency,
+        quoteCurrency: perpetualStatistics.quoteCurrency,
+        poolSymbol: perpetualStatistics.poolName,
+      });
+
+      return !positions.find((position) => position.symbol === symbol);
+    }
+    return true;
+  }, [perpetualStatistics, positions]);
+
   return (
     <>
       <Box className={styles.root}>
@@ -103,6 +118,7 @@ export const OrderSettings = memo(() => {
             id="keep-position-leverage"
             value="true"
             defaultChecked={keepPositionLeverage}
+            disabled={isKeepPosLeverageDisabled}
             onChange={(_event, checked) => setKeepPositionLeverage(checked)}
             control={keepPositionLeverage ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
             label="Keep pos. leverage"
