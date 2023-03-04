@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback } from 'react';
 
-import { Box, InputAdornment, OutlinedInput } from '@mui/material';
+import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { limitPriceAtom, orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom } from 'store/pools.store';
@@ -41,7 +41,11 @@ export const PricesBlock = memo(() => {
             <Box className={styles.label}>Trigger Price</Box>
             <OutlinedInput
               id="trigger-size"
-              endAdornment={<InputAdornment position="end">{perpetualStatistics?.quoteCurrency}</InputAdornment>}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Typography variant="adornment">{perpetualStatistics?.quoteCurrency}</Typography>
+                </InputAdornment>
+              }
               inputProps={{ step: 1, min: 0 }}
               type="number"
               defaultValue={triggerPrice}
@@ -54,7 +58,11 @@ export const PricesBlock = memo(() => {
         <Box className={styles.label}>Limit Price</Box>
         <OutlinedInput
           id="limit-size"
-          endAdornment={<InputAdornment position="end">{perpetualStatistics?.quoteCurrency}</InputAdornment>}
+          endAdornment={
+            <InputAdornment position="end">
+              <Typography variant="adornment">{perpetualStatistics?.quoteCurrency}</Typography>
+            </InputAdornment>
+          }
           inputProps={{ step: 1, min: -1 }}
           type="number"
           placeholder="-"

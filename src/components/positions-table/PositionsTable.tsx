@@ -348,7 +348,11 @@ export const PositionsTable = memo(() => {
                 rightSide={
                   <OutlinedInput
                     id="add-collateral"
-                    endAdornment={<InputAdornment position="end">{perpetualStatistics?.poolName}</InputAdornment>}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
+                      </InputAdornment>
+                    }
                     type="number"
                     inputProps={{ step: 0.1, min: 0 }}
                     defaultValue={addCollateral}
@@ -363,7 +367,11 @@ export const PositionsTable = memo(() => {
                 rightSide={
                   <OutlinedInput
                     id="remove-collateral"
-                    endAdornment={<InputAdornment position="end">{perpetualStatistics?.poolName}</InputAdornment>}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
+                      </InputAdornment>
+                    }
                     type="number"
                     inputProps={{ step: 0.1, min: 0, max: maxCollateral }}
                     defaultValue={removeCollateral}
