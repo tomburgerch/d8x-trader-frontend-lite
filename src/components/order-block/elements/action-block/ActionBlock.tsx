@@ -10,11 +10,13 @@ import { getSigner } from 'blockchain-api/getSigner';
 import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
-import { orderDigest } from 'network/network';
+import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
-import { proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
+import { newPositionRiskAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { OrderI } from 'types/types';
+import { OrderI, OrderInfoI } from 'types/types';
+import { formatNumber } from 'utils/formatNumber';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './ActionBlock.module.scss';
 
@@ -23,19 +25,59 @@ const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Short]: 'Sell',
 };
 
+function createMainOrder(orderInfo: OrderInfoI) {
+  let orderType = orderInfo.orderType.toUpperCase();
+  if (orderInfo.orderType === OrderTypeE.Stop) {
+    orderType = orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? 'STOP_LIMIT' : 'STOP_MARKET';
+  }
+
+  let limitPrice = orderInfo.limitPrice;
+  if (orderInfo.orderType === OrderTypeE.Market) {
+    limitPrice = orderInfo.maxMinEntryPrice;
+  }
+
+  return {
+    symbol: orderInfo.symbol,
+    side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
+    type: orderType,
+    limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
+    stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
+    quantity: orderInfo.size,
+    leverage: orderInfo.leverage,
+    reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+    keepPositionLvg: orderInfo.keepPositionLeverage,
+    timestamp: Math.floor(Date.now() / 1000),
+    // TODO: calculate based on expire for LIMIT and STOP
+    deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now
+  };
+}
+
 export const ActionBlock = memo(() => {
   const { address } = useAccount();
 
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
 
   const requestSentRef = useRef(false);
 
-  const openReviewOrderModal = useCallback(() => setShowReviewOrderModal(true), []);
+  const openReviewOrderModal = useCallback(() => {
+    if (!orderInfo || !address) {
+      return;
+    }
+
+    setShowReviewOrderModal(true);
+    setNewPositionRisk(null);
+
+    const mainOrder = createMainOrder(orderInfo);
+    positionRiskOnTrade(mainOrder, address).then((data) => {
+      setNewPositionRisk(data.data.newPositionRisk);
+    });
+  }, [orderInfo, address, setNewPositionRisk]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -67,31 +109,8 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    let orderType = orderInfo.orderType.toUpperCase();
-    if (orderInfo.orderType === OrderTypeE.Stop) {
-      orderType = orderInfo.limitPrice !== null && orderInfo.limitPrice > -1 ? 'STOP_LIMIT' : 'STOP_MARKET';
-    }
-
-    let limitPrice = orderInfo.limitPrice;
-    if (orderInfo.orderType === OrderTypeE.Market) {
-      limitPrice = orderInfo.maxEntryPrice;
-    }
-
     const orders: OrderI[] = [];
-    orders.push({
-      symbol: orderInfo.symbol,
-      side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
-      type: orderType,
-      limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
-      stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
-      quantity: orderInfo.size,
-      leverage: orderInfo.leverage,
-      reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
-      keepPositionLvg: orderInfo.keepPositionLeverage,
-      timestamp: Math.floor(Date.now() / 1000),
-      // TODO: calculate based on expire for LIMIT and STOP
-      deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now
-    });
+    orders.push(createMainOrder(orderInfo));
 
     if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossPrice) {
       orders.push({
@@ -187,32 +206,39 @@ export const ActionBlock = memo(() => {
           <DialogContent>
             <Box>
               <Typography variant="bodyMedium" className={styles.centered}>
-                {orderInfo.leverage.toFixed(2)}x {orderInfo.orderType} {orderBlockMap[orderInfo.orderBlock]}
+                {formatNumber(orderInfo.leverage)}x {orderInfo.orderType} {orderBlockMap[orderInfo.orderBlock]}
               </Typography>
               <Typography variant="bodySmall" className={styles.centered}>
-                {orderInfo.size} {orderInfo.baseCurrency} @ {orderInfo.midPrice.toFixed(2)} {orderInfo.quoteCurrency}
+                {orderInfo.size} {orderInfo.baseCurrency} @{' '}
+                {formatToCurrency(orderInfo.midPrice, orderInfo.quoteCurrency)}
               </Typography>
             </Box>
             <Box className={styles.orderDetails}>
-              <SidesRow leftSide="Trading fee:" rightSide={`${orderInfo.tradingFee} ${orderInfo.poolName}`} />
-              <SidesRow leftSide="Collateral:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
-              {orderInfo.maxEntryPrice !== null && (
+              <SidesRow
+                leftSide="Trading fee:"
+                rightSide={formatToCurrency(orderInfo.tradingFee, orderInfo.poolName, 6)}
+              />
+              <SidesRow
+                leftSide="Collateral:"
+                rightSide={newPositionRisk ? formatToCurrency(orderInfo.collateral, orderInfo.poolName) : '-'}
+              />
+              {orderInfo.maxMinEntryPrice !== null && (
                 <SidesRow
-                  leftSide="Max entry price:"
-                  rightSide={`${orderInfo.maxEntryPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
+                  leftSide={`${orderInfo.orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:`}
+                  rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
                 />
               )}
               {orderInfo.triggerPrice !== null && (
                 <SidesRow
                   leftSide="Trigger price:"
-                  rightSide={`${orderInfo.triggerPrice.toFixed(2)} ${orderInfo.quoteCurrency}`}
+                  rightSide={formatToCurrency(orderInfo.triggerPrice, orderInfo.quoteCurrency)}
                 />
               )}
               {orderInfo.limitPrice !== null && (
                 <SidesRow
                   leftSide="Limit price:"
                   rightSide={
-                    orderInfo.limitPrice > -1 ? `${orderInfo.limitPrice.toFixed(2)} ${orderInfo.quoteCurrency}` : '-'
+                    orderInfo.limitPrice > -1 ? formatToCurrency(orderInfo.limitPrice, orderInfo.quoteCurrency) : '-'
                   }
                 />
               )}
@@ -231,10 +257,30 @@ export const ActionBlock = memo(() => {
               </Typography>
             </Box>
             <Box className={styles.newPositionDetails}>
-              <SidesRow leftSide="Position size:" rightSide={`+${orderInfo.size} ${orderInfo.baseCurrency}`} />
-              <SidesRow leftSide="Margin:" rightSide={`${orderInfo.collateral} ${orderInfo.poolName}`} />
-              <SidesRow leftSide="Leverage:" rightSide={`${orderInfo.leverage.toFixed(2)}x`} />
-              <SidesRow leftSide="Liquidation price:" rightSide={`??? ${orderInfo.quoteCurrency}`} />
+              <SidesRow
+                leftSide="Position size:"
+                rightSide={
+                  newPositionRisk
+                    ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY + orderInfo.size, orderInfo.baseCurrency)
+                    : '-'
+                }
+              />
+              <SidesRow
+                leftSide="Margin:"
+                rightSide={newPositionRisk ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName) : '-'}
+              />
+              <SidesRow
+                leftSide="Leverage:"
+                rightSide={newPositionRisk ? `${formatNumber(newPositionRisk?.leverage)}x` : '-'}
+              />
+              <SidesRow
+                leftSide="Liquidation price:"
+                rightSide={
+                  !newPositionRisk || newPositionRisk.liquidationPrice[0] <= 0
+                    ? '-'
+                    : formatToCurrency(newPositionRisk?.liquidationPrice[0] ?? 0, orderInfo.quoteCurrency)
+                }
+              />
             </Box>
             <Box className={styles.validityMessages}>
               <Typography variant="bodyMedium" className={styles.centered}>

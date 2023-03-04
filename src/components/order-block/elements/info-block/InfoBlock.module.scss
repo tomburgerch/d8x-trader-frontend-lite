@@ -2,6 +2,9 @@
 
 .root {
   margin-top: $d8x-spacing;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--d8x-background);
 }
 
 .row {
