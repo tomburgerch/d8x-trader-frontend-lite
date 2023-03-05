@@ -24,7 +24,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
 
   return (
     <TableRow>
-      <TableCell align="center">
+      <TableCell align="left">
         <Typography variant="cellSmall">
           {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}
         </Typography>
@@ -35,26 +35,26 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
       <TableCell align="left">
         <Typography variant="cellSmall">{typeToLabelMap[order.type]}</Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">{formatToCurrency(order.quantity, parsedSymbol?.baseCurrency)}</Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {order.limitPrice ? formatToCurrency(order.limitPrice, parsedSymbol?.quoteCurrency) : 'N/A'}
         </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">
           {order.stopPrice ? formatToCurrency(order.stopPrice, parsedSymbol?.quoteCurrency) : 'N/A'}
         </Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="right">
         <Typography variant="cellSmall">{order.leverage}x</Typography>
       </TableCell>
       <TableCell align="left">
         <Typography variant="cellSmall">{deadlineDate}</Typography>
       </TableCell>
-      <TableCell align="left">
+      <TableCell align="center">
         <Button variant="primary" size="small" onClick={() => handleOrderCancel(order)}>
           Cancel
         </Button>
