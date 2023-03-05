@@ -35,8 +35,8 @@ export const PricesBlock = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.triggerPrice}>
-        {orderType === OrderTypeE.Stop && (
+      {orderType === OrderTypeE.Stop && (
+        <Box className={styles.triggerPrice}>
           <>
             <Box className={styles.label}>Trigger Price</Box>
             <OutlinedInput
@@ -52,8 +52,8 @@ export const PricesBlock = memo(() => {
               onChange={handleTriggerPriceChange}
             />
           </>
-        )}
-      </Box>
+        </Box>
+      )}
       <Box className={styles.limitPrice}>
         <Box className={styles.label}>Limit Price</Box>
         <OutlinedInput

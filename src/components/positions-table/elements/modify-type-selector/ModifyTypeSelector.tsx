@@ -24,6 +24,8 @@ export const ModifyTypeSelector = memo(({ modifyType, setModifyType }: ModifyTyp
         <Button
           key={key}
           className={classNames({ [styles.selected]: key === modifyType })}
+          variant={key === modifyType ? 'primary' : 'secondary'}
+          size="small"
           onClick={() => setModifyType(key)}
         >
           {ModifyTypeE[key]}

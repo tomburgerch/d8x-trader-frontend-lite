@@ -421,10 +421,15 @@ export const PositionsTable = memo(() => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeModifyModal} variant="secondaryAction">
+          <Button onClick={closeModifyModal} variant="secondary" size="small">
             Cancel
           </Button>
-          <Button onClick={handleModifyPositionConfirm} variant="action" disabled={isConfirmButtonDisabled}>
+          <Button
+            onClick={handleModifyPositionConfirm}
+            variant="primary"
+            size="small"
+            disabled={isConfirmButtonDisabled}
+          >
             Confirm
           </Button>
         </DialogActions>

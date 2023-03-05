@@ -55,7 +55,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
         <Typography variant="cellSmall">{deadlineDate}</Typography>
       </TableCell>
       <TableCell align="center">
-        <Button variant="primary" size="small" onClick={() => handleOrderCancel(order)}>
+        <Button variant="primary" size="tableSmall" onClick={() => handleOrderCancel(order)}>
           Cancel
         </Button>
       </TableCell>

@@ -3,4 +3,14 @@
 .root {
   width: 100%;
   border-radius: $d8x-border-radius;
+
+  &:global(.MuiPaper-root) {
+    background-color: transparent;
+  }
+}
+
+.separator {
+  height: 0;
+  border-bottom: 1px solid var(--d8x-separator-border-color);
+  margin: $d8x-spacing 0;
 }

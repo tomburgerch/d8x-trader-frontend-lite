@@ -17,6 +17,7 @@ import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
 
@@ -36,6 +37,11 @@ function createMainOrder(orderInfo: OrderInfoI) {
     limitPrice = orderInfo.maxMinEntryPrice;
   }
 
+  let deadlineMultiplier = 8; // By default, is it set to 8 hours
+  if (orderInfo.orderType !== OrderTypeE.Market && orderInfo.expireDays) {
+    deadlineMultiplier = 24 * mapExpiryToNumber(orderInfo.expireDays);
+  }
+
   return {
     symbol: orderInfo.symbol,
     side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
@@ -47,8 +53,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
     keepPositionLvg: orderInfo.keepPositionLeverage,
     timestamp: Math.floor(Date.now() / 1000),
-    // TODO: calculate based on expire for LIMIT and STOP
-    deadline: Math.floor(Date.now() / 1000 + 8 * 60 * 60), // order expires 8 hours from now
+    deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
 }
 
@@ -192,7 +197,7 @@ export const ActionBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Button
-        variant="action"
+        variant="primary"
         disabled={!isBuySellButtonActive}
         onClick={openReviewOrderModal}
         className={styles.buyButton}
@@ -206,7 +211,8 @@ export const ActionBlock = memo(() => {
           <DialogContent>
             <Box>
               <Typography variant="bodyMedium" className={styles.centered}>
-                {formatNumber(orderInfo.leverage)}x {orderInfo.orderType} {orderBlockMap[orderInfo.orderBlock]}
+                {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''} {orderInfo.orderType}{' '}
+                {orderBlockMap[orderInfo.orderBlock]}
               </Typography>
               <Typography variant="bodySmall" className={styles.centered}>
                 {orderInfo.size} {orderInfo.baseCurrency} @{' '}
@@ -294,10 +300,10 @@ export const ActionBlock = memo(() => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeReviewOrderModal} variant="secondaryAction">
+            <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
               Cancel
             </Button>
-            <Button onClick={handleOrderConfirm} variant="action">
+            <Button onClick={handleOrderConfirm} variant="primary" size="small">
               Confirm
             </Button>
           </DialogActions>

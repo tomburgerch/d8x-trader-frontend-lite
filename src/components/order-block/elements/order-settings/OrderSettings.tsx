@@ -15,21 +15,21 @@ import {
 
 import { ReactComponent as SettingsIcon } from 'assets/icons/settingsIcon.svg';
 import { Dialog } from 'components/dialog/Dialog';
+// import { createSymbol } from 'helpers/createSymbol';
 import {
-  keepPositionLeverageAtom,
+  // keepPositionLeverageAtom,
   orderBlockAtom,
   orderTypeAtom,
   reduceOnlyAtom,
   slippageSliderAtom,
 } from 'store/order-block.store';
-import { perpetualStatisticsAtom, positionsAtom } from 'store/pools.store';
+import { perpetualStatisticsAtom /*, positionsAtom*/ } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
 import { MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
 import styles from './OrderSettings.module.scss';
-import { createSymbol } from '../../../../helpers/createSymbol';
 
 const marks: MarkI[] = [
   { value: 1, label: '0.1%' },
@@ -58,12 +58,12 @@ function valueLabelFormat(value: number) {
 }
 
 export const OrderSettings = memo(() => {
-  const [positions] = useAtom(positionsAtom);
+  // const [positions] = useAtom(positionsAtom);
   const [orderBlock] = useAtom(orderBlockAtom);
   const [orderType] = useAtom(orderTypeAtom);
   const [slippage, setSlippage] = useAtom(slippageSliderAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
-  const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
+  // const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
   const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
   const [updatedSlippage, setUpdatedSlippage] = useState(2);
@@ -97,24 +97,24 @@ export const OrderSettings = memo(() => {
     return 0;
   }, [orderBlock, updatedSlippage, perpetualStatistics]);
 
-  const isKeepPosLeverageDisabled = useMemo(() => {
-    if (perpetualStatistics) {
-      const symbol = createSymbol({
-        baseCurrency: perpetualStatistics.baseCurrency,
-        quoteCurrency: perpetualStatistics.quoteCurrency,
-        poolSymbol: perpetualStatistics.poolName,
-      });
-
-      return !positions.find((position) => position.symbol === symbol);
-    }
-    return true;
-  }, [perpetualStatistics, positions]);
+  // const isKeepPosLeverageDisabled = useMemo(() => {
+  //   if (perpetualStatistics) {
+  //     const symbol = createSymbol({
+  //       baseCurrency: perpetualStatistics.baseCurrency,
+  //       quoteCurrency: perpetualStatistics.quoteCurrency,
+  //       poolSymbol: perpetualStatistics.poolName,
+  //     });
+  //
+  //     return !positions.find((position) => position.symbol === symbol);
+  //   }
+  //   return true;
+  // }, [perpetualStatistics, positions]);
 
   return (
     <>
       <Box className={styles.root}>
         <Box className={styles.keepPosLeverage}>
-          <FormControlLabel
+          {/*<FormControlLabel
             id="keep-position-leverage"
             value="true"
             defaultChecked={keepPositionLeverage}
@@ -122,8 +122,8 @@ export const OrderSettings = memo(() => {
             onChange={(_event, checked) => setKeepPositionLeverage(checked)}
             control={keepPositionLeverage ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
             label="Keep pos. leverage"
-            labelPlacement="start"
-          />
+            labelPlacement="end"
+          />*/}
         </Box>
         <Box className={styles.settings}>
           {orderType === OrderTypeE.Market && (
@@ -140,7 +140,7 @@ export const OrderSettings = memo(() => {
               onChange={(_event, checked) => setReduceOnly(checked)}
               control={reduceOnly ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
               label="Reduce only"
-              labelPlacement="start"
+              labelPlacement="end"
             />
           )}
         </Box>
@@ -167,10 +167,10 @@ export const OrderSettings = memo(() => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeSettingsModal} variant="secondaryAction">
+          <Button onClick={closeSettingsModal} variant="secondary" size="small">
             Cancel
           </Button>
-          <Button onClick={handleSettingsConfirm} variant="action">
+          <Button onClick={handleSettingsConfirm} variant="primary" size="small">
             Confirm
           </Button>
         </DialogActions>
