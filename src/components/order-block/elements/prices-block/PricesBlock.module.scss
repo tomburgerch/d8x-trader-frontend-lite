@@ -1,17 +1,15 @@
 @import 'styles/theme/theme';
 
 .root {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-top: $d8x-spacing;
 }
 
 .limitPrice,
 .triggerPrice {
   display: flex;
-  flex-wrap: nowrap;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: $d8x-spacing;
 
   .label {
     padding-right: $d8x-spacing;

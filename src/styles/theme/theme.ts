@@ -57,7 +57,10 @@ declare module '@mui/material/Button' {
     success: true;
     warning: true;
     action: true;
-    secondaryAction: true;
+  }
+  interface ButtonPropsSizeOverrides {
+    small: true;
+    tableSmall: true;
   }
 }
 /* eslint-enable */
@@ -67,7 +70,7 @@ const MuiButtonSharedStyle = {
   transition: 'ease-in-out 250ms',
   borderRadius: '26px',
   padding: '10px 20px',
-  fontSize: '17px',
+  fontSize: '16px',
   fontWeight: 700,
 };
 
@@ -83,7 +86,7 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: ['Inter', 'sans-serif'].join(','),
-    fontSize: 16,
+    fontSize: 14,
   },
   components: {
     MuiAppBar: {
@@ -171,6 +174,9 @@ export const theme = createTheme({
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.6)',
             },
+            ':disabled': {
+              color: 'var(--d8x-color-white-opac)',
+            },
           },
         },
         {
@@ -223,24 +229,23 @@ export const theme = createTheme({
           },
         },
         {
-          props: { variant: 'secondaryAction' },
-          style: {
-            ...MuiButtonSharedStyle,
-            borderRadius: '16px',
-            border: '1px solid rgb(var(--d8x-color-purple-rgb), 0.1)',
-            color: 'var(--d8x-color-purple)',
-            ':hover': {
-              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.1)',
-            },
-          },
-        },
-        {
           props: { size: 'small' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '2px 16px',
-            fontSize: '14px',
+            padding: '3px 16px',
+            fontSize: '18px',
+            fontWeight: 'normal',
             minWidth: '50px',
+          },
+        },
+        {
+          props: { size: 'tableSmall' },
+          style: {
+            ...MuiButtonSharedStyle,
+            padding: '0 8px',
+            fontSize: '14px',
+            fontWeight: 'normal',
+            minWidth: '40px',
           },
         },
       ],
@@ -248,8 +253,9 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: '16px',
+          borderRadius: '4px',
           backgroundColor: 'var(--d8x-background-purple)',
+          border: 'none',
           width: '180px',
           ':hover': {
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
@@ -264,6 +270,28 @@ export const theme = createTheme({
         input: {
           padding: '8px 10px',
           width: 'auto',
+          border: 'none',
+          fontSize: '18px',
+        },
+      },
+    },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        label: {
+          fontSize: '14px',
+        },
+      },
+    },
+    MuiSlider: {
+      styleOverrides: {
+        thumb: {
+          color: 'var(--d8x-color-purple)',
+        },
+        track: {
+          color: 'var(--d8x-color-purple)',
+        },
+        rail: {
+          color: 'var(--d8x-color-purple)',
         },
       },
     },
@@ -271,6 +299,13 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: 'none',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'var(--d8x-background-card-details)',
         },
       },
     },
@@ -285,7 +320,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           display: 'flex',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
+          padding: '20px 40px',
         },
       },
     },
@@ -374,13 +410,13 @@ theme.typography.bodyMedium = {
   fontWeight: 400,
   lineHeight: '32px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: 17,
+    fontSize: 18,
     lineHeight: '20px',
   },
 };
 
 theme.typography.bodySmall = {
-  fontSize: 16,
+  fontSize: 14,
   fontWeight: 400,
   lineHeight: '20px',
   [theme.breakpoints.down('sm')]: {

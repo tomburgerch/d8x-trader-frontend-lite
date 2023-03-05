@@ -55,7 +55,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const poolFee = get(poolFeeAtom);
   const orderBlock = get(orderBlockAtom);
   const orderType = get(orderTypeAtom);
-  const leverage = get(leverageAtom);
+  const leverageSaved = get(leverageAtom);
   const size = get(orderSizeAtom);
   const limitPrice = get(limitPriceAtom);
   const triggerPrice = get(triggerPriceAtom);
@@ -74,8 +74,13 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
 
   const positionBySymbol = positions.find((position) => position.symbol === symbol);
 
-  const collateral =
-    !newPositionRisk || !positionBySymbol ? 0 : newPositionRisk.collateralCC - positionBySymbol.collateralCC;
+  const previousCollateralCC = !positionBySymbol ? 0 : positionBySymbol.collateralCC;
+  const collateral = !newPositionRisk ? 0 : newPositionRisk.collateralCC - previousCollateralCC;
+
+  let leverage = leverageSaved;
+  if (keepPositionLeverage) {
+    leverage = newPositionRisk?.leverage ?? 0;
+  }
 
   let tradingFee = (poolFee * size) / 100_000;
   if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {

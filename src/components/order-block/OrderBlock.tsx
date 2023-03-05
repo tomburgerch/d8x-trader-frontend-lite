@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { Card, CardContent } from '@mui/material';
+import { Box, Card, CardContent } from '@mui/material';
 
 import { ActionBlock } from './elements/action-block/ActionBlock';
 import { ExpirySelector } from './elements/expiry-selector/ExpirySelector';
@@ -22,10 +22,13 @@ export const OrderBlock = memo(() => {
       <OrderSelector />
       <CardContent>
         <OrderTypeSelector />
+        <Box className={styles.separator} />
         <OrderSize />
         <PricesBlock />
+        <Box className={styles.separator} />
         <LeverageSelector />
         <OrderSettings />
+        <Box className={styles.separator} />
         <ExpirySelector />
         <StopLossSelector />
         <TakeProfitSelector />

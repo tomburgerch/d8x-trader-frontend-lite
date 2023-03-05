@@ -50,7 +50,7 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
         </Typography>
       </TableCell>
       <TableCell align="center">
-        <Button variant="primary" size="small" onClick={() => handlePositionModify(position)}>
+        <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
           Modify
         </Button>
       </TableCell>

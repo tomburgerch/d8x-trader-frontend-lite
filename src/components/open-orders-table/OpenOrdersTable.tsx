@@ -151,10 +151,10 @@ export const OpenOrdersTable = memo(() => {
         <DialogTitle>Cancel Open Order</DialogTitle>
         <DialogContent>Are you sure you want to cancel this order?</DialogContent>
         <DialogActions>
-          <Button onClick={closeCancelModal} variant="secondaryAction">
+          <Button onClick={closeCancelModal} variant="secondary" size="small">
             Cancel
           </Button>
-          <Button onClick={handleCancelOrderConfirm} variant="action">
+          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small">
             Confirm
           </Button>
         </DialogActions>

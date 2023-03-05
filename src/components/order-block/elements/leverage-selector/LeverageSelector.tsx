@@ -79,7 +79,7 @@ export const LeverageSelector = memo(() => {
           inputProps={{ min: 1, max: maxLeverage }}
           endAdornment={
             <InputAdornment position="end">
-              <Typography variant="adornment">x</Typography>
+              <Typography variant="adornment">X</Typography>
             </InputAdornment>
           }
           onChange={handleInputChange}
