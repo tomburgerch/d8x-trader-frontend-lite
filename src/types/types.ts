@@ -1,7 +1,7 @@
 import { BigNumberish, BytesLike } from 'ethers';
 import type { ReactNode } from 'react';
 
-import { ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
+import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
 
 export interface PerpetualI {
   id: number;
@@ -173,4 +173,9 @@ export interface CollateralChangeResponseI {
   proxyAddr: string;
   abi: string;
   amountHex: string;
+}
+
+export interface TableHeaderI {
+  label: string;
+  align: AlignE;
 }

@@ -1,4 +1,5 @@
 import { useAtom } from 'jotai';
+import type { ChangeEvent } from 'react';
 import { memo, useCallback, useState } from 'react';
 
 import {
@@ -13,6 +14,8 @@ import {
   Button,
   DialogActions,
   DialogContent,
+  Box,
+  TablePagination,
 } from '@mui/material';
 
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
@@ -22,22 +25,23 @@ import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { getCancelOrder } from 'network/network';
 import { openOrdersAtom } from 'store/pools.store';
-import { OrderWithIdI } from 'types/types';
+import { AlignE } from 'types/enums';
+import { OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 
 import styles from './OpenOrdersTable.module.scss';
 
-const openOrdersHeaders = [
-  'Symbol',
-  'Side',
-  'Type',
-  'Position Size',
-  'Limit Price',
-  'Stop Price',
-  'Leverage',
-  'Good until',
-  '',
+const openOrdersHeaders: TableHeaderI[] = [
+  { label: 'Symbol', align: AlignE.Left },
+  { label: 'Side', align: AlignE.Left },
+  { label: 'Type', align: AlignE.Left },
+  { label: 'Position Size', align: AlignE.Right },
+  { label: 'Limit Price', align: AlignE.Right },
+  { label: 'Stop Price', align: AlignE.Right },
+  { label: 'Leverage', align: AlignE.Right },
+  { label: 'Good until', align: AlignE.Left },
+  { label: '', align: AlignE.Center },
 ];
 
 export const OpenOrdersTable = memo(() => {
@@ -46,6 +50,8 @@ export const OpenOrdersTable = memo(() => {
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
   const [requestSent, setRequestSent] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -97,6 +103,15 @@ export const OpenOrdersTable = memo(() => {
       });
   }, [selectedOrder, requestSent]);
 
+  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  }, []);
+
   return (
     <>
       <TableContainer className={styles.root}>
@@ -104,20 +119,34 @@ export const OpenOrdersTable = memo(() => {
           <TableHead className={styles.tableHead}>
             <TableRow>
               {openOrdersHeaders.map((header) => (
-                <TableCell key={header} align="left">
-                  <Typography variant="bodySmall">{header}</Typography>
+                <TableCell key={header.label} align={header.align}>
+                  <Typography variant="bodySmall">{header.label}</Typography>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody className={styles.tableBody}>
-            {openOrders.map((order) => (
+            {openOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
               <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />
             ))}
             {openOrders.length === 0 && <EmptyTableRow colSpan={openOrdersHeaders.length} text="No open orders" />}
           </TableBody>
         </MuiTable>
       </TableContainer>
+      {openOrders.length > 5 && (
+        <Box className={styles.paginationHolder}>
+          <TablePagination
+            align="center"
+            rowsPerPageOptions={[5, 10, 20]}
+            component="div"
+            count={openOrders.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Box>
+      )}
       <Dialog open={isCancelModalOpen}>
         <DialogTitle>Cancel Open Order</DialogTitle>
         <DialogContent>Are you sure you want to cancel this order?</DialogContent>

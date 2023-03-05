@@ -53,3 +53,11 @@ export enum ToleranceE {
   '4%' = 4,
   '5%' = 5,
 }
+
+export enum AlignE {
+  Left = 'left',
+  Right = 'right',
+  Center = 'center',
+  Inherit = 'inherit',
+  Justify = 'justify',
+}

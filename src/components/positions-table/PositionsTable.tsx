@@ -18,6 +18,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -36,8 +37,9 @@ import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getAddCollateral, getAvailableMargin, getRemoveCollateral, orderDigest } from 'network/network';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { OrderTypeE } from 'types/enums';
+import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI } from 'types/types';
+import type { TableHeaderI } from 'types/types';
 
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionRow } from './elements/PositionRow';
@@ -60,6 +62,8 @@ export const PositionsTable = memo(() => {
   const [selectedPosition, setSelectedPosition] = useState<MarginAccountI | null>();
   const [requestSent, setRequestSent] = useState(false);
   const [maxCollateral, setMaxCollateral] = useState<number>();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -209,16 +213,16 @@ export const PositionsTable = memo(() => {
     setRemoveCollateral(+event.target.value);
   }, []);
 
-  const positionsHeaders: Array<{ label: string; align: 'left' | 'right' }> = useMemo(
+  const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
-      { label: 'Symbol', align: 'left' },
-      { label: 'Pos. size', align: 'right' },
-      { label: 'Side', align: 'left' },
-      { label: 'Entry Price', align: 'right' },
-      { label: 'Liq. price', align: 'right' },
-      { label: `Margin (${perpetualStatistics?.poolName})`, align: 'right' },
-      { label: 'Unr. PnL', align: 'right' },
-      { label: '', align: 'left' },
+      { label: 'Symbol', align: AlignE.Left },
+      { label: 'Pos. size', align: AlignE.Right },
+      { label: 'Side', align: AlignE.Left },
+      { label: 'Entry Price', align: AlignE.Right },
+      { label: 'Liq. price', align: AlignE.Right },
+      { label: `Margin (${perpetualStatistics?.poolName})`, align: AlignE.Right },
+      { label: 'Unr. PnL', align: AlignE.Right },
+      { label: '', align: AlignE.Left },
     ],
     [perpetualStatistics]
   );
@@ -305,6 +309,15 @@ export const PositionsTable = memo(() => {
     return formatToCurrency(selectedPosition.liquidationPrice[0], parsedSymbol?.quoteCurrency);
   }, [selectedPosition, modifyType, closePositionChecked, parsedSymbol]);
 
+  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  }, []);
+
   return (
     <>
       <TableContainer className={styles.root}>
@@ -319,13 +332,27 @@ export const PositionsTable = memo(() => {
             </TableRow>
           </TableHead>
           <TableBody className={styles.tableBody}>
-            {positions.map((position) => (
+            {positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((position) => (
               <PositionRow key={position.symbol} position={position} handlePositionModify={handlePositionModify} />
             ))}
             {positions.length === 0 && <EmptyTableRow colSpan={positionsHeaders.length} text="No open positions" />}
           </TableBody>
         </MuiTable>
       </TableContainer>
+      {positions.length > 5 && (
+        <Box className={styles.paginationHolder}>
+          <TablePagination
+            align="center"
+            rowsPerPageOptions={[5, 10, 20]}
+            component="div"
+            count={positions.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Box>
+      )}
       <Dialog open={isModifyModalOpen} className={styles.dialog}>
         <DialogTitle>Modify Position</DialogTitle>
         <DialogContent>
