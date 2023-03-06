@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 import {
   TableContainer,
@@ -18,13 +19,15 @@ import {
   TablePagination,
 } from '@mui/material';
 
+import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { getSigner } from 'blockchain-api/getSigner';
 import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
-import { getCancelOrder } from 'network/network';
-import { openOrdersAtom } from 'store/pools.store';
+import { createSymbol } from 'helpers/createSymbol';
+import { getCancelOrder, getOpenOrders } from 'network/network';
+import { openOrdersAtom, selectedPoolAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
@@ -32,20 +35,11 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 
 import styles from './OpenOrdersTable.module.scss';
 
-const openOrdersHeaders: TableHeaderI[] = [
-  { label: 'Symbol', align: AlignE.Left },
-  { label: 'Side', align: AlignE.Left },
-  { label: 'Type', align: AlignE.Left },
-  { label: 'Position Size', align: AlignE.Right },
-  { label: 'Limit Price', align: AlignE.Right },
-  { label: 'Stop Price', align: AlignE.Right },
-  { label: 'Leverage', align: AlignE.Right },
-  { label: 'Good until', align: AlignE.Left },
-  { label: '', align: AlignE.Center },
-];
-
 export const OpenOrdersTable = memo(() => {
-  const [openOrders] = useAtom(openOrdersAtom);
+  const { address } = useAccount();
+
+  const [selectedPool] = useAtom(selectedPoolAtom);
+  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
@@ -112,6 +106,36 @@ export const OpenOrdersTable = memo(() => {
     setPage(0);
   }, []);
 
+  const refreshOpenOrders = useCallback(() => {
+    if (selectedPool !== null && address) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        getOpenOrders(symbol, address).then(({ data }) => {
+          setOpenOrders(data);
+        });
+      });
+    }
+  }, [address, selectedPool, setOpenOrders]);
+
+  const openOrdersHeaders: TableHeaderI[] = useMemo(
+    () => [
+      { label: 'Symbol', align: AlignE.Left },
+      { label: 'Side', align: AlignE.Left },
+      { label: 'Type', align: AlignE.Left },
+      { label: 'Position Size', align: AlignE.Right },
+      { label: 'Limit Price', align: AlignE.Right },
+      { label: 'Stop Price', align: AlignE.Right },
+      { label: 'Leverage', align: AlignE.Right },
+      { label: 'Good until', align: AlignE.Left },
+      { label: <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />, align: AlignE.Center },
+    ],
+    [refreshOpenOrders]
+  );
+
   return (
     <>
       <TableContainer className={styles.root}>
@@ -119,7 +143,7 @@ export const OpenOrdersTable = memo(() => {
           <TableHead className={styles.tableHead}>
             <TableRow>
               {openOrdersHeaders.map((header) => (
-                <TableCell key={header.label} align={header.align}>
+                <TableCell key={header.label.toString()} align={header.align}>
                   <Typography variant="bodySmall">{header.label}</Typography>
                 </TableCell>
               ))}

@@ -176,6 +176,6 @@ export interface CollateralChangeResponseI {
 }
 
 export interface TableHeaderI {
-  label: string;
+  label: JSX.Element | string;
   align: AlignE;
 }

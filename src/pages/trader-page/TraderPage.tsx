@@ -28,6 +28,7 @@ export const TraderPage = memo(() => {
     ],
     []
   );
+
   return (
     <>
       <StaticBackground />

@@ -23,8 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { perpetualStatisticsAtom, positionsAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
-
+import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
@@ -34,9 +33,17 @@ import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { getAddCollateral, getAvailableMargin, getRemoveCollateral, orderDigest } from 'network/network';
+import {
+  getAddCollateral,
+  getAvailableMargin,
+  getPositionRisk,
+  getRemoveCollateral,
+  orderDigest,
+} from 'network/network';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { perpetualStatisticsAtom, positionsAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI } from 'types/types';
 import type { TableHeaderI } from 'types/types';
@@ -50,7 +57,7 @@ export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
-  const [positions] = useAtom(positionsAtom);
+  const [positions, setPositions] = useAtom(positionsAtom);
 
   const { address } = useAccount();
 
@@ -213,6 +220,21 @@ export const PositionsTable = memo(() => {
     setRemoveCollateral(+event.target.value);
   }, []);
 
+  const refreshPositions = useCallback(() => {
+    if (selectedPool !== null && address) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        getPositionRisk(symbol, address).then(({ data }) => {
+          setPositions(data);
+        });
+      });
+    }
+  }, [address, selectedPool, setPositions]);
+
   const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
       { label: 'Symbol', align: AlignE.Left },
@@ -222,9 +244,9 @@ export const PositionsTable = memo(() => {
       { label: 'Liq. price', align: AlignE.Right },
       { label: `Margin (${perpetualStatistics?.poolName})`, align: AlignE.Right },
       { label: 'Unr. PnL', align: AlignE.Right },
-      { label: '', align: AlignE.Left },
+      { label: <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [perpetualStatistics]
+    [perpetualStatistics, refreshPositions]
   );
 
   const isConfirmButtonDisabled = useMemo(() => {
@@ -325,7 +347,7 @@ export const PositionsTable = memo(() => {
           <TableHead className={styles.tableHead}>
             <TableRow>
               {positionsHeaders.map((header) => (
-                <TableCell key={header.label} align={header.align}>
+                <TableCell key={header.label.toString()} align={header.align}>
                   <Typography variant="bodySmall">{header.label}</Typography>
                 </TableCell>
               ))}

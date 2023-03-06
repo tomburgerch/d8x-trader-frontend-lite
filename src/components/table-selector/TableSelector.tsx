@@ -19,20 +19,18 @@ export const TableSelector = ({ selectorItems }: TableSelectorPropsI) => {
 
   return (
     <Box className={styles.root}>
-      <>
-        <Box className={styles.selectorTabs}>
-          {selectorItems.map(({ label }, index) => (
-            <Box
-              key={label}
-              onClick={() => setActiveIndex(index)}
-              className={classnames(styles.tabLabelWrapper, { [styles.inactiveTabLabel]: index !== activeIndex })}
-            >
-              <Typography variant="bodySmall">{label}</Typography>
-            </Box>
-          ))}
-        </Box>
-        {selectorItems[activeIndex].item}
-      </>
+      <Box className={styles.selectorTabs}>
+        {selectorItems.map(({ label }, index) => (
+          <Box
+            key={label}
+            onClick={() => setActiveIndex(index)}
+            className={classnames(styles.tabLabelWrapper, { [styles.inactiveTabLabel]: index !== activeIndex })}
+          >
+            <Typography variant="bodySmall">{label}</Typography>
+          </Box>
+        ))}
+      </Box>
+      {selectorItems[activeIndex].item}
     </Box>
   );
 };
