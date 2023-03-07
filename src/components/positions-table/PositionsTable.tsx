@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,8 +11,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   FormControlLabel,
   InputAdornment,
+  Link,
   OutlinedInput,
   Table as MuiTable,
   TableBody,
@@ -41,12 +44,13 @@ import {
   getPositionRisk,
   getRemoveCollateral,
   orderDigest,
+  positionRiskOnCollateralAction,
 } from 'network/network';
+import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { perpetualStatisticsAtom, positionsAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
-import type { MarginAccountI, OrderI } from 'types/types';
-import type { TableHeaderI } from 'types/types';
+import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
 
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionRow } from './elements/PositionRow';
@@ -67,6 +71,7 @@ export const PositionsTable = memo(() => {
   const [removeCollateral, setRemoveCollateral] = useState(0);
   const [isModifyModalOpen, setModifyModalOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<MarginAccountI | null>();
+  const [newPositionRisk, setNewPositionRisk] = useState<MarginAccountI | null>();
   const [requestSent, setRequestSent] = useState(false);
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
@@ -75,6 +80,10 @@ export const PositionsTable = memo(() => {
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
     setSelectedPosition(position);
+    setClosePositionChecked(false);
+    setAddCollateral(0);
+    setRemoveCollateral(0);
+    setModifyType(ModifyTypeE.Close);
   }, []);
 
   const closeModifyModal = useCallback(() => {
@@ -212,6 +221,10 @@ export const PositionsTable = memo(() => {
     }
   }, [modifyType, address, selectedPosition]);
 
+  useEffect(() => {
+    setNewPositionRisk(null);
+  }, [modifyType, addCollateral, removeCollateral]);
+
   const handleAddCollateralCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setAddCollateral(+event.target.value);
   }, []);
@@ -234,6 +247,35 @@ export const PositionsTable = memo(() => {
       });
     }
   }, [address, selectedPool, setPositions]);
+
+  const handleRefreshPositionRisk = useCallback(() => {
+    if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {
+      return;
+    }
+
+    if (modifyType === ModifyTypeE.Add && addCollateral === 0) {
+      return;
+    }
+
+    if (modifyType === ModifyTypeE.Remove && removeCollateral === 0) {
+      return;
+    }
+
+    positionRiskOnCollateralAction(
+      address,
+      modifyType === ModifyTypeE.Add ? addCollateral : -removeCollateral,
+      selectedPosition
+    ).then((data) => {
+      setNewPositionRisk(data.data.newPositionRisk);
+      setMaxCollateral(data.data.availableMargin);
+    });
+  }, [address, selectedPosition, modifyType, addCollateral, removeCollateral]);
+
+  const handleMaxCollateral = useCallback(() => {
+    if (maxCollateral) {
+      setRemoveCollateral(maxCollateral);
+    }
+  }, [maxCollateral]);
 
   const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
@@ -316,8 +358,16 @@ export const PositionsTable = memo(() => {
       return '-';
     }
 
-    return `${selectedPosition.leverage.toFixed(2)}x`;
-  }, [selectedPosition, modifyType, closePositionChecked]);
+    if (modifyType === ModifyTypeE.Add || modifyType === ModifyTypeE.Remove) {
+      if (!newPositionRisk) {
+        return '-';
+      } else {
+        return `${formatNumber(newPositionRisk.leverage)}x`;
+      }
+    }
+
+    return `${formatNumber(selectedPosition.leverage)}x`;
+  }, [selectedPosition, newPositionRisk, modifyType, closePositionChecked]);
 
   const calculatedLiqPrice = useMemo(() => {
     if (!selectedPosition || selectedPosition.liquidationPrice[0] < 0) {
@@ -328,8 +378,16 @@ export const PositionsTable = memo(() => {
       return '-';
     }
 
+    if (modifyType === ModifyTypeE.Add || modifyType === ModifyTypeE.Remove) {
+      if (!newPositionRisk) {
+        return '-';
+      } else {
+        return formatToCurrency(newPositionRisk.liquidationPrice[0], parsedSymbol?.quoteCurrency);
+      }
+    }
+
     return formatToCurrency(selectedPosition.liquidationPrice[0], parsedSymbol?.quoteCurrency);
-  }, [selectedPosition, modifyType, closePositionChecked, parsedSymbol]);
+  }, [selectedPosition, newPositionRisk, modifyType, closePositionChecked, parsedSymbol]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -339,6 +397,22 @@ export const PositionsTable = memo(() => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   }, []);
+
+  const isRefreshActive = useMemo(() => {
+    if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {
+      return false;
+    }
+
+    if (newPositionRisk) {
+      return false;
+    }
+
+    if (modifyType === ModifyTypeE.Add && addCollateral > 0) {
+      return true;
+    }
+
+    return modifyType === ModifyTypeE.Remove && removeCollateral > 0;
+  }, [selectedPosition, address, modifyType, addCollateral, removeCollateral, newPositionRisk]);
 
   return (
     <>
@@ -414,18 +488,25 @@ export const PositionsTable = memo(() => {
               <SidesRow
                 leftSide="Remove collateral"
                 rightSide={
-                  <OutlinedInput
-                    id="remove-collateral"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
-                      </InputAdornment>
-                    }
-                    type="number"
-                    inputProps={{ step: 0.1, min: 0, max: maxCollateral }}
-                    defaultValue={removeCollateral}
-                    onChange={handleRemoveCollateralCapture}
-                  />
+                  <FormControl variant="outlined">
+                    <OutlinedInput
+                      id="remove-collateral"
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
+                        </InputAdornment>
+                      }
+                      type="number"
+                      inputProps={{ step: 0.1, min: 0, max: maxCollateral }}
+                      value={removeCollateral}
+                      onChange={handleRemoveCollateralCapture}
+                    />
+                    {maxCollateral && (
+                      <Typography className={styles.helperText} variant="bodySmall">
+                        Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
+                      </Typography>
+                    )}
+                  </FormControl>
                 }
               />
             )}
@@ -435,6 +516,14 @@ export const PositionsTable = memo(() => {
               New position details
             </Typography>
           </Box>
+          {modifyType !== ModifyTypeE.Close && (
+            <Box className={styles.refreshHolder}>
+              <RefreshIcon
+                onClick={handleRefreshPositionRisk}
+                className={classnames(styles.actionIcon, { [styles.disabled]: !isRefreshActive })}
+              />
+            </Box>
+          )}
           <Box className={styles.newPositionDetails}>
             <SidesRow leftSide="Position size:" rightSide={calculatedPositionSize} />
             <SidesRow leftSide="Margin:" rightSide={calculatedMargin} />

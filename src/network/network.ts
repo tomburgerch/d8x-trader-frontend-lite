@@ -64,6 +64,28 @@ export function positionRiskOnTrade(
   });
 }
 
+export function positionRiskOnCollateralAction(
+  traderAddr: string,
+  amount: number,
+  positionRisk: MarginAccountI
+): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>> {
+  const requestOptions = {
+    ...getRequestOptions(RequestMethodE.Post),
+    body: JSON.stringify({
+      amount,
+      traderAddr,
+      positionRisk,
+    }),
+  };
+  return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
 export function getOpenOrders(symbol: string, traderAddr: string): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
   return fetch(`${config.apiUrl}/openOrders?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
     (data) => {

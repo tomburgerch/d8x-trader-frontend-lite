@@ -4,6 +4,10 @@
   border-radius: 0 $d8x-border-radius $d8x-border-radius $d8x-border-radius;
 }
 
+.refreshHolder {
+  text-align: center;
+}
+
 .actionIcon {
   cursor: pointer;
   transition: opacity linear 200ms;
@@ -11,6 +15,17 @@
   &:hover {
     opacity: 0.7;
   }
+
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.helperText {
+  text-align: right;
+  margin-top: $d8x-spacing / 2;
 }
 
 .tableHead {
