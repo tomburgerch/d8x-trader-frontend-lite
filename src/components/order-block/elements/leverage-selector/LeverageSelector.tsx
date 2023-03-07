@@ -4,6 +4,7 @@ import { memo, useCallback, useMemo } from 'react';
 
 import { Box, InputAdornment, OutlinedInput, Slider, Typography } from '@mui/material';
 
+import { InfoBlock } from 'components/info-block/InfoBlock';
 import { leverageAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom } from 'store/pools.store';
 import { MarkI } from 'types/types';
@@ -57,7 +58,18 @@ export const LeverageSelector = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Box>Leverage</Box>
+      <Box className={styles.label}>
+        <InfoBlock
+          title="Leverage"
+          content={
+            <Typography>
+              If you specify a limit price your order will be executed at the predetermined limit price or a better
+              price.
+            </Typography>
+          }
+        />
+        Leverage
+      </Box>
       <Box className={styles.sliderHolder}>
         <Slider
           aria-label="Leverage values"

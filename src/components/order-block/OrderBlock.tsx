@@ -6,11 +6,12 @@ import { ActionBlock } from './elements/action-block/ActionBlock';
 import { ExpirySelector } from './elements/expiry-selector/ExpirySelector';
 import { InfoBlock } from './elements/info-block/InfoBlock';
 import { LeverageSelector } from './elements/leverage-selector/LeverageSelector';
+import { LimitPrice } from './elements/limit-price/LimitPrice';
 import { OrderSelector } from './elements/order-selector/OrderSelector';
 import { OrderSettings } from './elements/order-settings/OrderSettings';
 import { OrderSize } from './elements/order-size/OrderSize';
 import { OrderTypeSelector } from './elements/order-type-selector/OrderTypeSelector';
-import { PricesBlock } from './elements/prices-block/PricesBlock';
+import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
 import { StopLossSelector } from './elements/stop-loss-selector/StopLossSelector';
 import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSelector';
 
@@ -24,7 +25,8 @@ export const OrderBlock = memo(() => {
         <OrderTypeSelector />
         <Box className={styles.separator} />
         <OrderSize />
-        <PricesBlock />
+        <TriggerPrice />
+        <LimitPrice />
         <Box className={styles.separator} />
         <LeverageSelector />
         <OrderSettings />

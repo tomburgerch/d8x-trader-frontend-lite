@@ -7,6 +7,13 @@
   margin-top: $d8x-spacing;
 }
 
+.label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
 .expiryOptions {
   display: flex;
   justify-content: center;

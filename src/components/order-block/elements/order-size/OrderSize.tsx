@@ -4,6 +4,7 @@ import { memo, useCallback } from 'react';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
+import { InfoBlock } from 'components/info-block/InfoBlock';
 import { orderSizeAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom } from 'store/pools.store';
 
@@ -22,7 +23,10 @@ export const OrderSize = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.label}>Order Size</Box>
+      <Box className={styles.label}>
+        <InfoBlock title="Order size" content={<Typography>Sets the size of your order.</Typography>} />
+        Order Size
+      </Box>
       <OutlinedInput
         id="order-size"
         endAdornment={

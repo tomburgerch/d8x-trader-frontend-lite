@@ -1,17 +1,16 @@
 @import 'styles/theme/theme';
 
 .root {
-  margin-top: $d8x-spacing;
-}
-
-.limitPrice,
-.triggerPrice {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: $d8x-spacing;
   margin-bottom: $d8x-spacing;
 
   .label {
+    display: flex;
+    align-items: center;
     padding-right: $d8x-spacing;
+    gap: 8px;
   }
 }
