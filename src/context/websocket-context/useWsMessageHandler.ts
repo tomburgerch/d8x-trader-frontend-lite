@@ -58,7 +58,7 @@ function isTradeMessage(message: CommonWsMessageI): message is OnTradeWsMessageI
 }
 
 function isLimitOrderCreatedMessage(message: CommonWsMessageI): message is OnLimitOrderCreatedWsMessageI {
-  return message.type === MessageTypeE.OnLimitOrderCreated;
+  return message.type === MessageTypeE.OnPerpetualLimitOrderCreated;
 }
 
 export function useWsMessageHandler() {

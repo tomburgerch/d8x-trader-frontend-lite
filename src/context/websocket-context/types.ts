@@ -8,15 +8,15 @@ export enum MessageTypeE {
   OnUpdateMarginAccount = 'onUpdateMarginAccount',
   OnPerpetualLimitOrderCancelled = 'onPerpetualLimitOrderCancelled',
   OnTrade = 'onTrade',
-  OnLimitOrderCreated = 'onLimitOrderCreated',
+  OnPerpetualLimitOrderCreated = 'onPerpetualLimitOrderCreated',
 }
 
 enum MessageNameE {
   PriceUpdate = 'PriceUpdate',
   UpdateMarginAccount = 'UpdateMarginAccount',
-  PerpetualLimitOrderCanceled = 'PerpetualLimitOrderCanceled',
+  PerpetualLimitOrderCancelled = 'PerpetualLimitOrderCancelled',
   Trade = 'Trade',
-  LimitOrderCreated = 'LimitOrderCreated',
+  PerpetualLimitOrderCreated = 'PerpetualLimitOrderCreated',
 }
 
 export interface CommonWsMessageI {
@@ -89,7 +89,7 @@ export interface OnUpdateMarginAccountWsMessageI extends CommonWsMessageI {
 export interface OnPerpetualLimitOrderCancelledWsMessageI extends CommonWsMessageI {
   type: MessageTypeE.OnPerpetualLimitOrderCancelled;
   data: {
-    name: MessageNameE.PerpetualLimitOrderCanceled;
+    name: MessageNameE.PerpetualLimitOrderCancelled;
     obj: {
       symbol: string;
       perpetualId: number;
@@ -113,9 +113,9 @@ export interface OnTradeWsMessageI extends CommonWsMessageI {
 }
 
 export interface OnLimitOrderCreatedWsMessageI extends CommonWsMessageI {
-  type: MessageTypeE.OnLimitOrderCreated;
+  type: MessageTypeE.OnPerpetualLimitOrderCreated;
   data: {
-    name: MessageNameE.LimitOrderCreated;
+    name: MessageNameE.PerpetualLimitOrderCreated;
     obj: {
       symbol: string;
       perpetualId: number;

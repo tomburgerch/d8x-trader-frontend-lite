@@ -82,7 +82,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     leverage = newPositionRisk?.leverage ?? 0;
   }
 
-  let tradingFee = (poolFee * size) / 100_000;
+  let tradingFee = poolFee / 10;
   if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
     tradingFee = tradingFee * 3;
   } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {

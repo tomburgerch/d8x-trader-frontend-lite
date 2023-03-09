@@ -22,9 +22,7 @@ export const InfoBlock = memo(() => {
       </Box>
       <Box className={styles.row}>
         <Typography variant="body2">Fees</Typography>
-        <Typography variant="body2">
-          {formatToCurrency(orderInfo?.tradingFee ?? 0, perpetualStatistics?.poolName, 6)}
-        </Typography>
+        <Typography variant="body2">{formatToCurrency(orderInfo?.tradingFee ?? 0, 'bps', 1)}</Typography>
       </Box>
     </Box>
   );

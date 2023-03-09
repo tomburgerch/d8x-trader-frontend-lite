@@ -1,12 +1,10 @@
 import { useAtom } from 'jotai/index';
 import type { SyntheticEvent } from 'react';
 import { memo, useEffect, useMemo } from 'react';
-import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import {
@@ -38,10 +36,6 @@ export const PerpetualsSelect = memo(() => {
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
-
-  const { address } = useAccount();
-
-  const { isConnected, send } = useWebSocketContext();
 
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
@@ -77,17 +71,6 @@ export const PerpetualsSelect = memo(() => {
       });
     }
   }, [symbol, setPerpetualStaticInfo]);
-
-  useEffect(() => {
-    if (symbol && isConnected) {
-      send(
-        JSON.stringify({
-          traderAddr: address ?? '',
-          symbol,
-        })
-      );
-    }
-  }, [symbol, isConnected, send, address]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);

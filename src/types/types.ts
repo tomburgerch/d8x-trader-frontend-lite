@@ -175,6 +175,11 @@ export interface CollateralChangeResponseI {
   amountHex: string;
 }
 
+export interface MaxOrderSizeResponseI {
+  buy: number;
+  sell: number;
+}
+
 export interface TableHeaderI {
   label: JSX.Element | string;
   align: AlignE;

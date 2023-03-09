@@ -10,7 +10,7 @@ import type {
   ValidatedResponseI,
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
-import { CancelOrderResponseI, CollateralChangeResponseI } from 'types/types';
+import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
 
 export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
@@ -32,16 +32,26 @@ export function getPerpetualStaticInfo(symbol: string): Promise<ValidatedRespons
   });
 }
 
-export function getPositionRisk(symbol: string, traderAddr: string): Promise<ValidatedResponseI<MarginAccountI>> {
-  return fetch(`${config.apiUrl}/positionRisk?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
+export function getPositionRisk(
+  symbol: string,
+  traderAddr: string,
+  timestamp?: number
+): Promise<ValidatedResponseI<MarginAccountI>> {
+  const params = new URLSearchParams({
+    symbol,
+    traderAddr,
+  });
+  if (timestamp) {
+    params.append('t', '' + timestamp);
+  }
+
+  return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
     }
-  );
+    return data.json();
+  });
 }
 
 export function positionRiskOnTrade(
@@ -86,16 +96,26 @@ export function positionRiskOnCollateralAction(
   });
 }
 
-export function getOpenOrders(symbol: string, traderAddr: string): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
-  return fetch(`${config.apiUrl}/openOrders?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
+export function getOpenOrders(
+  symbol: string,
+  traderAddr: string,
+  timestamp?: number
+): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
+  const params = new URLSearchParams({
+    symbol,
+    traderAddr,
+  });
+  if (timestamp) {
+    params.append('t', '' + timestamp);
+  }
+
+  return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
     }
-  );
+    return data.json();
+  });
 }
 
 export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<ValidatedResponseI<number>> {
@@ -108,6 +128,28 @@ export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<Val
       return data.json();
     }
   );
+}
+
+export function getMaxOrderSizeForTrader(
+  symbol: string,
+  traderAddr: string,
+  timestamp?: number
+): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
+  const params = new URLSearchParams({
+    symbol,
+    traderAddr,
+  });
+  if (timestamp) {
+    params.append('t', '' + timestamp);
+  }
+
+  return fetch(`${config.apiUrl}/maxOrderSizeForTrader?${params}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
 }
 
 export function orderDigest(orders: OrderI[], traderAddr: string): Promise<ValidatedResponseI<OrderDigestI>> {

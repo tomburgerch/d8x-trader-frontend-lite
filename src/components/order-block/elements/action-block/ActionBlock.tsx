@@ -10,11 +10,11 @@ import { getSigner } from 'blockchain-api/getSigner';
 import { signMessage } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
-import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
 import { newPositionRiskAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { OrderI, OrderInfoI } from 'types/types';
+import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -25,6 +25,8 @@ const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
   [OrderBlockE.Short]: 'Sell',
 };
+
+const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -67,6 +69,7 @@ export const ActionBlock = memo(() => {
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+  const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
 
   const requestSentRef = useRef(false);
 
@@ -81,6 +84,10 @@ export const ActionBlock = memo(() => {
     const mainOrder = createMainOrder(orderInfo);
     positionRiskOnTrade(mainOrder, address).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
+    });
+
+    getMaxOrderSizeForTrader(mainOrder.symbol, address, Date.now()).then((data) => {
+      setMaxOrderSize(data.data);
     });
   }, [orderInfo, address, setNewPositionRisk]);
 
@@ -123,6 +130,7 @@ export const ActionBlock = memo(() => {
         side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
         type: 'STOP_MARKET',
         stopPrice: orderInfo.stopLossPrice,
+        deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),
 
         // Same as for main Order
         symbol: orderInfo.symbol,
@@ -140,6 +148,7 @@ export const ActionBlock = memo(() => {
         side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
         type: OrderTypeE.Limit.toUpperCase(),
         limitPrice: orderInfo.takeProfitPrice,
+        deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),
 
         // Same as for main Order
         symbol: orderInfo.symbol,
@@ -194,6 +203,29 @@ export const ActionBlock = memo(() => {
       });
   }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
+  const atPrice = useMemo(() => {
+    if (orderInfo) {
+      let price = orderInfo.midPrice;
+      if (orderInfo.orderType === OrderTypeE.Limit && orderInfo.limitPrice) {
+        price = orderInfo.limitPrice;
+      } else if (orderInfo.orderType === OrderTypeE.Stop && orderInfo.triggerPrice) {
+        price = orderInfo.triggerPrice;
+      }
+      return formatToCurrency(price, orderInfo.quoteCurrency);
+    }
+    return '-';
+  }, [orderInfo]);
+
+  const validityCheckText = useMemo(() => {
+    if (!maxOrderSize || !orderInfo) {
+      return false;
+    }
+    if (orderInfo.orderBlock === OrderBlockE.Long) {
+      return orderInfo.size <= maxOrderSize.buy;
+    }
+    return orderInfo.size <= maxOrderSize.sell;
+  }, [maxOrderSize, orderInfo]);
+
   return (
     <Box className={styles.root}>
       <Button
@@ -215,15 +247,11 @@ export const ActionBlock = memo(() => {
                 {orderBlockMap[orderInfo.orderBlock]}
               </Typography>
               <Typography variant="bodySmall" className={styles.centered}>
-                {orderInfo.size} {orderInfo.baseCurrency} @{' '}
-                {formatToCurrency(orderInfo.midPrice, orderInfo.quoteCurrency)}
+                {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
               </Typography>
             </Box>
             <Box className={styles.orderDetails}>
-              <SidesRow
-                leftSide="Trading fee:"
-                rightSide={formatToCurrency(orderInfo.tradingFee, orderInfo.poolName, 6)}
-              />
+              <SidesRow leftSide="Trading fee:" rightSide={formatToCurrency(orderInfo.tradingFee, 'bps', 1)} />
               <SidesRow
                 leftSide="Collateral:"
                 rightSide={newPositionRisk ? formatToCurrency(orderInfo.collateral, orderInfo.poolName) : '-'}
@@ -293,11 +321,13 @@ export const ActionBlock = memo(() => {
                 Validity checks
               </Typography>
             </Box>
-            <Box className={styles.goMessage}>
-              <Typography variant="bodyMedium" className={styles.centered}>
-                Good to go
-              </Typography>
-            </Box>
+            {maxOrderSize && (
+              <Box className={styles.goMessage}>
+                <Typography variant="bodyMedium" className={styles.centered}>
+                  {validityCheckText}
+                </Typography>
+              </Box>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
