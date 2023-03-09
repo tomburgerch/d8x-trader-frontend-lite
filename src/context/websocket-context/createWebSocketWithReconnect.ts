@@ -70,6 +70,13 @@ export function createWebSocketWithReconnect() {
     off,
     onStateChange,
     close: () => client.close(),
+    reconnect: () => {
+      client.close();
+      setTimeout(() => {
+        reconnectOnClose = true;
+        start();
+      }, RECONNECT_TIMEOUT);
+    },
     send: (message: string) => client.send(message),
     isConnected: () => isConnected,
   };

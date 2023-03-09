@@ -11,12 +11,13 @@ import {
   removeOpenOrderAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
+  webSocketReadyAtom,
 } from 'store/pools.store';
 import { PerpetualStatisticsI } from 'types/types';
 
 import {
   CommonWsMessageI,
-  // ConnectWsMessageI,
+  ConnectWsMessageI,
   // ErrorWsMessageI,
   MessageTypeE,
   OnLimitOrderCreatedWsMessageI,
@@ -27,9 +28,9 @@ import {
   SubscriptionWsMessageI,
 } from './types';
 
-// function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
-//   return message.type === MessageTypeE.Connect;
-// }
+function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
+  return message.type === MessageTypeE.Connect;
+}
 
 // function isErrorMessage(message: CommonWsMessageI): message is ErrorWsMessageI {
 //   return message.type === MessageTypeE.Error;
@@ -66,6 +67,7 @@ export function useWsMessageHandler() {
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [, setWebSocketReady] = useAtom(webSocketReadyAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
@@ -90,7 +92,9 @@ export function useWsMessageHandler() {
     (message: string) => {
       const parsedMessage = JSON.parse(message);
 
-      if (isSubscriptionMessage(parsedMessage)) {
+      if (isConnectMessage(parsedMessage)) {
+        setWebSocketReady(true);
+      } else if (isSubscriptionMessage(parsedMessage)) {
         const parsedSymbol = parseSymbol(parsedMessage.msg);
         if (!parsedSymbol) {
           return;
@@ -163,6 +167,6 @@ export function useWsMessageHandler() {
         });
       }
     },
-    [updatePerpetualStats, setPositions, setOpenOrders, removeOpenOrder, address]
+    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, address]
   );
 }
