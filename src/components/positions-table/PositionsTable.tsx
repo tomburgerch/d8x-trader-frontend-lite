@@ -241,7 +241,7 @@ export const PositionsTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getPositionRisk(symbol, address).then(({ data }) => {
+        getPositionRisk(symbol, address, Date.now()).then(({ data }) => {
           setPositions(data);
         });
       });

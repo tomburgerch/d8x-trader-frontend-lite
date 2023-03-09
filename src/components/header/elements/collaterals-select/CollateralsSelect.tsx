@@ -6,6 +6,7 @@ import { useAccount } from 'wagmi';
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
+import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getOpenOrders, getPoolFee, getPositionRisk } from 'network/network';
 import {
@@ -37,6 +38,8 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 export const CollateralsSelect = memo(() => {
   const { address } = useAccount();
 
+  const { isConnected, send } = useWebSocketContext();
+
   const [pools] = useAtom(poolsAtom);
   const [, setPoolFee] = useAtom(poolFeeAtom);
   const [, setPositions] = useAtom(positionsAtom);
@@ -45,7 +48,7 @@ export const CollateralsSelect = memo(() => {
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   useEffect(() => {
-    if (selectedPool !== null) {
+    if (selectedPool !== null && address) {
       setPoolFee(0);
       getPoolFee(selectedPool.poolSymbol, address).then(({ data }) => {
         setPoolFee(data);
@@ -70,6 +73,24 @@ export const CollateralsSelect = memo(() => {
       });
     }
   }, [selectedPool, address, setOpenOrders, setPositions]);
+
+  useEffect(() => {
+    if (selectedPool && isConnected) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        send(
+          JSON.stringify({
+            traderAddr: address ?? '',
+            symbol,
+          })
+        );
+      });
+    }
+  }, [selectedPool, isConnected, send, address]);
 
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);

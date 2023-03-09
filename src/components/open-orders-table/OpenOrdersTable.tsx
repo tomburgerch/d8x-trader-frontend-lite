@@ -27,7 +27,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { createSymbol } from 'helpers/createSymbol';
 import { getCancelOrder, getOpenOrders } from 'network/network';
-import { openOrdersAtom, selectedPoolAtom } from 'store/pools.store';
+import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
@@ -40,6 +40,7 @@ export const OpenOrdersTable = memo(() => {
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
+  const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
@@ -108,18 +109,19 @@ export const OpenOrdersTable = memo(() => {
 
   const refreshOpenOrders = useCallback(() => {
     if (selectedPool !== null && address) {
+      clearOpenOrders();
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(symbol, address).then(({ data }) => {
+        getOpenOrders(symbol, address, Date.now()).then(({ data }) => {
           setOpenOrders(data);
         });
       });
     }
-  }, [address, selectedPool, setOpenOrders]);
+  }, [address, selectedPool, clearOpenOrders, setOpenOrders]);
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [
