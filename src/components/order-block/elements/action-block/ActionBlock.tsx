@@ -86,6 +86,7 @@ export const ActionBlock = memo(() => {
       setNewPositionRisk(data.data.newPositionRisk);
     });
 
+    setMaxOrderSize(undefined);
     getMaxOrderSizeForTrader(mainOrder.symbol, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
@@ -218,12 +219,16 @@ export const ActionBlock = memo(() => {
 
   const validityCheckText = useMemo(() => {
     if (!maxOrderSize || !orderInfo) {
-      return false;
+      return '-';
     }
+
+    let isGoodPrice;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      return orderInfo.size <= maxOrderSize.buy;
+      isGoodPrice = orderInfo.size <= maxOrderSize.buy;
+    } else {
+      isGoodPrice = orderInfo.size <= maxOrderSize.sell;
     }
-    return orderInfo.size <= maxOrderSize.sell;
+    return isGoodPrice ? 'Good to go' : 'Order will fail: order size is too large.';
   }, [maxOrderSize, orderInfo]);
 
   return (
@@ -321,13 +326,11 @@ export const ActionBlock = memo(() => {
                 Validity checks
               </Typography>
             </Box>
-            {maxOrderSize && (
-              <Box className={styles.goMessage}>
-                <Typography variant="bodyMedium" className={styles.centered}>
-                  {validityCheckText}
-                </Typography>
-              </Box>
-            )}
+            <Box className={styles.goMessage}>
+              <Typography variant="bodyMedium" className={styles.centered}>
+                {validityCheckText}
+              </Typography>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
