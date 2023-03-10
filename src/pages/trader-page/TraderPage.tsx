@@ -9,7 +9,6 @@ import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PerpetualStats } from 'components/perpetual-stats/PerpetualStats';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
-import { StaticBackground } from 'components/static-background/StaticBackground';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 
 import styles from './TraderPage.module.scss';
@@ -30,21 +29,18 @@ export const TraderPage = memo(() => {
   );
 
   return (
-    <>
-      <StaticBackground />
-      <Box className={styles.rootBox}>
-        <Header />
-        <Container className={styles.contentContainer}>
-          <Box className={styles.leftBlock}>
-            <PerpetualStats />
-            <TableSelector selectorItems={selectorItems} />
-          </Box>
-          <Box className={styles.rightBlock}>
-            <OrderBlock />
-          </Box>
-        </Container>
-        <Footer />
-      </Box>
-    </>
+    <Box className={styles.root}>
+      <Header />
+      <Container className={styles.contentContainer}>
+        <Box className={styles.leftBlock}>
+          <PerpetualStats />
+          <TableSelector selectorItems={selectorItems} />
+        </Box>
+        <Box className={styles.rightBlock}>
+          <OrderBlock />
+        </Box>
+      </Container>
+      <Footer />
+    </Box>
   );
 });
