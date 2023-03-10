@@ -1,8 +1,6 @@
 @import 'styles/theme/theme';
 
-.rootBox {
-  height: 100vh;
-  min-height: 830px;
+.root {
   display: flex;
   flex-direction: column;
 }
@@ -11,6 +9,7 @@
   display: flex;
   justify-content: space-between;
   flex: 1;
+  overflow-x: auto;
 }
 
 .leftBlock {
@@ -25,7 +24,7 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
 
-  .rootBox {
+  .root {
     margin: 0 12px;
   }
 }
