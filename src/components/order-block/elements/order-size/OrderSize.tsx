@@ -25,7 +25,6 @@ export const OrderSize = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.label}>
         <InfoBlock title="Order size" content={<Typography>Sets the size of your order.</Typography>} />
-        Order Size
       </Box>
       <OutlinedInput
         id="order-size"

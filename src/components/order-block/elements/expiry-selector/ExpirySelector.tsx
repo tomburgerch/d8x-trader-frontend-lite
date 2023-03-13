@@ -25,7 +25,6 @@ export const ExpirySelector = memo(() => {
           title="Expiry"
           content={<Typography>Number of days after which your order will expire.</Typography>}
         />
-        Expiry
       </Box>
       <Box className={styles.expiryOptions}>
         <ButtonGroup variant="outlined" aria-label="button group">

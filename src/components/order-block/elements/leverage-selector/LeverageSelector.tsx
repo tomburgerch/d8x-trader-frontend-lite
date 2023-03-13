@@ -59,16 +59,7 @@ export const LeverageSelector = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
-        <InfoBlock
-          title="Leverage"
-          content={
-            <Typography>
-              If you specify a limit price your order will be executed at the predetermined limit price or a better
-              price.
-            </Typography>
-          }
-        />
-        Leverage
+        <InfoBlock title="Leverage" content={<Typography>Specifies the leverage of your order.</Typography>} />
       </Box>
       <Box className={styles.sliderHolder}>
         <Slider

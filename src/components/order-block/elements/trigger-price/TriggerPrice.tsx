@@ -45,7 +45,6 @@ export const TriggerPrice = memo(() => {
             </>
           }
         />
-        Trigger Price
       </Box>
       <OutlinedInput
         id="trigger-size"
