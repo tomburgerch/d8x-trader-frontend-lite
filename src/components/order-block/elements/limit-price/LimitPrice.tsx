@@ -38,13 +38,12 @@ export const LimitPrice = memo(() => {
                 price.
               </Typography>
               <Typography>
-                For stop order, setting a limit price is optional. A stop order with specified limit price is a
+                For a stop order, setting a limit price is optional. A stop order with specified limit price is a
                 stop-limit order, a stop order without specified limit price is a stop-market order.
               </Typography>
             </>
           }
         />
-        Limit Price
       </Box>
       <OutlinedInput
         id="limit-size"

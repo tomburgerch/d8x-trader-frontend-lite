@@ -27,6 +27,7 @@ export const InfoBlock = ({ title, content }: InfoBlockPropsI) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {title}
     </>
   );
 };

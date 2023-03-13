@@ -26,15 +26,14 @@ export const StopLossSelector = memo(() => {
                 order reaches -50%.
               </Typography>
               <Typography>
-                Technically, your are specifying a limit order, of the opposing side (if your main order is a BUY order,
-                you are specifying a limit SELL order). The limit price is automatically calculated such that your
-                overall loss is as per your selection. Note that this does not 100% guarantee that your loss is limited
-                to the number you selected.
+                Technically, your are specifying a stop-market order, of the opposing side (if your main order is a BUY
+                order, you are specifying a stop-market SELL order). The trigger price is automatically calculated such
+                that your overall loss is as per your selection. Note that this does not 100% guarantee that your loss
+                is limited to the number you selected.
               </Typography>
             </>
           }
         />
-        Stop loss
       </Box>
       <Box className={styles.stopLossOptions}>
         <ButtonGroup variant="outlined" aria-label="button group">
