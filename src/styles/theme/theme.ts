@@ -81,7 +81,7 @@ export const theme = createTheme({
       sm: 600,
       md: 900,
       lg: 1200,
-      xl: 1760,
+      xl: 1650,
     },
   },
   typography: {
@@ -335,10 +335,6 @@ if (theme.components?.MuiTableCell?.styleOverrides?.root) {
     fontSize: 14,
     fontWeight: 400,
     whiteSpace: 'nowrap',
-    [theme.breakpoints.down('sm')]: {
-      fontSize: 11,
-      lineHeight: '13px',
-    },
   };
 }
 
@@ -418,17 +414,13 @@ theme.typography.bodyMedium = {
 theme.typography.bodySmall = {
   fontSize: 14,
   fontWeight: 400,
-  lineHeight: '20px',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: 11,
-    lineHeight: '13px',
-  },
+  lineHeight: '18px',
 };
 
 theme.typography.adornment = {
   fontSize: 14,
   fontWeight: 400,
-  lineHeight: '17px',
+  lineHeight: '18px',
 };
 
 theme.typography.cellSmall = {

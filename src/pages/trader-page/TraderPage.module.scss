@@ -5,15 +5,29 @@
   flex-direction: column;
 }
 
-.contentContainer {
+.sidesContainer {
   display: flex;
   justify-content: space-between;
   flex: 1;
   overflow-x: auto;
 }
 
+.columnContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $d8x-spacing * 5;
+  overflow-x: auto;
+  max-width: 1000px;
+  margin: 0 auto;
+  flex: 1;
+}
+
 .leftBlock {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $d8x-spacing * 5;
+  max-width: 900px;
 }
 
 .rightBlock {

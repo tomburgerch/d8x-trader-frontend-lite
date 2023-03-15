@@ -2,7 +2,7 @@ import { useAtom } from 'jotai/index';
 import type { SyntheticEvent } from 'react';
 import { memo, useEffect, useMemo } from 'react';
 
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, Popper, PopperProps } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
 import { createSymbol } from 'helpers/createSymbol';
@@ -29,6 +29,10 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
       <Box className={styles.optionsHolder}>{children}</Box>
     </Paper>
   );
+};
+
+const CustomPopper = (props: PopperProps) => {
+  return <Popper {...props} placement="auto" />;
 };
 
 export const PerpetualsSelect = memo(() => {
@@ -81,10 +85,11 @@ export const PerpetualsSelect = memo(() => {
       id="perpetuals-select"
       label="Perpetual"
       items={selectedPool?.perpetuals ?? []}
-      width="250px"
+      width="100%"
       value={selectedPerpetual}
       onChange={handleChange}
       PaperComponent={CustomPaper}
+      PopperComponent={CustomPopper}
       getOptionLabel={(option) => `${option.baseCurrency}/${option.quoteCurrency}`}
       renderOption={(props, option) => (
         <Box component="li" {...props}>

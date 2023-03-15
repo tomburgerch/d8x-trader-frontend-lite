@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 
-import { Box, InputAdornment, OutlinedInput, Slider, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, OutlinedInput, Slider, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { leverageAtom } from 'store/order-block.store';
@@ -49,12 +49,22 @@ export const LeverageSelector = memo(() => {
     [setLeverage]
   );
 
+  const leverageStep = useMemo(() => ((maxLeverage / 2) % 10 ? 0.5 : 1), [maxLeverage]);
+
   const handleInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setLeverage(+event.target.value);
     },
     [setLeverage]
   );
+
+  const handleDecreaseLeverage = useCallback(() => {
+    setLeverage(Math.max(1, leverage - leverageStep));
+  }, [setLeverage, leverageStep, leverage]);
+
+  const handleIncreaseLeverage = useCallback(() => {
+    setLeverage(Math.min(maxLeverage, leverage + leverageStep));
+  }, [setLeverage, leverageStep, leverage, maxLeverage]);
 
   return (
     <Box className={styles.root}>
@@ -67,7 +77,7 @@ export const LeverageSelector = memo(() => {
           value={leverage}
           min={1}
           max={maxLeverage}
-          step={(maxLeverage / 2) % 10 ? 0.5 : 1}
+          step={leverageStep}
           getAriaValueText={valueLabelFormat}
           valueLabelFormat={valueLabelFormat}
           valueLabelDisplay="auto"
@@ -76,6 +86,16 @@ export const LeverageSelector = memo(() => {
         />
       </Box>
       <Box className={styles.inputHolder}>
+        <Button
+          key="decrease-leverage"
+          variant="secondary"
+          size="small"
+          className={styles.decreaseButton}
+          onClick={handleDecreaseLeverage}
+          disabled={leverage < 1}
+        >
+          -
+        </Button>
         <OutlinedInput
           id="leverage"
           type="number"
@@ -88,6 +108,16 @@ export const LeverageSelector = memo(() => {
           onChange={handleInputChange}
           value={leverage}
         />
+        <Button
+          key="increase-leverage"
+          variant="secondary"
+          size="small"
+          className={styles.increaseButton}
+          onClick={handleIncreaseLeverage}
+          disabled={leverage > maxLeverage}
+        >
+          +
+        </Button>
       </Box>
     </Box>
   );

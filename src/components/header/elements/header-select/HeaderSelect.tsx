@@ -1,9 +1,11 @@
 import type { HTMLAttributes, JSXElementConstructor, ReactNode, SyntheticEvent } from 'react';
 
-import { Box, FormControl, TextField, Autocomplete } from '@mui/material';
+import { Box, FormControl, TextField, Autocomplete, PopperProps } from '@mui/material';
 
 import { ReactComponent as ArrowDropIcon } from 'assets/icons/arrowDropIcon.svg';
 import { genericMemo } from 'helpers/genericMemo';
+
+import styles from './HeaderSelect.module.scss';
 
 interface HeaderSelectI<T> {
   id: string;
@@ -11,6 +13,7 @@ interface HeaderSelectI<T> {
   items: T[];
   width?: string | number;
   PaperComponent?: JSXElementConstructor<HTMLAttributes<HTMLElement>>;
+  PopperComponent?: JSXElementConstructor<PopperProps>;
   onChange: (event: SyntheticEvent, value: T, reason: string) => void;
   value: T | null;
   getOptionLabel?: (option: T) => string;
@@ -23,19 +26,23 @@ function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
   }
 
   return (
-    <Box sx={{ mx: 5 }}>
+    <Box className={styles.root}>
       <FormControl fullWidth>
         <Autocomplete
           id={props.id}
           sx={{ width: props.width ?? 300 }}
           options={props.items}
           autoHighlight
+          classes={{
+            paper: styles.paper,
+          }}
           disableClearable
           value={props.value}
           onChange={props.onChange}
           getOptionLabel={props.getOptionLabel}
           popupIcon={<ArrowDropIcon width={20} />}
           PaperComponent={props.PaperComponent}
+          PopperComponent={props.PopperComponent}
           renderOption={props.renderOption}
           renderInput={(params) => (
             <TextField

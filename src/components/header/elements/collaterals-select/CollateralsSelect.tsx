@@ -102,7 +102,7 @@ export const CollateralsSelect = memo(() => {
       id="collaterals-select"
       label="Collateral"
       items={pools}
-      width="210px"
+      width="100%"
       value={selectedPool}
       onChange={handleChange}
       getOptionLabel={(option) => option.poolSymbol}

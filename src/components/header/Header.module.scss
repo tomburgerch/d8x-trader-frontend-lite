@@ -1,7 +1,12 @@
 @import 'styles/theme/theme';
 
+.root {
+  margin-bottom: $d8x-spacing * 5;
+}
+
 .toolbar {
   align-items: center;
+  min-height: 100px;
 }
 
 .logoLink {
@@ -10,6 +15,15 @@
 
 .selectBoxes {
   display: flex;
+}
+
+.mobileSelectBoxes {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 15px;
+  justify-content: center;
 }
 
 .walletConnect {
