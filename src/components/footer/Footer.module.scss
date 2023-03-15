@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0 2rem;
+  padding: $d8x-spacing * 5 0;
 }
 
 @media screen and ($d8x-breakpoint-max-sm) {

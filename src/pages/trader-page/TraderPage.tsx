@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { Header } from 'components/header/Header';
@@ -14,6 +14,9 @@ import { SelectorItemI, TableSelector } from 'components/table-selector/TableSel
 import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
+  const theme = useTheme();
+  const isBigScreen = useMediaQuery(theme.breakpoints.up('xl'));
+
   const selectorItems: SelectorItemI[] = useMemo(
     () => [
       {
@@ -31,15 +34,24 @@ export const TraderPage = memo(() => {
   return (
     <Box className={styles.root}>
       <Header />
-      <Container className={styles.contentContainer}>
-        <Box className={styles.leftBlock}>
+      {isBigScreen && (
+        <Container className={styles.sidesContainer}>
+          <Box className={styles.leftBlock}>
+            <PerpetualStats />
+            <TableSelector selectorItems={selectorItems} />
+          </Box>
+          <Box className={styles.rightBlock}>
+            <OrderBlock />
+          </Box>
+        </Container>
+      )}
+      {!isBigScreen && (
+        <Container className={styles.columnContainer}>
           <PerpetualStats />
-          <TableSelector selectorItems={selectorItems} />
-        </Box>
-        <Box className={styles.rightBlock}>
           <OrderBlock />
-        </Box>
-      </Container>
+          <TableSelector selectorItems={selectorItems} />
+        </Container>
+      )}
       <Footer />
     </Box>
   );

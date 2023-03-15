@@ -1,7 +1,7 @@
 @import 'styles/theme/theme';
 
 .root {
-  max-width: 900px;
+  width: 100%;
   display: flex;
   justify-content: space-around;
   background-color: var(--d8x-color-white);
@@ -16,8 +16,21 @@
   align-items: center;
   flex: 1;
   max-width: 180px;
+  min-width: 100px;
+
+  & + & {
+    border-left: 1px solid var(--d8x-side-border-color);
+  }
 }
 
 .statValue {
   color: var(--d8x-color-purple);
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+    justify-content: start;
+    overflow-x: auto;
+  }
 }

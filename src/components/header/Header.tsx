@@ -1,8 +1,7 @@
 import { useAtom } from 'jotai';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
-import { Box, Divider, Drawer, IconButton, Toolbar, Typography } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { getExchangeInfo } from 'network/network';
 import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom } from 'store/pools.store';
@@ -17,22 +16,28 @@ import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect'
 import { PageAppBar } from './Header.styles';
 import styles from './Header.module.scss';
 
-interface PropsI {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window?: () => Window;
-}
+// Might be used later
+// interface HeaderPropsI {
+//   /**
+//    * Injected by the documentation to work in an iframe.
+//    * You won't need it on your project.
+//    */
+//   window?: () => Window;
+// }
 
-const drawerWidth = 240;
+// Might be used later
+// const drawerWidth = 240;
 
-export const Header = memo(({ window }: PropsI) => {
+export const Header = memo(() => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+  // Might be used later
+  // const [mobileOpen, setMobileOpen] = useState(false);
 
   const requestRef = useRef(false);
 
@@ -47,6 +52,7 @@ export const Header = memo(({ window }: PropsI) => {
     }
   }, [setPools, setOracleFactoryAddr, setProxyAddr]);
 
+  /*
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -61,9 +67,12 @@ export const Header = memo(({ window }: PropsI) => {
   );
 
   const container = window !== undefined ? () => window().document.body : undefined;
+  */
+
+  console.log({ isSmallScreen });
 
   return (
-    <Container>
+    <Container className={styles.root}>
       <Box sx={{ display: 'flex' }}>
         <PageAppBar position="static">
           <Toolbar className={styles.toolbar}>
@@ -72,13 +81,16 @@ export const Header = memo(({ window }: PropsI) => {
                 <InteractiveLogo />
               </a>
             </Typography>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 2 }} className={styles.selectBoxes}>
-              <CollateralsSelect />
-              <PerpetualsSelect />
-            </Typography>
+            {!isSmallScreen && (
+              <Typography variant="h6" component="div" sx={{ flexGrow: 2 }} className={styles.selectBoxes}>
+                <CollateralsSelect />
+                <PerpetualsSelect />
+              </Typography>
+            )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} className={styles.walletConnect}>
               <WalletConnectButton />
             </Typography>
+            {/*}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { sm: 'none' } }} />
             <IconButton
               color="inherit"
@@ -89,8 +101,16 @@ export const Header = memo(({ window }: PropsI) => {
             >
               <MenuIcon />
             </IconButton>
+            {*/}
           </Toolbar>
+          {isSmallScreen && (
+            <Box className={styles.mobileSelectBoxes}>
+              <CollateralsSelect />
+              <PerpetualsSelect />
+            </Box>
+          )}
         </PageAppBar>
+        {/*}
         <Box component="nav">
           <Drawer
             anchor="right"
@@ -109,6 +129,7 @@ export const Header = memo(({ window }: PropsI) => {
             {drawer}
           </Drawer>
         </Box>
+        {*/}
       </Box>
     </Container>
   );

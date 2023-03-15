@@ -23,13 +23,49 @@
 
   :global(.MuiInputBase-root) {
     width: 100px;
+    padding-right: 0;
 
     input {
+      width: 45%;
       text-align: right;
     }
   }
 
   :global(.MuiInputAdornment-root) {
     margin-left: 0;
+  }
+}
+
+.decreaseButton,
+.increaseButton {
+  display: none;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+    justify-content: space-between;
+  }
+
+  .sliderHolder {
+    display: none;
+  }
+
+  .inputHolder {
+    display: flex;
+    gap: 8px;
+
+    :global(.MuiInputBase-root) {
+      width: 70px;
+
+      input {
+        width: 40%;
+      }
+    }
+  }
+
+  .decreaseButton,
+  .increaseButton {
+    display: inline-block;
   }
 }
