@@ -173,6 +173,13 @@ export interface CollateralChangeResponseI {
   proxyAddr: string;
   abi: string;
   amountHex: string;
+  priceUpdates: PriceUpdatesI;
+}
+
+export interface PriceUpdatesI {
+  updateData: string[];
+  publishTimes: number[];
+  updateFee: number
 }
 
 export interface MaxOrderSizeResponseI {
