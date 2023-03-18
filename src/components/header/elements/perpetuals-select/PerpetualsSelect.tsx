@@ -5,6 +5,7 @@ import { memo, useEffect, useMemo } from 'react';
 import { Box, Paper, Popper, PopperProps } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
+import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import {
@@ -41,6 +42,8 @@ export const PerpetualsSelect = memo(() => {
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
 
+  const { isConnected, send } = useCandlesWebSocketContext();
+
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
       return createSymbol({
@@ -67,6 +70,19 @@ export const PerpetualsSelect = memo(() => {
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
+
+  useEffect(() => {
+    if (selectedPerpetual && isConnected) {
+      send(JSON.stringify({ type: 'unsubscribe' }));
+      send(
+        JSON.stringify({
+          type: 'subscribe',
+          symbol: `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`,
+          period: '5m',
+        })
+      );
+    }
+  }, [selectedPerpetual, isConnected, send]);
 
   useEffect(() => {
     if (symbol) {

@@ -6,7 +6,7 @@ import { useAccount } from 'wagmi';
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
-import { useWebSocketContext } from 'context/websocket-context/useWebSocketContext';
+import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getOpenOrders, getPoolFee, getPositionRisk } from 'network/network';
 import {

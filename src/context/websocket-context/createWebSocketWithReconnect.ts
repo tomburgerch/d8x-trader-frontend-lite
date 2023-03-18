@@ -1,11 +1,10 @@
-import { config } from 'config';
 import type { Dispatch, SetStateAction } from 'react';
 
 const RECONNECT_TIMEOUT = 5000;
 
 type ReactDispatchT = Dispatch<SetStateAction<boolean>>;
 
-export function createWebSocketWithReconnect() {
+export function createWebSocketWithReconnect(wsUrl: string) {
   let client: WebSocket;
   let isConnected = false;
   let reconnectOnClose = true;
@@ -28,7 +27,7 @@ export function createWebSocketWithReconnect() {
   };
 
   const start = () => {
-    client = new WebSocket(config.wsUrl);
+    client = new WebSocket(wsUrl);
 
     client.onopen = () => {
       isConnected = true;

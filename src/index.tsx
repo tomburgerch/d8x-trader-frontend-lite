@@ -8,7 +8,8 @@ import { WagmiConfig } from 'wagmi';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 
 import { chains, wagmiClient } from 'blockchain-api/wagmi/wagmiClient';
-import { WebSocketContextProvider } from 'context/websocket-context/WebSocketContextProvider';
+import { CandlesWebSocketContextProvider } from 'context/websocket-context/candles/CandlesWebSocketContextProvider';
+import { WebSocketContextProvider } from 'context/websocket-context/d8x/WebSocketContextProvider';
 import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
@@ -24,17 +25,19 @@ if (container) {
     <StrictMode>
       <JotaiProvider>
         <WebSocketContextProvider>
-          <WagmiConfig client={wagmiClient}>
-            <RainbowKitProvider chains={chains} modalSize="compact">
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                  <BrowserRouter>
-                    <App />
-                  </BrowserRouter>
-                </ThemeProvider>
-              </StyledEngineProvider>
-            </RainbowKitProvider>
-          </WagmiConfig>
+          <CandlesWebSocketContextProvider>
+            <WagmiConfig client={wagmiClient}>
+              <RainbowKitProvider chains={chains} modalSize="compact">
+                <StyledEngineProvider injectFirst>
+                  <ThemeProvider theme={theme}>
+                    <BrowserRouter>
+                      <App />
+                    </BrowserRouter>
+                  </ThemeProvider>
+                </StyledEngineProvider>
+              </RainbowKitProvider>
+            </WagmiConfig>
+          </CandlesWebSocketContextProvider>
         </WebSocketContextProvider>
       </JotaiProvider>
     </StrictMode>
