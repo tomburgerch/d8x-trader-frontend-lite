@@ -5,10 +5,10 @@ import { CollateralChangeResponseI } from 'types/types';
 export function deposit(signer: ethers.providers.JsonRpcSigner, data: CollateralChangeResponseI) {
   const contract = new Contract(data.proxyAddr, [data.abi], signer);
   return contract.deposit(
-    data.perpId, 
-    BigNumber.from(data.amountHex), 
-    data.priceUpdates.updateData, 
-    data.priceUpdates.publishTimes, 
-    { gasLimit: 1_000_000, value: data.priceUpdates.updateFee }
+    data.perpId,
+    BigNumber.from(data.amountHex),
+    data.priceUpdate.updateData,
+    data.priceUpdate.publishTimes,
+    { gasLimit: 1_000_000, value: data.priceUpdate.updateFee }
   );
 }
