@@ -1,4 +1,5 @@
 import { BigNumberish, BytesLike } from 'ethers';
+import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
@@ -190,4 +191,13 @@ export interface MaxOrderSizeResponseI {
 export interface TableHeaderI {
   label: JSX.Element | string;
   align: AlignE;
+}
+
+export interface TvChartCandleI {
+  start: number;
+  time: Time;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
 }

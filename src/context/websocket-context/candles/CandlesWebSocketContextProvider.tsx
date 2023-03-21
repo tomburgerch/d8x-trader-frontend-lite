@@ -1,19 +1,20 @@
 import { useAtom } from 'jotai';
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { webSocketReadyAtom } from 'store/pools.store';
+import { config } from 'config';
+import { candlesWebSocketReadyAtom } from 'store/tv-chart.store';
 
-import { createWebSocketWithReconnect } from './createWebSocketWithReconnect';
-import { WebSocketContext, WebSocketContextI } from './WebSocketContext';
-import { useWsMessageHandler } from './useWsMessageHandler';
+import { createWebSocketWithReconnect } from '../createWebSocketWithReconnect';
+import { CandlesWebSocketContext, CandlesWebSocketContextI } from './CandlesWebSocketContext';
+import { useCandlesWsMessageHandler } from './useCandlesWsMessageHandler';
 
-const client = createWebSocketWithReconnect();
+const client = createWebSocketWithReconnect(config.candlesWsUrl);
 
 const PING_MESSAGE = JSON.stringify({ type: 'ping' });
 const WS_ALIVE_TIMEOUT = 10_000;
 
-export const WebSocketContextProvider = ({ children }: PropsWithChildren) => {
-  const [isWebSocketReady, setWebSocketReady] = useAtom(webSocketReadyAtom);
+export const CandlesWebSocketContextProvider = ({ children }: PropsWithChildren) => {
+  const [isCandlesWebSocketReady, setCandlesWebSocketReadyAtom] = useAtom(candlesWebSocketReadyAtom);
 
   const [messages, setMessages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(client.isConnected());
@@ -21,13 +22,13 @@ export const WebSocketContextProvider = ({ children }: PropsWithChildren) => {
 
   const waitForPongRef = useRef(false);
 
-  const handleWsMessage = useWsMessageHandler();
+  const handleWsMessage = useCandlesWsMessageHandler();
 
   useEffect(() => {
     if (!isConnected) {
-      setWebSocketReady(false);
+      setCandlesWebSocketReadyAtom(false);
     }
-  }, [setWebSocketReady, isConnected]);
+  }, [setCandlesWebSocketReadyAtom, isConnected]);
 
   useEffect(() => {
     return client.onStateChange(setIsConnected);
@@ -88,13 +89,13 @@ export const WebSocketContextProvider = ({ children }: PropsWithChildren) => {
     };
   }, [messages, isConnected]);
 
-  const contextValue: WebSocketContextI = useMemo(
+  const contextValue: CandlesWebSocketContextI = useMemo(
     () => ({
-      isConnected: isWebSocketReady,
+      isConnected: isCandlesWebSocketReady,
       send,
     }),
-    [isWebSocketReady, send]
+    [isCandlesWebSocketReady, send]
   );
 
-  return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;
+  return <CandlesWebSocketContext.Provider value={contextValue}>{children}</CandlesWebSocketContext.Provider>;
 };

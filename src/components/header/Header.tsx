@@ -69,8 +69,6 @@ export const Header = memo(() => {
   const container = window !== undefined ? () => window().document.body : undefined;
   */
 
-  console.log({ isSmallScreen });
-
   return (
     <Container className={styles.root}>
       <Box sx={{ display: 'flex' }}>

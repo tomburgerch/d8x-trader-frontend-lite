@@ -5,6 +5,7 @@ import { memo, useEffect, useMemo } from 'react';
 import { Box, Paper, Popper, PopperProps } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
+import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import {
@@ -13,6 +14,7 @@ import {
   selectedPerpetualAtom,
   selectedPoolAtom,
 } from 'store/pools.store';
+import { candlesAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -38,8 +40,13 @@ const CustomPopper = (props: PopperProps) => {
 export const PerpetualsSelect = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [selectedPeriod] = useAtom(selectedPeriodAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
+  const [, setCandles] = useAtom(candlesAtom);
+  const [, setNewCandles] = useAtom(newCandlesAtom);
+
+  const { isConnected, send } = useCandlesWebSocketContext();
 
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
@@ -67,6 +74,20 @@ export const PerpetualsSelect = memo(() => {
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
+
+  useEffect(() => {
+    if (selectedPerpetual && isConnected) {
+      send(JSON.stringify({ type: 'unsubscribe' }));
+      send(
+        JSON.stringify({
+          type: 'subscribe',
+          symbol: `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`,
+          period: selectedPeriod,
+        })
+      );
+      setNewCandles([]);
+    }
+  }, [selectedPerpetual, selectedPeriod, setCandles, setNewCandles, isConnected, send]);
 
   useEffect(() => {
     if (symbol) {

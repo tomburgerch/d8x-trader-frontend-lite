@@ -10,6 +10,7 @@ import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PerpetualStats } from 'components/perpetual-stats/PerpetualStats';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
 
 import styles from './TraderPage.module.scss';
 
@@ -38,6 +39,7 @@ export const TraderPage = memo(() => {
         <Container className={styles.sidesContainer}>
           <Box className={styles.leftBlock}>
             <PerpetualStats />
+            <TradingViewChart />
             <TableSelector selectorItems={selectorItems} />
           </Box>
           <Box className={styles.rightBlock}>
@@ -48,6 +50,7 @@ export const TraderPage = memo(() => {
       {!isBigScreen && (
         <Container className={styles.columnContainer}>
           <PerpetualStats />
+          <TradingViewChart />
           <OrderBlock />
           <TableSelector selectorItems={selectorItems} />
         </Container>

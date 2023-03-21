@@ -1,0 +1,8 @@
+@import 'styles/theme/theme';
+
+.root {
+  overflow: hidden;
+  background-color: var(--d8x-color-white);
+  padding: $d8x-spacing;
+  border-radius: $d8x-border-radius;
+}
