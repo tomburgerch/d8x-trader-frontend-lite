@@ -39,10 +39,11 @@ jobs:
         # test:
         REACT_APP_API_URL: https://api.quantena.tech
         REACT_APP_WEBSOCKET_URL: wss://ws.quantena.tech/
+        REACT_APP_CANDLES_WEBSOCKET_URL: wss://candles.testnet.quantena.tech/
         #REACT_APP_API_URL: https://dev.testnet.d8x.exchange/api/v1
         #REACT_APP_WEBSOCKET_URL: wss://dev.testnet.d8x.exchange/ws/
       run: |
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
+        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_CANDLES_WEBSOCKET_URL=$REACT_APP_CANDLES_WEBSOCKET_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   Version:
