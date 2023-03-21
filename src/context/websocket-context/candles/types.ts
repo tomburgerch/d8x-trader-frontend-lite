@@ -1,7 +1,7 @@
 export enum MessageTypeE {
   Connect = 'connect',
   Error = 'error',
-  Subscription = 'subscription',
+  Subscribe = 'subscribe',
   Update = 'update',
 }
 
@@ -21,15 +21,15 @@ export interface ErrorWsMessageI extends CommonWsMessageI {
 
 export interface CandleDataI {
   start: number;
-  time: Date;
+  time: string;
   open: number;
   high: number;
   low: number;
   close: number;
 }
 
-export interface SubscriptionWsMessageI extends CommonWsMessageI {
-  type: MessageTypeE.Subscription;
+export interface SubscribeWsMessageI extends CommonWsMessageI {
+  type: MessageTypeE.Subscribe;
   data: CandleDataI[];
 }
 

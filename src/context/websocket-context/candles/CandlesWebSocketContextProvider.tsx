@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { config } from 'config';
-import { candlesWebSocketReadyAtom } from 'store/pools.store';
+import { candlesWebSocketReadyAtom } from 'store/tv-chart.store';
 
 import { createWebSocketWithReconnect } from '../createWebSocketWithReconnect';
 import { CandlesWebSocketContext, CandlesWebSocketContextI } from './CandlesWebSocketContext';

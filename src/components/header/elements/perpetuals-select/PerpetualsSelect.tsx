@@ -14,6 +14,7 @@ import {
   selectedPerpetualAtom,
   selectedPoolAtom,
 } from 'store/pools.store';
+import { candlesAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -39,8 +40,11 @@ const CustomPopper = (props: PopperProps) => {
 export const PerpetualsSelect = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [selectedPeriod] = useAtom(selectedPeriodAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
+  const [, setCandles] = useAtom(candlesAtom);
+  const [, setNewCandles] = useAtom(newCandlesAtom);
 
   const { isConnected, send } = useCandlesWebSocketContext();
 
@@ -78,11 +82,12 @@ export const PerpetualsSelect = memo(() => {
         JSON.stringify({
           type: 'subscribe',
           symbol: `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`,
-          period: '5m',
+          period: selectedPeriod,
         })
       );
+      setNewCandles([]);
     }
-  }, [selectedPerpetual, isConnected, send]);
+  }, [selectedPerpetual, selectedPeriod, setCandles, setNewCandles, isConnected, send]);
 
   useEffect(() => {
     if (symbol) {

@@ -61,3 +61,11 @@ export enum AlignE {
   Inherit = 'inherit',
   Justify = 'justify',
 }
+
+export enum TvChartPeriodE {
+  '1Min' = '1m',
+  '5Min' = '5m',
+  '15Min' = '15m',
+  '1Hour' = '1h',
+  '1Day' = '1d',
+}
