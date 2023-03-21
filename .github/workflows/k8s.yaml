@@ -40,8 +40,9 @@ jobs:
         IMAGE_TAG: d8x-frontend-stage-${{ github.sha }}
         REACT_APP_API_URL: https://app.testnet.d8x.exchange/api/v1
         REACT_APP_WEBSOCKET_URL: wss://app.testnet.d8x.exchange/ws/
+        REACT_APP_CANDLES_WEBSOCKET_URL: wss://candles.testnet.quantena.tech/
       run: |
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
+        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_CANDLES_WEBSOCKET_URL=$REACT_APP_CANDLES_WEBSOCKET_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   deploy:
