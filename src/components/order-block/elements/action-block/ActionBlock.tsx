@@ -12,7 +12,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
-import { newPositionRiskAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
+import { newPositionRiskAtom, perpetualStaticInfoAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
@@ -65,6 +65,7 @@ export const ActionBlock = memo(() => {
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
@@ -118,7 +119,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    if (!address || !orderInfo || !selectedPool || !proxyAddr) {
+    if (!address || !orderInfo || !selectedPool || !proxyAddr || !selectedPerpetualStaticInfo) {
       return;
     }
 
@@ -202,7 +203,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
+  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive, selectedPerpetualStaticInfo]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -218,18 +219,25 @@ export const ActionBlock = memo(() => {
   }, [orderInfo]);
 
   const validityCheckText = useMemo(() => {
-    if (!maxOrderSize || !orderInfo) {
+    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo) {
       return '-';
     }
 
-    let isGoodPrice;
+    let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isGoodPrice = orderInfo.size <= maxOrderSize.buy;
+      isTooLarge = orderInfo.size > maxOrderSize.buy;
     } else {
-      isGoodPrice = orderInfo.size <= maxOrderSize.sell;
+      isTooLarge = orderInfo.size > maxOrderSize.sell;
     }
-    return isGoodPrice ? 'Good to go' : 'Order will fail: order size is too large.';
-  }, [maxOrderSize, orderInfo]);
+    if (isTooLarge) {
+      return 'Order will fail: order size is too large';
+    }
+    const isTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
+    if (isTooSmall) {
+      return 'Order will fail: order size is too small';
+    }
+    return 'Good to go';
+  }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo]);
 
   return (
     <Box className={styles.root}>
