@@ -95,7 +95,7 @@ export const openOrdersAtom = atom(
   (_get, set, openOrders: PerpetualOpenOrdersI) => {
     set(ordersAtom, (prev) => {
       const updatedOpenOrders = { ...prev };
-      openOrders.orderIds.forEach((orderId, index) => (updatedOpenOrders[orderId] = openOrders.orders[index]));
+      openOrders.orderIds?.forEach((orderId, index) => (updatedOpenOrders[orderId] = openOrders.orders[index]));
       return updatedOpenOrders;
     });
   }
