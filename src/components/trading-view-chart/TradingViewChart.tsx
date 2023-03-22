@@ -35,6 +35,8 @@ export const TradingViewChart = () => {
         width={width}
         height={Math.round(Math.max((width || 450) * 0.5, 300))}
         crosshair={{ mode: CrosshairMode.Normal }}
+        autoSize={true}
+        timeScale={{ timeVisible: true, barSpacing: 22 }}
       >
         <CandlestickSeries data={candles} reactive={true} ref={series} />
       </Chart>
