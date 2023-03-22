@@ -239,6 +239,10 @@ export const ActionBlock = memo(() => {
     return 'Good to go';
   }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo]);
 
+  const isConfirmButtonDisabled = useMemo( () => {
+    return validityCheckText !== 'Good to go';
+  }, [validityCheckText]);
+
   return (
     <Box className={styles.root}>
       <Button
@@ -344,7 +348,7 @@ export const ActionBlock = memo(() => {
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
               Cancel
             </Button>
-            <Button onClick={handleOrderConfirm} variant="primary" size="small">
+            <Button onClick={handleOrderConfirm} variant="primary" size="small" disabled={isConfirmButtonDisabled}>
               Confirm
             </Button>
           </DialogActions>
