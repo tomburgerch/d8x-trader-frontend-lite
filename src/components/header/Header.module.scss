@@ -1,7 +1,11 @@
 @import 'styles/theme/theme';
 
 .root {
-  margin-bottom: $d8x-spacing * 5;
+  margin-bottom: $d8x-spacing * 2;
+
+  :global(.MuiPaper-root) {
+    height: 80px;
+  }
 }
 
 .toolbar {
@@ -29,4 +33,14 @@
 .walletConnect {
   justify-content: right;
   display: flex;
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .root {
+
+    :global(.MuiPaper-root) {
+      height: 170px;
+    }
+  }
 }

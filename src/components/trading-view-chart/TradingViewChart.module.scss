@@ -3,6 +3,6 @@
 .root {
   overflow: hidden;
   background-color: var(--d8x-color-white);
-  padding: $d8x-spacing;
+  padding: $d8x-spacing * 3;
   border-radius: $d8x-border-radius;
 }
