@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getOpenOrders } from 'network/network';
 import {
+  failOrderAtom,
   openOrdersAtom,
   perpetualStatisticsAtom,
   positionsAtom,
@@ -20,6 +21,7 @@ import {
   ConnectWsMessageI,
   // ErrorWsMessageI,
   MessageTypeE,
+  OnExecutionFailedWsMessageI,
   OnLimitOrderCreatedWsMessageI,
   OnPerpetualLimitOrderCancelledWsMessageI,
   OnTradeWsMessageI,
@@ -62,6 +64,10 @@ function isLimitOrderCreatedMessage(message: CommonWsMessageI): message is OnLim
   return message.type === MessageTypeE.OnPerpetualLimitOrderCreated;
 }
 
+function isExecutionFailedMessage(message: CommonWsMessageI): message is OnExecutionFailedWsMessageI {
+  return message.type === MessageTypeE.OnExecutionFailed;
+}
+
 export function useWsMessageHandler() {
   const { address } = useAccount();
 
@@ -72,6 +78,7 @@ export function useWsMessageHandler() {
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
+  const [, failOpenOrder] = useAtom(failOrderAtom);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -162,8 +169,13 @@ export function useWsMessageHandler() {
           return;
         }
         removeOpenOrder(parsedMessage.data.obj.orderId);
+      } else if (isExecutionFailedMessage(parsedMessage)) {
+        if (!address || address !== parsedMessage.data.obj.traderAddr) {
+          return;
+        }
+        failOpenOrder(parsedMessage.data.obj.orderId);
       }
     },
-    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, address]
+    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]
   );
 }
