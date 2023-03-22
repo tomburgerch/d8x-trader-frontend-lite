@@ -161,10 +161,7 @@ export function useWsMessageHandler() {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
         }
-
-        getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
-          setOpenOrders(data);
-        });
+        removeOpenOrder(parsedMessage.data.obj.orderId);
       }
     },
     [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, address]
