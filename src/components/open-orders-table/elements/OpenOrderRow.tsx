@@ -20,7 +20,13 @@ const typeToLabelMap: Record<string, string> = {
 
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
   const parsedSymbol = parseSymbol(order.symbol);
-  const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : '';
+  let deadlineDate;
+  if(order.deadline === undefined) {
+    deadlineDate = '';
+  } else {
+    deadlineDate = order.deadline > 0 ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : 'Failed';
+  }
+  const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
 
   return (
     <TableRow>
@@ -49,7 +55,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
         </Typography>
       </TableCell>
       <TableCell align="right">
-        <Typography variant="cellSmall">{order.leverage}x</Typography>
+        <Typography variant="cellSmall">{leverage}x</Typography>
       </TableCell>
       <TableCell align="left">
         <Typography variant="cellSmall">{deadlineDate}</Typography>

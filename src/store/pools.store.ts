@@ -109,6 +109,14 @@ export const removeOpenOrderAtom = atom(null, (get, set, orderIdToRemove: string
   });
 });
 
+export const failOrderAtom = atom(null, (get, set, orderIdToUpdate: string) => {
+  set(ordersAtom, (prev) => {
+    const updatedOpenOrders = { ...prev };
+    updatedOpenOrders[orderIdToUpdate].deadline = -1;
+    return updatedOpenOrders;
+  });
+});
+
 export const clearOpenOrdersAtom = atom(null, (get, set) => {
   set(ordersAtom, {});
 });

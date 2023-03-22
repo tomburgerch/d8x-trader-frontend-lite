@@ -9,6 +9,7 @@ export enum MessageTypeE {
   OnPerpetualLimitOrderCancelled = 'onPerpetualLimitOrderCancelled',
   OnTrade = 'onTrade',
   OnPerpetualLimitOrderCreated = 'onPerpetualLimitOrderCreated',
+  OnExecutionFailed = 'onExecutionFailed',
 }
 
 enum MessageNameE {
@@ -17,6 +18,7 @@ enum MessageNameE {
   PerpetualLimitOrderCancelled = 'PerpetualLimitOrderCancelled',
   Trade = 'Trade',
   PerpetualLimitOrderCreated = 'PerpetualLimitOrderCreated',
+  ExecutionFailed = 'ExecutionFailed',
 }
 
 export interface CommonWsMessageI {
@@ -124,3 +126,17 @@ export interface OnLimitOrderCreatedWsMessageI extends CommonWsMessageI {
     };
   };
 }
+
+  export interface OnExecutionFailedWsMessageI extends CommonWsMessageI {
+    type: MessageTypeE.OnExecutionFailed;
+    data: {
+      name: MessageNameE.ExecutionFailed;
+      obj:  {
+        symbol: string,
+        perpetualId: number,
+        traderAddr: string,
+        orderId: string,
+        reason: string,
+      };
+    };
+  }
