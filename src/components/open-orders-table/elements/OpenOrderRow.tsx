@@ -21,7 +21,7 @@ const typeToLabelMap: Record<string, string> = {
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
   const parsedSymbol = parseSymbol(order.symbol);
   let deadlineDate;
-  if(order.deadline === undefined) {
+  if (order.deadline === undefined) {
     deadlineDate = '';
   } else {
     deadlineDate = order.deadline > 0 ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : 'Failed';
