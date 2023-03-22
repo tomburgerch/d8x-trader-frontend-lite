@@ -127,16 +127,16 @@ export interface OnLimitOrderCreatedWsMessageI extends CommonWsMessageI {
   };
 }
 
-  export interface OnExecutionFailedWsMessageI extends CommonWsMessageI {
-    type: MessageTypeE.OnExecutionFailed;
-    data: {
-      name: MessageNameE.ExecutionFailed;
-      obj:  {
-        symbol: string,
-        perpetualId: number,
-        traderAddr: string,
-        orderId: string,
-        reason: string,
-      };
+export interface OnExecutionFailedWsMessageI extends CommonWsMessageI {
+  type: MessageTypeE.OnExecutionFailed;
+  data: {
+    name: MessageNameE.ExecutionFailed;
+    obj: {
+      symbol: string;
+      perpetualId: number;
+      traderAddr: string;
+      orderId: string;
+      reason: string;
     };
-  }
+  };
+}
