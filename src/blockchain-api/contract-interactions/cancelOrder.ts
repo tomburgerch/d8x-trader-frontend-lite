@@ -9,5 +9,13 @@ export function cancelOrder(
   orderId: string
 ) {
   const contract = new Contract(data.OrderBookAddr, [data.abi], signer);
-  return contract.cancelOrder(orderId, signature, { gasLimit: 1_000_000 });
+  return contract.cancelOrder(
+    orderId, 
+    signature, 
+    data.priceUpdate.updateData,
+    data.priceUpdate.publishTimes,
+    { 
+      gasLimit: 1_000_000, value: 
+      data.priceUpdate.updateFee 
+  });
 }
