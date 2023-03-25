@@ -167,6 +167,7 @@ export interface CancelOrderResponseI {
   OrderBookAddr: string;
   abi: string;
   digest: string;
+  priceUpdate: PriceUpdatesI;
 }
 
 export interface CollateralChangeResponseI {
