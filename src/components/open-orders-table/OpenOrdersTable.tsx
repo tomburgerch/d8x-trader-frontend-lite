@@ -22,7 +22,7 @@ import {
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { getSigner } from 'blockchain-api/getSigner';
-import { signMessage } from 'blockchain-api/signMessage';
+import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { createSymbol } from 'helpers/createSymbol';
@@ -72,7 +72,7 @@ export const OpenOrdersTable = memo(() => {
       .then((data) => {
         if (data.data.digest) {
           const signer = getSigner();
-          signMessage(signer, [data.data.digest])
+          signMessages(signer, [data.data.digest])
             .then((signatures) => {
               cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
                 .then(() => {

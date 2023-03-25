@@ -1,13 +1,12 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
-import { getSigner } from 'blockchain-api/getSigner';
-import { signMessage } from 'blockchain-api/signMessage';
+import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
@@ -20,6 +19,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
+import { BigNumber } from 'ethers';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -62,6 +62,15 @@ function createMainOrder(orderInfo: OrderInfoI) {
 export const ActionBlock = memo(() => {
   const { address } = useAccount();
 
+  const { data: signer } = useSigner({
+    onError(error) {
+      console.log('Error', error)
+    },
+    onSuccess(data) {
+      data?.getBalance().then((b: BigNumber) => console.log(`balance = ${b}`))
+    }
+  })
+
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -73,6 +82,11 @@ export const ActionBlock = memo(() => {
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
 
   const requestSentRef = useRef(false);
+
+  // const balance = useBalance({
+  // address: address, token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
+  //   onSuccess(data) { console.log(`my balance is ${data.formatted} ${data.symbol}`)}
+  // });
 
   const openReviewOrderModal = useCallback(() => {
     if (!orderInfo || !address) {
@@ -110,7 +124,8 @@ export const ActionBlock = memo(() => {
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice < 0));
   }, [orderInfo, address]);
 
-  const handleOrderConfirm = useCallback(() => {
+
+  const parsedOrders = useMemo(() => {
     if (requestSentRef.current || requestSent) {
       return;
     }
@@ -119,7 +134,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    if (!address || !orderInfo || !selectedPool || !proxyAddr || !selectedPerpetualStaticInfo) {
+    if (!signer || !address || !orderInfo || !selectedPool || !proxyAddr || !selectedPerpetualStaticInfo) {
       return;
     }
 
@@ -161,28 +176,37 @@ export const ActionBlock = memo(() => {
         timestamp: Math.floor(Date.now() / 1000),
       });
     }
-
+    approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr);
+    return orders;
+    
+  }, [
+    orderInfo, 
+    selectedPool, 
+    address, 
+    proxyAddr, 
+    requestSent, 
+    isBuySellButtonActive, 
+    selectedPerpetualStaticInfo, 
+    signer
+  ]);
+  
+  
+  const handleOrderConfirm = useCallback(() => {
+    if (!address ||  !signer || !parsedOrders || !selectedPool) {
+      return;
+    }
     setRequestSent(true);
     requestSentRef.current = true;
-    orderDigest(orders, address)
+    orderDigest(parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          const signer = getSigner();
-          signMessage(signer, data.data.digests)
+          signMessages(signer, data.data.digests)
             .then((signatures) => {
-              approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr)
+              postOrder(signer, signatures, data.data)
                 .then(() => {
-                  postOrder(signer, signatures, data.data)
-                    .then(() => {
-                      setShowReviewOrderModal(false);
-                      requestSentRef.current = false;
-                      setRequestSent(false);
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      requestSentRef.current = false;
-                      setRequestSent(false);
-                    });
+                  setShowReviewOrderModal(false);
+                  requestSentRef.current = false;
+                  setRequestSent(false);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {
@@ -191,7 +215,8 @@ export const ActionBlock = memo(() => {
                   setRequestSent(false);
                 });
             })
-            .catch((error) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .catch((error: any) => {
               console.error(error);
               requestSentRef.current = false;
               setRequestSent(false);
@@ -202,9 +227,8 @@ export const ActionBlock = memo(() => {
         console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
-      });
-  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive, selectedPerpetualStaticInfo]);
-
+    });
+  }, [parsedOrders, address, signer, selectedPool]);
   const atPrice = useMemo(() => {
     if (orderInfo) {
       let price = orderInfo.midPrice;

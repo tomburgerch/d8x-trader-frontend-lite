@@ -32,7 +32,7 @@ import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
 import { getSigner } from 'blockchain-api/getSigner';
-import { signMessage } from 'blockchain-api/signMessage';
+import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -117,7 +117,7 @@ export const PositionsTable = memo(() => {
         .then((data) => {
           if (data.data.digests.length > 0) {
             const signer = getSigner();
-            signMessage(signer, data.data.digests)
+            signMessages(signer, data.data.digests)
               .then((signatures) => {
                 approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr)
                   .then(() => {
@@ -127,7 +127,8 @@ export const PositionsTable = memo(() => {
                         setModifyModalOpen(false);
                         setSelectedPosition(null);
                       })
-                      .catch((error) => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      .catch((error: any) => {
                         console.error(error);
                         setRequestSent(false);
                       });
@@ -214,7 +215,7 @@ export const PositionsTable = memo(() => {
 
     if (modifyType === ModifyTypeE.Remove) {
       getAvailableMargin(selectedPosition.symbol, address).then(({ data }) => {
-        setMaxCollateral(data.amount);
+        setMaxCollateral(data.amount < 0 ? 0 : data.amount);
       });
     } else {
       setMaxCollateral(undefined);
@@ -503,7 +504,7 @@ export const PositionsTable = memo(() => {
                     />
                     {maxCollateral && (
                       <Typography className={styles.helperText} variant="bodySmall">
-                        Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral < 0 ? 0 : maxCollateral)}</Link>
+                        Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
                       </Typography>
                     )}
                   </FormControl>
