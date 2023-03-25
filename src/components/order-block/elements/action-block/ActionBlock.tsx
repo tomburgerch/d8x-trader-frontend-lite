@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount, useBalance, useSigner } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -179,7 +179,16 @@ export const ActionBlock = memo(() => {
     approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr);
     return orders;
     
-  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive, selectedPerpetualStaticInfo, signer]);
+  }, [
+    orderInfo, 
+    selectedPool, 
+    address, 
+    proxyAddr, 
+    requestSent, 
+    isBuySellButtonActive, 
+    selectedPerpetualStaticInfo, 
+    signer
+  ]);
   
   
   const handleOrderConfirm = useCallback(() => {
