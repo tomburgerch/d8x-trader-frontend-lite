@@ -93,9 +93,7 @@ export interface OnPerpetualLimitOrderCancelledWsMessageI extends CommonWsMessag
   data: {
     name: MessageNameE.PerpetualLimitOrderCancelled;
     obj: {
-      symbol: string;
       perpetualId: number;
-      traderAddr: string;
       orderId: string;
     };
   };

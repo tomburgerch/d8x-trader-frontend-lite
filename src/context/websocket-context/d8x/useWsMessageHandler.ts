@@ -159,10 +159,6 @@ export function useWsMessageHandler() {
           setOpenOrders(data);
         });
       } else if (isPerpetualLimitOrderCancelledMessage(parsedMessage)) {
-        if (!address || address !== parsedMessage.data.obj.traderAddr) {
-          return;
-        }
-
         removeOpenOrder(parsedMessage.data.obj.orderId);
       } else if (isTradeMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
