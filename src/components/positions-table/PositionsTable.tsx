@@ -296,13 +296,13 @@ export const PositionsTable = memo(() => {
       case ModifyTypeE.Close:
         return !closePositionChecked;
       case ModifyTypeE.Add:
-        return addCollateral === 0;
+        return addCollateral <= 0 || addCollateral < 0;
       case ModifyTypeE.Remove:
-        return removeCollateral === 0;
+        return removeCollateral <= 0 || maxCollateral === undefined || maxCollateral < removeCollateral;
       default:
         return false;
     }
-  }, [modifyType, closePositionChecked, addCollateral, removeCollateral]);
+  }, [modifyType, closePositionChecked, addCollateral, removeCollateral, maxCollateral]);
 
   const parsedSymbol = useMemo(() => {
     if (selectedPosition) {
@@ -503,7 +503,7 @@ export const PositionsTable = memo(() => {
                     />
                     {maxCollateral && (
                       <Typography className={styles.helperText} variant="bodySmall">
-                        Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
+                        Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral < 0 ? 0 : maxCollateral)}</Link>
                       </Typography>
                     )}
                   </FormControl>
