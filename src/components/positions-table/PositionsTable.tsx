@@ -371,7 +371,7 @@ export const PositionsTable = memo(() => {
   }, [selectedPosition, newPositionRisk, modifyType, closePositionChecked]);
 
   const calculatedLiqPrice = useMemo(() => {
-    if (!selectedPosition || selectedPosition.liquidationPrice[0] < 0) {
+    if (!selectedPosition || selectedPosition.liquidationPrice[0] <= 0) {
       return '-';
     }
 
@@ -380,7 +380,7 @@ export const PositionsTable = memo(() => {
     }
 
     if (modifyType === ModifyTypeE.Add || modifyType === ModifyTypeE.Remove) {
-      if (!newPositionRisk) {
+      if (!newPositionRisk || newPositionRisk.liquidationPrice[0] <= 0) {
         return '-';
       } else {
         return formatToCurrency(newPositionRisk.liquidationPrice[0], parsedSymbol?.quoteCurrency);
