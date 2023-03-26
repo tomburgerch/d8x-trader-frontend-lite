@@ -17,17 +17,16 @@ export const InfoBlock = ({ title, content }: InfoBlockPropsI) => {
 
   return (
     <>
-      <InfoIcon onClick={() => setModalOpen(true)} />{' '}
+      <InfoIcon onClick={() => setModalOpen(true)} className={styles.actionIcon} /> {title}
       <Dialog open={isModalOpen} className={styles.dialog}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent className={styles.dialogContent}>{content}</DialogContent>
         <DialogActions className={styles.dialogAction}>
           <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
-            Cancel
+            Close
           </Button>
         </DialogActions>
       </Dialog>
-      {title}
     </>
   );
 };
