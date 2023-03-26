@@ -1,0 +1,26 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $d8x-spacing $d8x-spacing * 2;
+  gap: $d8x-spacing;
+  min-width: 115px;
+  height: 48px;
+  background: var(--d8x-color-white);
+  border: 1px solid var(--d8x-color-purple);
+  border-radius: $d8x-button-border-radius;
+}
+
+.starsHolder {
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+}
+
+.loyalty {
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--d8x-color-purple);
+}

@@ -11,6 +11,7 @@
 .toolbar {
   align-items: center;
   min-height: 100px;
+  padding: 0;
 }
 
 .logoLink {
@@ -19,6 +20,12 @@
 
 .selectBoxes {
   display: flex;
+}
+
+.mobileBox {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $d8x-spacing * 2;
 }
 
 .mobileSelectBoxes {
@@ -40,7 +47,21 @@
   .root {
 
     :global(.MuiPaper-root) {
-      height: 170px;
+      height: 150px;
+    }
+  }
+
+  .toolbar {
+    min-height: 80px;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+
+    :global(.MuiPaper-root) {
+      height: 200px;
     }
   }
 }

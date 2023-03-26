@@ -8,6 +8,7 @@ import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom } from 'store/pools.sto
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
+import { LoyaltyScore } from '../loyalty-score/LoyaltyScore';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
@@ -31,6 +32,7 @@ import styles from './Header.module.scss';
 export const Header = memo(() => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
@@ -85,6 +87,7 @@ export const Header = memo(() => {
                 <PerpetualsSelect />
               </Typography>
             )}
+            {!isMobileScreen && <LoyaltyScore />}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} className={styles.walletConnect}>
               <WalletConnectButton />
             </Typography>
@@ -101,6 +104,11 @@ export const Header = memo(() => {
             </IconButton>
             {*/}
           </Toolbar>
+          {isMobileScreen && (
+            <Box className={styles.mobileBox}>
+              <LoyaltyScore />
+            </Box>
+          )}
           {isSmallScreen && (
             <Box className={styles.mobileSelectBoxes}>
               <CollateralsSelect />
