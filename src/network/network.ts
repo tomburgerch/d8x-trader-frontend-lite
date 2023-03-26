@@ -32,6 +32,16 @@ export function getPerpetualStaticInfo(symbol: string): Promise<ValidatedRespons
   });
 }
 
+export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<number>> {
+  return fetch(`${config.apiUrl}/trader_loyalty?traderAddr=${address}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
 export function getPositionRisk(
   symbol: string,
   traderAddr: string,
