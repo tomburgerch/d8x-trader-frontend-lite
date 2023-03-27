@@ -67,7 +67,7 @@ export function getPositionRisk(
 export function positionRiskOnTrade(
   order: OrderI,
   traderAddr: string
-): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI }>> {
+): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
   const requestOptions = {
     ...getRequestOptions(RequestMethodE.Post),
     body: JSON.stringify({

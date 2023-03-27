@@ -119,7 +119,7 @@ export const PositionsTable = memo(() => {
             const signer = getSigner();
             signMessages(signer, data.data.digests)
               .then((signatures) => {
-                approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr)
+                approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
                   .then(() => {
                     postOrder(signer, signatures, data.data)
                       .then(() => {
@@ -139,7 +139,8 @@ export const PositionsTable = memo(() => {
                     setRequestSent(false);
                   });
               })
-              .catch((error) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .catch((error: any) => {
                 console.error(error);
                 setRequestSent(false);
               });
@@ -154,11 +155,19 @@ export const PositionsTable = memo(() => {
       getAddCollateral(selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           const signer = getSigner();
-          deposit(signer, data)
+          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
             .then(() => {
-              setRequestSent(false);
-              setModifyModalOpen(false);
-              setSelectedPosition(null);
+              deposit(signer, data)
+                .then(() => {
+                  setRequestSent(false);
+                  setModifyModalOpen(false);
+                  setSelectedPosition(null);
+                })
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .catch((error: any) => {
+                  console.error(error);
+                  setRequestSent(false);
+                });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {

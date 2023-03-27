@@ -17,6 +17,7 @@ export const proxyAddrAtom = atom('');
 export const perpetualStatisticsAtom = atom<PerpetualStatisticsI | null>(null);
 export const perpetualStaticInfoAtom = atom<PerpetualStaticInfoI | null>(null);
 export const newPositionRiskAtom = atom<MarginAccountI | null>(null);
+export const collateralDepositAtom = atom(0);
 export const webSocketReadyAtom = atom(false);
 export const loyaltyScoreAtom = atom(0);
 
