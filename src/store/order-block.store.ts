@@ -7,7 +7,7 @@ import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 import { mapStopLossToNumber } from 'utils/mapStopLossToNumber';
 import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 
-import { newPositionRiskAtom, perpetualStatisticsAtom, poolFeeAtom, positionsAtom } from './pools.store';
+import { collateralDepositAtom, newPositionRiskAtom, perpetualStatisticsAtom, poolFeeAtom } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
 export const orderTypeAtom = atom<OrderTypeE>(OrderTypeE.Market);
@@ -50,7 +50,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   }
 
   const newPositionRisk = get(newPositionRiskAtom);
-  const positions = get(positionsAtom);
+  const collateralDeposit = get(collateralDepositAtom);
+  // const positions = get(positionsAtom);
 
   const poolFee = get(poolFeeAtom);
   const orderBlock = get(orderBlockAtom);
@@ -72,10 +73,10 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     poolSymbol: perpetualStatistics.poolName,
   });
 
-  const positionBySymbol = positions.find((position) => position.symbol === symbol);
+  // const positionBySymbol = positions.find((position) => position.symbol === symbol);
 
-  const previousCollateralCC = !positionBySymbol ? 0 : positionBySymbol.collateralCC;
-  const collateral = !newPositionRisk ? 0 : newPositionRisk.collateralCC - previousCollateralCC;
+  // const previousCollateralCC = !positionBySymbol ? 0 : positionBySymbol.collateralCC;
+  const collateral = !collateralDeposit ? 0 : collateralDeposit;
 
   let leverage = leverageSaved;
   if (keepPositionLeverage) {
