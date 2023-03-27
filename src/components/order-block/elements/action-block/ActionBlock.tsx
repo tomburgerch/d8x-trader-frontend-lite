@@ -316,7 +316,7 @@ export const ActionBlock = memo(() => {
               <SidesRow leftSide="Trading fee:" rightSide={formatToCurrency(orderInfo.tradingFee, 'bps', 1)} />
               <SidesRow
                 leftSide="Deposit from wallet:"
-                rightSide={collateralDeposit ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'}
+                rightSide={newPositionRisk ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'}
               />
               {orderInfo.maxMinEntryPrice !== null && (
                 <SidesRow
