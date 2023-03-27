@@ -155,7 +155,7 @@ export const PositionsTable = memo(() => {
       getAddCollateral(selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           const signer = getSigner();
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
+          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
             .then(() => {
               deposit(signer, data)
                 .then(() => {
