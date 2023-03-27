@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount, useSigner, useBalance } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -90,10 +90,13 @@ export const ActionBlock = memo(() => {
 
   const requestSentRef = useRef(false);
 
-  // const balance = useBalance({
-  // address: address, token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
-  //   onSuccess(data) { console.log(`my balance is ${data.formatted} ${data.symbol}`)}
-  // });
+  const marginTokenBalance = useBalance({
+    address: address,
+    token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
+    onSuccess(data) {
+      console.log(`my ${selectedPool?.poolSymbol} balance is ${data.formatted} ${data.symbol}`);
+    },
+  });
 
   const openReviewOrderModal = useCallback(() => {
     if (!orderInfo || !address) {
@@ -258,7 +261,7 @@ export const ActionBlock = memo(() => {
   }, [orderInfo]);
 
   const validityCheckText = useMemo(() => {
-    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo) {
+    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo || !marginTokenBalance.data) {
       return '-';
     }
 
@@ -275,8 +278,11 @@ export const ActionBlock = memo(() => {
     if (isTooSmall) {
       return 'Order will fail: order size is too small';
     }
+    if (orderInfo.orderType === OrderTypeE.Market && Number(marginTokenBalance.data.formatted) < collateralDeposit) {
+      return 'Order will fail: insufficient wallet balance';
+    }
     return 'Good to go';
-  }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo]);
+  }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo, marginTokenBalance, collateralDeposit]);
 
   const isConfirmButtonDisabled = useMemo(() => {
     return validityCheckText !== 'Good to go' || requestSentRef.current || requestSent;
@@ -309,7 +315,7 @@ export const ActionBlock = memo(() => {
             <Box className={styles.orderDetails}>
               <SidesRow leftSide="Trading fee:" rightSide={formatToCurrency(orderInfo.tradingFee, 'bps', 1)} />
               <SidesRow
-                leftSide="Collateral:"
+                leftSide="Deposit from wallet:"
                 rightSide={collateralDeposit ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'}
               />
               {orderInfo.maxMinEntryPrice !== null && (
@@ -361,7 +367,11 @@ export const ActionBlock = memo(() => {
               />
               <SidesRow
                 leftSide="Leverage:"
-                rightSide={newPositionRisk ? `${formatNumber(newPositionRisk?.leverage)}x` : '-'}
+                rightSide={
+                  newPositionRisk && newPositionRisk.positionNotionalBaseCCY !== 0
+                    ? `${formatNumber(newPositionRisk?.leverage)}x`
+                    : '-'
+                }
               />
               <SidesRow
                 leftSide="Liquidation price:"
