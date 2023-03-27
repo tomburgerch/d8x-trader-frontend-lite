@@ -64,12 +64,12 @@ export const ActionBlock = memo(() => {
 
   const { data: signer } = useSigner({
     onError(error) {
-      console.log('Error', error)
+      console.log('Error', error);
     },
     onSuccess(data) {
-      data?.getBalance().then((b: BigNumber) => console.log(`balance = ${b}`))
-    }
-  })
+      data?.getBalance().then((b: BigNumber) => console.log(`balance = ${b}`));
+    },
+  });
 
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
@@ -124,7 +124,6 @@ export const ActionBlock = memo(() => {
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice < 0));
   }, [orderInfo, address]);
 
-
   const parsedOrders = useMemo(() => {
     if (requestSentRef.current || requestSent) {
       return;
@@ -178,21 +177,19 @@ export const ActionBlock = memo(() => {
     }
     approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr);
     return orders;
-    
   }, [
-    orderInfo, 
-    selectedPool, 
-    address, 
-    proxyAddr, 
-    requestSent, 
-    isBuySellButtonActive, 
-    selectedPerpetualStaticInfo, 
-    signer
+    orderInfo,
+    selectedPool,
+    address,
+    proxyAddr,
+    requestSent,
+    isBuySellButtonActive,
+    selectedPerpetualStaticInfo,
+    signer,
   ]);
-  
-  
+
   const handleOrderConfirm = useCallback(() => {
-    if (!address ||  !signer || !parsedOrders || !selectedPool) {
+    if (!address || !signer || !parsedOrders || !selectedPool) {
       return;
     }
     setRequestSent(true);
@@ -227,7 +224,7 @@ export const ActionBlock = memo(() => {
         console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
-    });
+      });
   }, [parsedOrders, address, signer, selectedPool]);
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -263,7 +260,7 @@ export const ActionBlock = memo(() => {
     return 'Good to go';
   }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo]);
 
-  const isConfirmButtonDisabled = useMemo( () => {
+  const isConfirmButtonDisabled = useMemo(() => {
     return validityCheckText !== 'Good to go';
   }, [validityCheckText]);
 

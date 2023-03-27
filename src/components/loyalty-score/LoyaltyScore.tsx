@@ -12,11 +12,11 @@ import { loyaltyScoreAtom } from 'store/pools.store';
 import styles from './LoyaltyScore.module.scss';
 
 const loyaltyMap: Record<number, string> = {
-  0: '-',
-  1: 'Silver',
-  2: 'Gold',
-  3: 'Platinum',
-  4: 'Diamond',
+  1: 'Diamond',
+  2: 'Platinum',
+  3: 'Gold',
+  4: 'Silver',
+  5: '-',
 };
 
 export const LoyaltyScore = () => {
@@ -30,17 +30,17 @@ export const LoyaltyScore = () => {
         setLoyaltyScore(data.data);
       });
     } else {
-      setLoyaltyScore(0);
+      setLoyaltyScore(5);
     }
   }, [address, setLoyaltyScore]);
 
   return (
     <Box className={styles.root}>
       <Box className={styles.starsHolder}>
-        {loyaltyScore > 0 ? <FilledStar /> : <EmptyStar />}
-        {loyaltyScore > 1 ? <FilledStar /> : <EmptyStar />}
-        {loyaltyScore > 2 ? <FilledStar /> : <EmptyStar />}
-        {loyaltyScore > 3 ? <FilledStar /> : <EmptyStar />}
+        {loyaltyScore < 5 ? <FilledStar /> : <EmptyStar />}
+        {loyaltyScore < 4 ? <FilledStar /> : <EmptyStar />}
+        {loyaltyScore < 3 ? <FilledStar /> : <EmptyStar />}
+        {loyaltyScore < 2 ? <FilledStar /> : <EmptyStar />}
       </Box>
       <Typography className={styles.loyalty}>{loyaltyMap[loyaltyScore]}</Typography>
     </Box>

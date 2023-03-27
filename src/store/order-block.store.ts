@@ -98,8 +98,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   let stopLossPrice = null;
   if (stopLoss !== StopLossE.None) {
     const stopLossMultiplier =
-      //(1 - Math.abs(mapStopLossToNumber(stopLoss)) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
-      (1 -  (orderBlock === OrderBlockE.Long ? 1 : -1) * Math.abs(mapStopLossToNumber(stopLoss)) / leverage );
+      1 - ((orderBlock === OrderBlockE.Long ? 1 : -1) * Math.abs(mapStopLossToNumber(stopLoss))) / leverage;
 
     if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
       stopLossPrice = maxMinEntryPrice * stopLossMultiplier;
@@ -117,8 +116,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   let takeProfitPrice = null;
   if (takeProfit !== TakeProfitE.None) {
     const takeProfitMultiplier =
-     // (1 + mapTakeProfitToNumber(takeProfit) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
-     (1 + (orderBlock === OrderBlockE.Long ? 1 : -1) * mapTakeProfitToNumber(takeProfit) / leverage  );
+      // (1 + mapTakeProfitToNumber(takeProfit) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
+      1 + ((orderBlock === OrderBlockE.Long ? 1 : -1) * mapTakeProfitToNumber(takeProfit)) / leverage;
 
     if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
       takeProfitPrice = maxMinEntryPrice * takeProfitMultiplier;
