@@ -98,7 +98,6 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   let stopLossPrice = null;
   if (stopLoss !== StopLossE.None) {
     const stopLossMultiplier =
-      // eslint-disable-next-line no-use-before-define
       1 - ((orderBlock === OrderBlockE.Long ? 1 : -1) * Math.abs(mapStopLossToNumber(stopLoss))) / leverage;
 
     if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
