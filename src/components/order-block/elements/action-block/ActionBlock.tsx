@@ -1,5 +1,7 @@
+import { BigNumber } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useSigner, useBalance } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -25,7 +27,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
-import { BigNumber } from 'ethers';
+import { ToastContent } from '../../../toast-content/ToastContent';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -216,12 +218,29 @@ export const ActionBlock = memo(() => {
                       setShowReviewOrderModal(false);
                       requestSentRef.current = false;
                       setRequestSent(false);
+
+                      toast.success(
+                        <ToastContent
+                          title="Order submitted"
+                          bodyLines={[{ label: 'Symbol', value: selectedPool.poolSymbol }]}
+                        />
+                      );
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch((error: any) => {
                       console.error(error);
                       requestSentRef.current = false;
                       setRequestSent(false);
+
+                      toast.error(
+                        <ToastContent
+                          title="Order failed"
+                          bodyLines={[
+                            { label: 'Symbol', value: selectedPool.poolSymbol },
+                            { label: 'Reason', value: error.message },
+                          ]}
+                        />
+                      );
                     });
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -229,6 +248,16 @@ export const ActionBlock = memo(() => {
                   console.error(error);
                   requestSentRef.current = false;
                   setRequestSent(false);
+
+                  toast.error(
+                    <ToastContent
+                      title="Order failed"
+                      bodyLines={[
+                        { label: 'Symbol', value: selectedPool.poolSymbol },
+                        { label: 'Reason', value: error.message },
+                      ]}
+                    />
+                  );
                 });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -236,6 +265,16 @@ export const ActionBlock = memo(() => {
               console.error(error);
               requestSentRef.current = false;
               setRequestSent(false);
+
+              toast.error(
+                <ToastContent
+                  title="Order failed"
+                  bodyLines={[
+                    { label: 'Symbol', value: selectedPool.poolSymbol },
+                    { label: 'Reason', value: error.message },
+                  ]}
+                />
+              );
             });
         }
       })
@@ -244,6 +283,16 @@ export const ActionBlock = memo(() => {
         console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
+
+        toast.error(
+          <ToastContent
+            title="Order failed"
+            bodyLines={[
+              { label: 'Symbol', value: selectedPool.poolSymbol },
+              { label: 'Reason', value: error.message },
+            ]}
+          />
+        );
       });
   }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit]);
 

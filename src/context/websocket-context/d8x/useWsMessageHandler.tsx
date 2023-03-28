@@ -29,6 +29,8 @@ import {
   OnUpdateMarkPriceWsMessageI,
   SubscriptionWsMessageI,
 } from './types';
+import { toast } from 'react-toastify';
+import { ToastContent } from '../../../components/toast-content/ToastContent';
 
 function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
   return message.type === MessageTypeE.Connect;
@@ -165,11 +167,26 @@ export function useWsMessageHandler() {
           return;
         }
         removeOpenOrder(parsedMessage.data.obj.orderId);
+        toast.success(
+          <ToastContent
+            title="Trade executed"
+            bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
+          />
+        );
       } else if (isExecutionFailedMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
         }
         failOpenOrder(parsedMessage.data.obj.orderId);
+        toast.error(
+          <ToastContent
+            title="Order failed"
+            bodyLines={[
+              { label: 'Symbol', value: parsedMessage.data.obj.symbol },
+              { label: 'Reason', value: parsedMessage.data.obj.reason },
+            ]}
+          />
+        );
       }
     },
     [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]

@@ -1,7 +1,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { memo } from 'react';
 
 import { Button } from '@mui/material';
-import { memo } from 'react';
 
 export const WalletConnectButton = memo(() => {
   return (

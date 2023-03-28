@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 import { Box } from '@mui/material';
 
@@ -17,6 +18,7 @@ export const App = memo(() => {
       <Routes>
         <Route key="trader-page" path="*" element={<TraderPage />} />
       </Routes>
+      <ToastContainer position="top-left" autoClose={10_000} />
     </Box>
   );
 });
