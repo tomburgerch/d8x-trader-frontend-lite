@@ -11,6 +11,8 @@ import type {
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
+import { MarketData, PerpetualDataHandler } from '@d8x/perpetuals-sdk';
+import { ethers } from 'ethers';
 
 export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
@@ -45,6 +47,7 @@ export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<nu
 export function getPositionRisk(
   symbol: string,
   traderAddr: string,
+  provider: ethers.providers.Provider,
   timestamp?: number
 ): Promise<ValidatedResponseI<MarginAccountI>> {
   const params = new URLSearchParams({
@@ -55,13 +58,25 @@ export function getPositionRisk(
     params.append('t', '' + timestamp);
   }
 
-  return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
+  const marketData = new MarketData(PerpetualDataHandler.readSDKConfig('central-park'));
+
+  const promise = marketData.createProxyInstance(provider).then(() => {
+    return marketData.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
+      return data as MarginAccountI;
+    });
   });
+
+  return promise.then((mgn) => {
+    return { type: 'positionRisk', msg: '', data: mgn } as ValidatedResponseI<MarginAccountI>;
+  });
+
+  // return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
+  //   if (!data.ok) {
+  //     console.error({ data });
+  //     throw new Error(data.statusText);
+  //   }
+  //   return data.json();
+  // });
 }
 
 export function positionRiskOnTrade(

@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useProvider } from 'wagmi';
 
 import {
   Box,
@@ -90,6 +90,8 @@ export const PositionsTable = memo(() => {
     setModifyModalOpen(false);
     setSelectedPosition(null);
   }, []);
+
+  const provider = useProvider();
 
   const handleModifyPositionConfirm = useCallback(() => {
     if (!selectedPosition || !address || !selectedPool || !proxyAddr) {
@@ -251,12 +253,12 @@ export const PositionsTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getPositionRisk(symbol, address, Date.now()).then(({ data }) => {
+        getPositionRisk(symbol, address, provider, Date.now()).then(({ data }) => {
           setPositions(data);
         });
       });
     }
-  }, [address, selectedPool, setPositions]);
+  }, [address, selectedPool, provider, setPositions]);
 
   const handleRefreshPositionRisk = useCallback(() => {
     if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {

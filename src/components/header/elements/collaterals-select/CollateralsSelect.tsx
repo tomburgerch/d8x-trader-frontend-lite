@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import type { SyntheticEvent } from 'react';
 import { memo, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useProvider } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
@@ -38,6 +38,8 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 export const CollateralsSelect = memo(() => {
   const { address } = useAccount();
 
+  const provider = useProvider();
+
   const { isConnected, send } = useWebSocketContext();
 
   const [pools] = useAtom(poolsAtom);
@@ -67,12 +69,12 @@ export const CollateralsSelect = memo(() => {
         getOpenOrders(symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
-        getPositionRisk(symbol, address).then(({ data }) => {
+        getPositionRisk(symbol, address, provider).then(({ data }) => {
           setPositions(data);
         });
       });
     }
-  }, [selectedPool, address, setOpenOrders, setPositions]);
+  }, [selectedPool, address, setOpenOrders, setPositions, provider]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {

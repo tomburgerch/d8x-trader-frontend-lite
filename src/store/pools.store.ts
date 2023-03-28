@@ -20,6 +20,7 @@ export const newPositionRiskAtom = atom<MarginAccountI | null>(null);
 export const collateralDepositAtom = atom(0);
 export const webSocketReadyAtom = atom(false);
 export const loyaltyScoreAtom = atom(0);
+export const abiAtom = atom<string[]>([]);
 
 const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
 const ordersAtom = atom<Record<string, OrderI>>({});
