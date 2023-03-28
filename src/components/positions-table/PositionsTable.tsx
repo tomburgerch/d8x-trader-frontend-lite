@@ -76,6 +76,7 @@ export const PositionsTable = memo(() => {
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [positionRiskSent, setPositionRiskSent] = useState(false);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -246,7 +247,8 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(() => {
-    if (selectedPool !== null && address) {
+    if (selectedPool !== null && address && provider && !positionRiskSent) {
+      setPositionRiskSent(true);
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
@@ -257,8 +259,9 @@ export const PositionsTable = memo(() => {
           setPositions(data);
         });
       });
+      setPositionRiskSent(false);
     }
-  }, [address, selectedPool, provider, setPositions]);
+  }, [address, selectedPool, provider, positionRiskSent, setPositions]);
 
   const handleRefreshPositionRisk = useCallback(() => {
     if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {

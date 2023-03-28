@@ -57,18 +57,20 @@ export function getPositionRisk(
   if (timestamp) {
     params.append('t', '' + timestamp);
   }
+  console.log(`called me at ${Date.now() / 1000}`);
+  const SDKconfig = PerpetualDataHandler.readSDKConfig('central-park');
 
-  const marketData = new MarketData(PerpetualDataHandler.readSDKConfig('central-park'));
+  const marketData = new MarketData(SDKconfig);
 
-  const promise = marketData.createProxyInstance(provider).then(() => {
+  return marketData.createProxyInstance(provider).then(() => {
     return marketData.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
-      return data as MarginAccountI;
+      return { type: 'positionRisk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
     });
   });
 
-  return promise.then((mgn) => {
-    return { type: 'positionRisk', msg: '', data: mgn } as ValidatedResponseI<MarginAccountI>;
-  });
+  // return promise.then((mgn) => {
+  //   return { type: 'positionRisk', msg: '', data: mgn } as ValidatedResponseI<MarginAccountI>;
+  // });
 
   // return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
   //   if (!data.ok) {

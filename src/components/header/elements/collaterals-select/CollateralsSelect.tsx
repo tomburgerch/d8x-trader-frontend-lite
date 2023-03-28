@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import type { SyntheticEvent } from 'react';
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useAccount, useProvider } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
@@ -22,6 +22,7 @@ import { PoolI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from './CollateralsSelect.module.scss';
+import { useDebouncedEffect } from 'helpers/useDebouncedEffect';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -48,6 +49,7 @@ export const CollateralsSelect = memo(() => {
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [positionRiskSent, setPositionRiskSent] = useState(false);
 
   useEffect(() => {
     if (selectedPool !== null && address) {
@@ -58,23 +60,27 @@ export const CollateralsSelect = memo(() => {
     }
   }, [selectedPool, setPoolFee, address]);
 
-  useEffect(() => {
-    if (selectedPool !== null && address) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
+  useDebouncedEffect(
+    () => {
+      if (selectedPool !== null && address && provider) {
+        selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+          const symbol = createSymbol({
+            baseCurrency,
+            quoteCurrency,
+            poolSymbol: selectedPool.poolSymbol,
+          });
+          getOpenOrders(symbol, address).then(({ data }) => {
+            setOpenOrders(data);
+          });
+          getPositionRisk(symbol, address, provider).then(({ data }) => {
+            setPositions(data);
+          });
         });
-        getOpenOrders(symbol, address).then(({ data }) => {
-          setOpenOrders(data);
-        });
-        getPositionRisk(symbol, address, provider).then(({ data }) => {
-          setPositions(data);
-        });
-      });
-    }
-  }, [selectedPool, address, setOpenOrders, setPositions, provider]);
+      }
+    },
+    [selectedPool, address, setOpenOrders, setPositions, provider],
+    10000
+  );
 
   useEffect(() => {
     if (selectedPool && isConnected) {
