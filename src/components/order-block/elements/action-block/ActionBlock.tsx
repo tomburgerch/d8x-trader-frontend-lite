@@ -11,6 +11,7 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
 import {
@@ -27,7 +28,6 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
-import { ToastContent } from '../../../toast-content/ToastContent';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -219,28 +219,13 @@ export const ActionBlock = memo(() => {
                       requestSentRef.current = false;
                       setRequestSent(false);
 
-                      toast.success(
-                        <ToastContent
-                          title="Order submitted"
-                          bodyLines={[{ label: 'Symbol', value: selectedPool.poolSymbol }]}
-                        />
-                      );
+                      toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch((error: any) => {
                       console.error(error);
                       requestSentRef.current = false;
                       setRequestSent(false);
-
-                      toast.error(
-                        <ToastContent
-                          title="Order failed"
-                          bodyLines={[
-                            { label: 'Symbol', value: selectedPool.poolSymbol },
-                            { label: 'Reason', value: error.message },
-                          ]}
-                        />
-                      );
                     });
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -248,16 +233,6 @@ export const ActionBlock = memo(() => {
                   console.error(error);
                   requestSentRef.current = false;
                   setRequestSent(false);
-
-                  toast.error(
-                    <ToastContent
-                      title="Order failed"
-                      bodyLines={[
-                        { label: 'Symbol', value: selectedPool.poolSymbol },
-                        { label: 'Reason', value: error.message },
-                      ]}
-                    />
-                  );
                 });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -265,16 +240,6 @@ export const ActionBlock = memo(() => {
               console.error(error);
               requestSentRef.current = false;
               setRequestSent(false);
-
-              toast.error(
-                <ToastContent
-                  title="Order failed"
-                  bodyLines={[
-                    { label: 'Symbol', value: selectedPool.poolSymbol },
-                    { label: 'Reason', value: error.message },
-                  ]}
-                />
-              );
             });
         }
       })
@@ -283,16 +248,6 @@ export const ActionBlock = memo(() => {
         console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
-
-        toast.error(
-          <ToastContent
-            title="Order failed"
-            bodyLines={[
-              { label: 'Symbol', value: selectedPool.poolSymbol },
-              { label: 'Reason', value: error.message },
-            ]}
-          />
-        );
       });
   }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit]);
 

@@ -1,7 +1,8 @@
 import { Box, Typography } from '@mui/material';
 
+import { SidesRow } from 'components/sides-row/SidesRow';
+
 import styles from './ToastContent.module.scss';
-import { SidesRow } from '../sides-row/SidesRow';
 
 interface ToastContentPropsI {
   title: string;

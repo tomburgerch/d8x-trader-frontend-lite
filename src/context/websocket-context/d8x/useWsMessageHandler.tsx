@@ -1,7 +1,9 @@
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getOpenOrders } from 'network/network';
 import {
@@ -29,8 +31,6 @@ import {
   OnUpdateMarkPriceWsMessageI,
   SubscriptionWsMessageI,
 } from './types';
-import { toast } from 'react-toastify';
-import { ToastContent } from '../../../components/toast-content/ToastContent';
 
 function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
   return message.type === MessageTypeE.Connect;
@@ -160,6 +160,13 @@ export function useWsMessageHandler() {
         getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
+
+        toast.success(
+          <ToastContent
+            title="Order submitted"
+            bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
+          />
+        );
       } else if (isPerpetualLimitOrderCancelledMessage(parsedMessage)) {
         removeOpenOrder(parsedMessage.data.obj.orderId);
       } else if (isTradeMessage(parsedMessage)) {

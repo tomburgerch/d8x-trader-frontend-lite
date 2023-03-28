@@ -37,6 +37,7 @@ import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import {
@@ -57,7 +58,6 @@ import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector
 import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
-import { ToastContent } from '../toast-content/ToastContent';
 
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -129,12 +129,7 @@ export const PositionsTable = memo(() => {
                         setModifyModalOpen(false);
                         setSelectedPosition(null);
 
-                        toast.success(
-                          <ToastContent
-                            title="Order closed"
-                            bodyLines={[{ label: 'Symbol', value: selectedPool.poolSymbol }]}
-                          />
-                        );
+                        toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
                       })
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       .catch((error: any) => {
@@ -146,48 +141,18 @@ export const PositionsTable = memo(() => {
                   .catch((error: any) => {
                     console.error(error);
                     setRequestSent(false);
-
-                    toast.error(
-                      <ToastContent
-                        title="Order close failed"
-                        bodyLines={[
-                          { label: 'Symbol', value: selectedPool.poolSymbol },
-                          { label: 'Reason', value: error.message },
-                        ]}
-                      />
-                    );
                   });
               })
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .catch((error: any) => {
                 console.error(error);
                 setRequestSent(false);
-
-                toast.error(
-                  <ToastContent
-                    title="Order close failed"
-                    bodyLines={[
-                      { label: 'Symbol', value: selectedPool.poolSymbol },
-                      { label: 'Reason', value: error.message },
-                    ]}
-                  />
-                );
               });
           }
         })
         .catch((error) => {
           console.error(error);
           setRequestSent(false);
-
-          toast.error(
-            <ToastContent
-              title="Order close failed"
-              bodyLines={[
-                { label: 'Symbol', value: selectedPool.poolSymbol },
-                { label: 'Reason', value: error.message },
-              ]}
-            />
-          );
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
@@ -202,58 +167,23 @@ export const PositionsTable = memo(() => {
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
 
-                  toast.success(
-                    <ToastContent
-                      title="Collateral added"
-                      bodyLines={[{ label: 'Symbol', value: selectedPool.poolSymbol }]}
-                    />
-                  );
+                  toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {
                   console.error(error);
                   setRequestSent(false);
-
-                  toast.error(
-                    <ToastContent
-                      title="Collateral add failed"
-                      bodyLines={[
-                        { label: 'Symbol', value: selectedPool.poolSymbol },
-                        { label: 'Reason', value: error.message },
-                      ]}
-                    />
-                  );
                 });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {
               console.error(error);
               setRequestSent(false);
-
-              toast.error(
-                <ToastContent
-                  title="Collateral add failed"
-                  bodyLines={[
-                    { label: 'Symbol', value: selectedPool.poolSymbol },
-                    { label: 'Reason', value: error.message },
-                  ]}
-                />
-              );
             });
         })
         .catch((error) => {
           console.error(error);
           setRequestSent(false);
-
-          toast.error(
-            <ToastContent
-              title="Collateral add failed"
-              bodyLines={[
-                { label: 'Symbol', value: selectedPool.poolSymbol },
-                { label: 'Reason', value: error.message },
-              ]}
-            />
-          );
         });
     } else if (modifyType === ModifyTypeE.Remove) {
       if (!maxCollateral || maxCollateral < removeCollateral) {
@@ -270,42 +200,17 @@ export const PositionsTable = memo(() => {
               setModifyModalOpen(false);
               setSelectedPosition(null);
 
-              toast.success(
-                <ToastContent
-                  title="Collateral removed"
-                  bodyLines={[{ label: 'Symbol', value: selectedPool.poolSymbol }]}
-                />
-              );
+              toast.success(<ToastContent title="Collateral remove processed" bodyLines={[]} />);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {
               console.error(error);
               setRequestSent(false);
-
-              toast.error(
-                <ToastContent
-                  title="Collateral remove failed"
-                  bodyLines={[
-                    { label: 'Symbol', value: selectedPool.poolSymbol },
-                    { label: 'Reason', value: error.message },
-                  ]}
-                />
-              );
             });
         })
         .catch((error) => {
           console.error(error);
           setRequestSent(false);
-
-          toast.error(
-            <ToastContent
-              title="Collateral remove failed"
-              bodyLines={[
-                { label: 'Symbol', value: selectedPool.poolSymbol },
-                { label: 'Reason', value: error.message },
-              ]}
-            />
-          );
         });
     }
   }, [
