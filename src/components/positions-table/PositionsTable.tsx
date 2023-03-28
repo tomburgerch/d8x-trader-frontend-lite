@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
 import {
@@ -36,6 +37,7 @@ import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import {
@@ -126,6 +128,8 @@ export const PositionsTable = memo(() => {
                         setRequestSent(false);
                         setModifyModalOpen(false);
                         setSelectedPosition(null);
+
+                        toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
                       })
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       .catch((error: any) => {
@@ -162,6 +166,8 @@ export const PositionsTable = memo(() => {
                   setRequestSent(false);
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
+
+                  toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {
@@ -193,6 +199,8 @@ export const PositionsTable = memo(() => {
               setRequestSent(false);
               setModifyModalOpen(false);
               setSelectedPosition(null);
+
+              toast.success(<ToastContent title="Collateral remove processed" bodyLines={[]} />);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {

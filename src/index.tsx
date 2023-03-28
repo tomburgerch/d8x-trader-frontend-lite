@@ -14,6 +14,7 @@ import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/index.scss';
 
 const container = document.getElementById('root');

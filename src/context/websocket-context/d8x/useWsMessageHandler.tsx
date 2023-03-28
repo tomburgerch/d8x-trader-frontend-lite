@@ -1,7 +1,9 @@
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getOpenOrders } from 'network/network';
 import {
@@ -158,6 +160,13 @@ export function useWsMessageHandler() {
         getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
+
+        toast.success(
+          <ToastContent
+            title="Order submitted"
+            bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
+          />
+        );
       } else if (isPerpetualLimitOrderCancelledMessage(parsedMessage)) {
         removeOpenOrder(parsedMessage.data.obj.orderId);
       } else if (isTradeMessage(parsedMessage)) {
@@ -165,11 +174,26 @@ export function useWsMessageHandler() {
           return;
         }
         removeOpenOrder(parsedMessage.data.obj.orderId);
+        toast.success(
+          <ToastContent
+            title="Trade executed"
+            bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
+          />
+        );
       } else if (isExecutionFailedMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
         }
         failOpenOrder(parsedMessage.data.obj.orderId);
+        toast.error(
+          <ToastContent
+            title="Order failed"
+            bodyLines={[
+              { label: 'Symbol', value: parsedMessage.data.obj.symbol },
+              { label: 'Reason', value: parsedMessage.data.obj.reason },
+            ]}
+          />
+        );
       }
     },
     [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]

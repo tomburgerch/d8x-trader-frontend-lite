@@ -1,5 +1,7 @@
+import { BigNumber } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useSigner, useBalance } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -9,6 +11,7 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
 import {
@@ -25,7 +28,6 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
-import { BigNumber } from 'ethers';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -216,6 +218,8 @@ export const ActionBlock = memo(() => {
                       setShowReviewOrderModal(false);
                       requestSentRef.current = false;
                       setRequestSent(false);
+
+                      toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch((error: any) => {
