@@ -11,8 +11,7 @@ import type {
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
-import { MarketData, PerpetualDataHandler } from '@d8x/perpetuals-sdk';
-import { ethers } from 'ethers';
+import { TraderInterface } from '@d8x/perpetuals-sdk';
 
 export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
@@ -45,9 +44,9 @@ export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<nu
 }
 
 export function getPositionRisk(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string,
-  provider: ethers.providers.Provider,
   timestamp?: number
 ): Promise<ValidatedResponseI<MarginAccountI>> {
   const params = new URLSearchParams({
@@ -57,92 +56,122 @@ export function getPositionRisk(
   if (timestamp) {
     params.append('t', '' + timestamp);
   }
-  console.log(`called me at ${Date.now() / 1000}`);
-  const SDKconfig = PerpetualDataHandler.readSDKConfig('central-park');
 
-  const marketData = new MarketData(SDKconfig);
-
-  return marketData.createProxyInstance(provider).then(() => {
-    return marketData.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
+  if (traderAPI) {
+    console.log(`positionRisk through SDK: ${symbol} ${Date.now() / 1000}`);
+    return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
       return { type: 'positionRisk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
     });
-  });
-
-  // return promise.then((mgn) => {
-  //   return { type: 'positionRisk', msg: '', data: mgn } as ValidatedResponseI<MarginAccountI>;
-  // });
-
-  // return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
-  //   if (!data.ok) {
-  //     console.error({ data });
-  //     throw new Error(data.statusText);
-  //   }
-  //   return data.json();
-  // });
+  } else {
+    console.log(`positionRisk through REST: ${symbol} ${Date.now() / 1000}`);
+    return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function positionRiskOnTrade(
+  traderAPI: TraderInterface | null,
   order: OrderI,
   traderAddr: string
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
-  const requestOptions = {
-    ...getRequestOptions(RequestMethodE.Post),
-    body: JSON.stringify({
-      order,
-      traderAddr,
-    }),
-  };
-  return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    console.log(`positionRiskOnTrade through SDK:  ${order.symbol} ${Date.now() / 1000}`);
+    return traderAPI.positionRiskOnTrade(traderAddr, order).then((data) => {
+      return { type: 'positionRiskOnTrade', msg: '', data: data } as ValidatedResponseI<{
+        newPositionRisk: MarginAccountI;
+        orderCost: number;
+      }>;
+    });
+  } else {
+    console.log(`positionRiskOnTrade through REST:  ${order.symbol} ${Date.now() / 1000}`);
+    const requestOptions = {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify({
+        order,
+        traderAddr,
+      }),
+    };
+    return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function positionRiskOnCollateralAction(
+  traderAPI: TraderInterface | null,
   traderAddr: string,
   amount: number,
   positionRisk: MarginAccountI
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>> {
-  const requestOptions = {
-    ...getRequestOptions(RequestMethodE.Post),
-    body: JSON.stringify({
-      amount,
-      traderAddr,
-      positionRisk,
-    }),
-  };
-  return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    console.log(`positionRiskOnCollateralAction through SDK: ${Date.now() / 1000}`);
+    return traderAPI.positionRiskOnCollateralAction(amount, positionRisk).then((data) => {
+      return traderAPI.getAvailableMargin(traderAddr, positionRisk.symbol).then((margin) => {
+        return {
+          type: 'positionRiskOnCollateralAction',
+          msg: '',
+          data: { newPositionRisk: data, availableMargin: margin },
+        } as ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>;
+      });
+    });
+  } else {
+    console.log(`positionRiskOnCollateralAction through REST: ${Date.now() / 1000}`);
+    const requestOptions = {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify({
+        amount,
+        traderAddr,
+        positionRisk,
+      }),
+    };
+    return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function getOpenOrders(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
-  const params = new URLSearchParams({
-    symbol,
-    traderAddr,
-  });
-  if (timestamp) {
-    params.append('t', '' + timestamp);
-  }
-
-  return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
+  if (traderAPI) {
+    console.log(`getOpenOrders through SDK: ${Date.now() / 1000}`);
+    return traderAPI.openOrders(traderAddr, symbol).then((data) => {
+      return { type: 'openOrders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
+    });
+  } else {
+    console.log(`getOpenOrders through REST: ${Date.now() / 1000}`);
+    const params = new URLSearchParams({
+      symbol,
+      traderAddr,
+    });
+    if (timestamp) {
+      params.append('t', '' + timestamp);
     }
-    return data.json();
-  });
+
+    return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<ValidatedResponseI<number>> {
@@ -158,10 +187,17 @@ export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<Val
 }
 
 export function getMaxOrderSizeForTrader(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
+  if (traderAPI) {
+    console.log(`TODO: maxOrderSizeForTrader through SDK: ${Date.now() / 1000}`);
+    // return traderAPI.maxOrderSizeForTrader(traderAddr, symbol).then((data) => {
+    //   return { type: 'openOrders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
+    // });
+  }
   const params = new URLSearchParams({
     symbol,
     traderAddr,

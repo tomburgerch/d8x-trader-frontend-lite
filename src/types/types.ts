@@ -159,7 +159,7 @@ export interface OrderDigestI {
   digests: string[];
   orderIds: string[];
   OrderBookAddr: string;
-  abi: string;
+  abi: string | string[];
   SCOrders: SmartContractOrderI[];
 }
 

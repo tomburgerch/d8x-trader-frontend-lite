@@ -1,17 +1,14 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, ContractTransaction } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount, useSigner, useBalance, useSignMessage, usePrepareContractWrite, useContractWrite } from 'wagmi';
-import { LOB_ABI } from 'blockchain-api/constants';
+import { useAccount, useSigner, useBalance, useSignMessage } from 'wagmi';
 import { Buffer } from 'buffer';
-import { MarketData, PerpetualDataHandler } from '@d8x/perpetuals-sdk';
 import { toast } from 'react-toastify';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
-// import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
-// import { signMessages } from 'blockchain-api/signMessage';
+import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -23,15 +20,15 @@ import {
   perpetualStaticInfoAtom,
   proxyAddrAtom,
   selectedPoolAtom,
+  traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { MaxOrderSizeResponseI, OrderI, OrderInfoI, SmartContractOrderI } from 'types/types';
+import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
-import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -92,17 +89,12 @@ export const ActionBlock = memo(() => {
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
-  // const [postOrderABI, setPostOrderABI] = useAtom(abiAtom);
-
-  const limitOrderBookAddr = useRef<string>('0x');
-  const orderSignatures = useRef<`0x${string}`[]>([]);
-  const scOrders = useRef<SmartContractOrderI[]>([]);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
-  // const [scOrders, setSCOrders] = useState<SmartContractOrderI[]>([]);
-  // const [orderSignatures, setOrderSignatures] = useState<string[]>([]);
+  const [, setPostOrderTransaction] = useState<ContractTransaction | null>(null);
 
   const requestSentRef = useRef(false);
 
@@ -123,16 +115,16 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(mainOrder, address).then((data) => {
+    positionRiskOnTrade(traderAPI, mainOrder, address).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(mainOrder.symbol, address, Date.now()).then((data) => {
+    getMaxOrderSizeForTrader(traderAPI, mainOrder.symbol, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
-  }, [orderInfo, address, setNewPositionRisk, setCollateralDeposit]);
+  }, [orderInfo, address, traderAPI, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -215,29 +207,12 @@ export const ActionBlock = memo(() => {
     signer,
   ]);
 
-  const { config: postOrdersConfig, error: perparePostOrdersError } = usePrepareContractWrite({
-    address: limitOrderBookAddr.current as `0x${string}`,
-    abi: LOB_ABI,
-    functionName: 'postOrders',
-    args: [scOrders.current, orderSignatures.current],
-    overrides: {
-      gasLimit: BigNumber.from(3_000_000),
-    },
-    enabled: limitOrderBookAddr.current !== '0x' && orderSignatures.current.length > 0 && scOrders.current.length > 0,
-  });
-
   const { signMessageAsync } = useSignMessage();
 
-  const {
-    data: postOrderdata,
-    error: postOrdersError,
-    isError,
-    write: postOrders,
-  } = useContractWrite(postOrdersConfig);
-
   // const { isLoading, isSuccess } = useWaitForTransaction({
-  //   hash: postOrderdata?.hash,
-  // })
+  //   hash: postOrderTransaction?.hash as `0x${string}`,
+  //   confirmations: 1,
+  // });
 
   const handleOrderConfirm = useCallback(() => {
     if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr) {
@@ -248,7 +223,6 @@ export const ActionBlock = memo(() => {
     orderDigest(parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          limitOrderBookAddr.current = data.data.OrderBookAddr;
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
             .then(() => {
               Promise.all(
@@ -256,11 +230,11 @@ export const ActionBlock = memo(() => {
               )
                 .then((signatures) => {
                   postOrder(signer, signatures, data.data)
-                    .then(() => {
+                    .then((tx: ContractTransaction) => {
                       setShowReviewOrderModal(false);
                       requestSentRef.current = false;
                       setRequestSent(false);
-
+                      setPostOrderTransaction(tx);
                       toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -291,18 +265,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-    postOrders?.();
-  }, [
-    parsedOrders,
-    address,
-    signer,
-    selectedPool,
-    proxyAddr,
-    collateralDeposit,
-    signMessageAsync,
-    limitOrderBookAddr,
-    postOrders,
-  ]);
+  }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit, signMessageAsync]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -454,12 +417,7 @@ export const ActionBlock = memo(() => {
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
               Cancel
             </Button>
-            <Button
-              onClick={handleOrderConfirm}
-              variant="primary"
-              size="small"
-              disabled={!postOrders || isConfirmButtonDisabled}
-            >
+            <Button onClick={handleOrderConfirm} variant="primary" size="small" disabled={isConfirmButtonDisabled}>
               Confirm
             </Button>
           </DialogActions>

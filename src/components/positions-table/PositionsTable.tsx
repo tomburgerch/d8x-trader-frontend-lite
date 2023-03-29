@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount, useProvider } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { toast } from 'react-toastify';
 
 import {
@@ -50,7 +50,13 @@ import {
 } from 'network/network';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { perpetualStatisticsAtom, positionsAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
+import {
+  perpetualStatisticsAtom,
+  positionsAtom,
+  proxyAddrAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+} from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
 
@@ -58,12 +64,14 @@ import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector
 import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
+import useDebounce from 'helpers/useDebounce';
 
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const { address } = useAccount();
 
@@ -93,8 +101,6 @@ export const PositionsTable = memo(() => {
     setModifyModalOpen(false);
     setSelectedPosition(null);
   }, []);
-
-  const provider = useProvider();
 
   const handleModifyPositionConfirm = useCallback(() => {
     if (!selectedPosition || !address || !selectedPool || !proxyAddr) {
@@ -255,7 +261,7 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(() => {
-    if (selectedPool !== null && address && provider && !positionRiskSent) {
+    if (selectedPool !== null && address && !positionRiskSent) {
       setPositionRiskSent(true);
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
@@ -263,36 +269,45 @@ export const PositionsTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getPositionRisk(symbol, address, provider, Date.now()).then(({ data }) => {
+        getPositionRisk(traderAPI, symbol, address, Date.now()).then(({ data }) => {
           setPositions(data);
         });
       });
       setPositionRiskSent(false);
     }
-  }, [address, selectedPool, provider, positionRiskSent, setPositions]);
+  }, [address, selectedPool, positionRiskSent, traderAPI, setPositions]);
+
+  const debouncedAddCollateral = useDebounce(addCollateral, 500);
+
+  const debouncedRemoveCollateral = useDebounce(removeCollateral, 500);
 
   const handleRefreshPositionRisk = useCallback(() => {
     if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {
       return;
     }
 
-    if (modifyType === ModifyTypeE.Add && addCollateral === 0) {
+    if (modifyType === ModifyTypeE.Add && debouncedAddCollateral === 0) {
       return;
     }
 
-    if (modifyType === ModifyTypeE.Remove && removeCollateral === 0) {
+    if (modifyType === ModifyTypeE.Remove && debouncedRemoveCollateral === 0) {
       return;
     }
 
     positionRiskOnCollateralAction(
+      traderAPI,
       address,
-      modifyType === ModifyTypeE.Add ? addCollateral : -removeCollateral,
+      modifyType === ModifyTypeE.Add ? debouncedAddCollateral : -debouncedRemoveCollateral,
       selectedPosition
     ).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setMaxCollateral(data.data.availableMargin);
     });
-  }, [address, selectedPosition, modifyType, addCollateral, removeCollateral]);
+  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral, traderAPI]);
+
+  useEffect(() => {
+    return handleRefreshPositionRisk();
+  }, [debouncedAddCollateral, debouncedRemoveCollateral, handleRefreshPositionRisk]);
 
   const handleMaxCollateral = useCallback(() => {
     if (maxCollateral) {

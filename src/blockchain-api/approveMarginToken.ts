@@ -9,14 +9,14 @@ export function approveMarginToken(
   minAmount: number
 ) {
   const marginToken: ethers.Contract = new ethers.Contract(marginTokenAddr, ERC20_ABI, signer);
-  const amount = ethers.constants.MaxUint256.div(2);
+  const amount = ethers.constants.MaxUint256;
   const minAmountBN = ethers.utils.parseUnits((4 * minAmount).toString(), 18);
   return signer.getAddress().then((addr: string) => {
     marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
       if (allowance.gt(minAmountBN)) {
         Promise.resolve();
       } else {
-        marginToken.approve(proxyAddr, amount, { gasLimit: 1_000_000 });
+        marginToken.approve(proxyAddr, amount, { gasLimit: BigNumber.from(1_000_000) });
       }
     });
   });
