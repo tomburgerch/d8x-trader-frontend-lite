@@ -1,9 +1,11 @@
+import { BigNumber } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount, useSigner, useBalance, useSignMessage, usePrepareContractWrite, useContractWrite } from 'wagmi';
 import { LOB_ABI } from 'blockchain-api/constants';
 import { Buffer } from 'buffer';
 import { MarketData, PerpetualDataHandler } from '@d8x/perpetuals-sdk';
+import { toast } from 'react-toastify';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -12,6 +14,7 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 // import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
 import { orderInfoAtom } from 'store/order-block.store';
 import {
@@ -28,7 +31,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
-import { BigNumber, ethers } from 'ethers';
+import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -218,7 +221,7 @@ export const ActionBlock = memo(() => {
     functionName: 'postOrders',
     args: [scOrders.current, orderSignatures.current],
     overrides: {
-      gasLimit: ethers.BigNumber.from(3_000_000),
+      gasLimit: BigNumber.from(3_000_000),
     },
     enabled: limitOrderBookAddr.current !== '0x' && orderSignatures.current.length > 0 && scOrders.current.length > 0,
   });
@@ -252,13 +255,20 @@ export const ActionBlock = memo(() => {
                 data.data.digests.map((dgst) => signMessageAsync({ message: Buffer.from(dgst.slice(2), 'hex') }))
               )
                 .then((signatures) => {
-                  scOrders.current = data.data.SCOrders;
-                  orderSignatures.current = signatures;
-                  setShowReviewOrderModal(false);
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  scOrders.current = [];
-                  orderSignatures.current = [];
+                  postOrder(signer, signatures, data.data)
+                    .then(() => {
+                      setShowReviewOrderModal(false);
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+
+                      toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
+                    })
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .catch((error: any) => {
+                      console.error(error);
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+                    });
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {

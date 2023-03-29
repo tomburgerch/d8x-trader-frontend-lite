@@ -1,6 +1,6 @@
 {
   "name": "d8x-app",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "start": "react-app-rewired start",
@@ -73,6 +73,7 @@
     "react-resize-detector": "8.0.4",
     "react-router-dom": "6.9.0",
     "react-scripts": "5.0.1",
+    "react-toastify": "9.1.2",
     "wagmi": "0.12.6"
   },
   "devDependencies": {

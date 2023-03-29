@@ -19,4 +19,11 @@
   --d8x-social-icon-color-hover: rgba(0, 0, 0, 0.5);
   --d8x-side-border-color: rgba(102, 74, 223, 0.1);
   --d8x-separator-border-color: rgba(102, 74, 223, 0.2);
+
+  // Override colors for toastify
+  --toastify-color-progress-success: #664ADF;
+  --toastify-color-progress-error: #FFBDBD;
+  --toastify-color-progress-warning: #FFBDBD;
+  --toastify-color-progress-info: #FFBDBD;
+  --toastify-color-progress-light: linear-gradient(to right, #FFDA9F, #FFBDBD, #000);
 }

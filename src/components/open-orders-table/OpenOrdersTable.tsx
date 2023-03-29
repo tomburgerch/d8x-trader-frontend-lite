@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
 import {
@@ -25,6 +26,7 @@ import { getSigner } from 'blockchain-api/getSigner';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { createSymbol } from 'helpers/createSymbol';
 import { getCancelOrder, getOpenOrders } from 'network/network';
 import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom } from 'store/pools.store';
@@ -79,6 +81,8 @@ export const OpenOrdersTable = memo(() => {
                   setCancelModalOpen(false);
                   setSelectedOrder(null);
                   setRequestSent(false);
+
+                  toast.success(<ToastContent title="Cancel order processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {
