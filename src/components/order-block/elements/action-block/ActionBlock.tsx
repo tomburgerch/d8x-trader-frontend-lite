@@ -1,14 +1,14 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, ContractTransaction } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useAccount, useSigner, useBalance, useSignMessage } from 'wagmi';
+import { Buffer } from 'buffer';
 import { toast } from 'react-toastify';
-import { useAccount, useSigner, useBalance } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
-import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -20,6 +20,7 @@ import {
   perpetualStaticInfoAtom,
   proxyAddrAtom,
   selectedPoolAtom,
+  traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
@@ -85,10 +86,12 @@ export const ActionBlock = memo(() => {
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
+  const [, setPostOrderTransaction] = useState<ContractTransaction | null>(null);
 
   const requestSentRef = useRef(false);
 
@@ -109,16 +112,16 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(mainOrder, address).then((data) => {
+    positionRiskOnTrade(traderAPI, mainOrder, address).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(mainOrder.symbol, address, Date.now()).then((data) => {
+    getMaxOrderSizeForTrader(traderAPI, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
-  }, [orderInfo, address, setNewPositionRisk, setCollateralDeposit]);
+  }, [orderInfo, address, traderAPI, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -151,6 +154,7 @@ export const ActionBlock = memo(() => {
     }
 
     const orders: OrderI[] = [];
+
     orders.push(createMainOrder(orderInfo));
 
     if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossPrice) {
@@ -200,6 +204,13 @@ export const ActionBlock = memo(() => {
     signer,
   ]);
 
+  const { signMessageAsync } = useSignMessage();
+
+  // const { isLoading, isSuccess } = useWaitForTransaction({
+  //   hash: postOrderTransaction?.hash as `0x${string}`,
+  //   confirmations: 1,
+  // });
+
   const handleOrderConfirm = useCallback(() => {
     if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr) {
       return;
@@ -211,14 +222,16 @@ export const ActionBlock = memo(() => {
         if (data.data.digests.length > 0) {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
             .then(() => {
-              signMessages(signer, data.data.digests)
+              Promise.all(
+                data.data.digests.map((dgst) => signMessageAsync({ message: Buffer.from(dgst.slice(2), 'hex') }))
+              )
                 .then((signatures) => {
                   postOrder(signer, signatures, data.data)
-                    .then(() => {
+                    .then((tx: ContractTransaction) => {
                       setShowReviewOrderModal(false);
                       requestSentRef.current = false;
                       setRequestSent(false);
-
+                      setPostOrderTransaction(tx);
                       toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -249,7 +262,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit]);
+  }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit, signMessageAsync]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {

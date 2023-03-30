@@ -29,7 +29,7 @@ import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { createSymbol } from 'helpers/createSymbol';
 import { getCancelOrder, getOpenOrders } from 'network/network';
-import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom } from 'store/pools.store';
+import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
@@ -43,6 +43,7 @@ export const OpenOrdersTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
   const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
@@ -70,7 +71,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(traderAPI, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           const signer = getSigner();
@@ -100,7 +101,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent]);
+  }, [selectedOrder, requestSent, traderAPI]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -120,12 +121,12 @@ export const OpenOrdersTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(symbol, address, Date.now()).then(({ data }) => {
+        getOpenOrders(traderAPI, symbol, address, Date.now()).then(({ data }) => {
           setOpenOrders(data);
         });
       });
     }
-  }, [address, selectedPool, clearOpenOrders, setOpenOrders]);
+  }, [address, selectedPool, traderAPI, clearOpenOrders, setOpenOrders]);
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [

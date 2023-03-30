@@ -14,6 +14,7 @@ import {
   removeOpenOrderAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
+  traderAPIAtom,
   webSocketReadyAtom,
 } from 'store/pools.store';
 import { PerpetualStatisticsI } from 'types/types';
@@ -81,6 +82,7 @@ export function useWsMessageHandler() {
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
   const [, failOpenOrder] = useAtom(failOrderAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -157,7 +159,7 @@ export function useWsMessageHandler() {
           return;
         }
 
-        getOpenOrders(parsedMessage.data.obj.symbol, address).then(({ data }) => {
+        getOpenOrders(traderAPI, parsedMessage.data.obj.symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
 
@@ -196,6 +198,15 @@ export function useWsMessageHandler() {
         );
       }
     },
-    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]
+    [
+      updatePerpetualStats,
+      setWebSocketReady,
+      setPositions,
+      setOpenOrders,
+      removeOpenOrder,
+      failOpenOrder,
+      address,
+      traderAPI,
+    ]
   );
 }

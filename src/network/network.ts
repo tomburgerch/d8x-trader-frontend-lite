@@ -11,8 +11,14 @@ import type {
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
+import { TraderInterface, BUY_SIDE, SELL_SIDE, floatToABK64x64 } from '@d8x/perpetuals-sdk';
 
-export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
+export function getExchangeInfo(traderAPI: TraderInterface | null): Promise<ValidatedResponseI<ExchangeInfoI>> {
+  if (traderAPI) {
+    return traderAPI.exchangeInfo().then((info) => {
+      return { type: 'exchangeInfo', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
+    });
+  }
   return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
@@ -22,16 +28,25 @@ export function getExchangeInfo(): Promise<ValidatedResponseI<ExchangeInfoI>> {
   });
 }
 
-export function getPerpetualStaticInfo(symbol: string): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
-  return fetch(`${config.apiUrl}/perpetualStaticInfo?symbol=${symbol}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+export function getPerpetualStaticInfo(
+  traderAPI: TraderInterface | null,
+  symbol: string
+): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
+  if (traderAPI) {
+    const info = traderAPI.getPerpetualStaticInfo(symbol);
+    return Promise.resolve({ type: 'perpetualStaticInfo', msg: '', data: info });
+  } else {
+    return fetch(`${config.apiUrl}/perpetualStaticInfo?symbol=${symbol}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
+// needs broker input: should go through backend
 export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<number>> {
   return fetch(`${config.apiUrl}/trader_loyalty?traderAddr=${address}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
@@ -43,6 +58,7 @@ export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<nu
 }
 
 export function getPositionRisk(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
@@ -55,79 +71,116 @@ export function getPositionRisk(
     params.append('t', '' + timestamp);
   }
 
-  return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
+      return { type: 'positionRisk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
+    });
+  } else {
+    return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function positionRiskOnTrade(
+  traderAPI: TraderInterface | null,
   order: OrderI,
   traderAddr: string
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
-  const requestOptions = {
-    ...getRequestOptions(RequestMethodE.Post),
-    body: JSON.stringify({
-      order,
-      traderAddr,
-    }),
-  };
-  return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    return traderAPI.positionRiskOnTrade(traderAddr, order).then((data) => {
+      return { type: 'positionRiskOnTrade', msg: '', data: data } as ValidatedResponseI<{
+        newPositionRisk: MarginAccountI;
+        orderCost: number;
+      }>;
+    });
+  } else {
+    const requestOptions = {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify({
+        order,
+        traderAddr,
+      }),
+    };
+    return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function positionRiskOnCollateralAction(
+  traderAPI: TraderInterface | null,
   traderAddr: string,
   amount: number,
   positionRisk: MarginAccountI
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>> {
-  const requestOptions = {
-    ...getRequestOptions(RequestMethodE.Post),
-    body: JSON.stringify({
-      amount,
-      traderAddr,
-      positionRisk,
-    }),
-  };
-  return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    return traderAPI.positionRiskOnCollateralAction(amount, positionRisk).then((data) => {
+      return traderAPI.getAvailableMargin(traderAddr, positionRisk.symbol).then((margin) => {
+        return {
+          type: 'positionRiskOnCollateralAction',
+          msg: '',
+          data: { newPositionRisk: data, availableMargin: margin },
+        } as ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>;
+      });
+    });
+  } else {
+    const requestOptions = {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify({
+        amount,
+        traderAddr,
+        positionRisk,
+      }),
+    };
+    return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
 export function getOpenOrders(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
-  const params = new URLSearchParams({
-    symbol,
-    traderAddr,
-  });
-  if (timestamp) {
-    params.append('t', '' + timestamp);
-  }
-
-  return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
+  if (traderAPI) {
+    return traderAPI.openOrders(traderAddr, symbol).then((data) => {
+      return { type: 'openOrders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
+    });
+  } else {
+    const params = new URLSearchParams({
+      symbol,
+      traderAddr,
+    });
+    if (timestamp) {
+      params.append('t', '' + timestamp);
     }
-    return data.json();
-  });
+
+    return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
+// needs broker input, should go through backend
 export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<ValidatedResponseI<number>> {
   return fetch(`${config.apiUrl}/queryFee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
@@ -141,27 +194,53 @@ export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<Val
 }
 
 export function getMaxOrderSizeForTrader(
-  symbol: string,
+  traderAPI: TraderInterface | null,
+  order: OrderI,
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
-  const params = new URLSearchParams({
-    symbol,
-    traderAddr,
-  });
-  if (timestamp) {
-    params.append('t', '' + timestamp);
-  }
-
-  return fetch(`${config.apiUrl}/maxOrderSizeForTrader?${params}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
+  const symbol = order.symbol;
+  if (traderAPI) {
+    return (
+      traderAPI
+        .positionRisk(traderAddr, symbol)
+        .then((positionRisk) => {
+          return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk).then((buy) => {
+            return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk).then((sell) => {
+              return {
+                type: 'maxOrderSizeForTrader',
+                msg: '',
+                data: { buy: buy, sell: sell },
+              } as ValidatedResponseI<MaxOrderSizeResponseI>;
+            });
+          });
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch((error: any) => {
+          console.log(error);
+          throw new Error(error);
+        })
+    );
+  } else {
+    const params = new URLSearchParams({
+      symbol,
+      traderAddr,
+    });
+    if (timestamp) {
+      params.append('t', '' + timestamp);
     }
-    return data.json();
-  });
+
+    return fetch(`${config.apiUrl}/maxOrderSizeForTrader?${params}`, getRequestOptions()).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
+  }
 }
 
+// needs broker input
 export function orderDigest(orders: OrderI[], traderAddr: string): Promise<ValidatedResponseI<OrderDigestI>> {
   const requestOptions = {
     ...getRequestOptions(RequestMethodE.Post),
@@ -179,55 +258,143 @@ export function orderDigest(orders: OrderI[], traderAddr: string): Promise<Valid
   });
 }
 
-export function getCancelOrder(symbol: string, orderId: string): Promise<ValidatedResponseI<CancelOrderResponseI>> {
-  return fetch(`${config.apiUrl}/cancelOrder?symbol=${symbol}&orderId=${orderId}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+export function getCancelOrder(
+  traderAPI: TraderInterface | null,
+  symbol: string,
+  orderId: string
+): Promise<ValidatedResponseI<CancelOrderResponseI>> {
+  if (traderAPI) {
+    const cancelABI = traderAPI.getOrderBookABI(symbol, 'cancelOrder');
+    return traderAPI.cancelOrderDigest(symbol, orderId).then((digest) => {
+      return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
+        return {
+          type: 'cancelOrder',
+          msg: '',
+          data: {
+            OrderBookAddr: digest.OBContractAddr,
+            abi: cancelABI,
+            digest: digest.digest,
+            priceUpdate: {
+              updateData: submission.priceFeedVaas,
+              publishTimes: submission.timestamps,
+              updateFee: traderAPI.PRICE_UPDATE_FEE_GWEI * submission.timestamps.length,
+            },
+          },
+        };
+      });
+    });
+  } else {
+    return fetch(`${config.apiUrl}/cancelOrder?symbol=${symbol}&orderId=${orderId}`, getRequestOptions()).then(
+      (data) => {
+        if (!data.ok) {
+          console.error({ data });
+          throw new Error(data.statusText);
+        }
+        return data.json();
+      }
+    );
+  }
 }
 
 export function getAddCollateral(
+  traderAPI: TraderInterface | null,
   symbol: string,
   amount: number
 ): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
-  return fetch(`${config.apiUrl}/addCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then((data) => {
-    if (!data.ok) {
-      console.error({ data });
-      throw new Error(data.statusText);
-    }
-    return data.json();
-  });
+  if (traderAPI) {
+    const perpId = traderAPI.getPerpetualStaticInfo(symbol).id;
+    const proxyAddr = traderAPI.getProxyAddress();
+    const proxyABI = traderAPI.getProxyABI('deposit');
+    const amountHex = floatToABK64x64(amount);
+    return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
+      return {
+        type: 'addCollateral',
+        msg: '',
+        data: {
+          perpId: perpId,
+          proxyAddr: proxyAddr,
+          abi: proxyABI,
+          amountHex: amountHex.toString(),
+          priceUpdate: {
+            updateData: submission.priceFeedVaas,
+            publishTimes: submission.timestamps,
+            updateFee: traderAPI.PRICE_UPDATE_FEE_GWEI * submission.priceFeedVaas.length,
+          },
+        },
+      };
+    });
+  } else {
+    return fetch(`${config.apiUrl}/addCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
+      (data) => {
+        if (!data.ok) {
+          console.error({ data });
+          throw new Error(data.statusText);
+        }
+        return data.json();
+      }
+    );
+  }
 }
 
 export function getAvailableMargin(
+  traderAPI: TraderInterface | null,
   symbol: string,
   traderAddr: string
 ): Promise<ValidatedResponseI<{ amount: number }>> {
-  return fetch(`${config.apiUrl}/availableMargin?symbol=${symbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
-    (data) => {
+  if (traderAPI) {
+    return traderAPI.getAvailableMargin(traderAddr, symbol).then((margin) => {
+      return { type: 'availableMargin', msg: '', data: { amount: margin } };
+    });
+  } else {
+    return fetch(
+      `${config.apiUrl}/availableMargin?symbol=${symbol}&traderAddr=${traderAddr}`,
+      getRequestOptions()
+    ).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
       }
       return data.json();
-    }
-  );
+    });
+  }
 }
 
 export function getRemoveCollateral(
+  traderAPI: TraderInterface | null,
   symbol: string,
   amount: number
 ): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
-  return fetch(`${config.apiUrl}/removeCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
+  if (traderAPI) {
+    const perpId = traderAPI.getPerpetualStaticInfo(symbol).id;
+    const proxyAddr = traderAPI.getProxyAddress();
+    const proxyABI = traderAPI.getProxyABI('withdraw');
+    const amountHex = floatToABK64x64(amount);
+    return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
+      return {
+        type: 'removeCollateral',
+        msg: '',
+        data: {
+          perpId: perpId,
+          proxyAddr: proxyAddr,
+          abi: proxyABI,
+          amountHex: amountHex.toString(),
+          priceUpdate: {
+            updateData: submission.priceFeedVaas,
+            publishTimes: submission.timestamps,
+            updateFee: traderAPI.PRICE_UPDATE_FEE_GWEI * submission.priceFeedVaas.length,
+          },
+        },
+      };
+    });
+  } else {
+    return fetch(`${config.apiUrl}/removeCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
+      (data) => {
+        if (!data.ok) {
+          console.error({ data });
+          throw new Error(data.statusText);
+        }
+        return data.json();
       }
-      return data.json();
-    }
-  );
+    );
+  }
 }

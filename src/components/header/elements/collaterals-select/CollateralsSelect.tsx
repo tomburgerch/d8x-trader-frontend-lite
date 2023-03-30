@@ -16,6 +16,7 @@ import {
   positionsAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
+  traderAPIAtom,
 } from 'store/pools.store';
 import { PoolI } from 'types/types';
 
@@ -46,6 +47,7 @@ export const CollateralsSelect = memo(() => {
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   useEffect(() => {
     if (selectedPool !== null && address) {
@@ -64,15 +66,15 @@ export const CollateralsSelect = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(symbol, address).then(({ data }) => {
+        getOpenOrders(traderAPI, symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
-        getPositionRisk(symbol, address).then(({ data }) => {
+        getPositionRisk(traderAPI, symbol, address).then(({ data }) => {
           setPositions(data);
         });
       });
     }
-  }, [selectedPool, address, setOpenOrders, setPositions]);
+  }, [selectedPool, address, traderAPI, setOpenOrders, setPositions]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {

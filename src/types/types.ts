@@ -15,7 +15,6 @@ export interface PerpetualI {
   midPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
-  maxPositionBC: number;
 }
 
 export interface PerpetualStatisticsI {
@@ -159,7 +158,7 @@ export interface OrderDigestI {
   digests: string[];
   orderIds: string[];
   OrderBookAddr: string;
-  abi: string;
+  abi: string | string[];
   SCOrders: SmartContractOrderI[];
 }
 
