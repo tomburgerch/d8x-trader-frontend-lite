@@ -1,8 +1,8 @@
 import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount, useSigner, useBalance, useSignMessage, useContractEvent, useWaitForTransaction } from 'wagmi';
-import { Buffer } from 'buffer';
+import { useAccount, useSigner, useBalance, useContractEvent, useWaitForTransaction } from 'wagmi';
+// import { Buffer } from 'buffer';
 import { toast } from 'react-toastify';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -208,7 +208,7 @@ export const ActionBlock = memo(() => {
     signer,
   ]);
 
-  const { signMessageAsync } = useSignMessage();
+  // const { signMessageAsync } = useSignMessage();
 
   const waitForTxnConfig = useMemo(() => {
     if (!postOrderTransaction || !postOrderTransaction.hash) {
@@ -222,14 +222,25 @@ export const ActionBlock = memo(() => {
       confirmations: 1,
       onSuccess(data: unknown) {
         console.log(data);
-        toast.success(
-          <ToastContent title="Order posted" bodyLines={[{ label: 'Tx:', value: postOrderTransaction.hash }]} />
-        );
+        // toast.success(
+        //   <ToastContent
+        //     title="Order posted"
+        //     bodyLines={[
+        //       {
+        //         label: 'Tx:',
+        //         value: `${postOrderTransaction.hash.slice(0, 7)}...`,
+        //       },
+        //     ]}
+        //   />
+        // );
+        toast.success(<ToastContent title="Order posted" bodyLines={[]} />);
+        setPostOrderTransaction(null);
+        setIsAwaitingExecution(true);
       },
     };
-  }, [postOrderTransaction]);
+  }, [postOrderTransaction, setPostOrderTransaction]);
 
-  const { isLoading, isSuccess } = useWaitForTransaction(waitForTxnConfig);
+  useWaitForTransaction(waitForTxnConfig);
 
   const proxyABI = useMemo(() => {
     return traderAPI?.getABI('proxy') as string[] | undefined;
@@ -278,10 +289,10 @@ export const ActionBlock = memo(() => {
         if (data.data.digests.length > 0) {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
             .then(() => {
-              // Promise.resolve(new Array<string>(data.data.digests.length))
-              Promise.all(
-                data.data.digests.map((dgst) => signMessageAsync({ message: Buffer.from(dgst.slice(2), 'hex') }))
-              )
+              Promise.resolve(new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero))
+                // Promise.all(
+                //   data.data.digests.map((dgst) => signMessageAsync({ message: Buffer.from(dgst.slice(2), 'hex') }))
+                // )
                 .then((signatures) => {
                   console.log('signed');
                   data.data.OrderBookAddr = traderAPI.getOrderBookAddress(parsedOrders[0].symbol);
@@ -292,20 +303,16 @@ export const ActionBlock = memo(() => {
                       requestSentRef.current = false;
                       setRequestSent(false);
                       setPostOrderTransaction(tx);
-                      setIsAwaitingExecution(true);
                       setPendingOrderId(data.data.orderIds[0]);
-                      toast.success(
-                        <ToastContent
-                          title="Order submit processed"
-                          bodyLines={[{ label: 'Tx hash', value: tx.hash }]}
-                        />
-                      );
+                      toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
                     })
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .catch((error: any) => {
                       console.error(error);
                       requestSentRef.current = false;
                       setRequestSent(false);
+                      setIsAwaitingExecution(false);
+                      setPostOrderTransaction(null);
                     });
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -313,6 +320,8 @@ export const ActionBlock = memo(() => {
                   console.error(error);
                   requestSentRef.current = false;
                   setRequestSent(false);
+                  setIsAwaitingExecution(false);
+                  setPostOrderTransaction(null);
                 });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,6 +329,8 @@ export const ActionBlock = memo(() => {
               console.error(error);
               requestSentRef.current = false;
               setRequestSent(false);
+              setIsAwaitingExecution(false);
+              setPostOrderTransaction(null);
             });
         }
       })
@@ -328,6 +339,8 @@ export const ActionBlock = memo(() => {
         console.error(error);
         requestSentRef.current = false;
         setRequestSent(false);
+        setIsAwaitingExecution(false);
+        setPostOrderTransaction(null);
       });
   }, [
     parsedOrders,
@@ -339,7 +352,7 @@ export const ActionBlock = memo(() => {
     traderAPI,
     setIsAwaitingExecution,
     setPendingOrderId,
-    signMessageAsync,
+    // signMessageAsync,
   ]);
 
   const atPrice = useMemo(() => {
