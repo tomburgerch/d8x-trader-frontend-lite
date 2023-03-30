@@ -12,10 +12,6 @@ export function postOrder(
   signatures: string[],
   data: OrderDigestI
 ): Promise<ContractTransaction> {
-  console.log(`order book address: ${data.OrderBookAddr}`);
-  console.log(`abi: ${LOB_ABI}`);
-  console.log(`signatures: ${signatures}`);
-  console.log(`order.trader: ${data.SCOrders[0].traderAddr}`);
   // const abi = typeof data.abi === 'string' ? [data.abi] : data.abi;
   const contract = new Contract(data.OrderBookAddr, LOB_ABI, signer);
   const obOrders = TraderInterface.chainOrders(data.SCOrders, data.orderIds);
