@@ -165,7 +165,7 @@ export const PositionsTable = memo(() => {
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
-      getAddCollateral(selectedPosition.symbol, addCollateral)
+      getAddCollateral(traderAPI, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           const signer = getSigner();
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
@@ -200,7 +200,7 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      getRemoveCollateral(selectedPosition.symbol, removeCollateral)
+      getRemoveCollateral(traderAPI, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
           const signer = getSigner();
           withdraw(signer, data)
@@ -232,6 +232,7 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
+    traderAPI,
   ]);
 
   useEffect(() => {
@@ -240,13 +241,13 @@ export const PositionsTable = memo(() => {
     }
 
     if (modifyType === ModifyTypeE.Remove) {
-      getAvailableMargin(selectedPosition.symbol, address).then(({ data }) => {
+      getAvailableMargin(traderAPI, selectedPosition.symbol, address).then(({ data }) => {
         setMaxCollateral(data.amount < 0 ? 0 : data.amount);
       });
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, address, selectedPosition]);
+  }, [modifyType, address, selectedPosition, traderAPI]);
 
   useEffect(() => {
     setNewPositionRisk(null);

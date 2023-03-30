@@ -71,7 +71,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(traderAPI, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           const signer = getSigner();
@@ -101,7 +101,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent]);
+  }, [selectedOrder, requestSent, traderAPI]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);

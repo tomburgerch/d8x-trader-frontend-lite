@@ -4,7 +4,7 @@ import { memo, useEffect, useRef } from 'react';
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { getExchangeInfo } from 'network/network';
-import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom } from 'store/pools.store';
+import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -37,6 +37,7 @@ export const Header = memo(() => {
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   // Might be used later
   // const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,13 +47,13 @@ export const Header = memo(() => {
   useEffect(() => {
     if (!requestRef.current) {
       requestRef.current = true;
-      getExchangeInfo().then(({ data }) => {
+      getExchangeInfo(traderAPI).then(({ data }) => {
         setPools(data.pools);
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
       });
     }
-  }, [setPools, setOracleFactoryAddr, setProxyAddr]);
+  }, [traderAPI, setPools, setOracleFactoryAddr, setProxyAddr]);
 
   /*
   const handleDrawerToggle = () => {

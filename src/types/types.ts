@@ -15,7 +15,6 @@ export interface PerpetualI {
   midPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
-  maxPositionBC: number;
 }
 
 export interface PerpetualStatisticsI {

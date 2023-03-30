@@ -118,7 +118,7 @@ export const ActionBlock = memo(() => {
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(traderAPI, mainOrder.symbol, address, Date.now()).then((data) => {
+    getMaxOrderSizeForTrader(traderAPI, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
   }, [orderInfo, address, traderAPI, setNewPositionRisk, setCollateralDeposit]);

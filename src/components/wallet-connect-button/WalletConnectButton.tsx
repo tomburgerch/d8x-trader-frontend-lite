@@ -13,6 +13,10 @@ export const WalletConnectButton = memo(() => {
   const provider = useProvider();
 
   useEffect(() => {
+    if (!provider) {
+      setTraderAPI(null);
+      return;
+    }
     provider
       .getNetwork()
       .then((network) => {
