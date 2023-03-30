@@ -5,11 +5,12 @@ import { useEffect } from 'react';
 import { TraderInterface, PerpetualDataHandler } from '@d8x/perpetuals-sdk';
 
 import { Button } from '@mui/material';
-import { traderAPIAtom } from 'store/pools.store';
+import { proxyABIAtom, traderAPIAtom } from 'store/pools.store';
 import { useAtom } from 'jotai';
 
 export const WalletConnectButton = memo(() => {
   const [, setTraderAPI] = useAtom(traderAPIAtom);
+  const [, setProxyABI] = useAtom(proxyABIAtom);
   const provider = useProvider();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export const WalletConnectButton = memo(() => {
         freshTraderAPI
           .createProxyInstance(provider)
           .then(() => {
+            setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
             setTraderAPI(freshTraderAPI);
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +41,7 @@ export const WalletConnectButton = memo(() => {
         console.log(error);
         // throw new Error(error);
       });
-  }, [provider, setTraderAPI]);
+  }, [provider, setTraderAPI, setProxyABI]);
 
   return (
     <ConnectButton.Custom>
