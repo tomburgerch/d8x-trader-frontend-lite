@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import type { SyntheticEvent } from 'react';
 import { memo, useEffect } from 'react';
-import { useAccount, useProvider } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
@@ -23,7 +23,6 @@ import { PoolI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from './CollateralsSelect.module.scss';
-import { useDebouncedEffect } from 'helpers/useDebouncedEffect';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -39,8 +38,6 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 
 export const CollateralsSelect = memo(() => {
   const { address } = useAccount();
-
-  const provider = useProvider();
 
   const { isConnected, send } = useWebSocketContext();
 
@@ -61,27 +58,23 @@ export const CollateralsSelect = memo(() => {
     }
   }, [selectedPool, setPoolFee, address]);
 
-  useDebouncedEffect(
-    () => {
-      if (selectedPool !== null && address && provider) {
-        selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-          const symbol = createSymbol({
-            baseCurrency,
-            quoteCurrency,
-            poolSymbol: selectedPool.poolSymbol,
-          });
-          getOpenOrders(traderAPI, symbol, address).then(({ data }) => {
-            setOpenOrders(data);
-          });
-          getPositionRisk(traderAPI, symbol, address).then(({ data }) => {
-            setPositions(data);
-          });
+  useEffect(() => {
+    if (selectedPool !== null && address) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
         });
-      }
-    },
-    [selectedPool, address, setOpenOrders, setPositions, provider],
-    10000
-  );
+        getOpenOrders(traderAPI, symbol, address).then(({ data }) => {
+          setOpenOrders(data);
+        });
+        getPositionRisk(traderAPI, symbol, address).then(({ data }) => {
+          setPositions(data);
+        });
+      });
+    }
+  }, [selectedPool, address, traderAPI, setOpenOrders, setPositions]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {

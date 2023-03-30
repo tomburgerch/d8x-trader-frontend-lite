@@ -35,9 +35,6 @@ const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Short]: 'Sell',
 };
 
-// const perpSDKConfig = PerpetualDataHandler.readSDKConfig("central-park");
-// const mktData = new MarketData(perpSDKConfig);
-
 const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
 function createMainOrder(orderInfo: OrderInfoI) {
