@@ -13,7 +13,9 @@ import { proxyABIAtom, traderAPIAtom } from 'store/pools.store';
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
   const [, setProxyABI] = useAtom(proxyABIAtom);
+
   const traderAPIRef = useRef(traderAPI);
+  const loadingAPIRef = useRef(false);
 
   const provider = useProvider();
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
@@ -22,23 +24,24 @@ export const WalletConnectButton = memo(() => {
   // init SDK API --> calls will be done via trader's connected wallet
   const loadTraderAPI = useCallback(
     (loadProvider: ethers.providers.Provider) => {
+      loadingAPIRef.current = true;
       loadProvider
         .getNetwork()
         .then((network) => {
-          console.log('network fetched through provider');
           const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
           freshTraderAPI
             .createProxyInstance(loadProvider)
             .then(() => {
-              console.log('proxy instance created');
               setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
               setTraderAPI(freshTraderAPI);
+              loadingAPIRef.current = false;
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {
               // error connecting to network through SDK
               console.log('error in createProxyInstance()', error);
               setTraderAPI(null);
+              loadingAPIRef.current = false;
             });
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,6 +49,7 @@ export const WalletConnectButton = memo(() => {
           // error getting network from provider
           console.log('error in getNetwork()', error);
           setTraderAPI(null);
+          loadingAPIRef.current = false;
         });
     },
     [setProxyABI, setTraderAPI]
@@ -55,7 +59,6 @@ export const WalletConnectButton = memo(() => {
   const unloadTraderAPI = useCallback(() => {
     if (!traderAPIRef.current) {
       // already flushed
-      console.log('trader API already flushed');
       return;
     }
     setTraderAPI(null);
@@ -73,16 +76,15 @@ export const WalletConnectButton = memo(() => {
 
   // wallet connected: use SDK
   useEffect(() => {
-    if (isConnected && provider) {
-      console.log('loading trader API');
-      loadTraderAPI(provider);
+    if (loadingAPIRef.current || !isConnected || !provider) {
+      return;
     }
+    loadTraderAPI(provider);
   }, [isConnected, provider, loadTraderAPI]);
 
   // wallet disconnected or reconnecting: use REST
   useEffect(() => {
-    if (isDisconnected || isReconnecting) {
-      console.log('flushing trader API');
+    if (isDisconnected || isReconnecting || traderAPIRef.current) {
       unloadTraderAPI();
     }
   }, [isDisconnected, isReconnecting, unloadTraderAPI]);
