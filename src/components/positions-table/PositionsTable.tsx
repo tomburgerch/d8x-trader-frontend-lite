@@ -75,6 +75,7 @@ export const PositionsTable = memo(() => {
   const [, removePosition] = useAtom(removePositionAtom);
 
   const traderAPIRef = useRef(traderAPI);
+  const updatedPositionsRef = useRef(false);
 
   const { address, isConnected, isDisconnected } = useAccount();
 
@@ -135,11 +136,11 @@ export const PositionsTable = memo(() => {
               .then(() => {
                 const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
                 postOrder(signer, signatures, data.data)
-                  .then(() => {
+                  .then((tx) => {
                     setRequestSent(false);
                     setModifyModalOpen(false);
                     setSelectedPosition(null);
-
+                    console.log(`closePosition tx hash: ${tx.hash}`);
                     toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
                   })
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,11 +168,11 @@ export const PositionsTable = memo(() => {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
             .then(() => {
               deposit(signer, data)
-                .then(() => {
+                .then((tx) => {
                   setRequestSent(false);
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
-
+                  console.log(`addCollateral tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -200,11 +201,11 @@ export const PositionsTable = memo(() => {
         .then(({ data }) => {
           const signer = getSigner();
           withdraw(signer, data)
-            .then(() => {
+            .then((tx) => {
               setRequestSent(false);
               setModifyModalOpen(false);
               setSelectedPosition(null);
-
+              console.log(`removeCollaeral tx hash: ${tx.hash}`);
               toast.success(<ToastContent title="Collateral remove processed" bodyLines={[]} />);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -230,8 +231,8 @@ export const PositionsTable = memo(() => {
     maxCollateral,
   ]);
 
-  useEffect(() => {
-    if (isDisconnected && selectedPool) {
+  const clearPositions = useCallback(() => {
+    if (selectedPool?.perpetuals) {
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
@@ -241,7 +242,13 @@ export const PositionsTable = memo(() => {
         removePosition(symbol);
       });
     }
-  }, [isDisconnected, selectedPool, removePosition]);
+  }, [selectedPool, removePosition]);
+
+  useEffect(() => {
+    if (isDisconnected) {
+      clearPositions();
+    }
+  }, [isDisconnected, clearPositions]);
 
   useEffect(() => {
     if (!address || !selectedPosition) {
@@ -270,7 +277,7 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(() => {
-    if (selectedPool !== null && address && !positionRiskSent) {
+    if (selectedPool?.perpetuals && address && isConnected && !positionRiskSent) {
       setPositionRiskSent(true);
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
@@ -284,13 +291,14 @@ export const PositionsTable = memo(() => {
       });
       setPositionRiskSent(false);
     }
-  }, [address, selectedPool, positionRiskSent, setPositions]);
+  }, [address, isConnected, selectedPool, positionRiskSent, setPositions]);
 
   useEffect(() => {
-    if (isConnected && selectedPool) {
+    if (!updatedPositionsRef.current) {
       refreshPositions();
+      updatedPositionsRef.current = true;
     }
-  }, [isConnected, selectedPool, refreshPositions]);
+  }, [refreshPositions]);
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 
