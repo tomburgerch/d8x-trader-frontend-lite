@@ -51,12 +51,13 @@ export const OpenOrdersTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const traderAPIRef = useRef(traderAPI);
+  const openOrdersRefreshedRef = useRef(false);
 
   useEffect(() => {
     if (isDisconnected) {
       clearOpenOrders();
     }
-  }, [isDisconnected]);
+  }, [isDisconnected, clearOpenOrders]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -77,6 +78,10 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
+    if (isDisconnected) {
+      return;
+    }
+
     setRequestSent(true);
     getCancelOrder(traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
@@ -85,11 +90,11 @@ export const OpenOrdersTable = memo(() => {
           signMessages(signer, [data.data.digest])
             .then((signatures) => {
               cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
-                .then(() => {
+                .then((tx) => {
                   setCancelModalOpen(false);
                   setSelectedOrder(null);
                   setRequestSent(false);
-
+                  console.log(`cancelOrder tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Cancel order processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,7 +113,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent]);
+  }, [selectedOrder, requestSent, isDisconnected]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -120,8 +125,7 @@ export const OpenOrdersTable = memo(() => {
   }, []);
 
   const refreshOpenOrders = useCallback(() => {
-    if (selectedPool !== null && address) {
-      clearOpenOrders();
+    if (selectedPool !== null && address && !isDisconnected) {
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
@@ -133,7 +137,14 @@ export const OpenOrdersTable = memo(() => {
         });
       });
     }
-  }, [address, selectedPool, clearOpenOrders, setOpenOrders]);
+  }, [address, selectedPool, isDisconnected, setOpenOrders]);
+
+  useEffect(() => {
+    if (!openOrdersRefreshedRef.current) {
+      refreshOpenOrders();
+      openOrdersRefreshedRef.current = true;
+    }
+  });
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [
@@ -192,7 +203,7 @@ export const OpenOrdersTable = memo(() => {
           <Button onClick={closeCancelModal} variant="secondary" size="small">
             Cancel
           </Button>
-          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small">
+          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={requestSent}>
             Confirm
           </Button>
         </DialogActions>
