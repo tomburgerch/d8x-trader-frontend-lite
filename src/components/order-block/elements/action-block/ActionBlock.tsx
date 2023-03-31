@@ -192,7 +192,7 @@ export const ActionBlock = memo(() => {
       });
     }
     return orders;
-  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive, signer]);
+  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
   const handleOrderConfirm = useCallback(() => {
     if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr) {
@@ -208,7 +208,7 @@ export const ActionBlock = memo(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
             postOrder(signer, signatures, data.data).then((tx: ContractTransaction) => {
               // success submitting to mempool
-              console.log(`posted hash: ${tx.hash}`);
+              console.log(`postOrder tx hash: ${tx.hash}`);
               setShowReviewOrderModal(false);
               toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
             });
@@ -224,17 +224,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [
-    parsedOrders,
-    address,
-    signer,
-    selectedPool,
-    proxyAddr,
-    collateralDeposit,
-    // requestSentRef,
-    // setRequestSent,
-    // setShowReviewOrderModal
-  ]);
+  }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
