@@ -84,10 +84,10 @@ export const positionsAtom = atom(
     const perpetualsStats = get(perpetualsStatsAtom);
     return Object.values(perpetualsStats).filter(({ side }) => side !== 'CLOSED');
   },
-  (_get, set, perpetualInfo: MarginAccountI) => {
+  (_get, set, position: MarginAccountI) => {
     set(perpetualsStatsAtom, (prev) => ({
       ...prev,
-      [perpetualInfo.symbol]: perpetualInfo,
+      [position.symbol]: position,
     }));
   }
 );
@@ -111,6 +111,14 @@ export const removeOpenOrderAtom = atom(null, (get, set, orderIdToRemove: string
     const updatedOpenOrders = { ...prev };
     delete updatedOpenOrders[orderIdToRemove];
     return updatedOpenOrders;
+  });
+});
+
+export const removePositionAtom = atom(null, (get, set, symbolToRemove: string) => {
+  set(perpetualsStatsAtom, (prev) => {
+    const perpetualsStats = { ...prev };
+    delete perpetualsStats[symbolToRemove];
+    return perpetualsStats;
   });
 });
 

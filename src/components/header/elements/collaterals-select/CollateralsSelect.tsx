@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import type { SyntheticEvent } from 'react';
+import { SyntheticEvent, useRef } from 'react';
 import { memo, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -49,6 +49,8 @@ export const CollateralsSelect = memo(() => {
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
+  const traderAPIRef = useRef(traderAPI);
+
   useEffect(() => {
     if (selectedPool !== null && address) {
       setPoolFee(0);
@@ -66,15 +68,15 @@ export const CollateralsSelect = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(traderAPI, symbol, address).then(({ data }) => {
+        getOpenOrders(traderAPIRef.current, symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
-        getPositionRisk(traderAPI, symbol, address).then(({ data }) => {
+        getPositionRisk(traderAPIRef.current, symbol, address).then(({ data }) => {
           setPositions(data);
         });
       });
     }
-  }, [selectedPool, address, traderAPI, setOpenOrders, setPositions]);
+  }, [selectedPool, address, setOpenOrders, setPositions]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {

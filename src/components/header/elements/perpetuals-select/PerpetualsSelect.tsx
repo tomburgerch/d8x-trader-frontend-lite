@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai/index';
-import type { SyntheticEvent } from 'react';
+import { SyntheticEvent, useRef } from 'react';
 import { memo, useEffect, useMemo } from 'react';
 
 import { Box, Paper, Popper, PopperProps } from '@mui/material';
@@ -47,6 +47,7 @@ export const PerpetualsSelect = memo(() => {
   const [, setCandles] = useAtom(candlesAtom);
   const [, setNewCandles] = useAtom(newCandlesAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const traderAPIRef = useRef(traderAPI);
 
   const { isConnected, send } = useCandlesWebSocketContext();
 
@@ -93,11 +94,11 @@ export const PerpetualsSelect = memo(() => {
 
   useEffect(() => {
     if (symbol) {
-      getPerpetualStaticInfo(traderAPI, symbol).then(({ data }) => {
+      getPerpetualStaticInfo(traderAPIRef.current, symbol).then(({ data }) => {
         setPerpetualStaticInfo(data);
       });
     }
-  }, [symbol, traderAPI, setPerpetualStaticInfo]);
+  }, [symbol, traderAPIRef, setPerpetualStaticInfo]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);
