@@ -2,7 +2,6 @@ import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useAccount, useSigner, useBalance, useContractEvent, useWaitForTransaction } from 'wagmi';
-// import { Buffer } from 'buffer';
 import { toast } from 'react-toastify';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -208,8 +207,6 @@ export const ActionBlock = memo(() => {
     signer,
   ]);
 
-  // const { signMessageAsync } = useSignMessage();
-
   const waitForTxnConfig = useMemo(() => {
     if (!postOrderTransaction || !postOrderTransaction.hash) {
       console.log('not waiting for tx');
@@ -222,23 +219,12 @@ export const ActionBlock = memo(() => {
       confirmations: 1,
       onSuccess(data: unknown) {
         console.log(data);
-        // toast.success(
-        //   <ToastContent
-        //     title="Order posted"
-        //     bodyLines={[
-        //       {
-        //         label: 'Tx:',
-        //         value: `${postOrderTransaction.hash.slice(0, 7)}...`,
-        //       },
-        //     ]}
-        //   />
-        // );
         toast.success(<ToastContent title="Order posted" bodyLines={[]} />);
         setPostOrderTransaction(null);
         setIsAwaitingExecution(true);
       },
     };
-  }, [postOrderTransaction, setPostOrderTransaction]);
+  }, [postOrderTransaction, setPostOrderTransaction, setIsAwaitingExecution]);
 
   useWaitForTransaction(waitForTxnConfig);
 
@@ -287,60 +273,31 @@ export const ActionBlock = memo(() => {
     orderDigest(parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
-            .then(() => {
-              Promise.resolve(new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero))
-                // Promise.all(
-                //   data.data.digests.map((dgst) => signMessageAsync({ message: Buffer.from(dgst.slice(2), 'hex') }))
-                // )
-                .then((signatures) => {
-                  console.log('signed');
-                  data.data.OrderBookAddr = traderAPI.getOrderBookAddress(parsedOrders[0].symbol);
-                  postOrder(signer, signatures, data.data)
-                    .then((tx: ContractTransaction) => {
-                      console.log(`posted hash: ${tx.hash}`);
-                      setShowReviewOrderModal(false);
-                      requestSentRef.current = false;
-                      setRequestSent(false);
-                      setPostOrderTransaction(tx);
-                      setPendingOrderId(data.data.orderIds[0]);
-                      toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
-                    })
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .catch((error: any) => {
-                      console.error(error);
-                      requestSentRef.current = false;
-                      setRequestSent(false);
-                      setIsAwaitingExecution(false);
-                      setPostOrderTransaction(null);
-                    });
-                })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .catch((error: any) => {
-                  console.error(error);
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  setIsAwaitingExecution(false);
-                  setPostOrderTransaction(null);
-                });
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: any) => {
-              console.error(error);
-              requestSentRef.current = false;
-              setRequestSent(false);
-              setIsAwaitingExecution(false);
-              setPostOrderTransaction(null);
+          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then(() => {
+            // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+            const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
+            postOrder(signer, signatures, data.data).then((tx: ContractTransaction) => {
+              // success submitting to mempool
+              console.log(`posted hash: ${tx.hash}`);
+              setShowReviewOrderModal(false);
+              setPostOrderTransaction(tx);
+              setPendingOrderId(data.data.orderIds[0]);
+              toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
             });
+          });
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) => {
         console.error(error);
-        requestSentRef.current = false;
-        setRequestSent(false);
+        // not waiting for trade and no tx to watch
         setIsAwaitingExecution(false);
         setPostOrderTransaction(null);
+      })
+      .finally(() => {
+        // release lock
+        requestSentRef.current = false;
+        setRequestSent(false);
       });
   }, [
     parsedOrders,
@@ -350,9 +307,11 @@ export const ActionBlock = memo(() => {
     proxyAddr,
     collateralDeposit,
     traderAPI,
+    requestSentRef,
+    setRequestSent,
+    setShowReviewOrderModal,
     setIsAwaitingExecution,
     setPendingOrderId,
-    // signMessageAsync,
   ]);
 
   const atPrice = useMemo(() => {

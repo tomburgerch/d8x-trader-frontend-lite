@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { toast } from 'react-toastify';
@@ -33,7 +33,6 @@ import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
 import { getSigner } from 'blockchain-api/getSigner';
-import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -54,6 +53,7 @@ import {
   perpetualStatisticsAtom,
   positionsAtom,
   proxyAddrAtom,
+  removePositionAtom,
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
@@ -65,6 +65,7 @@ import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
 import useDebounce from 'helpers/useDebounce';
+import { ethers } from 'ethers';
 
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -72,8 +73,11 @@ export const PositionsTable = memo(() => {
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [, removePosition] = useAtom(removePositionAtom);
 
-  const { address } = useAccount();
+  const traderAPIRef = useRef(traderAPI);
+
+  const { address, isConnected, isDisconnected } = useAccount();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
   const [closePositionChecked, setClosePositionChecked] = useState(false);
@@ -128,23 +132,16 @@ export const PositionsTable = memo(() => {
         .then((data) => {
           if (data.data.digests.length > 0) {
             const signer = getSigner();
-            signMessages(signer, data.data.digests)
-              .then((signatures) => {
-                approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
+            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
+              .then(() => {
+                const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
+                postOrder(signer, signatures, data.data)
                   .then(() => {
-                    postOrder(signer, signatures, data.data)
-                      .then(() => {
-                        setRequestSent(false);
-                        setModifyModalOpen(false);
-                        setSelectedPosition(null);
+                    setRequestSent(false);
+                    setModifyModalOpen(false);
+                    setSelectedPosition(null);
 
-                        toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
-                      })
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      .catch((error: any) => {
-                        console.error(error);
-                        setRequestSent(false);
-                      });
+                    toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
                   })
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   .catch((error: any) => {
@@ -165,7 +162,7 @@ export const PositionsTable = memo(() => {
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
-      getAddCollateral(traderAPI, selectedPosition.symbol, addCollateral)
+      getAddCollateral(traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           const signer = getSigner();
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
@@ -200,7 +197,7 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      getRemoveCollateral(traderAPI, selectedPosition.symbol, removeCollateral)
+      getRemoveCollateral(traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
           const signer = getSigner();
           withdraw(signer, data)
@@ -232,7 +229,7 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
-    traderAPI,
+    traderAPIRef,
   ]);
 
   useEffect(() => {
@@ -241,13 +238,13 @@ export const PositionsTable = memo(() => {
     }
 
     if (modifyType === ModifyTypeE.Remove) {
-      getAvailableMargin(traderAPI, selectedPosition.symbol, address).then(({ data }) => {
+      getAvailableMargin(traderAPIRef.current, selectedPosition.symbol, address).then(({ data }) => {
         setMaxCollateral(data.amount < 0 ? 0 : data.amount);
       });
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, address, selectedPosition, traderAPI]);
+  }, [modifyType, address, selectedPosition, traderAPIRef]);
 
   useEffect(() => {
     setNewPositionRisk(null);
@@ -270,13 +267,32 @@ export const PositionsTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getPositionRisk(traderAPI, symbol, address, Date.now()).then(({ data }) => {
+        getPositionRisk(traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
           setPositions(data);
         });
       });
       setPositionRiskSent(false);
     }
-  }, [address, selectedPool, positionRiskSent, traderAPI, setPositions]);
+  }, [address, selectedPool, positionRiskSent, traderAPIRef, setPositions]);
+
+  useEffect(() => {
+    if (isDisconnected && selectedPool) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        removePosition(symbol);
+      });
+    }
+  }, [isDisconnected, selectedPool, removePosition]);
+
+  useEffect(() => {
+    if (isConnected && selectedPool) {
+      refreshPositions();
+    }
+  }, [isConnected, selectedPool, refreshPositions]);
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 

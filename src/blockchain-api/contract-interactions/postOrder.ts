@@ -16,5 +16,4 @@ export function postOrder(
   const contract = new Contract(data.OrderBookAddr, LOB_ABI, signer);
   const obOrders = TraderInterface.chainOrders(data.SCOrders, data.orderIds);
   return contract.postOrders(obOrders, signatures, { gasLimit: BigNumber.from(3_000_000) });
-  // return contract.postOrders(data.SCOrders, signatures, { gasLimit: BigNumber.from(3_000_000) });
 }
