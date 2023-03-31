@@ -1,3 +1,7 @@
+## Quantena testnet deployments
+* Stable version: https://app.testnet.d8x.exchange/
+* Development version: https://dev.testnet.d8x.exchange/
+
 ## Project setup/settings
 
 Some helpful configurations for the project
