@@ -59,7 +59,7 @@ export const WalletConnectButton = memo(() => {
       return;
     }
     setTraderAPI(null);
-  }, [traderAPIRef, setTraderAPI]);
+  }, [setTraderAPI]);
 
   // connection error
   useEffect(() => {

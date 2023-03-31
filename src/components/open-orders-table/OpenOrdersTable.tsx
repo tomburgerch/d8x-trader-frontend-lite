@@ -1,23 +1,22 @@
 import { useAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
 import {
-  TableContainer,
-  Table as MuiTable,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Typography,
-  DialogTitle,
+  Box,
   Button,
   DialogActions,
   DialogContent,
-  Box,
+  DialogTitle,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TablePagination,
+  TableRow,
+  Typography,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -38,7 +37,7 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 import styles from './OpenOrdersTable.module.scss';
 
 export const OpenOrdersTable = memo(() => {
-  const { address } = useAccount();
+  const { address, isDisconnected } = useAccount();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -50,6 +49,14 @@ export const OpenOrdersTable = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const traderAPIRef = useRef(traderAPI);
+
+  useEffect(() => {
+    if (isDisconnected) {
+      clearOpenOrders();
+    }
+  }, [isDisconnected]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -71,7 +78,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(traderAPI, selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           const signer = getSigner();
@@ -101,7 +108,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent, traderAPI]);
+  }, [selectedOrder, requestSent]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -121,12 +128,12 @@ export const OpenOrdersTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(traderAPI, symbol, address, Date.now()).then(({ data }) => {
+        getOpenOrders(traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
           setOpenOrders(data);
         });
       });
     }
-  }, [address, selectedPool, traderAPI, clearOpenOrders, setOpenOrders]);
+  }, [address, selectedPool, clearOpenOrders, setOpenOrders]);
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [

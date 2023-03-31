@@ -1,8 +1,8 @@
 import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
-import { useAccount, useSigner, useBalance, useContractEvent, useWaitForTransaction } from 'wagmi';
 import { toast } from 'react-toastify';
+import { useAccount, useBalance, useSigner } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -18,7 +18,6 @@ import {
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   proxyAddrAtom,
-  removeOpenOrderAtom,
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
@@ -87,16 +86,13 @@ export const ActionBlock = memo(() => {
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
-  const [postOrderTransaction, setPostOrderTransaction] = useState<ContractTransaction | null>(null);
-  const [isAwaitingExecution, setIsAwaitingExecution] = useState<boolean>(false);
-  const [pendingOrderId, setPendingOrderId] = useState<string | undefined>(undefined);
 
   const requestSentRef = useRef(false);
+  const traderAPIRef = useRef(traderAPI);
 
   const marginTokenBalance = useBalance({
     address: address,
@@ -115,16 +111,16 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(traderAPI, mainOrder, address).then((data) => {
+    positionRiskOnTrade(traderAPIRef.current, mainOrder, address).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(traderAPI, mainOrder, address, Date.now()).then((data) => {
+    getMaxOrderSizeForTrader(traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
-  }, [orderInfo, address, traderAPI, setNewPositionRisk, setCollateralDeposit]);
+  }, [orderInfo, address, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -152,7 +148,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    if (!signer || !address || !orderInfo || !selectedPool || !proxyAddr || !selectedPerpetualStaticInfo) {
+    if (!address || !orderInfo || !selectedPool || !proxyAddr) {
       return;
     }
 
@@ -196,76 +192,10 @@ export const ActionBlock = memo(() => {
       });
     }
     return orders;
-  }, [
-    orderInfo,
-    selectedPool,
-    address,
-    proxyAddr,
-    requestSent,
-    isBuySellButtonActive,
-    selectedPerpetualStaticInfo,
-    signer,
-  ]);
-
-  const waitForTxnConfig = useMemo(() => {
-    if (!postOrderTransaction || !postOrderTransaction.hash) {
-      console.log('not waiting for tx');
-      return {
-        confirmations: 1,
-      };
-    }
-    return {
-      hash: postOrderTransaction.hash as `0x${string}`,
-      confirmations: 1,
-      onSuccess(data: unknown) {
-        console.log(data);
-        toast.success(<ToastContent title="Order posted" bodyLines={[]} />);
-        setPostOrderTransaction(null);
-        setIsAwaitingExecution(true);
-      },
-    };
-  }, [postOrderTransaction, setPostOrderTransaction, setIsAwaitingExecution]);
-
-  useWaitForTransaction(waitForTxnConfig);
-
-  const proxyABI = useMemo(() => {
-    return traderAPI?.getABI('proxy') as string[] | undefined;
-  }, [traderAPI]);
-
-  const tradeEventConfig = useMemo(() => {
-    if (!isAwaitingExecution || !traderAPI || !pendingOrderId) {
-      // with this config the event listener is turned off
-      return {
-        listener(...args: unknown[]) {
-          console.log(args);
-        },
-      };
-    } else {
-      // listen to the Trade event
-      console.log('listening to trade event...');
-      return {
-        address: proxyAddr as `0x${string}`,
-        abi: proxyABI,
-        eventName: 'Trade',
-        listener(...args: unknown[]) {
-          console.log(`perp id: ${args[0]}, trader: ${args[1]}`);
-          if (args[4] === pendingOrderId) {
-            setIsAwaitingExecution(false);
-            removeOpenOrder(pendingOrderId);
-            const symbol = traderAPI.getSymbolFromPerpId(args[0] as number);
-            if (symbol) {
-              toast.success(<ToastContent title="Order executed" bodyLines={[{ label: 'Symbol', value: symbol }]} />);
-            }
-          }
-        },
-      };
-    }
-  }, [isAwaitingExecution, proxyAddr, proxyABI, pendingOrderId, traderAPI, removeOpenOrder]);
-
-  useContractEvent(tradeEventConfig);
+  }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive, signer]);
 
   const handleOrderConfirm = useCallback(() => {
-    if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr || !traderAPI) {
+    if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr) {
       return;
     }
     setRequestSent(true);
@@ -280,8 +210,6 @@ export const ActionBlock = memo(() => {
               // success submitting to mempool
               console.log(`posted hash: ${tx.hash}`);
               setShowReviewOrderModal(false);
-              setPostOrderTransaction(tx);
-              setPendingOrderId(data.data.orderIds[0]);
               toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
             });
           });
@@ -290,9 +218,6 @@ export const ActionBlock = memo(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) => {
         console.error(error);
-        // not waiting for trade and no tx to watch
-        setIsAwaitingExecution(false);
-        setPostOrderTransaction(null);
       })
       .finally(() => {
         // release lock
@@ -306,12 +231,9 @@ export const ActionBlock = memo(() => {
     selectedPool,
     proxyAddr,
     collateralDeposit,
-    traderAPI,
-    requestSentRef,
-    setRequestSent,
-    setShowReviewOrderModal,
-    setIsAwaitingExecution,
-    setPendingOrderId,
+    // requestSentRef,
+    // setRequestSent,
+    // setShowReviewOrderModal
   ]);
 
   const atPrice = useMemo(() => {

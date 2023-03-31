@@ -1,9 +1,8 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
-import { ChangeEvent, useRef } from 'react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 
 import {
   Box,
@@ -47,8 +46,6 @@ import {
   orderDigest,
   positionRiskOnCollateralAction,
 } from 'network/network';
-import { formatNumber } from 'utils/formatNumber';
-import { formatToCurrency } from 'utils/formatToCurrency';
 import {
   perpetualStatisticsAtom,
   positionsAtom,
@@ -59,13 +56,15 @@ import {
 } from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
+import { formatNumber } from 'utils/formatNumber';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionRow } from './elements/PositionRow';
 
-import styles from './PositionsTable.module.scss';
-import useDebounce from 'helpers/useDebounce';
 import { ethers } from 'ethers';
+import useDebounce from 'helpers/useDebounce';
+import styles from './PositionsTable.module.scss';
 
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -229,8 +228,20 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
-    traderAPIRef,
   ]);
+
+  useEffect(() => {
+    if (isDisconnected && selectedPool) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        removePosition(symbol);
+      });
+    }
+  }, [isDisconnected, selectedPool, removePosition]);
 
   useEffect(() => {
     if (!address || !selectedPosition) {
@@ -244,7 +255,7 @@ export const PositionsTable = memo(() => {
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, address, selectedPosition, traderAPIRef]);
+  }, [modifyType, address, selectedPosition]);
 
   useEffect(() => {
     setNewPositionRisk(null);
@@ -273,20 +284,7 @@ export const PositionsTable = memo(() => {
       });
       setPositionRiskSent(false);
     }
-  }, [address, selectedPool, positionRiskSent, traderAPIRef, setPositions]);
-
-  useEffect(() => {
-    if (isDisconnected && selectedPool) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
-        });
-        removePosition(symbol);
-      });
-    }
-  }, [isDisconnected, selectedPool, removePosition]);
+  }, [address, selectedPool, positionRiskSent, setPositions]);
 
   useEffect(() => {
     if (isConnected && selectedPool) {
@@ -312,7 +310,7 @@ export const PositionsTable = memo(() => {
     }
 
     positionRiskOnCollateralAction(
-      traderAPI,
+      traderAPIRef.current,
       address,
       modifyType === ModifyTypeE.Add ? debouncedAddCollateral : -debouncedRemoveCollateral,
       selectedPosition
@@ -320,7 +318,7 @@ export const PositionsTable = memo(() => {
       setNewPositionRisk(data.data.newPositionRisk);
       setMaxCollateral(data.data.availableMargin);
     });
-  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral, traderAPI]);
+  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral]);
 
   useEffect(() => {
     return handleRefreshPositionRisk();
