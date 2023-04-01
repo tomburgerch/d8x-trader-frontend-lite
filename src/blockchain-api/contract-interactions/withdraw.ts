@@ -1,11 +1,8 @@
-import { ethers, Contract, BigNumber, ContractTransaction } from 'ethers';
+import { Contract, ContractTransaction, BigNumber, Signer } from 'ethers';
 
 import { CollateralChangeResponseI } from 'types/types';
 
-export function withdraw(
-  signer: ethers.providers.JsonRpcSigner,
-  data: CollateralChangeResponseI
-): Promise<ContractTransaction> {
+export function withdraw(signer: Signer, data: CollateralChangeResponseI): Promise<ContractTransaction> {
   const contract = new Contract(data.proxyAddr, [data.abi], signer);
   return contract.withdraw(
     data.perpId,

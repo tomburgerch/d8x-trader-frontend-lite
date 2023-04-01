@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "private": true,
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
@@ -86,6 +87,7 @@
     "@types/react-dom": "18.0.11",
     "@typescript-eslint/eslint-plugin": "5.56.0",
     "@typescript-eslint/parser": "5.56.0",
+    "source-map-explorer": "^2.5.3",
     "eslint": "8.36.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "17.0.0",

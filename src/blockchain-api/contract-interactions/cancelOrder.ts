@@ -1,9 +1,9 @@
-import { ethers, Contract, ContractTransaction } from 'ethers';
+import { Contract, ContractTransaction, Signer } from 'ethers';
 
 import { CancelOrderResponseI } from 'types/types';
 
 export function cancelOrder(
-  signer: ethers.providers.JsonRpcSigner,
+  signer: Signer,
   signature: string,
   data: CancelOrderResponseI,
   orderId: string

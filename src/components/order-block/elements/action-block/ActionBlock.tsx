@@ -1,4 +1,3 @@
-import { BigNumber, ContractTransaction, ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -73,9 +72,6 @@ export const ActionBlock = memo(() => {
   const { data: signer } = useSigner({
     onError(error) {
       console.log('Error', error);
-    },
-    onSuccess(data) {
-      data?.getBalance().then((b: BigNumber) => console.log(`balance = ${b}`));
     },
   });
 
@@ -205,10 +201,12 @@ export const ActionBlock = memo(() => {
         if (data.data.digests.length > 0) {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then(() => {
             // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-            const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
-            postOrder(signer, signatures, data.data).then((tx: ContractTransaction) => {
+            const signatures = new Array<string>(data.data.digests.length).fill(
+              '0x0000000000000000000000000000000000000000000000000000000000000000'
+            );
+            postOrder(signer, signatures, data.data).then(() => {
               // success submitting to mempool
-              console.log(`postOrder tx hash: ${tx.hash}`);
+              // console.log(`postOrder tx hash: ${tx.hash}`);
               setShowReviewOrderModal(false);
               toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
             });

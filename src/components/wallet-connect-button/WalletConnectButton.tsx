@@ -6,7 +6,6 @@ import { useAccount, useConnect, useProvider } from 'wagmi';
 
 import { Button } from '@mui/material';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { proxyABIAtom, traderAPIAtom } from 'store/pools.store';
 
@@ -20,40 +19,6 @@ export const WalletConnectButton = memo(() => {
   const provider = useProvider();
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
-
-  // init SDK API --> calls will be done via trader's connected wallet
-  const loadTraderAPI = useCallback(
-    (loadProvider: ethers.providers.Provider) => {
-      loadingAPIRef.current = true;
-      loadProvider
-        .getNetwork()
-        .then((network) => {
-          const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
-          freshTraderAPI
-            .createProxyInstance(loadProvider)
-            .then(() => {
-              setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
-              setTraderAPI(freshTraderAPI);
-              loadingAPIRef.current = false;
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: any) => {
-              // error connecting to network through SDK
-              console.log('error in createProxyInstance()', error);
-              setTraderAPI(null);
-              loadingAPIRef.current = false;
-            });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((error: any) => {
-          // error getting network from provider
-          console.log('error in getNetwork()', error);
-          setTraderAPI(null);
-          loadingAPIRef.current = false;
-        });
-    },
-    [setProxyABI, setTraderAPI]
-  );
 
   // set trader API to null -> calls will be done via REST
   const unloadTraderAPI = useCallback(() => {
@@ -79,8 +44,34 @@ export const WalletConnectButton = memo(() => {
     if (loadingAPIRef.current || !isConnected || !provider) {
       return;
     }
-    loadTraderAPI(provider);
-  }, [isConnected, provider, loadTraderAPI]);
+    // loadTraderAPI(provider);
+    provider
+      .getNetwork()
+      .then((network) => {
+        const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
+        freshTraderAPI
+          .createProxyInstance(provider)
+          .then(() => {
+            setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
+            setTraderAPI(freshTraderAPI);
+            loadingAPIRef.current = false;
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .catch((error: any) => {
+            // error connecting to network through SDK
+            console.log('error in createProxyInstance()', error);
+            setTraderAPI(null);
+            loadingAPIRef.current = false;
+          });
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        // error getting network from provider
+        console.log('error in getNetwork()', error);
+        setTraderAPI(null);
+        loadingAPIRef.current = false;
+      });
+  }, [isConnected, provider, setProxyABI, setTraderAPI]);
 
   // wallet disconnected or reconnecting: use REST
   useEffect(() => {

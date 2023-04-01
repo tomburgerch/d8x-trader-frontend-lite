@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 
 import {
   Box,
@@ -31,7 +31,6 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
-import { getSigner } from 'blockchain-api/getSigner';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -62,7 +61,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionRow } from './elements/PositionRow';
 
-import { ethers } from 'ethers';
+import { constants } from 'ethers';
 import useDebounce from 'helpers/useDebounce';
 import styles from './PositionsTable.module.scss';
 
@@ -78,6 +77,7 @@ export const PositionsTable = memo(() => {
   const updatedPositionsRef = useRef(false);
 
   const { address, isConnected, isDisconnected } = useAccount();
+  const { data: signer } = useSigner();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
   const [closePositionChecked, setClosePositionChecked] = useState(false);
@@ -107,7 +107,7 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const handleModifyPositionConfirm = useCallback(() => {
-    if (!selectedPosition || !address || !selectedPool || !proxyAddr) {
+    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !signer) {
       return;
     }
 
@@ -131,10 +131,9 @@ export const PositionsTable = memo(() => {
       orderDigest([closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
-            const signer = getSigner();
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
               .then(() => {
-                const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
+                const signatures = new Array<string>(data.data.digests.length).fill(constants.HashZero);
                 postOrder(signer, signatures, data.data)
                   .then((tx) => {
                     setRequestSent(false);
@@ -164,7 +163,6 @@ export const PositionsTable = memo(() => {
       setRequestSent(true);
       getAddCollateral(traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
-          const signer = getSigner();
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
             .then(() => {
               deposit(signer, data)
@@ -199,7 +197,6 @@ export const PositionsTable = memo(() => {
       setRequestSent(true);
       getRemoveCollateral(traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
-          const signer = getSigner();
           withdraw(signer, data)
             .then((tx) => {
               setRequestSent(false);
@@ -229,6 +226,7 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
+    signer,
   ]);
 
   const clearPositions = useCallback(() => {

@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 
 import {
   Box,
@@ -21,7 +21,6 @@ import {
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
-import { getSigner } from 'blockchain-api/getSigner';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
@@ -38,6 +37,7 @@ import styles from './OpenOrdersTable.module.scss';
 
 export const OpenOrdersTable = memo(() => {
   const { address, isDisconnected } = useAccount();
+  const { data: signer } = useSigner();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -78,7 +78,7 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
-    if (isDisconnected) {
+    if (isDisconnected || !signer) {
       return;
     }
 
@@ -86,7 +86,6 @@ export const OpenOrdersTable = memo(() => {
     getCancelOrder(traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
-          const signer = getSigner();
           signMessages(signer, [data.data.digest])
             .then((signatures) => {
               cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
@@ -113,7 +112,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent, isDisconnected]);
+  }, [selectedOrder, requestSent, isDisconnected, signer]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);

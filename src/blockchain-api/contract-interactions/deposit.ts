@@ -1,11 +1,8 @@
-import { ethers, Contract, BigNumber, ContractTransaction } from 'ethers';
+import { Contract, ContractTransaction, BigNumber, Signer } from 'ethers';
 
 import { CollateralChangeResponseI } from 'types/types';
 
-export function deposit(
-  signer: ethers.providers.JsonRpcSigner,
-  data: CollateralChangeResponseI
-): Promise<ContractTransaction> {
+export function deposit(signer: Signer, data: CollateralChangeResponseI): Promise<ContractTransaction> {
   const contract = new Contract(data.proxyAddr, [data.abi], signer);
   return contract.deposit(
     data.perpId,
