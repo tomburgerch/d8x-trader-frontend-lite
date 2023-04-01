@@ -14,8 +14,8 @@ import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButto
 import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect';
 
-import { PageAppBar } from './Header.styles';
 import styles from './Header.module.scss';
+import { PageAppBar } from './Header.styles';
 
 // Might be used later
 // interface HeaderPropsI {
@@ -43,17 +43,18 @@ export const Header = memo(() => {
   // const [mobileOpen, setMobileOpen] = useState(false);
 
   const requestRef = useRef(false);
+  const traderAPIRef = useRef(traderAPI);
 
   useEffect(() => {
     if (!requestRef.current) {
       requestRef.current = true;
-      getExchangeInfo(traderAPI).then(({ data }) => {
+      getExchangeInfo(traderAPIRef.current).then(({ data }) => {
         setPools(data.pools);
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
       });
     }
-  }, [traderAPI, setPools, setOracleFactoryAddr, setProxyAddr]);
+  }, [setPools, setOracleFactoryAddr, setProxyAddr]);
 
   /*
   const handleDrawerToggle = () => {

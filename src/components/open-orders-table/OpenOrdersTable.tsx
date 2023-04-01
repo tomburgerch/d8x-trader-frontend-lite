@@ -1,28 +1,26 @@
 import { useAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 
 import {
-  TableContainer,
-  Table as MuiTable,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Typography,
-  DialogTitle,
+  Box,
   Button,
   DialogActions,
   DialogContent,
-  Box,
+  DialogTitle,
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TablePagination,
+  TableRow,
+  Typography,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
-import { getSigner } from 'blockchain-api/getSigner';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
@@ -38,7 +36,8 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 import styles from './OpenOrdersTable.module.scss';
 
 export const OpenOrdersTable = memo(() => {
-  const { address } = useAccount();
+  const { address, isDisconnected } = useAccount();
+  const { data: signer } = useSigner();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -50,6 +49,15 @@ export const OpenOrdersTable = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const traderAPIRef = useRef(traderAPI);
+  const openOrdersRefreshedRef = useRef(false);
+
+  useEffect(() => {
+    if (isDisconnected) {
+      clearOpenOrders();
+    }
+  }, [isDisconnected, clearOpenOrders]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -70,19 +78,22 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
+    if (isDisconnected || !signer) {
+      return;
+    }
+
     setRequestSent(true);
-    getCancelOrder(traderAPI, selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
-          const signer = getSigner();
           signMessages(signer, [data.data.digest])
             .then((signatures) => {
               cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
-                .then(() => {
+                .then((tx) => {
                   setCancelModalOpen(false);
                   setSelectedOrder(null);
                   setRequestSent(false);
-
+                  console.log(`cancelOrder tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Cancel order processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,7 +112,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent, traderAPI]);
+  }, [selectedOrder, requestSent, isDisconnected, signer]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -113,20 +124,26 @@ export const OpenOrdersTable = memo(() => {
   }, []);
 
   const refreshOpenOrders = useCallback(() => {
-    if (selectedPool !== null && address) {
-      clearOpenOrders();
+    if (selectedPool !== null && address && !isDisconnected) {
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(traderAPI, symbol, address, Date.now()).then(({ data }) => {
+        getOpenOrders(traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
           setOpenOrders(data);
         });
       });
     }
-  }, [address, selectedPool, traderAPI, clearOpenOrders, setOpenOrders]);
+  }, [address, selectedPool, isDisconnected, setOpenOrders]);
+
+  useEffect(() => {
+    if (!openOrdersRefreshedRef.current) {
+      refreshOpenOrders();
+      openOrdersRefreshedRef.current = true;
+    }
+  });
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [
@@ -185,7 +202,7 @@ export const OpenOrdersTable = memo(() => {
           <Button onClick={closeCancelModal} variant="secondary" size="small">
             Cancel
           </Button>
-          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small">
+          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={requestSent}>
             Confirm
           </Button>
         </DialogActions>

@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
@@ -84,6 +84,8 @@ export function useWsMessageHandler() {
   const [, failOpenOrder] = useAtom(failOrderAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
+  const traderAPIRef = useRef(traderAPI);
+
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
       if (selectedPool && selectedPerpetual) {
@@ -159,7 +161,7 @@ export function useWsMessageHandler() {
           return;
         }
 
-        getOpenOrders(traderAPI, parsedMessage.data.obj.symbol, address).then(({ data }) => {
+        getOpenOrders(traderAPIRef.current, parsedMessage.data.obj.symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
 
@@ -198,15 +200,6 @@ export function useWsMessageHandler() {
         );
       }
     },
-    [
-      updatePerpetualStats,
-      setWebSocketReady,
-      setPositions,
-      setOpenOrders,
-      removeOpenOrder,
-      failOpenOrder,
-      address,
-      traderAPI,
-    ]
+    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]
   );
 }

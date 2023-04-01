@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "private": true,
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
@@ -53,7 +54,7 @@
     ]
   },
   "dependencies": {
-    "@d8x/perpetuals-sdk": "0.1.12",
+    "@d8x/perpetuals-sdk": "0.1.13",
     "@emotion/react": "11.10.6",
     "@emotion/styled": "11.10.6",
     "@mui/icons-material": "5.11.11",
@@ -99,6 +100,7 @@
     "lint-staged": "13.2.0",
     "prettier": "2.8.7",
     "react-app-rewired": "2.2.1",
+    "source-map-explorer": "^2.5.3",
     "stylelint": "14.16.1",
     "stylelint-config-css-modules": "4.2.0",
     "stylelint-config-standard-scss": "6.1.0",

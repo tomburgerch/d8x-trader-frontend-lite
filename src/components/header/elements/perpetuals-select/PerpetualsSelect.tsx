@@ -1,6 +1,5 @@
 import { useAtom } from 'jotai/index';
-import { SyntheticEvent, useRef } from 'react';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, SyntheticEvent, useEffect, useMemo, useRef } from 'react';
 
 import { Box, Paper, Popper, PopperProps } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
@@ -98,7 +97,7 @@ export const PerpetualsSelect = memo(() => {
         setPerpetualStaticInfo(data);
       });
     }
-  }, [symbol, traderAPIRef, setPerpetualStaticInfo]);
+  }, [symbol, setPerpetualStaticInfo]);
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);

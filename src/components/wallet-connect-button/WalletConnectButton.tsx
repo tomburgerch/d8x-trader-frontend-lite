@@ -6,60 +6,28 @@ import { useAccount, useConnect, useProvider } from 'wagmi';
 
 import { Button } from '@mui/material';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { ethers } from 'ethers';
 import { useAtom } from 'jotai';
 import { proxyABIAtom, traderAPIAtom } from 'store/pools.store';
 
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
   const [, setProxyABI] = useAtom(proxyABIAtom);
+
   const traderAPIRef = useRef(traderAPI);
+  const loadingAPIRef = useRef(false);
 
   const provider = useProvider();
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
 
-  // init SDK API --> calls will be done via trader's connected wallet
-  const loadTraderAPI = useCallback(
-    (loadProvider: ethers.providers.Provider) => {
-      loadProvider
-        .getNetwork()
-        .then((network) => {
-          console.log('network fetched through provider');
-          const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
-          freshTraderAPI
-            .createProxyInstance(loadProvider)
-            .then(() => {
-              console.log('proxy instance created');
-              setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
-              setTraderAPI(freshTraderAPI);
-            })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .catch((error: any) => {
-              // error connecting to network through SDK
-              console.log('error in createProxyInstance()', error);
-              setTraderAPI(null);
-            });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((error: any) => {
-          // error getting network from provider
-          console.log('error in getNetwork()', error);
-          setTraderAPI(null);
-        });
-    },
-    [setProxyABI, setTraderAPI]
-  );
-
   // set trader API to null -> calls will be done via REST
   const unloadTraderAPI = useCallback(() => {
     if (!traderAPIRef.current) {
       // already flushed
-      console.log('trader API already flushed');
       return;
     }
     setTraderAPI(null);
-  }, [traderAPIRef, setTraderAPI]);
+  }, [setTraderAPI]);
 
   // connection error
   useEffect(() => {
@@ -73,16 +41,41 @@ export const WalletConnectButton = memo(() => {
 
   // wallet connected: use SDK
   useEffect(() => {
-    if (isConnected && provider) {
-      console.log('loading trader API');
-      loadTraderAPI(provider);
+    if (loadingAPIRef.current || !isConnected || !provider) {
+      return;
     }
-  }, [isConnected, provider, loadTraderAPI]);
+    // loadTraderAPI(provider);
+    provider
+      .getNetwork()
+      .then((network) => {
+        const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
+        freshTraderAPI
+          .createProxyInstance(provider)
+          .then(() => {
+            setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
+            setTraderAPI(freshTraderAPI);
+            loadingAPIRef.current = false;
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .catch((error: any) => {
+            // error connecting to network through SDK
+            console.log('error in createProxyInstance()', error);
+            setTraderAPI(null);
+            loadingAPIRef.current = false;
+          });
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        // error getting network from provider
+        console.log('error in getNetwork()', error);
+        setTraderAPI(null);
+        loadingAPIRef.current = false;
+      });
+  }, [isConnected, provider, setProxyABI, setTraderAPI]);
 
   // wallet disconnected or reconnecting: use REST
   useEffect(() => {
-    if (isDisconnected || isReconnecting) {
-      console.log('flushing trader API');
+    if (isDisconnected || isReconnecting || traderAPIRef.current) {
       unloadTraderAPI();
     }
   }, [isDisconnected, isReconnecting, unloadTraderAPI]);

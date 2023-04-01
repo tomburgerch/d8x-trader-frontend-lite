@@ -1,9 +1,8 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
-import { ChangeEvent, useRef } from 'react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAccount, useSigner } from 'wagmi';
 
 import {
   Box,
@@ -32,7 +31,6 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
-import { getSigner } from 'blockchain-api/getSigner';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -47,8 +45,6 @@ import {
   orderDigest,
   positionRiskOnCollateralAction,
 } from 'network/network';
-import { formatNumber } from 'utils/formatNumber';
-import { formatToCurrency } from 'utils/formatToCurrency';
 import {
   perpetualStatisticsAtom,
   positionsAtom,
@@ -59,13 +55,15 @@ import {
 } from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
+import { formatNumber } from 'utils/formatNumber';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionRow } from './elements/PositionRow';
 
-import styles from './PositionsTable.module.scss';
+import { constants } from 'ethers';
 import useDebounce from 'helpers/useDebounce';
-import { ethers } from 'ethers';
+import styles from './PositionsTable.module.scss';
 
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -76,8 +74,10 @@ export const PositionsTable = memo(() => {
   const [, removePosition] = useAtom(removePositionAtom);
 
   const traderAPIRef = useRef(traderAPI);
+  const updatedPositionsRef = useRef(false);
 
   const { address, isConnected, isDisconnected } = useAccount();
+  const { data: signer } = useSigner();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
   const [closePositionChecked, setClosePositionChecked] = useState(false);
@@ -107,7 +107,7 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const handleModifyPositionConfirm = useCallback(() => {
-    if (!selectedPosition || !address || !selectedPool || !proxyAddr) {
+    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !signer) {
       return;
     }
 
@@ -131,16 +131,15 @@ export const PositionsTable = memo(() => {
       orderDigest([closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
-            const signer = getSigner();
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
               .then(() => {
-                const signatures = new Array<string>(data.data.digests.length).fill(ethers.constants.HashZero);
+                const signatures = new Array<string>(data.data.digests.length).fill(constants.HashZero);
                 postOrder(signer, signatures, data.data)
-                  .then(() => {
+                  .then((tx) => {
                     setRequestSent(false);
                     setModifyModalOpen(false);
                     setSelectedPosition(null);
-
+                    console.log(`closePosition tx hash: ${tx.hash}`);
                     toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
                   })
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,15 +163,14 @@ export const PositionsTable = memo(() => {
       setRequestSent(true);
       getAddCollateral(traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
-          const signer = getSigner();
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
             .then(() => {
               deposit(signer, data)
-                .then(() => {
+                .then((tx) => {
                   setRequestSent(false);
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
-
+                  console.log(`addCollateral tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -199,13 +197,12 @@ export const PositionsTable = memo(() => {
       setRequestSent(true);
       getRemoveCollateral(traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
-          const signer = getSigner();
           withdraw(signer, data)
-            .then(() => {
+            .then((tx) => {
               setRequestSent(false);
               setModifyModalOpen(false);
               setSelectedPosition(null);
-
+              console.log(`removeCollaeral tx hash: ${tx.hash}`);
               toast.success(<ToastContent title="Collateral remove processed" bodyLines={[]} />);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -229,8 +226,27 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
-    traderAPIRef,
+    signer,
   ]);
+
+  const clearPositions = useCallback(() => {
+    if (selectedPool?.perpetuals) {
+      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+        const symbol = createSymbol({
+          baseCurrency,
+          quoteCurrency,
+          poolSymbol: selectedPool.poolSymbol,
+        });
+        removePosition(symbol);
+      });
+    }
+  }, [selectedPool, removePosition]);
+
+  useEffect(() => {
+    if (isDisconnected) {
+      clearPositions();
+    }
+  }, [isDisconnected, clearPositions]);
 
   useEffect(() => {
     if (!address || !selectedPosition) {
@@ -244,7 +260,7 @@ export const PositionsTable = memo(() => {
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, address, selectedPosition, traderAPIRef]);
+  }, [modifyType, address, selectedPosition]);
 
   useEffect(() => {
     setNewPositionRisk(null);
@@ -259,7 +275,7 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(() => {
-    if (selectedPool !== null && address && !positionRiskSent) {
+    if (selectedPool?.perpetuals && address && isConnected && !positionRiskSent) {
       setPositionRiskSent(true);
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
@@ -273,26 +289,14 @@ export const PositionsTable = memo(() => {
       });
       setPositionRiskSent(false);
     }
-  }, [address, selectedPool, positionRiskSent, traderAPIRef, setPositions]);
+  }, [address, isConnected, selectedPool, positionRiskSent, setPositions]);
 
   useEffect(() => {
-    if (isDisconnected && selectedPool) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
-        });
-        removePosition(symbol);
-      });
-    }
-  }, [isDisconnected, selectedPool, removePosition]);
-
-  useEffect(() => {
-    if (isConnected && selectedPool) {
+    if (!updatedPositionsRef.current) {
       refreshPositions();
+      updatedPositionsRef.current = true;
     }
-  }, [isConnected, selectedPool, refreshPositions]);
+  }, [refreshPositions]);
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 
@@ -312,7 +316,7 @@ export const PositionsTable = memo(() => {
     }
 
     positionRiskOnCollateralAction(
-      traderAPI,
+      traderAPIRef.current,
       address,
       modifyType === ModifyTypeE.Add ? debouncedAddCollateral : -debouncedRemoveCollateral,
       selectedPosition
@@ -320,7 +324,7 @@ export const PositionsTable = memo(() => {
       setNewPositionRisk(data.data.newPositionRisk);
       setMaxCollateral(data.data.availableMargin);
     });
-  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral, traderAPI]);
+  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral]);
 
   useEffect(() => {
     return handleRefreshPositionRisk();

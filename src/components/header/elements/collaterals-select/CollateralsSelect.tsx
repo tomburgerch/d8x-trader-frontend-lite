@@ -1,6 +1,5 @@
 import { useAtom } from 'jotai';
-import { SyntheticEvent, useRef } from 'react';
-import { memo, useEffect } from 'react';
+import { memo, SyntheticEvent, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
