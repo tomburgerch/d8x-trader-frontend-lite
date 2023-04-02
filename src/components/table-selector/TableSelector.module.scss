@@ -1,7 +1,7 @@
 @import 'styles/theme/theme';
 
 .root {
-  max-width: 900px;
+  max-width: 920px;
 }
 
 .selectorTabs {
@@ -23,5 +23,42 @@
     background-color: var(--d8x-color-white-opac);
     cursor: pointer;
     transition: 150ms;
+  }
+}
+
+.mobileRoot {
+  width: 100%;
+  border-radius: $d8x-border-radius;
+
+  &:global(.MuiPaper-root) {
+    background-color: transparent;
+  }
+}
+
+.mobileRootHeader {
+  padding: 0;
+  background-color: var(--d8x-background-purple);
+}
+
+.rootOptions {
+  display: flex;
+  justify-content: center;
+
+  :global(.MuiButtonBase-root) {
+    flex: 1;
+    border-radius: 0;
+    padding: 10px 8px;
+    font-size: 24px;
+    line-height: 29px;
+    background-color: var(--d8x-background-inactive-tab);
+
+    &:hover,
+    &.selected {
+      background-color: var(--d8x-background-card-details);
+    }
+
+    &.selected {
+      font-weight: bold;
+    }
   }
 }

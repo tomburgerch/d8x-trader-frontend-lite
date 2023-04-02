@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { constants } from 'ethers';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -24,6 +25,8 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -37,6 +40,7 @@ import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { useDebounce } from 'helpers/useDebounce';
 import {
   getAddCollateral,
   getAvailableMargin,
@@ -59,10 +63,9 @@ import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
+import { PositionBlock } from './elements/position-block/PositionBlock';
 import { PositionRow } from './elements/PositionRow';
 
-import { constants } from 'ethers';
-import useDebounce from 'helpers/useDebounce';
 import styles from './PositionsTable.module.scss';
 
 export const PositionsTable = memo(() => {
@@ -75,6 +78,9 @@ export const PositionsTable = memo(() => {
 
   const traderAPIRef = useRef(traderAPI);
   const updatedPositionsRef = useRef(false);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { address, isConnected, isDisconnected } = useAccount();
   const { data: signer } = useSigner();
@@ -475,25 +481,45 @@ export const PositionsTable = memo(() => {
 
   return (
     <>
-      <TableContainer className={styles.root}>
-        <MuiTable>
-          <TableHead className={styles.tableHead}>
-            <TableRow>
-              {positionsHeaders.map((header) => (
-                <TableCell key={header.label.toString()} align={header.align}>
-                  <Typography variant="bodySmall">{header.label}</Typography>
-                </TableCell>
+      {!isSmallScreen && (
+        <TableContainer className={styles.root}>
+          <MuiTable>
+            <TableHead className={styles.tableHead}>
+              <TableRow>
+                {positionsHeaders.map((header) => (
+                  <TableCell key={header.label.toString()} align={header.align}>
+                    <Typography variant="bodySmall">{header.label}</Typography>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody className={styles.tableBody}>
+              {positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((position) => (
+                <PositionRow key={position.symbol} position={position} handlePositionModify={handlePositionModify} />
               ))}
-            </TableRow>
-          </TableHead>
-          <TableBody className={styles.tableBody}>
+              {positions.length === 0 && <EmptyTableRow colSpan={positionsHeaders.length} text="No open positions" />}
+            </TableBody>
+          </MuiTable>
+        </TableContainer>
+      )}
+      {isSmallScreen && (
+        <Box>
+          <Box className={styles.refreshHolder}>
+            <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />
+          </Box>
+          <Box>
             {positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((position) => (
-              <PositionRow key={position.symbol} position={position} handlePositionModify={handlePositionModify} />
+              <PositionBlock
+                key={position.symbol}
+                headers={positionsHeaders}
+                position={position}
+                handlePositionModify={handlePositionModify}
+              />
             ))}
-            {positions.length === 0 && <EmptyTableRow colSpan={positionsHeaders.length} text="No open positions" />}
-          </TableBody>
-        </MuiTable>
-      </TableContainer>
+            {positions.length === 0 && <Box className={styles.noData}>No open positions</Box>}
+          </Box>
+        </Box>
+      )}
       {positions.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination

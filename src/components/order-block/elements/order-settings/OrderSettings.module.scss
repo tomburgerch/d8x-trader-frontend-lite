@@ -45,3 +45,11 @@
   margin-top: 3 * $d8x-spacing;
   color: var(--d8x-color-black-opac);
 }
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .dialogContent {
+    min-width: 250px;
+    padding-top: 2 * $d8x-spacing !important;
+  }
+}

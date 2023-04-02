@@ -1,6 +1,7 @@
 @import 'styles/theme/theme';
 
 .root {
+  margin-top: $d8x-spacing * 2;
   margin-bottom: $d8x-spacing * 2;
 
   :global(.MuiPaper-root) {
@@ -20,6 +21,7 @@
 
 .selectBoxes {
   display: flex;
+  flex-grow: 2;
 }
 
 .mobileBox {
@@ -40,6 +42,14 @@
 .walletConnect {
   justify-content: right;
   display: flex;
+  flex-grow: 1;
+  gap: 15px;
+}
+
+.loyaltyBox {
+  display: flex;
+  flex-grow: 1;
+  justify-content: right;
 }
 
 @media screen and ($d8x-breakpoint-max-md) {

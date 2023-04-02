@@ -9,7 +9,7 @@
   display: flex;
   justify-content: space-between;
   flex: 1;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .columnContainer {
@@ -33,7 +33,7 @@
 .rightBlock {
   flex: 1;
   max-width: 600px;
-  margin-left: 80px;
+  margin-left: $d8x-spacing * 2.5;
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {

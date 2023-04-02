@@ -5,7 +5,8 @@
 }
 
 .refreshHolder {
-  text-align: center;
+  text-align: right;
+  padding-right: $d8x-spacing;
 }
 
 .actionIcon {
@@ -34,6 +35,10 @@
 
 .tableBody {
   background-color: var(--d8x-color-white-opac);
+}
+
+.noData {
+  text-align: center;
 }
 
 .paginationHolder {

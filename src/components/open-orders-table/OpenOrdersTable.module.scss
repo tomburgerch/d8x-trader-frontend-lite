@@ -21,6 +21,15 @@
   background-color: var(--d8x-color-white-opac);
 }
 
+.refreshHolder {
+  text-align: right;
+  padding-right: $d8x-spacing;
+}
+
+.noData {
+  text-align: center;
+}
+
 .paginationHolder {
   display: flex;
   justify-content: center;
