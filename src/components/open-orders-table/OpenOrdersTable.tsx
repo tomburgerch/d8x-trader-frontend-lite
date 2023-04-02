@@ -17,6 +17,8 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -32,12 +34,16 @@ import { AlignE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
+import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
 
 export const OpenOrdersTable = memo(() => {
   const { address, isDisconnected } = useAccount();
   const { data: signer } = useSigner();
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -162,25 +168,45 @@ export const OpenOrdersTable = memo(() => {
 
   return (
     <>
-      <TableContainer className={styles.root}>
-        <MuiTable>
-          <TableHead className={styles.tableHead}>
-            <TableRow>
-              {openOrdersHeaders.map((header) => (
-                <TableCell key={header.label.toString()} align={header.align}>
-                  <Typography variant="bodySmall">{header.label}</Typography>
-                </TableCell>
+      {!isSmallScreen && (
+        <TableContainer className={styles.root}>
+          <MuiTable>
+            <TableHead className={styles.tableHead}>
+              <TableRow>
+                {openOrdersHeaders.map((header) => (
+                  <TableCell key={header.label.toString()} align={header.align}>
+                    <Typography variant="bodySmall">{header.label}</Typography>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody className={styles.tableBody}>
+              {openOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />
               ))}
-            </TableRow>
-          </TableHead>
-          <TableBody className={styles.tableBody}>
+              {openOrders.length === 0 && <EmptyTableRow colSpan={openOrdersHeaders.length} text="No open orders" />}
+            </TableBody>
+          </MuiTable>
+        </TableContainer>
+      )}
+      {isSmallScreen && (
+        <Box>
+          <Box className={styles.refreshHolder}>
+            <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />
+          </Box>
+          <Box>
             {openOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-              <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />
+              <OpenOrderBlock
+                key={order.id}
+                headers={openOrdersHeaders}
+                order={order}
+                handleOrderCancel={handleOrderCancel}
+              />
             ))}
-            {openOrders.length === 0 && <EmptyTableRow colSpan={openOrdersHeaders.length} text="No open orders" />}
-          </TableBody>
-        </MuiTable>
-      </TableContainer>
+            {openOrders.length === 0 && <Box className={styles.noData}>No open orders</Box>}
+          </Box>
+        </Box>
+      )}
       {openOrders.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination

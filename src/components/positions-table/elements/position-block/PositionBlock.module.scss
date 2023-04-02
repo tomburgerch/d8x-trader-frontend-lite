@@ -1,0 +1,24 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  margin-bottom: $d8x-spacing;
+}
+
+.dataBlock {
+  flex: 1;
+  background-color: var(--d8x-background);
+  padding: $d8x-spacing;
+  border-radius: $d8x-border-radius-small;
+}
+
+.value {
+  color: var(--d8x-color-purple);
+}
+
+.actionBlock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $d8x-spacing;
+}

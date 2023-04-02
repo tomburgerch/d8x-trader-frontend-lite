@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import classnames from 'classnames';
 
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import styles from './TableSelector.module.scss';
 
@@ -15,7 +15,34 @@ interface TableSelectorPropsI {
 }
 
 export const TableSelector = ({ selectorItems }: TableSelectorPropsI) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+
   const [activeIndex, setActiveIndex] = useState(0);
+
+  if (isSmallScreen) {
+    return (
+      <Card className={styles.mobileRoot}>
+        <CardHeader
+          className={styles.mobileRootHeader}
+          title={
+            <Box className={styles.rootOptions}>
+              {selectorItems.map(({ label }, index) => (
+                <Button
+                  key={label}
+                  className={classnames({ [styles.selected]: index === activeIndex })}
+                  onClick={() => setActiveIndex(index)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </Box>
+          }
+        />
+        <CardContent>{selectorItems[activeIndex].item}</CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Box className={styles.root}>

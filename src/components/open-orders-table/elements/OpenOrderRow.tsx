@@ -6,17 +6,12 @@ import { parseSymbol } from 'helpers/parseSymbol';
 import type { OrderWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
+import { typeToLabelMap } from '../typeToLabelMap';
+
 interface OpenOrderRowPropsI {
   order: OrderWithIdI;
   handleOrderCancel: (order: OrderWithIdI) => void;
 }
-
-const typeToLabelMap: Record<string, string> = {
-  MARKET: 'Market',
-  LIMIT: 'Limit',
-  STOP_LIMIT: 'Stop',
-  STOP_MARKET: 'Stop',
-};
 
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
   const parsedSymbol = parseSymbol(order.symbol);
