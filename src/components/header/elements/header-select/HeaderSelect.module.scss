@@ -4,6 +4,7 @@
   width: 100%;
   margin-left: $d8x-spacing * 4;
   margin-right: $d8x-spacing * 4;
+  min-width: 260px;
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
