@@ -78,17 +78,19 @@ export const Header = memo(() => {
       <Box sx={{ display: 'flex' }}>
         <PageAppBar position="static">
           <Toolbar className={styles.toolbar}>
-            <Typography variant="h6" component="div">
-              <a href="/" className={styles.logoLink}>
-                <InteractiveLogo />
-              </a>
-            </Typography>
-            {!isSmallScreen && (
-              <Typography variant="h6" component="div" className={styles.selectBoxes}>
-                <CollateralsSelect />
-                <PerpetualsSelect />
+            <Box className={styles.leftSide}>
+              <Typography variant="h6" component="div">
+                <a href="/" className={styles.logoLink}>
+                  <InteractiveLogo />
+                </a>
               </Typography>
-            )}
+              {!isSmallScreen && (
+                <Typography variant="h6" component="div" className={styles.selectBoxes}>
+                  <CollateralsSelect />
+                  <PerpetualsSelect />
+                </Typography>
+              )}
+            </Box>
             {!isMobileScreen && isSmallScreen && (
               <Box className={styles.loyaltyBox}>
                 <LoyaltyScore />

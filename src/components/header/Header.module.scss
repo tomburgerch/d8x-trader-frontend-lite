@@ -15,6 +15,11 @@
   padding: 0;
 }
 
+.leftSide {
+  display: flex;
+  width: 900px;
+}
+
 .logoLink {
   line-height: 1;
 }
@@ -61,6 +66,10 @@
     }
   }
 
+  .leftSide {
+    width: auto;
+  }
+
   .toolbar {
     min-height: 80px;
   }
@@ -71,7 +80,11 @@
   .root {
 
     :global(.MuiPaper-root) {
-      height: 200px;
+      height: 280px;
     }
+  }
+
+  .mobileSelectBoxes {
+    flex-direction: column;
   }
 }
