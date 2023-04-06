@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useBalance, useSigner } from 'wagmi';
+import { useAccount, useBalance, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -68,6 +68,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 
 export const ActionBlock = memo(() => {
   const { address } = useAccount();
+  const chainId = useChainId();
 
   const { data: signer } = useSigner({
     onError(error) {
@@ -107,16 +108,16 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(traderAPIRef.current, mainOrder, address).then((data) => {
+    positionRiskOnTrade(chainId, traderAPIRef.current, mainOrder, address).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
+    getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
-  }, [orderInfo, address, setNewPositionRisk, setCollateralDeposit]);
+  }, [orderInfo, chainId, address, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -196,7 +197,7 @@ export const ActionBlock = memo(() => {
     }
     setRequestSent(true);
     requestSentRef.current = true;
-    orderDigest(parsedOrders, address)
+    orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then(() => {
@@ -222,7 +223,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [parsedOrders, address, signer, selectedPool, proxyAddr, collateralDeposit]);
+  }, [parsedOrders, chainId, address, signer, selectedPool, proxyAddr, collateralDeposit]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {

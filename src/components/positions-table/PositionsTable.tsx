@@ -3,7 +3,7 @@ import { constants } from 'ethers';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import {
   Box,
@@ -82,6 +82,7 @@ export const PositionsTable = memo(() => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+  const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
   const { data: signer } = useSigner();
 
@@ -134,7 +135,7 @@ export const PositionsTable = memo(() => {
         leverage: selectedPosition.leverage,
       };
 
-      orderDigest([closeOrder], address)
+      orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
@@ -167,7 +168,7 @@ export const PositionsTable = memo(() => {
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
-      getAddCollateral(traderAPIRef.current, selectedPosition.symbol, addCollateral)
+      getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
             .then(() => {
@@ -201,7 +202,7 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      getRemoveCollateral(traderAPIRef.current, selectedPosition.symbol, removeCollateral)
+      getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
           withdraw(signer, data)
             .then((tx) => {
@@ -226,6 +227,7 @@ export const PositionsTable = memo(() => {
     modifyType,
     selectedPosition,
     requestSent,
+    chainId,
     address,
     selectedPool,
     proxyAddr,
@@ -260,13 +262,13 @@ export const PositionsTable = memo(() => {
     }
 
     if (modifyType === ModifyTypeE.Remove) {
-      getAvailableMargin(traderAPIRef.current, selectedPosition.symbol, address).then(({ data }) => {
+      getAvailableMargin(chainId, traderAPIRef.current, selectedPosition.symbol, address).then(({ data }) => {
         setMaxCollateral(data.amount < 0 ? 0 : data.amount);
       });
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, address, selectedPosition]);
+  }, [modifyType, chainId, address, selectedPosition]);
 
   useEffect(() => {
     setNewPositionRisk(null);
@@ -289,13 +291,13 @@ export const PositionsTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getPositionRisk(traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
+        getPositionRisk(chainId, traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
           setPositions(data);
         });
       });
       setPositionRiskSent(false);
     }
-  }, [address, isConnected, selectedPool, positionRiskSent, setPositions]);
+  }, [chainId, address, isConnected, selectedPool, positionRiskSent, setPositions]);
 
   useEffect(() => {
     if (!updatedPositionsRef.current) {
@@ -322,6 +324,7 @@ export const PositionsTable = memo(() => {
     }
 
     positionRiskOnCollateralAction(
+      chainId,
       traderAPIRef.current,
       address,
       modifyType === ModifyTypeE.Add ? debouncedAddCollateral : -debouncedRemoveCollateral,
@@ -330,7 +333,7 @@ export const PositionsTable = memo(() => {
       setNewPositionRisk(data.data.newPositionRisk);
       setMaxCollateral(data.data.availableMargin);
     });
-  }, [address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral]);
+  }, [chainId, address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral]);
 
   useEffect(() => {
     return handleRefreshPositionRisk();

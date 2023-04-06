@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, SyntheticEvent, useEffect, useRef } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
@@ -37,6 +37,7 @@ const CustomPaper = ({ children, ...props }: PaperProps) => {
 
 export const CollateralsSelect = memo(() => {
   const { address } = useAccount();
+  const chainId = useChainId();
 
   const { isConnected, send } = useWebSocketContext();
 
@@ -53,11 +54,11 @@ export const CollateralsSelect = memo(() => {
   useEffect(() => {
     if (selectedPool !== null && address) {
       setPoolFee(0);
-      getPoolFee(selectedPool.poolSymbol, address).then(({ data }) => {
+      getPoolFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
         setPoolFee(data);
       });
     }
-  }, [selectedPool, setPoolFee, address]);
+  }, [selectedPool, setPoolFee, chainId, address]);
 
   useEffect(() => {
     if (selectedPool !== null && address) {
@@ -67,15 +68,15 @@ export const CollateralsSelect = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(traderAPIRef.current, symbol, address).then(({ data }) => {
+        getOpenOrders(chainId, traderAPIRef.current, symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
-        getPositionRisk(traderAPIRef.current, symbol, address).then(({ data }) => {
+        getPositionRisk(chainId, traderAPIRef.current, symbol, address).then(({ data }) => {
           setPositions(data);
         });
       });
     }
-  }, [selectedPool, address, setOpenOrders, setPositions]);
+  }, [selectedPool, chainId, address, setOpenOrders, setPositions]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {

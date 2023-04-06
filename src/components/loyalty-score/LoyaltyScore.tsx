@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
@@ -21,18 +21,19 @@ const loyaltyMap: Record<number, string> = {
 
 export const LoyaltyScore = () => {
   const { address } = useAccount();
+  const chainId = useChainId();
 
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
 
   useEffect(() => {
     if (address) {
-      getTraderLoyalty(address).then((data) => {
+      getTraderLoyalty(chainId, address).then((data) => {
         setLoyaltyScore(data.data);
       });
     } else {
       setLoyaltyScore(5);
     }
-  }, [address, setLoyaltyScore]);
+  }, [chainId, address, setLoyaltyScore]);
 
   return (
     <Box className={styles.root}>
