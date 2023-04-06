@@ -21,7 +21,7 @@ export function getExchangeInfo(traderAPI: TraderInterface | null): Promise<Vali
     });
   } else {
     console.log('exchangeInfo via BE');
-    return fetch(`${config.apiUrl}/exchangeInfo`, getRequestOptions()).then((data) => {
+    return fetch(`${config.apiUrl.default}/exchangeInfo`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -41,7 +41,7 @@ export function getPerpetualStaticInfo(
     return Promise.resolve({ type: 'perpetualStaticInfo', msg: '', data: info });
   } else {
     console.log('perpStaticInfo via BE');
-    return fetch(`${config.apiUrl}/perpetualStaticInfo?symbol=${symbol}`, getRequestOptions()).then((data) => {
+    return fetch(`${config.apiUrl.default}/perpetualStaticInfo?symbol=${symbol}`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -53,7 +53,7 @@ export function getPerpetualStaticInfo(
 
 // needs broker input: should go through backend
 export function getTraderLoyalty(address: string): Promise<ValidatedResponseI<number>> {
-  return fetch(`${config.apiUrl}/trader_loyalty?traderAddr=${address}`, getRequestOptions()).then((data) => {
+  return fetch(`${config.apiUrl.default}/trader_loyalty?traderAddr=${address}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);
@@ -83,7 +83,7 @@ export function getPositionRisk(
     });
   } else {
     console.log(`positionRisk via BE ${symbol}`);
-    return fetch(`${config.apiUrl}/positionRisk?${params}`, getRequestOptions()).then((data) => {
+    return fetch(`${config.apiUrl.default}/positionRisk?${params}`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -115,7 +115,7 @@ export function positionRiskOnTrade(
         traderAddr,
       }),
     };
-    return fetch(`${config.apiUrl}/positionRiskOnTrade`, requestOptions).then((data) => {
+    return fetch(`${config.apiUrl.default}/positionRiskOnTrade`, requestOptions).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -152,7 +152,7 @@ export function positionRiskOnCollateralAction(
         positionRisk,
       }),
     };
-    return fetch(`${config.apiUrl}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
+    return fetch(`${config.apiUrl.default}/positionRiskOnCollateralAction`, requestOptions).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -183,7 +183,7 @@ export function getOpenOrders(
       params.append('t', '' + timestamp);
     }
 
-    return fetch(`${config.apiUrl}/openOrders?${params}`, getRequestOptions()).then((data) => {
+    return fetch(`${config.apiUrl.default}/openOrders?${params}`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -195,15 +195,16 @@ export function getOpenOrders(
 
 // needs broker input, should go through backend
 export function getPoolFee(poolSymbol: string, traderAddr?: string): Promise<ValidatedResponseI<number>> {
-  return fetch(`${config.apiUrl}/queryFee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
+  return fetch(
+    `${config.apiUrl.default}/queryFee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`,
+    getRequestOptions()
+  ).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
     }
-  );
+    return data.json();
+  });
 }
 
 export function getMaxOrderSizeForTrader(
@@ -243,7 +244,7 @@ export function getMaxOrderSizeForTrader(
       params.append('t', '' + timestamp);
     }
 
-    return fetch(`${config.apiUrl}/maxOrderSizeForTrader?${params}`, getRequestOptions()).then((data) => {
+    return fetch(`${config.apiUrl.default}/maxOrderSizeForTrader?${params}`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
         throw new Error(data.statusText);
@@ -262,7 +263,7 @@ export function orderDigest(orders: OrderI[], traderAddr: string): Promise<Valid
       traderAddr,
     }),
   };
-  return fetch(`${config.apiUrl}/orderDigest`, requestOptions).then((data) => {
+  return fetch(`${config.apiUrl.default}/orderDigest`, requestOptions).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);
@@ -297,7 +298,7 @@ export function getCancelOrder(
       });
     });
   } else {
-    return fetch(`${config.apiUrl}/cancelOrder?symbol=${symbol}&orderId=${orderId}`, getRequestOptions()).then(
+    return fetch(`${config.apiUrl.default}/cancelOrder?symbol=${symbol}&orderId=${orderId}`, getRequestOptions()).then(
       (data) => {
         if (!data.ok) {
           console.error({ data });
@@ -337,7 +338,7 @@ export function getAddCollateral(
       };
     });
   } else {
-    return fetch(`${config.apiUrl}/addCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
+    return fetch(`${config.apiUrl.default}/addCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
       (data) => {
         if (!data.ok) {
           console.error({ data });
@@ -360,7 +361,7 @@ export function getAvailableMargin(
     });
   } else {
     return fetch(
-      `${config.apiUrl}/availableMargin?symbol=${symbol}&traderAddr=${traderAddr}`,
+      `${config.apiUrl.default}/availableMargin?symbol=${symbol}&traderAddr=${traderAddr}`,
       getRequestOptions()
     ).then((data) => {
       if (!data.ok) {
@@ -400,14 +401,15 @@ export function getRemoveCollateral(
       };
     });
   } else {
-    return fetch(`${config.apiUrl}/removeCollateral?symbol=${symbol}&amount=${amount}`, getRequestOptions()).then(
-      (data) => {
-        if (!data.ok) {
-          console.error({ data });
-          throw new Error(data.statusText);
-        }
-        return data.json();
+    return fetch(
+      `${config.apiUrl.default}/removeCollateral?symbol=${symbol}&amount=${amount}`,
+      getRequestOptions()
+    ).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
       }
-    );
+      return data.json();
+    });
   }
 }

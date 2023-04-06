@@ -1,10 +1,8 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { ReactDispatchT, WebSocketI } from './types';
 
 const RECONNECT_TIMEOUT = 5000;
 
-type ReactDispatchT = Dispatch<SetStateAction<boolean>>;
-
-export function createWebSocketWithReconnect(wsUrl: string) {
+export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
   let client: WebSocket;
   let isConnected = false;
   let reconnectOnClose = true;
