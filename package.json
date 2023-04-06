@@ -59,7 +59,7 @@
     "@emotion/styled": "11.10.6",
     "@mui/icons-material": "5.11.11",
     "@mui/material": "5.11.14",
-    "@rainbow-me/rainbowkit": "0.12.4",
+    "@rainbow-me/rainbowkit": "0.12.7",
     "buffer": "6.0.3",
     "classnames": "2.3.2",
     "date-fns": "2.29.3",
@@ -75,7 +75,7 @@
     "react-router-dom": "6.9.0",
     "react-scripts": "5.0.1",
     "react-toastify": "9.1.2",
-    "wagmi": "0.12.6"
+    "wagmi": "0.12.9"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "5.16.5",
