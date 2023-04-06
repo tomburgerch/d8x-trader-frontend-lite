@@ -151,7 +151,7 @@ export interface SmartContractOrderI {
   fLeverage: BigNumberish;
   iDeadline: BigNumberish;
   createdTimestamp: BigNumberish;
-  submittedBlock: BigNumberish;
+  submittedTimestamp: BigNumberish;
 }
 
 export interface OrderDigestI {
