@@ -38,8 +38,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: frontend
         IMAGE_TAG: d8x-frontend-stage-${{ github.sha }}
-        REACT_APP_API_URL: default::https://api.quantena.tech
-        REACT_APP_WEBSOCKET_URL: default::wss://ws.quantena.tech
+        REACT_APP_API_URL: 137::https://api.quantena.tech;80001::https://api.quantena.tech;1442::https://api.zktest.quantena.tech;default::https://api.quantena.tech
+        REACT_APP_WEBSOCKET_URL: 137::wss://ws.quantena.tech/;80001::wss://ws.quantena.tech/;1442::wss://ws.zktest.quantena.tech/;default::wss://ws.quantena.tech/
         REACT_APP_CANDLES_WEBSOCKET_URL: default::wss://candles.testnet.quantena.tech/
       run: |
         docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_CANDLES_WEBSOCKET_URL=$REACT_APP_CANDLES_WEBSOCKET_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
