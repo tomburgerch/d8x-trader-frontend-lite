@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useBalance, useChainId, useSigner } from 'wagmi';
 
@@ -89,7 +89,12 @@ export const ActionBlock = memo(() => {
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
 
   const requestSentRef = useRef(false);
+  // const traderAPIRef = useRef(traderAPI);
   const traderAPIRef = useRef(traderAPI);
+
+  useEffect(() => {
+    traderAPIRef.current = traderAPI;
+  });
 
   const marginTokenBalance = useBalance({
     address: address,
