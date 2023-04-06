@@ -37,9 +37,9 @@ jobs:
         ECR_REPOSITORY: frontend
         IMAGE_TAG: d8x-frontend-${{ github.sha }}
         # test:
-        REACT_APP_API_URL: https://api.quantena.tech
-        REACT_APP_WEBSOCKET_URL: wss://ws.quantena.tech/
-        REACT_APP_CANDLES_WEBSOCKET_URL: wss://candles.testnet.quantena.tech/
+        REACT_APP_API_URL: 137::https://api.quantena.tech;80001::https://api.quantena.tech;1442::https://api.zktest.quantena.tech;default::https://api.quantena.tech
+        REACT_APP_WEBSOCKET_URL: 137::wss://ws.quantena.tech/;80001::wss://ws.quantena.tech/;1442::wss://ws.zktest.quantena.tech/;default::wss://ws.quantena.tech/
+        REACT_APP_CANDLES_WEBSOCKET_URL: default::wss://candles.testnet.quantena.tech/
         #REACT_APP_API_URL: https://dev.testnet.d8x.exchange/api/v1
         #REACT_APP_WEBSOCKET_URL: wss://dev.testnet.d8x.exchange/ws/
       run: |

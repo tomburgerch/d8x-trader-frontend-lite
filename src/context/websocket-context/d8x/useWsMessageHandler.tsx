@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -73,6 +73,7 @@ function isExecutionFailedMessage(message: CommonWsMessageI): message is OnExecu
 
 export function useWsMessageHandler() {
   const { address } = useAccount();
+  const chainId = useChainId();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
@@ -161,7 +162,7 @@ export function useWsMessageHandler() {
           return;
         }
 
-        getOpenOrders(traderAPIRef.current, parsedMessage.data.obj.symbol, address).then(({ data }) => {
+        getOpenOrders(chainId, traderAPIRef.current, parsedMessage.data.obj.symbol, address).then(({ data }) => {
           setOpenOrders(data);
         });
 
@@ -200,6 +201,15 @@ export function useWsMessageHandler() {
         );
       }
     },
-    [updatePerpetualStats, setWebSocketReady, setPositions, setOpenOrders, removeOpenOrder, failOpenOrder, address]
+    [
+      updatePerpetualStats,
+      setWebSocketReady,
+      setPositions,
+      setOpenOrders,
+      removeOpenOrder,
+      failOpenOrder,
+      chainId,
+      address,
+    ]
   );
 }

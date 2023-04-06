@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
+import { useChainId } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
@@ -34,6 +35,8 @@ export const Header = memo(() => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const chainId = useChainId();
+
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
@@ -48,13 +51,13 @@ export const Header = memo(() => {
   useEffect(() => {
     if (!requestRef.current) {
       requestRef.current = true;
-      getExchangeInfo(traderAPIRef.current).then(({ data }) => {
+      getExchangeInfo(chainId, traderAPIRef.current).then(({ data }) => {
         setPools(data.pools);
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
       });
     }
-  }, [setPools, setOracleFactoryAddr, setProxyAddr]);
+  }, [chainId, setPools, setOracleFactoryAddr, setProxyAddr]);
 
   /*
   const handleDrawerToggle = () => {

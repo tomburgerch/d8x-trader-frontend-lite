@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import {
   Box,
@@ -40,6 +40,7 @@ import styles from './OpenOrdersTable.module.scss';
 
 export const OpenOrdersTable = memo(() => {
   const { address, isDisconnected } = useAccount();
+  const chainId = useChainId();
   const { data: signer } = useSigner();
 
   const theme = useTheme();
@@ -89,7 +90,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           signMessages(signer, [data.data.digest])
@@ -118,7 +119,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent, isDisconnected, signer]);
+  }, [selectedOrder, requestSent, isDisconnected, signer, chainId]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -137,12 +138,12 @@ export const OpenOrdersTable = memo(() => {
           quoteCurrency,
           poolSymbol: selectedPool.poolSymbol,
         });
-        getOpenOrders(traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
+        getOpenOrders(chainId, traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
           setOpenOrders(data);
         });
       });
     }
-  }, [address, selectedPool, isDisconnected, setOpenOrders]);
+  }, [chainId, address, selectedPool, isDisconnected, setOpenOrders]);
 
   useEffect(() => {
     if (!openOrdersRefreshedRef.current) {
