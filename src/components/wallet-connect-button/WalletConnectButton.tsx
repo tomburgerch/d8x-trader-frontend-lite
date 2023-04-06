@@ -44,7 +44,7 @@ export const WalletConnectButton = memo(() => {
     if (loadingAPIRef.current || !isConnected || !provider) {
       return;
     }
-    // loadTraderAPI(provider);
+    loadingAPIRef.current = true;
     provider
       .getNetwork()
       .then((network) => {
@@ -55,6 +55,7 @@ export const WalletConnectButton = memo(() => {
             setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
             setTraderAPI(freshTraderAPI);
             loadingAPIRef.current = false;
+            console.log(`SDK loaded on chain ${network.name} (id ${network.chainId})`);
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .catch((error: any) => {
