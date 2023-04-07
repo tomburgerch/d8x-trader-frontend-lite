@@ -53,7 +53,7 @@ export const CollateralsSelect = memo(() => {
 
   useEffect(() => {
     if (selectedPool !== null && address) {
-      setPoolFee(0);
+      setPoolFee(undefined);
       getPoolFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
         setPoolFee(data);
       });

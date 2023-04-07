@@ -13,7 +13,7 @@ import type {
 
 export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const poolsAtom = atom<PoolI[]>([]);
-export const poolFeeAtom = atom<number>(0);
+export const poolFeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
 export const proxyAddrAtom = atom('');
 export const perpetualStatisticsAtom = atom<PerpetualStatisticsI | null>(null);

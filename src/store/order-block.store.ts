@@ -48,12 +48,15 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   if (!perpetualStatistics) {
     return null;
   }
+  const poolFee = get(poolFeeAtom);
+  if (poolFee === undefined) {
+    return null;
+  }
 
   const newPositionRisk = get(newPositionRiskAtom);
   const collateralDeposit = get(collateralDepositAtom);
   // const positions = get(positionsAtom);
 
-  const poolFee = get(poolFeeAtom);
   const orderBlock = get(orderBlockAtom);
   const orderType = get(orderTypeAtom);
   const leverageSaved = get(leverageAtom);
