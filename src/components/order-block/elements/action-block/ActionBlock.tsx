@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useBalance, useChainId, useSigner } from 'wagmi';
+import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -17,6 +17,7 @@ import {
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
+  poolTokenBalanceAtom,
   proxyAddrAtom,
   selectedPoolAtom,
   traderAPIAtom,
@@ -85,6 +86,7 @@ export const ActionBlock = memo(() => {
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -95,14 +97,6 @@ export const ActionBlock = memo(() => {
 
   useEffect(() => {
     traderAPIRef.current = traderAPI;
-  });
-
-  const marginTokenBalance = useBalance({
-    address: address,
-    token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
-    onSuccess(data) {
-      console.log(`my ${selectedPool?.poolSymbol} balance is ${data.formatted} ${data.symbol}`);
-    },
   });
 
   const openReviewOrderModal = useCallback(() => {
@@ -266,17 +260,16 @@ export const ActionBlock = memo(() => {
     }
     if (
       orderInfo.orderType === OrderTypeE.Market &&
-      Boolean(marginTokenBalance?.data) &&
-      Number(marginTokenBalance.data?.formatted) < collateralDeposit
+      (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit)
     ) {
-      return 'Order will fail: insufficient wallet balance';
+      return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     return 'Good to go';
   }, [
     maxOrderSize,
     orderInfo,
     selectedPerpetualStaticInfo,
-    marginTokenBalance,
+    poolTokenBalance,
     selectedPerpetualStatistics,
     collateralDeposit,
   ]);
