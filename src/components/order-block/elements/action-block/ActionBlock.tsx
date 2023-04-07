@@ -47,7 +47,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     limitPrice = orderInfo.maxMinEntryPrice;
   }
 
-  let deadlineMultiplier = 8; // By default, is it set to 8 hours
+  let deadlineMultiplier = 200; // By default, is it set to 8 hours
   if (orderInfo.orderType !== OrderTypeE.Market && orderInfo.expireDays) {
     deadlineMultiplier = 24 * mapExpiryToNumber(orderInfo.expireDays);
   }
@@ -282,7 +282,11 @@ export const ActionBlock = memo(() => {
   ]);
 
   const isConfirmButtonDisabled = useMemo(() => {
-    return validityCheckText !== 'Good to go' || requestSentRef.current || requestSent;
+    return (
+      (validityCheckText !== 'Good to go' && validityCheckText !== 'Market is closed') ||
+      requestSentRef.current ||
+      requestSent
+    );
   }, [validityCheckText, requestSent]);
 
   return (
