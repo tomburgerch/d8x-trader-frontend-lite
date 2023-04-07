@@ -77,6 +77,7 @@ export const PerpetualsSelect = memo(() => {
         indexPrice: selectedPerpetual.indexPrice,
         currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
         openInterestBC: selectedPerpetual.openInterestBC,
+        isMarketClosed: selectedPerpetual.isMarketClosed,
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);

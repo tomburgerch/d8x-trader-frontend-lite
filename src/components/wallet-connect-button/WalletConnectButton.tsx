@@ -115,10 +115,9 @@ export const WalletConnectButton = memo(() => {
               }
 
               return (
-                <>
-                  {/*}
-                  <Button onClick={openChainModal} style={{ display: 'flex', alignItems: 'center' }} variant="primary">
-                    {chain.hasIcon && (
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <Button onClick={openChainModal} style={{ display: 'flex', alignItems: 'center' }} variant="outlined">
+                    {/* {chain.hasIcon && (
                       <div
                         style={{
                           background: chain.iconBackground,
@@ -133,15 +132,15 @@ export const WalletConnectButton = memo(() => {
                           <img alt={chain.name ?? 'Chain icon'} src={chain.iconUrl} style={{ width: 12, height: 12 }} />
                         )}
                       </div>
-                    )}
+                    )} */}
                     {chain.name}
                   </Button>
-                  {*/}
 
                   <Button onClick={openAccountModal} variant="primary">
                     {account.displayName}
+                    {/* {account.displayBalance ? ` (${account.displayBalance})` : ''} */}
                   </Button>
-                </>
+                </div>
               );
             })()}
           </div>

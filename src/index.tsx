@@ -16,6 +16,7 @@ import { App } from './App';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/index.scss';
+import { Disclaimer } from 'components/disclaimer/disclaimer';
 
 const container = document.getElementById('root');
 
@@ -28,7 +29,12 @@ if (container) {
         <WebSocketContextProvider>
           <CandlesWebSocketContextProvider>
             <WagmiConfig client={wagmiClient}>
-              <RainbowKitProvider chains={chains} modalSize="compact">
+              <RainbowKitProvider
+                chains={chains}
+                initialChain={80001}
+                appInfo={{ appName: 'D8X', disclaimer: Disclaimer, learnMoreUrl: 'https://d8x.exchange/' }}
+                modalSize="compact"
+              >
                 <StyledEngineProvider injectFirst>
                   <ThemeProvider theme={theme}>
                     <BrowserRouter>

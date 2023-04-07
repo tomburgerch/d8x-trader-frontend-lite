@@ -124,6 +124,7 @@ export function useWsMessageHandler() {
           indexPrice: parsedMessage.data.indexPrice,
           currentFundingRateBps: parsedMessage.data.currentFundingRateBps,
           openInterestBC: parsedMessage.data.openInterestBC,
+          isMarketClosed: parsedMessage.data.isMarketClosed,
         });
       } else if (isUpdateMarkPriceMessage(parsedMessage)) {
         const parsedSymbol = parseSymbol(parsedMessage.data.obj.symbol);
@@ -150,6 +151,7 @@ export function useWsMessageHandler() {
           indexPrice,
           currentFundingRateBps,
           openInterestBC,
+          isMarketClosed: false,
         });
       } else if (isUpdateMarginAccountMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {

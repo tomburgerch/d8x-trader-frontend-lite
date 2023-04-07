@@ -16,6 +16,7 @@ import {
   collateralDepositAtom,
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
+  perpetualStatisticsAtom,
   proxyAddrAtom,
   selectedPoolAtom,
   traderAPIAtom,
@@ -80,6 +81,7 @@ export const ActionBlock = memo(() => {
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
+  const [selectedPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
@@ -89,7 +91,6 @@ export const ActionBlock = memo(() => {
   const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
 
   const requestSentRef = useRef(false);
-  // const traderAPIRef = useRef(traderAPI);
   const traderAPIRef = useRef(traderAPI);
 
   useEffect(() => {
@@ -244,10 +245,12 @@ export const ActionBlock = memo(() => {
   }, [orderInfo]);
 
   const validityCheckText = useMemo(() => {
-    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo || !marginTokenBalance.data) {
+    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo || !selectedPerpetualStatistics) {
       return '-';
     }
-
+    if (selectedPerpetualStatistics.isMarketClosed) {
+      return 'Market is closed';
+    }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
       isTooLarge = orderInfo.size > maxOrderSize.buy;
@@ -261,11 +264,22 @@ export const ActionBlock = memo(() => {
     if (isTooSmall) {
       return 'Order will fail: order size is too small';
     }
-    if (orderInfo.orderType === OrderTypeE.Market && Number(marginTokenBalance.data.formatted) < collateralDeposit) {
+    if (
+      orderInfo.orderType === OrderTypeE.Market &&
+      Boolean(marginTokenBalance?.data) &&
+      Number(marginTokenBalance.data?.formatted) < collateralDeposit
+    ) {
       return 'Order will fail: insufficient wallet balance';
     }
     return 'Good to go';
-  }, [maxOrderSize, orderInfo, selectedPerpetualStaticInfo, marginTokenBalance, collateralDeposit]);
+  }, [
+    maxOrderSize,
+    orderInfo,
+    selectedPerpetualStaticInfo,
+    marginTokenBalance,
+    selectedPerpetualStatistics,
+    collateralDeposit,
+  ]);
 
   const isConfirmButtonDisabled = useMemo(() => {
     return validityCheckText !== 'Good to go' || requestSentRef.current || requestSent;

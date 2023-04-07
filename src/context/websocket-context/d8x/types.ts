@@ -49,6 +49,7 @@ export interface SubscriptionWsMessageI extends CommonWsMessageI {
     midPrice: number;
     openInterestBC: number;
     state: string; // TODO: check for available statuses
+    isMarketClosed: boolean;
   };
 }
 

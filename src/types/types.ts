@@ -15,6 +15,7 @@ export interface PerpetualI {
   midPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
+  isMarketClosed: boolean;
 }
 
 export interface PerpetualStatisticsI {
@@ -27,6 +28,7 @@ export interface PerpetualStatisticsI {
   indexPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
+  isMarketClosed: boolean;
 }
 
 export interface PoolI {
