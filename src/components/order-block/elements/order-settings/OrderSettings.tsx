@@ -66,7 +66,7 @@ export const OrderSettings = memo(() => {
   // const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
   const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
-  const [updatedSlippage, setUpdatedSlippage] = useState(2);
+  const [updatedSlippage, setUpdatedSlippage] = useState(4);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const openSettingsModal = useCallback(() => setShowSettingsModal(true), []);

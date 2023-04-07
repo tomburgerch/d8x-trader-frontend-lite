@@ -1,11 +1,17 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
-import { useChainId } from 'wagmi';
+import { useAccount, useBalance, useChainId } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { getExchangeInfo } from 'network/network';
-import { oracleFactoryAddrAtom, poolsAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
+import {
+  oracleFactoryAddrAtom,
+  poolTokenBalanceAtom,
+  poolsAtom,
+  proxyAddrAtom,
+  selectedPoolAtom,
+} from 'store/pools.store';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -36,28 +42,54 @@ export const Header = memo(() => {
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const chainId = useChainId();
+  const { address } = useAccount();
 
   const [, setPools] = useAtom(poolsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
+  const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
 
   // Might be used later
   // const [mobileOpen, setMobileOpen] = useState(false);
 
   const requestRef = useRef(false);
-  const traderAPIRef = useRef(traderAPI);
 
   useEffect(() => {
     if (!requestRef.current) {
       requestRef.current = true;
-      getExchangeInfo(chainId, traderAPIRef.current).then(({ data }) => {
+      setProxyAddr(undefined);
+      getExchangeInfo(chainId, null).then(({ data }) => {
         setPools(data.pools);
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
       });
+      requestRef.current = false;
     }
   }, [chainId, setPools, setOracleFactoryAddr, setProxyAddr]);
+
+  const { data: poolTokenBalance, isError } = useBalance({
+    address: address,
+    token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
+    chainId: chainId,
+    enabled: !requestRef.current && address !== undefined,
+    onSuccess(data) {
+      console.log(
+        `my ${selectedPool?.poolSymbol} (addr ${selectedPool?.marginTokenAddr} on chain ${chainId}) balance is ${data.formatted} ${data.symbol}`
+      );
+    },
+    onError() {
+      console.log(
+        `failed to fetch balance of ${selectedPool?.poolSymbol} margin token: ${selectedPool?.marginTokenAddr}, chain id ${chainId})`
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (poolTokenBalance && selectedPool && chainId && !isError) {
+      setPoolTokenBalance(Number(poolTokenBalance.formatted));
+    }
+  }, [selectedPool, chainId, poolTokenBalance, isError, setPoolTokenBalance]);
 
   /*
   const handleDrawerToggle = () => {

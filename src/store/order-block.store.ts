@@ -14,7 +14,7 @@ export const orderTypeAtom = atom<OrderTypeE>(OrderTypeE.Market);
 export const orderSizeAtom = atom(0);
 export const triggerPriceAtom = atom(0);
 export const leverageAtom = atom(1);
-export const slippageSliderAtom = atom(2);
+export const slippageSliderAtom = atom(4);
 export const keepPositionLeverageAtom = atom(false);
 export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(ExpiryE['60D']);
@@ -48,12 +48,15 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   if (!perpetualStatistics) {
     return null;
   }
+  const poolFee = get(poolFeeAtom);
+  if (poolFee === undefined) {
+    return null;
+  }
 
   const newPositionRisk = get(newPositionRiskAtom);
   const collateralDeposit = get(collateralDepositAtom);
   // const positions = get(positionsAtom);
 
-  const poolFee = get(poolFeeAtom);
   const orderBlock = get(orderBlockAtom);
   const orderType = get(orderTypeAtom);
   const leverageSaved = get(leverageAtom);

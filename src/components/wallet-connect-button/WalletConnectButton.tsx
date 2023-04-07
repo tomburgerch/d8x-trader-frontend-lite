@@ -2,34 +2,31 @@ import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useConnect, useProvider } from 'wagmi';
+import { useAccount, useChainId, useConnect, useProvider } from 'wagmi';
 
 import { Button } from '@mui/material';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { useAtom } from 'jotai';
-import { proxyABIAtom, traderAPIAtom } from 'store/pools.store';
+import { traderAPIAtom } from 'store/pools.store';
 
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
-  const [, setProxyABI] = useAtom(proxyABIAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
 
+  const chainId = useChainId();
   const provider = useProvider();
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
 
-  // set trader API to null -> calls will be done via REST
   const unloadTraderAPI = useCallback(() => {
     if (!traderAPIRef.current) {
-      // already flushed
       return;
     }
     setTraderAPI(null);
   }, [setTraderAPI]);
 
-  // connection error
   useEffect(() => {
     if (errorMessage) {
       toast.error(
@@ -39,47 +36,35 @@ export const WalletConnectButton = memo(() => {
     }
   }, [errorMessage, unloadTraderAPI]);
 
-  // wallet connected: use SDK
-  useEffect(() => {
-    if (loadingAPIRef.current || !isConnected || !provider) {
-      return;
-    }
-    loadingAPIRef.current = true;
-    provider
-      .getNetwork()
-      .then((network) => {
-        const freshTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(network.chainId));
-        freshTraderAPI
-          .createProxyInstance(provider)
-          .then(() => {
-            setProxyABI(freshTraderAPI.getABI('proxy') as string[] | undefined);
-            setTraderAPI(freshTraderAPI);
-            loadingAPIRef.current = false;
-            console.log(`SDK loaded on chain ${network.name} (id ${network.chainId})`);
-          })
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .catch((error: any) => {
-            // error connecting to network through SDK
-            console.log('error in createProxyInstance()', error);
-            setTraderAPI(null);
-            loadingAPIRef.current = false;
-          });
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => {
-        // error getting network from provider
-        console.log('error in getNetwork()', error);
-        setTraderAPI(null);
-        loadingAPIRef.current = false;
-      });
-  }, [isConnected, provider, setProxyABI, setTraderAPI]);
-
-  // wallet disconnected or reconnecting: use REST
   useEffect(() => {
     if (isDisconnected || isReconnecting || traderAPIRef.current) {
       unloadTraderAPI();
     }
   }, [isDisconnected, isReconnecting, unloadTraderAPI]);
+
+  useEffect(() => {
+    if (loadingAPIRef.current || !isConnected || !provider || !chainId) {
+      return;
+    }
+    setTraderAPI(null);
+    console.log(`reloading SDK on chainId ${chainId}`);
+    loadingAPIRef.current = true;
+    const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(chainId));
+    // console.log(`proxy ${newTraderAPI.getProxyAddress()}`);
+    newTraderAPI
+      .createProxyInstance(provider)
+      .then(() => {
+        setTraderAPI(newTraderAPI);
+        loadingAPIRef.current = false;
+        console.log(`SDK loaded on chain id ${chainId}`);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        console.log('error in createProxyInstance()', error);
+        setTraderAPI(null);
+        loadingAPIRef.current = false;
+      });
+  }, [isConnected, provider, chainId, setTraderAPI]);
 
   return (
     <ConnectButton.Custom>
