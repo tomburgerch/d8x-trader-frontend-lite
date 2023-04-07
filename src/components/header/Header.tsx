@@ -68,7 +68,7 @@ export const Header = memo(() => {
     }
   }, [chainId, setPools, setOracleFactoryAddr, setProxyAddr]);
 
-  const { data: poolTokenBalance } = useBalance({
+  const { data: poolTokenBalance, isError } = useBalance({
     address: address,
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
     chainId: chainId,
@@ -86,10 +86,10 @@ export const Header = memo(() => {
   });
 
   useEffect(() => {
-    if (poolTokenBalance && selectedPool && chainId) {
+    if (poolTokenBalance && selectedPool && chainId && !isError) {
       setPoolTokenBalance(Number(poolTokenBalance.formatted));
     }
-  }, [selectedPool, chainId, poolTokenBalance, setPoolTokenBalance]);
+  }, [selectedPool, chainId, poolTokenBalance, isError, setPoolTokenBalance]);
 
   /*
   const handleDrawerToggle = () => {
