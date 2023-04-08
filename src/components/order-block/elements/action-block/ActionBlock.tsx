@@ -48,7 +48,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     limitPrice = orderInfo.maxMinEntryPrice;
   }
 
-  let deadlineMultiplier = 200; // By default, is it set to 8 hours
+  let deadlineMultiplier = 200; // By default, is it set to 200 hours
   if (orderInfo.orderType !== OrderTypeE.Market && orderInfo.expireDays) {
     deadlineMultiplier = 24 * mapExpiryToNumber(orderInfo.expireDays);
   }

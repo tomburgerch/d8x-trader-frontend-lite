@@ -69,7 +69,18 @@ export const LeverageSelector = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
-        <InfoBlock title="Leverage" content={<Typography>Specifies the leverage of your order.</Typography>} />
+        <InfoBlock
+          title="Leverage"
+          content={
+            <>
+              <Typography>Specifies the leverage of your order.</Typography>
+              <Typography>
+                If your order is reducing an existing position ("partial closure"), the leverage you select has no
+                impact.
+              </Typography>
+            </>
+          }
+        />
       </Box>
       <Box className={styles.sliderHolder}>
         <Slider
