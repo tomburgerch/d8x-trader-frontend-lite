@@ -75,7 +75,8 @@ export const LeverageSelector = memo(() => {
             <>
               <Typography>Specifies the leverage of your order.</Typography>
               <Typography>
-                If you are reducing an existing position ("partial closure"), the leverage you select has no impact.
+                If your order is reducing an existing position ("partial closure"), the leverage you select has no
+                impact.
               </Typography>
             </>
           }
