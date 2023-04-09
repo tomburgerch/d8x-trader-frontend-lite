@@ -152,6 +152,16 @@
   }
 }
 
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .figures {
+
+    li {
+      animation: none;
+    }
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-sm) {
 
   .figures {
