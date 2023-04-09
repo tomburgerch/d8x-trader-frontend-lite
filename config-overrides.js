@@ -11,6 +11,7 @@ module.exports = function override(config) {
     os: require.resolve('os-browserify'),
     url: require.resolve('url'),
   });
+
   config.ignoreWarnings = [/Failed to parse source map/];
   config.resolve.fallback = fallback;
   config.plugins = (config.plugins || []).concat([
@@ -19,5 +20,6 @@ module.exports = function override(config) {
       Buffer: ['buffer', 'Buffer'],
     }),
   ]);
+
   return config;
 };
