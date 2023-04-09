@@ -1,0 +1,36 @@
+@import 'styles/theme/theme';
+
+.root {
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.buttonsHolder {
+  display: flex;
+  gap: 12px;
+}
+
+.chainButton {
+  display: flex;
+  align-items: center;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.addressButton {
+  display: flex;
+  align-items: center;
+  gap: $d8x-spacing;
+}
+
+.starsHolder {
+  margin-top: -10px;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  color: var(--d8x-color-white);
+}
