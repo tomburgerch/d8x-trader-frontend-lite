@@ -15,7 +15,6 @@ import {
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
-import { LoyaltyScore } from '../loyalty-score/LoyaltyScore';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
@@ -39,7 +38,6 @@ import { PageAppBar } from './Header.styles';
 export const Header = memo(() => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const chainId = useChainId();
   const { address } = useAccount();
@@ -126,13 +124,7 @@ export const Header = memo(() => {
                 </Typography>
               )}
             </Box>
-            {!isMobileScreen && isSmallScreen && (
-              <Box className={styles.loyaltyBox}>
-                <LoyaltyScore />
-              </Box>
-            )}
             <Typography variant="h6" component="div" className={styles.walletConnect}>
-              {!isSmallScreen && !isMobileScreen && <LoyaltyScore />}
               <WalletConnectButton />
             </Typography>
             {/*}
@@ -148,11 +140,6 @@ export const Header = memo(() => {
             </IconButton>
             {*/}
           </Toolbar>
-          {isMobileScreen && (
-            <Box className={styles.mobileBox}>
-              <LoyaltyScore />
-            </Box>
-          )}
           {isSmallScreen && (
             <Box className={styles.mobileSelectBoxes}>
               <CollateralsSelect />

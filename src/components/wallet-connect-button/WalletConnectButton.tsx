@@ -1,20 +1,37 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useConnect, useProvider } from 'wagmi';
 
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
+
+import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
+import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { useAtom } from 'jotai';
-import { traderAPIAtom } from 'store/pools.store';
+import { getTraderLoyalty } from 'network/network';
+import { loyaltyScoreAtom, traderAPIAtom } from 'store/pools.store';
+import { cutAddressName } from 'utils/cutAddressName';
+
+import styles from './WalletConnectButton.module.scss';
+
+const loyaltyMap: Record<number, string> = {
+  1: 'Diamond',
+  2: 'Platinum',
+  3: 'Gold',
+  4: 'Silver',
+  5: '-',
+};
 
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
+  const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
 
+  const { address } = useAccount();
   const chainId = useChainId();
   const provider = useProvider();
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
@@ -26,6 +43,16 @@ export const WalletConnectButton = memo(() => {
     }
     setTraderAPI(null);
   }, [setTraderAPI]);
+
+  useEffect(() => {
+    if (address) {
+      getTraderLoyalty(chainId, address).then((data) => {
+        setLoyaltyScore(data.data);
+      });
+    } else {
+      setLoyaltyScore(5);
+    }
+  }, [chainId, address, setLoyaltyScore]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -75,18 +102,14 @@ export const WalletConnectButton = memo(() => {
           <div
             {...(!mounted && {
               'aria-hidden': true,
-              style: {
-                opacity: 0,
-                pointerEvents: 'none',
-                userSelect: 'none',
-              },
+              className: styles.root,
             })}
           >
             {(() => {
               if (!connected) {
                 return (
                   <Button onClick={openConnectModal} variant="primary">
-                    Connect Wallet
+                    Connect
                   </Button>
                 );
               }
@@ -100,30 +123,19 @@ export const WalletConnectButton = memo(() => {
               }
 
               return (
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <Button onClick={openChainModal} style={{ display: 'flex', alignItems: 'center' }} variant="outlined">
-                    {/* {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <img alt={chain.name ?? 'Chain icon'} src={chain.iconUrl} style={{ width: 12, height: 12 }} />
-                        )}
-                      </div>
-                    )} */}
-                    {chain.name}
+                <div className={styles.buttonsHolder}>
+                  <Button onClick={openChainModal} className={styles.chainButton} variant="outlined">
+                    <img src={chain.iconUrl} alt={chain.name} title={chain.name} />
                   </Button>
 
-                  <Button onClick={openAccountModal} variant="primary">
-                    {account.displayName}
-                    {/* {account.displayBalance ? ` (${account.displayBalance})` : ''} */}
+                  <Button onClick={openAccountModal} variant="primary" className={styles.addressButton}>
+                    <Box className={styles.starsHolder} title={loyaltyMap[loyaltyScore]}>
+                      {loyaltyScore < 5 ? <FilledStar /> : <EmptyStar />}
+                      {loyaltyScore < 4 ? <FilledStar /> : <EmptyStar />}
+                      {loyaltyScore < 3 ? <FilledStar /> : <EmptyStar />}
+                      {loyaltyScore < 2 ? <FilledStar /> : <EmptyStar />}
+                    </Box>
+                    {cutAddressName(account.address)}
                   </Button>
                 </div>
               );

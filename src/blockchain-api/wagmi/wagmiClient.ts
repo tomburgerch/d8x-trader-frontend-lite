@@ -4,20 +4,19 @@ import { configureChains, createClient } from 'wagmi';
 import { polygonMumbai, polygon, polygonZkEvm, polygonZkEvmTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
-const defautChains: Chain[] = [
-  polygon,
-  polygonMumbai,
-  {
-    ...polygonZkEvm,
-    iconUrl: 'https://zkevm.polygonscan.com/images/favicon.ico?v=23.3.5.0',
-  },
-  {
-    ...polygonZkEvmTestnet,
-    iconUrl: 'https://testnet-zkevm.polygonscan.com/images/favicon.ico?v=23.3.5.0',
-  },
+import polygonMainIcon from 'assets/networks/polygonMain.svg';
+import polygonTestIcon from 'assets/networks/polygonTest.svg';
+import zkMainIcon from 'assets/networks/zkEvmMain.svg';
+import zkTestIcon from 'assets/networks/zkEvmTest.svg';
+
+const defaultChains: Chain[] = [
+  { ...polygon, iconUrl: polygonMainIcon, iconBackground: 'transparent' },
+  { ...polygonMumbai, iconUrl: polygonTestIcon, iconBackground: 'transparent' },
+  { ...polygonZkEvm, iconUrl: zkMainIcon, iconBackground: 'transparent' },
+  { ...polygonZkEvmTestnet, iconUrl: zkTestIcon, iconBackground: 'transparent' },
 ];
 
-const { chains, provider } = configureChains(defautChains, [publicProvider()]);
+const { chains, provider } = configureChains(defaultChains, [publicProvider()]);
 
 const connectors = connectorsForWallets([
   {
