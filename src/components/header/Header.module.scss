@@ -7,6 +7,11 @@
   :global(.MuiPaper-root) {
     height: 80px;
   }
+
+  :global(.MuiOutlinedInput-root) {
+    width: auto;
+    background-color: var(--d8x-background-card-title);
+  }
 }
 
 .toolbar {
@@ -21,18 +26,13 @@
 }
 
 .logoLink {
+  display: flex;
   line-height: 1;
 }
 
 .selectBoxes {
   display: flex;
   flex-grow: 2;
-}
-
-.mobileBox {
-  display: flex;
-  justify-content: center;
-  margin-bottom: $d8x-spacing * 2;
 }
 
 .mobileSelectBoxes {
@@ -49,12 +49,6 @@
   display: flex;
   flex-grow: 1;
   gap: 15px;
-}
-
-.loyaltyBox {
-  display: flex;
-  flex-grow: 1;
-  justify-content: right;
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
@@ -80,7 +74,7 @@
   .root {
 
     :global(.MuiPaper-root) {
-      height: 280px;
+      height: auto;
     }
   }
 
