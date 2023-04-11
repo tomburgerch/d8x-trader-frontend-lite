@@ -7,6 +7,27 @@
   min-width: 260px;
 }
 
+.autocomplete {
+
+  :global(.MuiOutlinedInput-root) {
+
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: rgba(var(--d8x-color-purple-rgb), 0.5);
+    }
+
+    &:hover {
+
+      :global(.MuiOutlinedInput-notchedOutline) {
+        border-color: var(--d8x-color-purple);
+      }
+    }
+  }
+
+  :global(.MuiInputLabel-root):global(.Mui-focused) {
+    color: var(--d8x-color-purple);
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-md) {
 
   .root {

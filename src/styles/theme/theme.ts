@@ -275,6 +275,17 @@ export const theme = createTheme({
         },
       },
     },
+    MuiAutocomplete: {
+      styleOverrides: {
+        root: {
+          borderColor: 'var(--d8x-color-purple)',
+        },
+        input: {
+          color: 'var(--d8x-color-purple)',
+          padding: '3px 4px 3px 6px !important',
+        },
+      },
+    },
     MuiFormControlLabel: {
       styleOverrides: {
         label: {

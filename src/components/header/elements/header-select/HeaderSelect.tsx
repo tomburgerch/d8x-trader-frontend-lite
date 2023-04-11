@@ -36,8 +36,10 @@ function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
           classes={{
             paper: styles.paper,
           }}
+          className={styles.autocomplete}
           disableClearable
           value={props.value}
+          // freeSolo={true}
           onChange={props.onChange}
           getOptionLabel={props.getOptionLabel}
           popupIcon={<ArrowDropIcon width={20} />}
