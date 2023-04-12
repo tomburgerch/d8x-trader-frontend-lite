@@ -139,10 +139,10 @@ export const ActionBlock = memo(() => {
     if (!orderInfo.size) {
       return false;
     }
-    if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice < 0)) {
+    if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice <= 0)) {
       return false;
     }
-    return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice < 0));
+    return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
   }, [orderInfo, address]);
 
   const parsedOrders = useMemo(() => {
@@ -284,8 +284,10 @@ export const ActionBlock = memo(() => {
     const isPositonTooSmall =
       (!positionToModify || positionToModify.positionNotionalBaseCCY === 0) &&
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
-    if (isPositonTooSmall) {
+    if (isPositonTooSmall && orderInfo.orderType === OrderTypeE.Market) {
       return 'Order will fail: resulting position too small';
+    } else if (orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC) {
+      return 'Warning: order size below minimal position size';
     }
     if (
       orderInfo.orderType === OrderTypeE.Market &&
@@ -307,7 +309,11 @@ export const ActionBlock = memo(() => {
   ]);
 
   const isOrderValid = useMemo(() => {
-    return validityCheckText === 'Good to go' || validityCheckText === 'Market is closed';
+    return (
+      validityCheckText === 'Good to go' ||
+      validityCheckText === 'Market is closed' ||
+      /Warning/.test(validityCheckText)
+    );
   }, [validityCheckText]);
 
   const isConfirmButtonDisabled = useMemo(() => {
@@ -342,7 +348,9 @@ export const ActionBlock = memo(() => {
               <SidesRow leftSide="Trading fee:" rightSide={formatToCurrency(orderInfo.tradingFee, 'bps', 1)} />
               <SidesRow
                 leftSide="Deposit from wallet:"
-                rightSide={newPositionRisk ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'}
+                rightSide={
+                  isOrderValid && collateralDeposit >= 0 ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'
+                }
               />
               {orderInfo.maxMinEntryPrice !== null && (
                 <SidesRow
@@ -390,7 +398,7 @@ export const ActionBlock = memo(() => {
               <SidesRow
                 leftSide="Margin:"
                 rightSide={
-                  isOrderValid && newPositionRisk
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
                     ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
                     : '-'
                 }
