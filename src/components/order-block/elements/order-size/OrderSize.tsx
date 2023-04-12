@@ -36,10 +36,26 @@ export const OrderSize = memo(() => {
     return 0.1;
   }, [perpetualStaticInfo]);
 
+  const minPositionString = useMemo(() => {
+    if (perpetualStaticInfo) {
+      return roundToLotString(10 * perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC);
+    }
+    return 0.1;
+  }, [perpetualStaticInfo]);
+
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
-        <InfoBlock title="Order size" content={<Typography>Sets the size of your order.</Typography>} />
+        <InfoBlock
+          title="Order size"
+          content={
+            <Typography>
+              Sets the size of your order. The minimal position size is {minPositionString}{' '}
+              {perpetualStatistics?.baseCurrency}, with a step size of {orderSizeStep}{' '}
+              {perpetualStatistics?.baseCurrency}.
+            </Typography>
+          }
+        />
       </Box>
       <OutlinedInput
         id="order-size"
