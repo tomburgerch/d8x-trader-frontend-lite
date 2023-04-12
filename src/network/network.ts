@@ -110,11 +110,12 @@ export function positionRiskOnTrade(
   chainId: number,
   traderAPI: TraderInterface | null,
   order: OrderI,
-  traderAddr: string
+  traderAddr: string,
+  curAccount?: MarginAccountI
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
   if (traderAPI) {
     console.log('positionRiskOnTrade via SDK');
-    return traderAPI.positionRiskOnTrade(traderAddr, order).then((data) => {
+    return traderAPI.positionRiskOnTrade(traderAddr, order, curAccount).then((data) => {
       return { type: 'positionRiskOnTrade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;
         orderCost: number;
