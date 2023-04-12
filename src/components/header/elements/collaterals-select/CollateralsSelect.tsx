@@ -80,6 +80,7 @@ export const CollateralsSelect = memo(() => {
 
   useEffect(() => {
     if (selectedPool && isConnected) {
+      send(JSON.stringify({ type: 'unsubscribe' }));
       selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
         const symbol = createSymbol({
           baseCurrency,
