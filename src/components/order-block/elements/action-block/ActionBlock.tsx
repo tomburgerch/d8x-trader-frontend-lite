@@ -20,6 +20,7 @@ import {
   poolTokenBalanceAtom,
   proxyAddrAtom,
   selectedPoolAtom,
+  positionsAtom,
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
@@ -29,6 +30,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
+import { useDebounce } from 'helpers/useDebounce';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -84,6 +86,7 @@ export const ActionBlock = memo(() => {
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [selectedPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
+  const [positions] = useAtom(positionsAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
@@ -108,7 +111,13 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(chainId, traderAPIRef.current, mainOrder, address).then((data) => {
+    positionRiskOnTrade(
+      chainId,
+      traderAPIRef.current,
+      mainOrder,
+      address,
+      positions?.find((pos) => pos.symbol === orderInfo.symbol)
+    ).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
     });
@@ -117,7 +126,7 @@ export const ActionBlock = memo(() => {
     getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
-  }, [orderInfo, chainId, address, setNewPositionRisk, setCollateralDeposit]);
+  }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
@@ -238,11 +247,25 @@ export const ActionBlock = memo(() => {
     return '-';
   }, [orderInfo]);
 
+  const isMarketClosed = useDebounce(
+    useMemo(() => {
+      return selectedPerpetualStatistics && selectedPerpetualStatistics.isMarketClosed;
+    }, [selectedPerpetualStatistics]),
+    30_000
+  );
+
+  const positionToModify = useDebounce(
+    useMemo(() => {
+      return positions?.find((pos) => pos.symbol === orderInfo?.symbol);
+    }, [positions, orderInfo?.symbol]),
+    1_000
+  );
+
   const validityCheckText = useMemo(() => {
-    if (!maxOrderSize || !orderInfo || !selectedPerpetualStaticInfo || !selectedPerpetualStatistics) {
+    if (!maxOrderSize || !orderInfo?.orderBlock || !selectedPerpetualStaticInfo) {
       return '-';
     }
-    if (selectedPerpetualStatistics.isMarketClosed) {
+    if (isMarketClosed) {
       return 'Market is closed';
     }
     let isTooLarge;
@@ -254,9 +277,15 @@ export const ActionBlock = memo(() => {
     if (isTooLarge) {
       return 'Order will fail: order size is too large';
     }
-    const isTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
-    if (isTooSmall) {
+    const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
+    if (isOrderTooSmall) {
       return 'Order will fail: order size is too small';
+    }
+    const isPositonTooSmall =
+      (!positionToModify || positionToModify.positionNotionalBaseCCY === 0) &&
+      orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
+    if (isPositonTooSmall) {
+      return 'Order will fail: resulting position too small';
     }
     if (
       orderInfo.orderType === OrderTypeE.Market &&
@@ -267,20 +296,23 @@ export const ActionBlock = memo(() => {
     return 'Good to go';
   }, [
     maxOrderSize,
-    orderInfo,
+    orderInfo?.size,
+    orderInfo?.orderBlock,
+    orderInfo?.orderType,
     selectedPerpetualStaticInfo,
     poolTokenBalance,
-    selectedPerpetualStatistics,
+    isMarketClosed,
     collateralDeposit,
+    positionToModify,
   ]);
 
+  const isOrderValid = useMemo(() => {
+    return validityCheckText === 'Good to go' || validityCheckText === 'Market is closed';
+  }, [validityCheckText]);
+
   const isConfirmButtonDisabled = useMemo(() => {
-    return (
-      (validityCheckText !== 'Good to go' && validityCheckText !== 'Market is closed') ||
-      requestSentRef.current ||
-      requestSent
-    );
-  }, [validityCheckText, requestSent]);
+    return !isOrderValid || requestSentRef.current || requestSent;
+  }, [isOrderValid, requestSent]);
 
   return (
     <Box className={styles.root}>
@@ -350,19 +382,23 @@ export const ActionBlock = memo(() => {
               <SidesRow
                 leftSide="Position size:"
                 rightSide={
-                  newPositionRisk
+                  isOrderValid && newPositionRisk
                     ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
                     : '-'
                 }
               />
               <SidesRow
                 leftSide="Margin:"
-                rightSide={newPositionRisk ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName) : '-'}
+                rightSide={
+                  isOrderValid && newPositionRisk
+                    ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
+                    : '-'
+                }
               />
               <SidesRow
                 leftSide="Leverage:"
                 rightSide={
-                  newPositionRisk && newPositionRisk.positionNotionalBaseCCY !== 0
+                  isOrderValid && newPositionRisk && newPositionRisk.positionNotionalBaseCCY !== 0
                     ? `${formatNumber(newPositionRisk?.leverage)}x`
                     : '-'
                 }
@@ -370,7 +406,7 @@ export const ActionBlock = memo(() => {
               <SidesRow
                 leftSide="Liquidation price:"
                 rightSide={
-                  !newPositionRisk || newPositionRisk.liquidationPrice[0] <= 0
+                  !isOrderValid || !newPositionRisk || newPositionRisk.liquidationPrice[0] <= 0
                     ? '-'
                     : formatToCurrency(newPositionRisk?.liquidationPrice[0] ?? 0, orderInfo.quoteCurrency)
                 }
