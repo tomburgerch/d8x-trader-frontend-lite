@@ -374,11 +374,17 @@ export const ActionBlock = memo(() => {
               )}
               <SidesRow
                 leftSide="Stop-loss:"
-                rightSide={orderInfo.stopLoss === StopLossE.None ? '-' : orderInfo.stopLoss}
+                rightSide={
+                  !orderInfo.stopLossPrice ? '-' : formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                }
               />
               <SidesRow
                 leftSide="Take-profit:"
-                rightSide={orderInfo.takeProfit === TakeProfitE.None ? '-' : orderInfo.takeProfit}
+                rightSide={
+                  !orderInfo.takeProfitPrice
+                    ? '-'
+                    : formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                }
               />
             </Box>
             <Box className={styles.newPositionHeader}>
