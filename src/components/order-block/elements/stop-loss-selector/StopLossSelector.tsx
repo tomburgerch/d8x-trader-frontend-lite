@@ -26,10 +26,10 @@ export const StopLossSelector = memo(() => {
                 order reaches -50%.
               </Typography>
               <Typography>
-                Technically, your are specifying a stop-market order, of the opposing side (if your main order is a BUY
+                Technically, you are specifying a stop-market order, of the opposing side (if your main order is a BUY
                 order, you are specifying a stop-market SELL order). The trigger price is automatically calculated such
-                that your overall loss is as per your selection. Note that this does not 100% guarantee that your loss
-                is limited to the number you selected.
+                that your overall loss is as per your selection, assuming you entered at the worst price your slippage
+                settings allow.
               </Typography>
             </>
           }

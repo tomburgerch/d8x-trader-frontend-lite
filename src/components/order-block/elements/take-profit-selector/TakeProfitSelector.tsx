@@ -28,8 +28,8 @@ export const TakeProfitSelector = memo(() => {
               <Typography>
                 Technically, you are specifying a limit order of the opposing side (if your main order is a BUY order,
                 you are specifying a limit SELL order). The limit price is automatically calculated such that your
-                overall profit is as per your selection. Note that this does not 10=% guarantee that your selected
-                profit level is realized if triggered.
+                overall profit is as per your selection, assuming you entered at the worst price your slippage settings
+                allow.
               </Typography>
             </>
           }

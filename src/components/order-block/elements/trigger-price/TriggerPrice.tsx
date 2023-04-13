@@ -33,14 +33,14 @@ export const TriggerPrice = memo(() => {
           title="Trigger price"
           content={
             <>
-              <Typography>The trigger price is the price at which your stop order is triggered.</Typography>
+              <Typography>The trigger price is the mark price at which your stop order is triggered.</Typography>
               <Typography>
-                If you do not select a limit price in addition to your trigger price (stop-market order), your order
-                will be executed at the best available price once triggered.
+                If you do not select a limit price in addition to your trigger price, you would be placing a stop-market
+                order. Your order will be executed at the best available price once triggered.
               </Typography>
               <Typography>
-                If you specify a limit price in addition to your trigger price (stop-limit order), your order will be
-                executed at the predetermined limit price or a better price.
+                If you specify a limit price in addition to your trigger price, you would be placing a stop-limit order.
+                Your order will be executed at the predetermined limit price or a better price.
               </Typography>
             </>
           }

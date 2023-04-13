@@ -76,7 +76,7 @@ export const ActionBlock = memo(() => {
 
   const { data: signer } = useSigner({
     onError(error) {
-      console.log('Error', error);
+      console.log(error);
     },
   });
 
@@ -214,9 +214,9 @@ export const ActionBlock = memo(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(
               '0x0000000000000000000000000000000000000000000000000000000000000000'
             );
-            postOrder(signer, signatures, data.data).then(() => {
+            postOrder(signer, signatures, data.data).then((tx) => {
               // success submitting to mempool
-              // console.log(`postOrder tx hash: ${tx.hash}`);
+              console.log(`postOrder tx hash: ${tx.hash}`);
               setShowReviewOrderModal(false);
               toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
             });
