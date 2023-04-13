@@ -4,9 +4,9 @@ import { Chart, CandlestickSeries } from 'lightweight-charts-react-wrapper';
 import { useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 
-import { candlesAtom, newCandlesAtom } from 'store/tv-chart.store';
+import { candlesAtom, candlesDataReadyAtom, newCandlesAtom } from 'store/tv-chart.store';
 
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
 
@@ -15,6 +15,7 @@ import styles from './TradingViewChart.module.scss';
 export const TradingViewChart = () => {
   const [candles] = useAtom(candlesAtom);
   const [newCandles, setNewCandles] = useAtom(newCandlesAtom);
+  const [isCandleDataReady] = useAtom(candlesDataReadyAtom);
 
   const series = useRef<ISeriesApi<'Candlestick'>>(null);
 
@@ -43,6 +44,11 @@ export const TradingViewChart = () => {
       <Box className={styles.periodsHolder}>
         <PeriodSelector />
       </Box>
+      {!isCandleDataReady && (
+        <Box className={styles.loaderHolder}>
+          <CircularProgress color="primary" />
+        </Box>
+      )}
     </Box>
   );
 };

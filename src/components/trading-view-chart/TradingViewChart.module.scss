@@ -1,6 +1,7 @@
 @import 'styles/theme/theme';
 
 .root {
+  position: relative;
   overflow: hidden;
   background-color: var(--d8x-color-white);
   padding: $d8x-spacing * 3;
@@ -9,4 +10,17 @@
 
 .periodsHolder {
   margin-top: $d8x-spacing * 2;
+}
+
+.loaderHolder {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--d8x-background-loader);
 }

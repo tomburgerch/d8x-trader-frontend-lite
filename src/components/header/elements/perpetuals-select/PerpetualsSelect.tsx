@@ -15,7 +15,7 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { candlesAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
+import { candlesAtom, candlesDataReadyAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
@@ -46,6 +46,7 @@ export const PerpetualsSelect = memo(() => {
   const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [, setCandles] = useAtom(candlesAtom);
   const [, setNewCandles] = useAtom(newCandlesAtom);
+  const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
   const traderAPIRef = useRef(traderAPI);
@@ -93,8 +94,9 @@ export const PerpetualsSelect = memo(() => {
         })
       );
       setNewCandles([]);
+      setCandlesDataReady(false);
     }
-  }, [selectedPerpetual, selectedPeriod, setCandles, setNewCandles, isConnected, send]);
+  }, [selectedPerpetual, selectedPeriod, setCandles, setNewCandles, setCandlesDataReady, isConnected, send]);
 
   useEffect(() => {
     if (symbol) {

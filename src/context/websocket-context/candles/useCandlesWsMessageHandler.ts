@@ -3,7 +3,13 @@ import { useCallback } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
 
 import { selectedPerpetualAtom } from 'store/pools.store';
-import { candlesAtom, candlesWebSocketReadyAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
+import {
+  candlesAtom,
+  candlesDataReadyAtom,
+  candlesWebSocketReadyAtom,
+  newCandlesAtom,
+  selectedPeriodAtom,
+} from 'store/tv-chart.store';
 import { PerpetualI } from 'types/types';
 import { TvChartPeriodE } from 'types/enums';
 
@@ -42,6 +48,7 @@ export function useCandlesWsMessageHandler() {
   const [, setCandlesWebSocketReady] = useAtom(candlesWebSocketReadyAtom);
   const [, setCandles] = useAtom(candlesAtom);
   const [, setNewCandles] = useAtom(newCandlesAtom);
+  const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
 
   return useCallback(
     (message: string) => {
@@ -51,7 +58,7 @@ export function useCandlesWsMessageHandler() {
         setCandlesWebSocketReady(true);
       } else if (isSubscribeMessage(parsedMessage) && selectedPerpetual) {
         const symbol = createPairWithPeriod(selectedPerpetual, selectedPeriod);
-        if (parsedMessage.msg !== symbol) {
+        if (parsedMessage.msg !== symbol || !parsedMessage.data) {
           return;
         }
 
@@ -65,9 +72,10 @@ export function useCandlesWsMessageHandler() {
             close: +candle.close,
           }))
         );
+        setCandlesDataReady(true);
       } else if (isUpdateMessage(parsedMessage) && selectedPerpetual) {
         const symbol = createPairWithPeriod(selectedPerpetual, selectedPeriod);
-        if (parsedMessage.msg !== symbol) {
+        if (parsedMessage.msg !== symbol || !parsedMessage.data) {
           return;
         }
 
@@ -87,8 +95,9 @@ export function useCandlesWsMessageHandler() {
 
           return newData;
         });
+        setCandlesDataReady(true);
       }
     },
-    [setCandlesWebSocketReady, setCandles, setNewCandles, selectedPerpetual, selectedPeriod]
+    [setCandlesWebSocketReady, setCandles, setNewCandles, setCandlesDataReady, selectedPerpetual, selectedPeriod]
   );
 }
