@@ -1,4 +1,4 @@
-import { BigNumber, Signer, Contract, constants, utils, Transaction } from 'ethers';
+import { BigNumber, Signer, Contract, constants, utils } from 'ethers';
 
 import { ERC20_ABI } from './constants';
 

@@ -139,7 +139,10 @@ export const PositionsTable = memo(() => {
         .then((data) => {
           if (data.data.digests.length > 0) {
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
-              .then(() => {
+              .then((res) => {
+                if (res?.hash) {
+                  console.log(res.hash);
+                }
                 const signatures = new Array<string>(data.data.digests.length).fill(constants.HashZero);
                 postOrder(signer, signatures, data.data)
                   .then((tx) => {
@@ -171,7 +174,10 @@ export const PositionsTable = memo(() => {
       getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral)
-            .then(() => {
+            .then((res) => {
+              if (res?.hash) {
+                console.log(res.hash);
+              }
               deposit(signer, data)
                 .then((tx) => {
                   setRequestSent(false);

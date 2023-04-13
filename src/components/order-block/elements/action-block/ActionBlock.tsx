@@ -289,7 +289,10 @@ export const ActionBlock = memo(() => {
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
     if (isPositonTooSmall && orderInfo.orderType === OrderTypeE.Market) {
       return 'Order will fail: resulting position too small';
-    } else if (orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC) {
+    } else if (
+      orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC &&
+      orderInfo.orderType !== OrderTypeE.Market
+    ) {
       return 'Warning: order size below minimal position size';
     }
     if (
