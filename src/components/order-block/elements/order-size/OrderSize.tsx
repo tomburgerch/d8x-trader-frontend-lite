@@ -49,11 +49,13 @@ export const OrderSize = memo(() => {
         <InfoBlock
           title="Order size"
           content={
-            <Typography>
-              Sets the size of your order. The minimal position size is {minPositionString}{' '}
-              {perpetualStatistics?.baseCurrency}, with a step size of {orderSizeStep}{' '}
-              {perpetualStatistics?.baseCurrency}.
-            </Typography>
+            <>
+              <Typography> Sets the size of your order. </Typography>
+              <Typography>
+                The minimal position size is {minPositionString} {perpetualStatistics?.baseCurrency}, with a step size
+                of {orderSizeStep} {perpetualStatistics?.baseCurrency}.
+              </Typography>
+            </>
           }
         />
       </Box>

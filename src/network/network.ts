@@ -22,12 +22,12 @@ export function getExchangeInfo(
   traderAPI: TraderInterface | null
 ): Promise<ValidatedResponseI<ExchangeInfoI>> {
   if (traderAPI) {
-    console.log('exchangeInfo via SDK');
+    // console.log('exchangeInfo via SDK');
     return traderAPI.exchangeInfo().then((info) => {
       return { type: 'exchangeInfo', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
     });
   } else {
-    console.log('exchangeInfo via BE');
+    // console.log('exchangeInfo via BE');
     return fetch(`${getApiUrlByChainId(chainId)}/exchangeInfo`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
@@ -44,11 +44,11 @@ export function getPerpetualStaticInfo(
   symbol: string
 ): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
   if (traderAPI) {
-    console.log('perpStaticInfo via SDK');
+    // console.log('perpStaticInfo via SDK');
     const info = traderAPI.getPerpetualStaticInfo(symbol);
     return Promise.resolve({ type: 'perpetualStaticInfo', msg: '', data: info });
   } else {
-    console.log('perpStaticInfo via BE');
+    // console.log('perpStaticInfo via BE');
     return fetch(`${getApiUrlByChainId(chainId)}/perpetualStaticInfo?symbol=${symbol}`, getRequestOptions()).then(
       (data) => {
         if (!data.ok) {
@@ -90,12 +90,12 @@ export function getPositionRisk(
   }
 
   if (traderAPI) {
-    console.log(`positionRisk via SDK ${symbol}`);
+    // console.log(`positionRisk via SDK ${symbol}`);
     return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
       return { type: 'positionRisk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
     });
   } else {
-    console.log(`positionRisk via BE ${symbol}`);
+    // console.log(`positionRisk via BE ${symbol}`);
     return fetch(`${getApiUrlByChainId(chainId)}/positionRisk?${params}`, getRequestOptions()).then((data) => {
       if (!data.ok) {
         console.error({ data });
@@ -114,7 +114,7 @@ export function positionRiskOnTrade(
   curAccount?: MarginAccountI
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
   if (traderAPI) {
-    console.log('positionRiskOnTrade via SDK');
+    // console.log('positionRiskOnTrade via SDK');
     return traderAPI.positionRiskOnTrade(traderAddr, order, curAccount).then((data) => {
       return { type: 'positionRiskOnTrade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;
@@ -122,7 +122,7 @@ export function positionRiskOnTrade(
       }>;
     });
   } else {
-    console.log('positionRiskOnTrade via BE');
+    // console.log('positionRiskOnTrade via BE');
     const requestOptions = {
       ...getRequestOptions(RequestMethodE.Post),
       body: JSON.stringify({
@@ -148,7 +148,7 @@ export function positionRiskOnCollateralAction(
   positionRisk: MarginAccountI
 ): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>> {
   if (traderAPI) {
-    console.log('positionRiskOnCollateral via SDK');
+    // console.log('positionRiskOnCollateral via SDK');
     return traderAPI.positionRiskOnCollateralAction(amount, positionRisk).then((data) => {
       return traderAPI.getAvailableMargin(traderAddr, positionRisk.symbol).then((margin) => {
         return {
@@ -159,7 +159,7 @@ export function positionRiskOnCollateralAction(
       });
     });
   } else {
-    console.log('positionRiskOnCollateral via BE');
+    // console.log('positionRiskOnCollateral via BE');
     const requestOptions = {
       ...getRequestOptions(RequestMethodE.Post),
       body: JSON.stringify({
@@ -186,12 +186,12 @@ export function getOpenOrders(
   timestamp?: number
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
   if (traderAPI) {
-    console.log(`openOrders via SDK ${symbol} `);
+    // console.log(`openOrders via SDK ${symbol} `);
     return traderAPI.openOrders(traderAddr, symbol).then((data) => {
       return { type: 'openOrders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
     });
   } else {
-    console.log(`openOrders via BE ${symbol}`);
+    // console.log(`openOrders via BE ${symbol}`);
     const params = new URLSearchParams({
       symbol,
       traderAddr,

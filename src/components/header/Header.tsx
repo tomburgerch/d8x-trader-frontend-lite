@@ -71,16 +71,16 @@ export const Header = memo(() => {
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
     chainId: chainId,
     enabled: !requestRef.current && address !== undefined,
-    onSuccess(data) {
-      console.log(
-        `my ${selectedPool?.poolSymbol} (addr ${selectedPool?.marginTokenAddr} on chain ${chainId}) balance is ${data.formatted} ${data.symbol}`
-      );
-    },
-    onError() {
-      console.log(
-        `failed to fetch balance of ${selectedPool?.poolSymbol} margin token: ${selectedPool?.marginTokenAddr}, chain id ${chainId})`
-      );
-    },
+    // onSuccess(data) {
+    //   console.log(
+    //     `my ${selectedPool?.poolSymbol} (addr ${selectedPool?.marginTokenAddr} on chain ${chainId}) balance is ${data.formatted} ${data.symbol}`
+    //   );
+    // },
+    // onError() {
+    //   console.log(
+    //     `failed to fetch balance of ${selectedPool?.poolSymbol} margin token: ${selectedPool?.marginTokenAddr}, chain id ${chainId})`
+    //   );
+    // },
   });
 
   useEffect(() => {

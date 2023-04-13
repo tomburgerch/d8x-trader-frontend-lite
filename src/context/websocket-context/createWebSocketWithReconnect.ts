@@ -51,11 +51,11 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
       stateChangeListeners.forEach((fn) => fn(false));
 
       if (!reconnectOnClose) {
-        console.log('ws closed by app');
+        // console.log('ws closed by app');
         return;
       }
 
-      console.log('ws closed by server');
+      // console.log('ws closed by server');
       setTimeout(start, RECONNECT_TIMEOUT);
     };
   };
