@@ -336,6 +336,13 @@ export const theme = createTheme({
         },
       },
     },
+    MuiCircularProgress: {
+      styleOverrides: {
+        colorPrimary: {
+          color: 'var(--d8x-color-purple)',
+        },
+      },
+    },
   },
 });
 
