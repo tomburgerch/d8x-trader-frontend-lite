@@ -209,7 +209,10 @@ export const ActionBlock = memo(() => {
     orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then(() => {
+          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then((res) => {
+            if (res?.hash) {
+              console.log(res.hash);
+            }
             // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
             const signatures = new Array<string>(data.data.digests.length).fill(
               '0x0000000000000000000000000000000000000000000000000000000000000000'
