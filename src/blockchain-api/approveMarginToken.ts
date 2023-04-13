@@ -1,4 +1,4 @@
-import { BigNumber, Signer, Contract, constants, utils } from 'ethers';
+import { BigNumber, Signer, Contract, constants, utils, Transaction } from 'ethers';
 
 import { ERC20_ABI } from './constants';
 
@@ -7,11 +7,11 @@ export function approveMarginToken(signer: Signer, marginTokenAddr: string, prox
   const amount = constants.MaxUint256;
   const minAmountBN = utils.parseUnits((4 * minAmount).toString(), 18);
   return signer.getAddress().then((addr: string) => {
-    marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
+    return marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
       if (allowance.gt(minAmountBN)) {
-        Promise.resolve();
+        return Promise.resolve(null);
       } else {
-        marginToken.approve(proxyAddr, amount, { gasLimit: BigNumber.from(1_000_000) });
+        return marginToken.approve(proxyAddr, amount, { gasLimit: BigNumber.from(1_000_000) });
       }
     });
   });
