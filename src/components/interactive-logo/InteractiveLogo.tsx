@@ -5,8 +5,8 @@ import styles from './InteractiveLogo.module.scss';
 export const InteractiveLogo = memo(() => {
   return (
     <svg
-      width="221"
-      height="50"
+      width="212"
+      height="48"
       viewBox="0 0 221 50"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
