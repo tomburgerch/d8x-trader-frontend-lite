@@ -1,6 +1,5 @@
 import { useAtom } from 'jotai';
-import { CrosshairMode, ISeriesApi } from 'lightweight-charts';
-import { Chart, CandlestickSeries } from 'lightweight-charts-react-wrapper';
+import { ISeriesApi } from 'lightweight-charts';
 import { memo, useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 
@@ -8,6 +7,7 @@ import { Box, CircularProgress } from '@mui/material';
 
 import { candlesAtom, candlesDataReadyAtom, newCandlesAtom } from 'store/tv-chart.store';
 
+import { ChartBlock } from './elements/chart-block/ChartBlock';
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
 
 import styles from './TradingViewChart.module.scss';
@@ -33,14 +33,7 @@ export const TradingViewChart = memo(() => {
 
   return (
     <Box className={styles.root} ref={ref}>
-      <Chart
-        width={width}
-        height={Math.round(Math.max((width || 450) * 0.5, 300))}
-        crosshair={{ mode: CrosshairMode.Normal }}
-        timeScale={{ timeVisible: true, barSpacing: candles.length < 60 ? 22 : 8 }}
-      >
-        <CandlestickSeries data={candles} reactive={true} ref={seriesRef} />
-      </Chart>
+      <ChartBlock width={width} candles={candles} seriesRef={seriesRef} />
       <Box className={styles.periodsHolder}>
         <PeriodSelector />
       </Box>

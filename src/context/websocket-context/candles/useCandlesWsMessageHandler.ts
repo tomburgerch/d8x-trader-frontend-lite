@@ -56,22 +56,28 @@ export function useCandlesWsMessageHandler() {
 
       if (isConnectMessage(parsedMessage)) {
         setCandlesWebSocketReady(true);
+        setCandlesDataReady(true);
       } else if (isSubscribeMessage(parsedMessage) && selectedPerpetual) {
         const symbol = createPairWithPeriod(selectedPerpetual, selectedPeriod);
-        if (parsedMessage.msg !== symbol || !parsedMessage.data) {
+        const newData = parsedMessage.data;
+        if (parsedMessage.msg !== symbol || !newData) {
           return;
         }
 
-        setCandles(
-          parsedMessage.data.map((candle) => ({
+        setCandles((prevData) => {
+          // TODO: VOV: Temporary work-around. Should be only 1 message from backend
+          if (prevData.length === newData.length && prevData[0].close === +newData[0].close) {
+            return prevData;
+          }
+          return parsedMessage.data.map((candle) => ({
             start: candle.start,
             time: (new Date(candle.time).getTime() / 1000) as UTCTimestamp,
             open: +candle.open,
             high: +candle.high,
             low: +candle.low,
             close: +candle.close,
-          }))
-        );
+          }));
+        });
         setCandlesDataReady(true);
       } else if (isUpdateMessage(parsedMessage) && selectedPerpetual) {
         const symbol = createPairWithPeriod(selectedPerpetual, selectedPeriod);
