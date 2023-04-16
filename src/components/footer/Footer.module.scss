@@ -16,25 +16,33 @@
 
 .iconsHolder {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
 }
 
 .footerSocialLogo {
   color: var(--d8x-social-icon-color);
   transition: color 300ms linear;
   text-decoration: none;
+  margin: 0;
 
   &:hover {
     color: var(--d8x-social-icon-color-hover);
     text-decoration: none;
+  }
+
+  svg {
+    width: 24px;
   }
 }
 
 @media screen and ($d8x-breakpoint-max-sm) {
 
   .rootBox {
-    display: block;
+    display: flex;
     flex-direction: column;
+    justify-content: center;
   }
 
   .footerLogoWrapper {
