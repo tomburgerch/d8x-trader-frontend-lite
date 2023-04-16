@@ -7,10 +7,42 @@
   padding: $d8x-spacing * 5 0;
 }
 
+.footerSocial {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.iconsHolder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+}
+
+.footerSocialLogo {
+  color: var(--d8x-social-icon-color);
+  transition: color 300ms linear;
+  text-decoration: none;
+  margin: 0;
+
+  &:hover {
+    color: var(--d8x-social-icon-color-hover);
+    text-decoration: none;
+  }
+
+  svg {
+    width: 24px;
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-sm) {
 
   .rootBox {
+    display: flex;
     flex-direction: column;
+    justify-content: center;
   }
 
   .footerLogoWrapper {
@@ -18,6 +50,8 @@
   }
 
   .footerLogo {
-    height: 25px;
+    display: block;
+    text-align: center;
+    margin-top: 24px;
   }
 }

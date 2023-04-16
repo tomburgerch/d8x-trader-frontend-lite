@@ -3,6 +3,9 @@ import { memo } from 'react';
 import { Box, Link, Typography } from '@mui/material';
 
 import { ReactComponent as Logo } from 'assets/logo.svg';
+import { ReactComponent as GithubLogo } from 'assets/social/github.svg';
+import { ReactComponent as MediumLogo } from 'assets/social/medium.svg';
+import { ReactComponent as TwitterLogo } from 'assets/social/twitter.svg';
 
 import { Container } from '../container/Container';
 
@@ -18,7 +21,40 @@ export const Footer = memo(() => {
               © Copyright 2023 D8X
             </Typography>
           </Box>
-          <Link href="/" color="inherit" underline="none" className={styles.footerLogoWrapper}>
+          <Box className={styles.iconsHolder}>
+            <Link
+              href="https://github.com/D8-X"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerSocialLogo}
+            >
+              <GithubLogo />
+            </Link>
+            <Link
+              href="https://medium.com/@d8x.exchange"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerSocialLogo}
+            >
+              <MediumLogo />
+            </Link>
+            <Link
+              href="https://twitter.com/d8x_exchange"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerSocialLogo}
+            >
+              <TwitterLogo />
+            </Link>
+          </Box>
+          <Link
+            href="https://d8x.exchange"
+            target="_blank"
+            rel="noopener noreferrer"
+            color="inherit"
+            underline="none"
+            className={styles.footerLogoWrapper}
+          >
             <Logo className={styles.footerLogo} />
           </Link>
         </Box>
