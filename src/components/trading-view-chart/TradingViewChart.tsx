@@ -1,46 +1,39 @@
 import { useAtom } from 'jotai';
-import { CrosshairMode, ISeriesApi } from 'lightweight-charts';
-import { Chart, CandlestickSeries } from 'lightweight-charts-react-wrapper';
-import { useEffect, useRef } from 'react';
+import { ISeriesApi } from 'lightweight-charts';
+import { memo, useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 
 import { Box, CircularProgress } from '@mui/material';
 
 import { candlesAtom, candlesDataReadyAtom, newCandlesAtom } from 'store/tv-chart.store';
 
+import { ChartBlock } from './elements/chart-block/ChartBlock';
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
 
 import styles from './TradingViewChart.module.scss';
 
-export const TradingViewChart = () => {
+export const TradingViewChart = memo(() => {
   const [candles] = useAtom(candlesAtom);
   const [newCandles, setNewCandles] = useAtom(newCandlesAtom);
   const [isCandleDataReady] = useAtom(candlesDataReadyAtom);
 
-  const series = useRef<ISeriesApi<'Candlestick'>>(null);
+  const seriesRef = useRef<ISeriesApi<'Candlestick'>>(null);
 
   const { width, ref } = useResizeDetector();
 
   useEffect(() => {
-    if (newCandles.length === 0) {
+    const candlesLength = newCandles.length;
+    if (candlesLength === 0 || !seriesRef.current) {
       return;
     }
 
-    newCandles.forEach((newCandle) => series.current?.update(newCandle));
+    seriesRef.current.update(newCandles[candlesLength - 1]);
     setNewCandles((prevData) => prevData.slice(newCandles.length));
   }, [newCandles, setNewCandles]);
 
   return (
     <Box className={styles.root} ref={ref}>
-      <Chart
-        width={width}
-        height={Math.round(Math.max((width || 450) * 0.5, 300))}
-        crosshair={{ mode: CrosshairMode.Normal }}
-        autoSize={true}
-        timeScale={{ timeVisible: true, barSpacing: candles.length < 60 ? 22 : 8 }}
-      >
-        <CandlestickSeries data={candles} reactive={true} ref={series} />
-      </Chart>
+      <ChartBlock width={width} candles={candles} seriesRef={seriesRef} />
       <Box className={styles.periodsHolder}>
         <PeriodSelector />
       </Box>
@@ -51,4 +44,4 @@ export const TradingViewChart = () => {
       )}
     </Box>
   );
-};
+});
