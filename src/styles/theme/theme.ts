@@ -243,7 +243,7 @@ export const theme = createTheme({
           style: {
             ...MuiButtonSharedStyle,
             padding: '0 8px',
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: 'normal',
             minWidth: '40px',
           },
@@ -442,11 +442,11 @@ theme.typography.adornment = {
 };
 
 theme.typography.cellSmall = {
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 400,
   lineHeight: '16px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: '16px',
   },
 };

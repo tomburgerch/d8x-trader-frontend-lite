@@ -124,7 +124,7 @@ export const WalletConnectButton = memo(() => {
 
               return (
                 <div className={styles.buttonsHolder}>
-                  <Button onClick={openChainModal} className={styles.chainButton} variant="outlined">
+                  <Button onClick={openChainModal} className={styles.chainButton} variant="primary">
                     <img src={chain.iconUrl} alt={chain.name} title={chain.name} />
                   </Button>
 
