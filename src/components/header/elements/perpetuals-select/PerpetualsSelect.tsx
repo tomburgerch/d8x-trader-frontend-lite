@@ -78,7 +78,6 @@ export const PerpetualsSelect = memo(() => {
         indexPrice: selectedPerpetual.indexPrice,
         currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
         openInterestBC: selectedPerpetual.openInterestBC,
-        isMarketClosed: selectedPerpetual.isMarketClosed,
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
@@ -127,7 +126,7 @@ export const PerpetualsSelect = memo(() => {
             <Box className={styles.pair}>
               {option.baseCurrency}/{option.quoteCurrency}
             </Box>
-            <Box className={styles.status}>{option.state}</Box>
+            <Box className={styles.status}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
           </Box>
         </Box>
       )}

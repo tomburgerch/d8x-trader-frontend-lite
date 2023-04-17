@@ -16,12 +16,12 @@ import {
   collateralDepositAtom,
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
-  perpetualStatisticsAtom,
   poolTokenBalanceAtom,
   proxyAddrAtom,
   selectedPoolAtom,
   positionsAtom,
   traderAPIAtom,
+  selectedPerpetualAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
@@ -83,8 +83,8 @@ export const ActionBlock = memo(() => {
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
-  const [selectedPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [positions] = useAtom(positionsAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
@@ -252,8 +252,8 @@ export const ActionBlock = memo(() => {
 
   const isMarketClosed = useDebounce(
     useMemo(() => {
-      return selectedPerpetualStatistics && selectedPerpetualStatistics.isMarketClosed;
-    }, [selectedPerpetualStatistics]),
+      return selectedPerpetual && selectedPerpetual.isMarketClosed;
+    }, [selectedPerpetual]),
     30_000
   );
 

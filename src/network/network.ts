@@ -445,3 +445,25 @@ export function getRemoveCollateral(
     });
   }
 }
+
+export function getMarketClosedStatus(
+  traderAPI: TraderInterface | null,
+  symbol: string
+): Promise<ValidatedResponseI<{ isMarketClosed: boolean }>> {
+  if (traderAPI) {
+    console.log('calling isMarketClosed');
+    return traderAPI.isMarketClosed(symbol).then((isClosed) => {
+      return {
+        type: 'isMarketClosed',
+        msg: '',
+        data: { isMarketClosed: isClosed },
+      };
+    });
+  } else {
+    return Promise.resolve({
+      type: 'isMarketClosed',
+      msg: '',
+      data: { isMarketClosed: true },
+    });
+  }
+}
