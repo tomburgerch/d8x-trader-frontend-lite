@@ -54,7 +54,7 @@
     ]
   },
   "dependencies": {
-    "@d8x/perpetuals-sdk": "0.4.1",
+    "@d8x/perpetuals-sdk": "0.4.4",
     "@emotion/react": "11.10.6",
     "@emotion/styled": "11.10.6",
     "@mui/icons-material": "5.11.11",
