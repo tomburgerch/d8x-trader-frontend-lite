@@ -28,7 +28,6 @@ export interface PerpetualStatisticsI {
   indexPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
-  isMarketClosed: boolean;
 }
 
 export interface PoolI {

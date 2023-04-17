@@ -1,11 +1,11 @@
 import { useAtom } from 'jotai';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';
 
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { getOpenOrders } from 'network/network';
+import { getMarketClosedStatus, getOpenOrders } from 'network/network';
 import {
   failOrderAtom,
   openOrdersAtom,
@@ -32,6 +32,7 @@ import {
   OnUpdateMarkPriceWsMessageI,
   SubscriptionWsMessageI,
 } from './types';
+import { useDebounce } from 'helpers/useDebounce';
 
 function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
   return message.type === MessageTypeE.Connect;
@@ -78,7 +79,7 @@ export function useWsMessageHandler() {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setWebSocketReady] = useAtom(webSocketReadyAtom);
-  const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [perpetualStats, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
@@ -86,6 +87,8 @@ export function useWsMessageHandler() {
   const [traderAPI] = useAtom(traderAPIAtom);
 
   const traderAPIRef = useRef(traderAPI);
+
+  const [, setMarketClosed] = useState(true);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -101,6 +104,35 @@ export function useWsMessageHandler() {
     },
     [selectedPool, selectedPerpetual, setPerpetualStatistics]
   );
+
+  const debouncedIndexPrice = useDebounce(
+    useMemo(() => {
+      return perpetualStats?.indexPrice;
+    }, [perpetualStats?.indexPrice]),
+    15_000
+  );
+
+  useEffect(() => {
+    if (
+      debouncedIndexPrice === undefined ||
+      perpetualStats?.baseCurrency === undefined ||
+      perpetualStats?.quoteCurrency === undefined ||
+      selectedPool?.poolSymbol === undefined
+    ) {
+      return;
+    }
+    const symbol = `${perpetualStats?.baseCurrency}-${perpetualStats?.quoteCurrency}-${selectedPool?.poolSymbol}`;
+    (async () => {
+      getMarketClosedStatus(traderAPIRef.current, symbol)
+        .then((data) => {
+          console.log(`${symbol} market is ${data.data.isMarketClosed ? '' : 'not'} closed`);
+          setMarketClosed(data.data.isMarketClosed);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })();
+  }, [debouncedIndexPrice, perpetualStats?.baseCurrency, perpetualStats?.quoteCurrency, selectedPool?.poolSymbol]);
 
   return useCallback(
     (message: string) => {
@@ -124,7 +156,6 @@ export function useWsMessageHandler() {
           indexPrice: parsedMessage.data.indexPrice,
           currentFundingRateBps: parsedMessage.data.currentFundingRateBps,
           openInterestBC: parsedMessage.data.openInterestBC,
-          isMarketClosed: parsedMessage.data.isMarketClosed,
         });
       } else if (isUpdateMarkPriceMessage(parsedMessage)) {
         const parsedSymbol = parseSymbol(parsedMessage.data.obj.symbol);
@@ -151,7 +182,6 @@ export function useWsMessageHandler() {
           indexPrice,
           currentFundingRateBps,
           openInterestBC,
-          isMarketClosed: false,
         });
       } else if (isUpdateMarginAccountMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
@@ -212,6 +242,7 @@ export function useWsMessageHandler() {
       failOpenOrder,
       chainId,
       address,
+      // isMarketClosed,
     ]
   );
 }
