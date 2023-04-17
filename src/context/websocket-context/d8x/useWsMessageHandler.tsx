@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -109,30 +109,27 @@ export function useWsMessageHandler() {
     useMemo(() => {
       return perpetualStats?.indexPrice;
     }, [perpetualStats?.indexPrice]),
-    15_000
+    60_000
   );
 
-  useEffect(() => {
-    if (
-      debouncedIndexPrice === undefined ||
-      perpetualStats?.baseCurrency === undefined ||
-      perpetualStats?.quoteCurrency === undefined ||
-      selectedPool?.poolSymbol === undefined
-    ) {
-      return;
-    }
-    const symbol = `${perpetualStats?.baseCurrency}-${perpetualStats?.quoteCurrency}-${selectedPool?.poolSymbol}`;
-    (async () => {
-      getMarketClosedStatus(traderAPIRef.current, symbol)
-        .then((data) => {
-          console.log(`${symbol} market is ${data.data.isMarketClosed ? '' : 'not'} closed`);
-          setMarketClosed(data.data.isMarketClosed);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })();
-  }, [debouncedIndexPrice, perpetualStats?.baseCurrency, perpetualStats?.quoteCurrency, selectedPool?.poolSymbol]);
+  const updateMarketStatus = useCallback(
+    (symbol: string) => {
+      if (debouncedIndexPrice === undefined) {
+        return;
+      }
+      (async () => {
+        getMarketClosedStatus(traderAPIRef.current, symbol)
+          .then((data) => {
+            console.log(`${symbol} market is ${data.data.isMarketClosed ? '' : 'not'} closed`);
+            setMarketClosed(data.data.isMarketClosed);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })();
+    },
+    [debouncedIndexPrice]
+  );
 
   return useCallback(
     (message: string) => {
@@ -183,6 +180,8 @@ export function useWsMessageHandler() {
           currentFundingRateBps,
           openInterestBC,
         });
+
+        updateMarketStatus(`${parsedSymbol.baseCurrency}-${parsedSymbol.quoteCurrency}-${parsedSymbol.poolSymbol}`);
       } else if (isUpdateMarginAccountMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
@@ -242,7 +241,7 @@ export function useWsMessageHandler() {
       failOpenOrder,
       chainId,
       address,
-      // isMarketClosed,
+      updateMarketStatus,
     ]
   );
 }
