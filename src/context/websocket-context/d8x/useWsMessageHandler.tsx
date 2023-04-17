@@ -128,7 +128,7 @@ export function useWsMessageHandler() {
         });
       } else if (isUpdateMarkPriceMessage(parsedMessage)) {
         const parsedSymbol = parseSymbol(parsedMessage.data.obj.symbol);
-        if (!parsedSymbol) {
+        if (!parsedSymbol || selectedPerpetual?.isMarketClosed === undefined) {
           return;
         }
 
@@ -151,7 +151,7 @@ export function useWsMessageHandler() {
           indexPrice,
           currentFundingRateBps,
           openInterestBC,
-          isMarketClosed: false,
+          isMarketClosed: selectedPerpetual.isMarketClosed,
         });
       } else if (isUpdateMarginAccountMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
@@ -212,6 +212,7 @@ export function useWsMessageHandler() {
       failOpenOrder,
       chainId,
       address,
+      selectedPerpetual?.isMarketClosed,
     ]
   );
 }

@@ -269,7 +269,7 @@ export const ActionBlock = memo(() => {
       return '-';
     }
     if (isMarketClosed) {
-      return 'Market is closed';
+      return 'Warning: Market is closed';
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
