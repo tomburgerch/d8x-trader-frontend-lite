@@ -117,13 +117,13 @@ export const Header = memo(() => {
                   <InteractiveLogo />
                 </a>
               </Typography>
-              {!isSmallScreen && (
-                <Typography variant="h6" component="div" className={styles.selectBoxes}>
-                  <CollateralsSelect />
-                  <PerpetualsSelect />
-                </Typography>
-              )}
             </Box>
+            {!isSmallScreen && (
+              <Typography variant="h6" component="div" className={styles.selectBoxes}>
+                <CollateralsSelect />
+                <PerpetualsSelect />
+              </Typography>
+            )}
             <Typography variant="h6" component="div" className={styles.walletConnect}>
               <WalletConnectButton />
             </Typography>

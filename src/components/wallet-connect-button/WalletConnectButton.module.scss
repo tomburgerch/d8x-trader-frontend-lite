@@ -8,24 +8,25 @@
 
 .buttonsHolder {
   display: flex;
-  gap: 12px;
+  gap: $d8x-spacing * 4;
 }
 
 .chainButton {
   display: flex;
   align-items: center;
   border-color: transparent;
+  min-width: 64px;
 
   img {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
 }
 
 .addressButton {
   display: flex;
   align-items: center;
-  gap: $d8x-spacing;
+  gap: 2 * $d8x-spacing;
 }
 
 .starsHolder {

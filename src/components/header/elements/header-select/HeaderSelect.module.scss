@@ -2,7 +2,6 @@
 
 .root {
   width: 100%;
-  margin-left: $d8x-spacing * 4;
   margin-right: $d8x-spacing * 4;
   min-width: 260px;
 }
@@ -25,6 +24,10 @@
 
   :global(.MuiInputLabel-root):global(.Mui-focused) {
     color: var(--d8x-color-purple);
+  }
+
+  :global(.MuiInputLabel-root) {
+    color: var(--d8x-color-black);
   }
 }
 
