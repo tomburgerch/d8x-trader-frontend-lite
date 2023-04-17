@@ -6,21 +6,22 @@
 
 .selectorTabs {
   display: flex;
-  gap: 2px;
 }
 
 .tabLabelWrapper {
-  background-color: var(--d8x-color-white);
+  color: var(--d8x-color-purple);
+  background-color: var(--d8x-background-card-details);
   padding: 0.4rem 0.8rem;
   border-radius: $d8x-border-radius $d8x-border-radius 0 0;
   cursor: default;
 }
 
 .inactiveTabLabel {
-  color: var(--d8x-color-black-opac);
+  color: var(--d8x-color-purple);
+  background-color: var(--d8x-background-inactive-tab);
 
   &:hover {
-    background-color: var(--d8x-color-white-opac);
+    background-color: var(--d8x-color-white);
     cursor: pointer;
     transition: 150ms;
   }

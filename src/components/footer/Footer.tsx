@@ -6,6 +6,7 @@ import { ReactComponent as Logo } from 'assets/logo.svg';
 import { ReactComponent as GithubLogo } from 'assets/social/github.svg';
 import { ReactComponent as MediumLogo } from 'assets/social/medium.svg';
 import { ReactComponent as TwitterLogo } from 'assets/social/twitter.svg';
+import { ReactComponent as DiscordLogo } from 'assets/social/discord.svg';
 
 import { Container } from '../container/Container';
 
@@ -37,6 +38,14 @@ export const Footer = memo(() => {
               className={styles.footerSocialLogo}
             >
               <MediumLogo />
+            </Link>
+            <Link
+              href="https://discord.gg/JdJ8EXqCVE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerSocialLogo}
+            >
+              <DiscordLogo />
             </Link>
             <Link
               href="https://twitter.com/d8x_exchange"
