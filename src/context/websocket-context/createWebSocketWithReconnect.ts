@@ -74,7 +74,13 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
         start();
       }, RECONNECT_TIMEOUT);
     },
-    send: (message: string) => client.send(message),
+    send: (message: string) => {
+      if (client.readyState === client.OPEN) {
+        client.send(message);
+        return true;
+      }
+      return false;
+    },
     isConnected: () => isConnected,
   };
 }
