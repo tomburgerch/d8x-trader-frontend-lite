@@ -1,8 +1,8 @@
 @import 'styles/theme/theme';
 
 .root {
-  margin-top: $d8x-spacing * 2;
-  margin-bottom: $d8x-spacing * 2;
+  margin-top: $d8x-spacing;
+  margin-bottom: $d8x-spacing * 5;
 
   :global(.MuiPaper-root) {
     height: 80px;
