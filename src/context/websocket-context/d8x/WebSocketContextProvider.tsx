@@ -1,33 +1,58 @@
 import { useAtom } from 'jotai';
-import { memo, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 import { useChainId } from 'wagmi';
 
 import { config } from 'config';
 import { webSocketReadyAtom } from 'store/pools.store';
 
 import { createWebSocketWithReconnect } from '../createWebSocketWithReconnect';
+import { usePingPong } from '../hooks/usePingPong';
 import { WebSocketI } from '../types';
 import { WebSocketContext, WebSocketContextI } from './WebSocketContext';
 import { useWsMessageHandler } from './useWsMessageHandler';
+import { useHandleMessage } from '../hooks/useHandleMessage';
+import { useMessagesToSend } from '../hooks/useMessagesToSend';
+import { useSend } from '../hooks/useSend';
 
 let client: WebSocketI;
-
-const PING_MESSAGE = JSON.stringify({ type: 'ping' });
-const WS_ALIVE_TIMEOUT = 10_000;
 
 export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) => {
   const [isWebSocketReady, setWebSocketReady] = useAtom(webSocketReadyAtom);
   const chainId = useChainId();
 
+  const waitForPongRef = useRef(false);
+
   const [messages, setMessages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [messagesToSend, setMessagesToSend] = useState<string[]>([]);
-
-  const waitForPongRef = useRef(false);
 
   const handleWsMessage = useWsMessageHandler();
 
   const wsUrl = useMemo(() => config.wsUrl[`${chainId}`] || config.wsUrl.default, [chainId]);
+
+  usePingPong({
+    client,
+    isConnected,
+    messages,
+    waitForPongRef,
+  });
+
+  useHandleMessage({
+    messages,
+    setMessages,
+    handleWsMessage,
+  });
+
+  const { setMessagesToSend } = useMessagesToSend({
+    client,
+    isConnected,
+  });
+
+  const send = useSend({
+    client,
+    isConnected,
+    setMessagesToSend,
+    waitForPongRef,
+  });
 
   useEffect(() => {
     if (client) {
@@ -52,55 +77,6 @@ export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) =
       setWebSocketReady(false);
     }
   }, [setWebSocketReady, isConnected]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      messages.forEach(handleWsMessage);
-      setMessages([]);
-    }
-  }, [messages, handleWsMessage]);
-
-  useEffect(() => {
-    if (client && isConnected && messagesToSend.length > 0) {
-      messagesToSend.forEach(client.send);
-      setMessagesToSend([]);
-    }
-  }, [isConnected, messagesToSend]);
-
-  const send = useCallback(
-    (message: string) => {
-      if (client && isConnected) {
-        client.send(message);
-      } else {
-        setMessagesToSend((prevState) => [...prevState, message]);
-      }
-    },
-    [isConnected]
-  );
-
-  useEffect(() => {
-    if (!client || !isConnected) {
-      return;
-    }
-
-    let pingMessageTimeout = setTimeout(() => {
-      if (client) {
-        client.send(PING_MESSAGE);
-        waitForPongRef.current = true;
-        pingMessageTimeout = setTimeout(() => {
-          if (client && waitForPongRef.current) {
-            client.reconnect();
-            waitForPongRef.current = false;
-          }
-        }, WS_ALIVE_TIMEOUT);
-      }
-    }, WS_ALIVE_TIMEOUT);
-
-    return () => {
-      clearTimeout(pingMessageTimeout);
-      waitForPongRef.current = false;
-    };
-  }, [messages, isConnected]);
 
   const contextValue: WebSocketContextI = useMemo(
     () => ({

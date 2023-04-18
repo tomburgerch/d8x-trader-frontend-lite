@@ -8,6 +8,6 @@ export interface WebSocketI {
   onStateChange: (fn: ReactDispatchT) => () => void;
   close: () => void;
   reconnect: () => void;
-  send: (message: string) => void;
+  send: (message: string) => boolean;
   isConnected: () => boolean;
 }
