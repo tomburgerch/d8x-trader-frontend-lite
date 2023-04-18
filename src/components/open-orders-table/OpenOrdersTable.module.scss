@@ -17,12 +17,16 @@
   background-color: var(--d8x-color-white);
 
   :global(.MuiTypography-root) {
-    font-weight: bold;
+    font-weight: 400;
   }
 }
 
 .tableBody {
   background-color: var(--d8x-color-white-opac);
+
+  :global(.MuiTypography-root) {
+    color: var(--d8x-color-purple);
+  }
 }
 
 .refreshHolder {
