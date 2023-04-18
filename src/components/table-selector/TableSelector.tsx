@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import classnames from 'classnames';
+import type { Dispatch, SetStateAction } from 'react';
 
-import { Box, Button, Card, CardContent, CardHeader, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader } from '@mui/material';
 
 import styles from './TableSelector.module.scss';
 
@@ -12,52 +12,30 @@ export interface SelectorItemI {
 
 interface TableSelectorPropsI {
   selectorItems: SelectorItemI[];
+  activeIndex: number;
+  setActiveIndex: Dispatch<SetStateAction<number>>;
 }
 
-export const TableSelector = ({ selectorItems }: TableSelectorPropsI) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  if (isSmallScreen) {
-    return (
-      <Card className={styles.mobileRoot}>
-        <CardHeader
-          className={styles.mobileRootHeader}
-          title={
-            <Box className={styles.rootOptions}>
-              {selectorItems.map(({ label }, index) => (
-                <Button
-                  key={label}
-                  className={classnames({ [styles.selected]: index === activeIndex })}
-                  onClick={() => setActiveIndex(index)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </Box>
-          }
-        />
-        <CardContent>{selectorItems[activeIndex].item}</CardContent>
-      </Card>
-    );
-  }
-
+export const TableSelector = ({ selectorItems, activeIndex, setActiveIndex }: TableSelectorPropsI) => {
   return (
-    <Box className={styles.root}>
-      <Box className={styles.selectorTabs}>
-        {selectorItems.map(({ label }, index) => (
-          <Box
-            key={label}
-            onClick={() => setActiveIndex(index)}
-            className={classnames(styles.tabLabelWrapper, { [styles.inactiveTabLabel]: index !== activeIndex })}
-          >
-            <Typography variant="bodySmall">{label}</Typography>
+    <Card className={styles.root}>
+      <CardHeader
+        className={styles.header}
+        title={
+          <Box className={styles.rootOptions}>
+            {selectorItems.map(({ label }, index) => (
+              <Button
+                key={label}
+                className={classnames({ [styles.selected]: index === activeIndex })}
+                onClick={() => setActiveIndex(index)}
+              >
+                {label}
+              </Button>
+            ))}
           </Box>
-        ))}
-      </Box>
-      {selectorItems[activeIndex].item}
-    </Box>
+        }
+      />
+      <CardContent>{selectorItems[activeIndex].item}</CardContent>
+    </Card>
   );
 };

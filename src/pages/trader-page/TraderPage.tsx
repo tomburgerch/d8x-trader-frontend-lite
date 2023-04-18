@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -17,6 +17,8 @@ import styles from './TraderPage.module.scss';
 export const TraderPage = memo(() => {
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('xl'));
+
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const selectorItems: SelectorItemI[] = useMemo(
     () => [
@@ -40,7 +42,7 @@ export const TraderPage = memo(() => {
           <Box className={styles.leftBlock}>
             <PerpetualStats />
             <TradingViewChart />
-            <TableSelector selectorItems={selectorItems} />
+            <TableSelector selectorItems={selectorItems} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
           </Box>
           <Box className={styles.rightBlock}>
             <OrderBlock />
@@ -52,7 +54,7 @@ export const TraderPage = memo(() => {
           <PerpetualStats />
           <TradingViewChart />
           <OrderBlock />
-          <TableSelector selectorItems={selectorItems} />
+          <TableSelector selectorItems={selectorItems} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
         </Container>
       )}
       <Footer />
