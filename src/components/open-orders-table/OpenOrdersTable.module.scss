@@ -15,6 +15,10 @@
 
 .tableHead {
   background-color: var(--d8x-color-white);
+
+  :global(.MuiTypography-root) {
+    font-weight: bold;
+  }
 }
 
 .tableBody {
