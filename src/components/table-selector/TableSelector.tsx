@@ -35,7 +35,7 @@ export const TableSelector = ({ selectorItems, activeIndex, setActiveIndex }: Ta
           </Box>
         }
       />
-      <CardContent>{selectorItems[activeIndex].item}</CardContent>
+      <CardContent className={styles.content}>{selectorItems[activeIndex].item}</CardContent>
     </Card>
   );
 };
