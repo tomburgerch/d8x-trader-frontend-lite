@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
 
+import { timeToLocal } from 'helpers/timeToLocal';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import {
   candlesAtom,
@@ -69,14 +70,18 @@ export function useCandlesWsMessageHandler() {
           if (prevData.length === newData.length && prevData[0].close === +newData[0].close) {
             return prevData;
           }
-          return parsedMessage.data.map((candle) => ({
-            start: candle.start,
-            time: (new Date(candle.time).getTime() / 1000) as UTCTimestamp,
-            open: +candle.open,
-            high: +candle.high,
-            low: +candle.low,
-            close: +candle.close,
-          }));
+          return parsedMessage.data.map((candle) => {
+            const localTime = timeToLocal(candle.time);
+
+            return {
+              start: localTime,
+              time: (localTime / 1000) as UTCTimestamp,
+              open: +candle.open,
+              high: +candle.high,
+              low: +candle.low,
+              close: +candle.close,
+            };
+          });
         });
         setCandlesDataReady(true);
       } else if (isUpdateMessage(parsedMessage) && selectedPerpetual) {
@@ -89,9 +94,11 @@ export function useCandlesWsMessageHandler() {
           const newData = [...prevData];
 
           parsedMessage.data.forEach((newCandle) => {
+            const localTime = timeToLocal(newCandle.time);
+
             newData.push({
-              start: newCandle.start,
-              time: (new Date(newCandle.time).getTime() / 1000) as UTCTimestamp,
+              start: localTime,
+              time: (localTime / 1000) as UTCTimestamp,
               open: +newCandle.open,
               high: +newCandle.high,
               low: +newCandle.low,
