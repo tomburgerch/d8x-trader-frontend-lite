@@ -1,5 +1,5 @@
-import { Contract, ContractTransaction, Signer } from 'ethers';
-
+import { Signer } from '@ethersproject/abstract-signer';
+import { Contract, ContractTransaction } from '@ethersproject/contracts';
 import { CancelOrderResponseI } from 'types/types';
 
 export function cancelOrder(
