@@ -1,7 +1,7 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -16,16 +16,27 @@ export const OrderSize = memo(() => {
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
 
+  const [inputValue, setInputValue] = useState(`${orderSize}`);
+
   const handleInputCapture = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setOrderSize(+event.target.value);
+      const targetValue = event.target.value;
+      if (targetValue) {
+        setOrderSize(+targetValue);
+        setInputValue(targetValue);
+      } else {
+        setOrderSize(0);
+        setInputValue('');
+      }
     },
     [setOrderSize]
   );
 
   const handleInputBlur = useCallback(() => {
     if (perpetualStaticInfo) {
-      setOrderSize(+roundToLotString(orderSize, perpetualStaticInfo.lotSizeBC));
+      const roundedValue = roundToLotString(orderSize, perpetualStaticInfo.lotSizeBC);
+      setOrderSize(+roundedValue);
+      setInputValue(roundedValue);
     }
   }, [perpetualStaticInfo, orderSize, setOrderSize]);
 
@@ -68,7 +79,7 @@ export const OrderSize = memo(() => {
         }
         type="number"
         inputProps={{ step: orderSizeStep, min: 0 }}
-        value={orderSize}
+        value={inputValue}
         onChange={handleInputCapture}
         onBlur={handleInputBlur}
       />
