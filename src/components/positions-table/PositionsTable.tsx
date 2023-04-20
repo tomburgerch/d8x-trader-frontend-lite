@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { constants } from 'ethers';
+import { HashZero } from '@ethersproject/constants';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -143,7 +143,7 @@ export const PositionsTable = memo(() => {
                 if (res?.hash) {
                   console.log(res.hash);
                 }
-                const signatures = new Array<string>(data.data.digests.length).fill(constants.HashZero);
+                const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
                 postOrder(signer, signatures, data.data)
                   .then((tx) => {
                     setRequestSent(false);

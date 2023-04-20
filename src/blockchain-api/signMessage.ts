@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { Signer } from 'ethers';
+import { Signer } from '@ethersproject/abstract-signer';
 
 export function signMessages(signer: Signer, digests: string[]) {
   const promises = [];

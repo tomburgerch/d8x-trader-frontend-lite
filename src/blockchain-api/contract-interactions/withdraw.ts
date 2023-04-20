@@ -1,4 +1,6 @@
-import { Contract, ContractTransaction, BigNumber, Signer } from 'ethers';
+import { Signer } from '@ethersproject/abstract-signer';
+import { Contract, ContractTransaction } from '@ethersproject/contracts';
+import { BigNumber } from '@ethersproject/bignumber';
 
 import { CollateralChangeResponseI } from 'types/types';
 

@@ -105,7 +105,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
       1 - ((orderBlock === OrderBlockE.Long ? 1 : -1) * Math.abs(mapStopLossToNumber(stopLoss))) / leverage;
 
     if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
-      stopLossPrice = maxMinEntryPrice * stopLossMultiplier;
+      stopLossPrice = perpetualStatistics.midPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
       stopLossPrice = limitPrice * stopLossMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
@@ -124,7 +124,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
       1 + ((orderBlock === OrderBlockE.Long ? 1 : -1) * mapTakeProfitToNumber(takeProfit)) / leverage;
 
     if (orderType === OrderTypeE.Market && maxMinEntryPrice) {
-      takeProfitPrice = maxMinEntryPrice * takeProfitMultiplier;
+      takeProfitPrice = perpetualStatistics.midPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Limit && limitPrice) {
       takeProfitPrice = limitPrice * takeProfitMultiplier;
     } else if (orderType === OrderTypeE.Stop) {
