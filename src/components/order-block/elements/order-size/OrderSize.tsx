@@ -34,7 +34,6 @@ export const OrderSize = memo(() => {
 
   const handleInputBlur = useCallback(() => {
     if (perpetualStaticInfo) {
-      console.log('handleInputBlur');
       const roundedValue = roundToLotString(orderSize, perpetualStaticInfo.lotSizeBC);
       setOrderSize(+roundedValue);
       setInputValue(roundedValue);
