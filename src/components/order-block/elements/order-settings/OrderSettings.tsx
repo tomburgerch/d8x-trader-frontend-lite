@@ -23,7 +23,7 @@ import {
   reduceOnlyAtom,
   slippageSliderAtom,
 } from 'store/order-block.store';
-import { perpetualStatisticsAtom /*, positionsAtom*/ } from 'store/pools.store';
+import { perpetualStatisticsAtom, selectedPerpetualAtom /*, positionsAtom*/ } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
 import { MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -63,6 +63,7 @@ export const OrderSettings = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
   const [slippage, setSlippage] = useAtom(slippageSliderAtom);
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   // const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
   const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
@@ -163,7 +164,7 @@ export const OrderSettings = memo(() => {
           />
           <Typography variant="body2" className={styles.maxEntryPrice}>
             {orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:{' '}
-            {formatToCurrency(entryPrice, perpetualStatistics?.quoteCurrency)}
+            {formatToCurrency(entryPrice, selectedPerpetual?.quoteCurrency)}
           </Typography>
         </DialogContent>
         <DialogActions>

@@ -49,14 +49,7 @@ import {
   orderDigest,
   positionRiskOnCollateralAction,
 } from 'network/network';
-import {
-  perpetualStatisticsAtom,
-  positionsAtom,
-  proxyAddrAtom,
-  removePositionAtom,
-  selectedPoolAtom,
-  traderAPIAtom,
-} from 'store/pools.store';
+import { positionsAtom, proxyAddrAtom, removePositionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { AlignE, OrderTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
@@ -71,7 +64,6 @@ import styles from './PositionsTable.module.scss';
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, removePosition] = useAtom(removePositionAtom);
@@ -358,11 +350,11 @@ export const PositionsTable = memo(() => {
       { label: 'Side', align: AlignE.Left },
       { label: 'Entry Price', align: AlignE.Right },
       { label: 'Liq. price', align: AlignE.Right },
-      { label: `Margin (${perpetualStatistics?.poolName})`, align: AlignE.Right },
+      { label: `Margin (${selectedPool?.poolSymbol})`, align: AlignE.Right },
       { label: 'Unr. PnL', align: AlignE.Right },
       { label: <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [perpetualStatistics, refreshPositions]
+    [selectedPool, refreshPositions]
   );
 
   const isConfirmButtonDisabled = useMemo(() => {
@@ -567,7 +559,7 @@ export const PositionsTable = memo(() => {
                     id="add-collateral"
                     endAdornment={
                       <InputAdornment position="end">
-                        <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
+                        <Typography variant="adornment">{selectedPool?.poolSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
@@ -587,7 +579,7 @@ export const PositionsTable = memo(() => {
                       id="remove-collateral"
                       endAdornment={
                         <InputAdornment position="end">
-                          <Typography variant="adornment">{perpetualStatistics?.poolName}</Typography>
+                          <Typography variant="adornment">{selectedPool?.poolSymbol}</Typography>
                         </InputAdornment>
                       }
                       type="number"

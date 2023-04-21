@@ -1,11 +1,11 @@
 import { useAtom } from 'jotai';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';
 
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { getMarketClosedStatus, getOpenOrders } from 'network/network';
+import { getOpenOrders } from 'network/network';
 import {
   failOrderAtom,
   openOrdersAtom,
@@ -32,7 +32,6 @@ import {
   OnUpdateMarkPriceWsMessageI,
   SubscriptionWsMessageI,
 } from './types';
-import { useDebounce } from 'helpers/useDebounce';
 
 function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessageI {
   return message.type === MessageTypeE.Connect;
@@ -79,7 +78,7 @@ export function useWsMessageHandler() {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setWebSocketReady] = useAtom(webSocketReadyAtom);
-  const [perpetualStats, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
@@ -87,8 +86,6 @@ export function useWsMessageHandler() {
   const [traderAPI] = useAtom(traderAPIAtom);
 
   const traderAPIRef = useRef(traderAPI);
-
-  const [, setMarketClosed] = useState(true);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -103,32 +100,6 @@ export function useWsMessageHandler() {
       }
     },
     [selectedPool, selectedPerpetual, setPerpetualStatistics]
-  );
-
-  const debouncedIndexPrice = useDebounce(
-    useMemo(() => {
-      return perpetualStats?.indexPrice;
-    }, [perpetualStats?.indexPrice]),
-    60_000
-  );
-
-  const updateMarketStatus = useCallback(
-    (symbol: string) => {
-      if (debouncedIndexPrice === undefined) {
-        return;
-      }
-      (async () => {
-        getMarketClosedStatus(traderAPIRef.current, symbol)
-          .then((data) => {
-            console.log(`${symbol} market is ${data.data.isMarketClosed ? '' : 'not'} closed`);
-            setMarketClosed(data.data.isMarketClosed);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })();
-    },
-    [debouncedIndexPrice]
   );
 
   return useCallback(
@@ -180,8 +151,6 @@ export function useWsMessageHandler() {
           currentFundingRateBps,
           openInterestBC,
         });
-
-        updateMarketStatus(`${parsedSymbol.baseCurrency}-${parsedSymbol.quoteCurrency}-${parsedSymbol.poolSymbol}`);
       } else if (isUpdateMarginAccountMessage(parsedMessage)) {
         if (!address || address !== parsedMessage.data.obj.traderAddr) {
           return;
@@ -241,7 +210,6 @@ export function useWsMessageHandler() {
       failOpenOrder,
       chainId,
       address,
-      updateMarketStatus,
     ]
   );
 }

@@ -5,7 +5,7 @@ import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { limitPriceAtom, orderTypeAtom } from 'store/order-block.store';
-import { perpetualStatisticsAtom } from 'store/pools.store';
+import { selectedPerpetualAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
 
 import styles from './LimitPrice.module.scss';
@@ -13,7 +13,7 @@ import styles from './LimitPrice.module.scss';
 export const LimitPrice = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
   const [limitPrice, setLimitPrice] = useAtom(limitPriceAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   const handleLimitPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -49,7 +49,7 @@ export const LimitPrice = memo(() => {
         id="limit-size"
         endAdornment={
           <InputAdornment position="end">
-            <Typography variant="adornment">{perpetualStatistics?.quoteCurrency}</Typography>
+            <Typography variant="adornment">{selectedPerpetual?.quoteCurrency}</Typography>
           </InputAdornment>
         }
         inputProps={{ step: 1, min: -1 }}

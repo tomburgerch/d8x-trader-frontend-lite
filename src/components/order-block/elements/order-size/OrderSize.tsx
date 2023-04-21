@@ -7,14 +7,14 @@ import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { orderSizeAtom } from 'store/order-block.store';
-import { perpetualStaticInfoAtom, perpetualStatisticsAtom } from 'store/pools.store';
+import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
 
 import styles from './OrderSize.module.scss';
 
 export const OrderSize = memo(() => {
   const [orderSize, setOrderSize] = useAtom(orderSizeAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
+  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   const [inputValue, setInputValue] = useState(`${orderSize}`);
 
@@ -63,8 +63,8 @@ export const OrderSize = memo(() => {
             <>
               <Typography> Sets the size of your order. </Typography>
               <Typography>
-                The minimal position size is {minPositionString} {perpetualStatistics?.baseCurrency}, with a step size
-                of {orderSizeStep} {perpetualStatistics?.baseCurrency}.
+                The minimal position size is {minPositionString} {selectedPerpetual?.baseCurrency}, with a step size of{' '}
+                {orderSizeStep} {selectedPerpetual?.baseCurrency}.
               </Typography>
             </>
           }
@@ -74,7 +74,7 @@ export const OrderSize = memo(() => {
         id="order-size"
         endAdornment={
           <InputAdornment position="end">
-            <Typography variant="adornment">{perpetualStatistics?.baseCurrency}</Typography>
+            <Typography variant="adornment">{selectedPerpetual?.baseCurrency}</Typography>
           </InputAdornment>
         }
         type="number"
