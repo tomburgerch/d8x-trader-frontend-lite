@@ -4,7 +4,7 @@ import { memo, useMemo } from 'react';
 import { Box, Typography } from '@mui/material';
 
 import { orderInfoAtom, orderSizeAtom } from 'store/order-block.store';
-import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
+import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './InfoBlock.module.scss';
@@ -12,8 +12,8 @@ import styles from './InfoBlock.module.scss';
 export const InfoBlock = memo(() => {
   const [orderInfo] = useAtom(orderInfoAtom);
   const [orderSize] = useAtom(orderSizeAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
 
   const feeInCC = useMemo(() => {
     if (!orderInfo?.tradingFee || !selectedPerpetual?.collToQuoteIndexPrice || !selectedPerpetual?.indexPrice) {
@@ -28,12 +28,12 @@ export const InfoBlock = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.row}>
         <Typography variant="body2">Order size</Typography>
-        <Typography variant="body2">{formatToCurrency(orderSize, perpetualStatistics?.baseCurrency)}</Typography>
+        <Typography variant="body2">{formatToCurrency(orderSize, selectedPerpetual?.baseCurrency)}</Typography>
       </Box>
       <Box className={styles.row}>
         <Typography variant="body2">Fees</Typography>
         <Typography variant="body2">
-          {formatToCurrency(feeInCC, perpetualStatistics?.poolName)} {'('}
+          {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
           {formatToCurrency(orderInfo?.tradingFee, 'bps', 1)}
           {')'}
         </Typography>
