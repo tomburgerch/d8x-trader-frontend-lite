@@ -10,7 +10,6 @@ import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 import { collateralDepositAtom, newPositionRiskAtom, perpetualStatisticsAtom, poolFeeAtom } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
-export const orderTypeAtom = atom<OrderTypeE>(OrderTypeE.Market);
 export const orderSizeAtom = atom(0);
 export const triggerPriceAtom = atom(0);
 export const leverageAtom = atom(1);
@@ -23,6 +22,23 @@ export const takeProfitAtom = atom(TakeProfitE.None);
 
 const limitPriceValueAtom = atom(-1);
 
+const orderTypeValueAtom = atom<OrderTypeE>(OrderTypeE.Market);
+
+export const orderTypeAtom = atom(
+  (get) => {
+    return get(orderTypeValueAtom);
+  },
+  (get, set, newType: OrderTypeE) => {
+    if (newType === OrderTypeE.Limit) {
+      const perpetualStatistics = get(perpetualStatisticsAtom);
+      set(limitPriceValueAtom, perpetualStatistics?.indexPrice ?? -1);
+    } else {
+      set(limitPriceValueAtom, -1);
+    }
+    set(orderTypeValueAtom, newType);
+  }
+);
+
 export const limitPriceAtom = atom(
   (get) => {
     const orderType = get(orderTypeAtom);
@@ -32,9 +48,6 @@ export const limitPriceAtom = atom(
     }
 
     const limitPrice = get(limitPriceValueAtom);
-    if (orderType === OrderTypeE.Limit) {
-      return limitPrice < 0 ? 0 : limitPrice;
-    }
 
     return limitPrice < 0 ? null : limitPrice;
   },
