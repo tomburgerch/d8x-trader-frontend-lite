@@ -4,10 +4,10 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { MaxUint256 } from '@ethersproject/constants';
 
-import { ERC20_ABI } from './constants';
+import { erc20ABI } from 'wagmi';
 
 export function approveMarginToken(signer: Signer, marginTokenAddr: string, proxyAddr: string, minAmount: number) {
-  const marginToken = new Contract(marginTokenAddr, ERC20_ABI, signer);
+  const marginToken = new Contract(marginTokenAddr, erc20ABI, signer);
   const amount = MaxUint256;
   const minAmountBN = parseUnits((4 * minAmount).toString(), 18);
   return signer.getAddress().then((addr: string) => {

@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useState } from 'react';
+import { ChangeEvent, memo, useCallback } from 'react';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -15,17 +15,11 @@ export const TriggerPrice = memo(() => {
   const [triggerPrice, setTriggerPrice] = useAtom(triggerPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
-  const [inputValue, setInputValue] = useState(`${triggerPrice}`);
-
   const handleTriggerPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const targetValue = event.target.value;
       if (targetValue) {
-        setTriggerPrice(+targetValue);
-        setInputValue(targetValue);
-      } else {
-        setTriggerPrice(0);
-        setInputValue('');
+        setTriggerPrice(targetValue);
       }
     },
     [setTriggerPrice]
@@ -64,8 +58,8 @@ export const TriggerPrice = memo(() => {
         }
         inputProps={{ step: 1, min: 0 }}
         type="number"
-        defaultValue={inputValue}
         onChange={handleTriggerPriceChange}
+        value={triggerPrice === null ? '' : triggerPrice}
       />
     </Box>
   );

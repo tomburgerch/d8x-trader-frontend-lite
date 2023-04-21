@@ -11,7 +11,6 @@ import { collateralDepositAtom, newPositionRiskAtom, perpetualStatisticsAtom, po
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
 export const orderSizeAtom = atom(0);
-export const triggerPriceAtom = atom(0);
 export const leverageAtom = atom(1);
 export const slippageSliderAtom = atom(4);
 export const keepPositionLeverageAtom = atom(false);
@@ -21,6 +20,7 @@ export const stopLossAtom = atom(StopLossE.None);
 export const takeProfitAtom = atom(TakeProfitE.None);
 
 const limitPriceValueAtom = atom(-1);
+const triggerPriceValueAtom = atom(0);
 
 const orderTypeValueAtom = atom<OrderTypeE>(OrderTypeE.Market);
 
@@ -31,9 +31,19 @@ export const orderTypeAtom = atom(
   (get, set, newType: OrderTypeE) => {
     if (newType === OrderTypeE.Limit) {
       const perpetualStatistics = get(perpetualStatisticsAtom);
-      set(limitPriceValueAtom, perpetualStatistics?.indexPrice ?? -1);
+      const initialLimit =
+        perpetualStatistics?.midPrice === undefined ? -1 : Math.round(100 * perpetualStatistics?.midPrice) / 100;
+      set(limitPriceValueAtom, initialLimit);
+      set(triggerPriceValueAtom, -1);
+    } else if (newType === OrderTypeE.Stop) {
+      const perpetualStatistics = get(perpetualStatisticsAtom);
+      const initialTrigger =
+        perpetualStatistics?.markPrice === undefined ? -1 : Math.round(100 * perpetualStatistics?.markPrice) / 100;
+      set(limitPriceValueAtom, -1);
+      set(triggerPriceValueAtom, initialTrigger);
     } else {
       set(limitPriceValueAtom, -1);
+      set(triggerPriceValueAtom, -1);
     }
     set(orderTypeValueAtom, newType);
   }
@@ -53,6 +63,20 @@ export const limitPriceAtom = atom(
   },
   (get, set, newLimitPrice: string) => {
     set(limitPriceValueAtom, newLimitPrice === '' || +newLimitPrice < 0 ? -1 : +newLimitPrice);
+  }
+);
+
+export const triggerPriceAtom = atom(
+  (get) => {
+    const orderType = get(orderTypeAtom);
+    if (orderType === OrderTypeE.Market || orderType === OrderTypeE.Limit) {
+      return 0;
+    }
+    const triggerPrice = get(triggerPriceValueAtom);
+    return triggerPrice < 0 ? 0 : triggerPrice;
+  },
+  (get, set, newTriggerPrice: string) => {
+    set(triggerPriceValueAtom, newTriggerPrice === '' || +newTriggerPrice < 0 ? -1 : +newTriggerPrice);
   }
 );
 
