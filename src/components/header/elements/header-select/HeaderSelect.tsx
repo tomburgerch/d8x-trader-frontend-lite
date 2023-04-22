@@ -42,7 +42,7 @@ function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
           // freeSolo={true}
           onChange={props.onChange}
           getOptionLabel={props.getOptionLabel}
-          popupIcon={<ArrowDropIcon width={20} />}
+          popupIcon={<ArrowDropIcon width={24} height={24} />}
           PaperComponent={props.PaperComponent}
           PopperComponent={props.PopperComponent}
           renderOption={props.renderOption}

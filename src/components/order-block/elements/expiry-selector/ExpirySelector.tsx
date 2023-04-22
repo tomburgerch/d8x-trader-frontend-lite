@@ -23,7 +23,15 @@ export const ExpirySelector = memo(() => {
       <Box className={styles.label}>
         <InfoBlock
           title="Expiry"
-          content={<Typography>Number of days after which your order will expire.</Typography>}
+          content={
+            <>
+              <Typography>Number of days after which your main order will expire.</Typography>
+              <Typography>
+                Expiry of Take-Profit or Stop-Loss orders is not affected by this selection and is set by default 5
+                years into the future.
+              </Typography>
+            </>
+          }
         />
       </Box>
       <Box className={styles.expiryOptions}>
