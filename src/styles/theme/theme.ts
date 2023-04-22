@@ -1,6 +1,7 @@
 import { CSSProperties } from 'react';
 
 import { createTheme } from '@mui/material/styles';
+import { borderRadius } from '@mui/system';
 
 // Disable eslint as @mui does not follow same linting convention for interface suffixes.
 
@@ -253,7 +254,7 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: '4px',
+          borderRadius: '8px',
           backgroundColor: 'var(--d8x-background-purple)',
           border: 'none',
           width: '180px',
