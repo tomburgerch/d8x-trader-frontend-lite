@@ -1,8 +1,11 @@
+@import 'styles/theme/theme';
+
 .root {
   max-width: 920px;
 
   &:global(.MuiPaper-root) {
     background-color: transparent;
+    border-radius: $d8x-border-radius;
   }
 }
 

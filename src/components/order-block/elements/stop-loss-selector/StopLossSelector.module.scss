@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
 }
 
 .label {
@@ -34,8 +34,8 @@
   .root {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    margin-top: 16px;
+    gap: 2 * $d8x-spacing;
+    margin-top: 2 * $d8x-spacing;
   }
 
   .stopLossOptions {

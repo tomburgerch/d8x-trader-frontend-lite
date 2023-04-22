@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: $d8x-spacing;
-  margin-bottom: $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
+  margin-bottom: 2 * $d8x-spacing;
 
   .label {
     display: flex;
