@@ -4,12 +4,16 @@
   position: relative;
   overflow: hidden;
   background-color: var(--d8x-color-white);
-  padding: $d8x-spacing * 4;
+  padding-top: $d8x-spacing * 6;
+  padding-left: $d8x-spacing * 4;
+  padding-right: $d8x-spacing;
   border-radius: $d8x-border-radius;
 }
 
 .periodsHolder {
   margin-top: $d8x-spacing * 2;
+  padding-right: $d8x-spacing * 3;
+  padding-bottom: $d8x-spacing * 4;
 }
 
 .loaderHolder {
