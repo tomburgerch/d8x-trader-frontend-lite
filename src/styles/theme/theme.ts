@@ -279,16 +279,16 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '8px',
-          backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.5) !important',
+          backgroundColor: 'var(--d8x-color-white) !important',
           minWidth: '180px',
           ':hover': {
-            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+            backgroundColor: 'var(--d8x-color-white) !important',
           },
           ':focus': {
-            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+            backgroundColor: 'var(--d8x-color-white) !important',
           },
           ':active': {
-            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+            backgroundColor: 'var(--d8x-color-white) !important',
           },
           ':before': {
             border: 'none !important',
@@ -302,7 +302,7 @@ export const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         input: {
-          fontWeight: 'bold',
+          fontWeight: '500',
           color: 'var(--d8x-color-purple)',
           padding: '3px 4px 3px 4px !important',
           width: 'auto',
