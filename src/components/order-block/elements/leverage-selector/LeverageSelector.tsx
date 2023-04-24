@@ -4,6 +4,8 @@ import { memo, useCallback, useMemo } from 'react';
 
 import { Box, Button, InputAdornment, OutlinedInput, Slider, Typography } from '@mui/material';
 
+import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
+import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { leverageAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom } from 'store/pools.store';
@@ -99,13 +101,13 @@ export const LeverageSelector = memo(() => {
       <Box className={styles.inputHolder}>
         <Button
           key="decrease-leverage"
-          variant="secondary"
+          variant="outlined"
           size="small"
           className={styles.decreaseButton}
           onClick={handleDecreaseLeverage}
-          disabled={leverage < 1}
+          disabled={leverage === 1}
         >
-          -
+          <DecreaseIcon />
         </Button>
         <OutlinedInput
           id="leverage"
@@ -121,13 +123,13 @@ export const LeverageSelector = memo(() => {
         />
         <Button
           key="increase-leverage"
-          variant="secondary"
+          variant="outlined"
           size="small"
           className={styles.increaseButton}
           onClick={handleIncreaseLeverage}
-          disabled={leverage > maxLeverage}
+          disabled={leverage >= maxLeverage}
         >
-          +
+          <IncreaseIcon />
         </Button>
       </Box>
     </Box>
