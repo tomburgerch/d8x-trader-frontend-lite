@@ -54,7 +54,7 @@ function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
                 ...params.inputProps,
                 autoComplete: 'new-password', // disable autocomplete and autofill
               }}
-              variant="outlined"
+              variant="filled"
             />
           )}
         />

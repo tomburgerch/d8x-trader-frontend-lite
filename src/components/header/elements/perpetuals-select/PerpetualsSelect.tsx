@@ -116,7 +116,7 @@ export const PerpetualsSelect = memo(() => {
   return (
     <HeaderSelect<PerpetualI>
       id="perpetuals-select"
-      label="Perpetual"
+      label="Perpetual:"
       items={selectedPool?.perpetuals ?? []}
       width="100%"
       value={selectedPerpetual}

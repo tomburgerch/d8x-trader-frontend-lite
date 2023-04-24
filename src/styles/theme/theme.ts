@@ -1,7 +1,6 @@
 import { CSSProperties } from 'react';
 
 import { createTheme } from '@mui/material/styles';
-import { borderRadius } from '@mui/system';
 
 // Disable eslint as @mui does not follow same linting convention for interface suffixes.
 
@@ -276,14 +275,39 @@ export const theme = createTheme({
         },
       },
     },
-    MuiAutocomplete: {
+    MuiFilledInput: {
       styleOverrides: {
         root: {
-          borderColor: 'var(--d8x-color-purple)',
+          borderRadius: '8px',
+          backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.5) !important',
+          minWidth: '180px',
+          ':hover': {
+            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+          },
+          ':focus': {
+            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+          },
+          ':active': {
+            backgroundColor: 'rgba(var(--d8x-color-white-rgb), 0.7) !important',
+          },
+          ':before': {
+            border: 'none !important',
+          },
+          ':after': {
+            border: 'none !important',
+          },
         },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
         input: {
+          fontWeight: 'bold',
           color: 'var(--d8x-color-purple)',
-          padding: '3px 4px 3px 6px !important',
+          padding: '3px 4px 3px 4px !important',
+          width: 'auto',
+          border: 'none',
+          fontSize: '18px',
         },
       },
     },
