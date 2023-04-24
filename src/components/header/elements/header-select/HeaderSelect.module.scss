@@ -6,11 +6,15 @@
   min-width: 260px;
 }
 
-.autocomplete {
+:global(.MuiFilledInput-root) {
+  border: 1px solid rgba(var(--d8x-color-purple-rgb), 0.6);
 
-  :global(.MuiFilledInput-root) {
+  &:hover {
     border: 1px solid var(--d8x-color-purple);
   }
+}
+
+.autocomplete {
 
   :global(.MuiInputLabel-root):global(.Mui-focused) {
     color: var(--d8x-color-black);
