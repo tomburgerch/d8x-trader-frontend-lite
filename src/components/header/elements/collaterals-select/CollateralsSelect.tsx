@@ -105,7 +105,7 @@ export const CollateralsSelect = memo(() => {
   return (
     <HeaderSelect<PoolI>
       id="collaterals-select"
-      label="Collateral"
+      label="Collateral:"
       items={pools}
       width="100%"
       value={selectedPool}
