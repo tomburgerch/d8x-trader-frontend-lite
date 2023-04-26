@@ -72,7 +72,7 @@ export const PositionsTable = memo(() => {
   const updatedPositionsRef = useRef(false);
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
@@ -482,7 +482,7 @@ export const PositionsTable = memo(() => {
 
   return (
     <>
-      {!isSmallScreen && (
+      {!isFluidScreen && (
         <TableContainer className={styles.root}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
@@ -503,7 +503,7 @@ export const PositionsTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isSmallScreen && (
+      {isFluidScreen && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />

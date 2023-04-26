@@ -44,7 +44,7 @@ export const OpenOrdersTable = memo(() => {
   const { data: signer } = useSigner();
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -169,7 +169,7 @@ export const OpenOrdersTable = memo(() => {
 
   return (
     <>
-      {!isSmallScreen && (
+      {!isFluidScreen && (
         <TableContainer className={styles.root}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
@@ -190,7 +190,7 @@ export const OpenOrdersTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isSmallScreen && (
+      {isFluidScreen && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />
