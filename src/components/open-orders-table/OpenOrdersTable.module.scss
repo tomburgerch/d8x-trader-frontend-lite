@@ -1,9 +1,5 @@
 @import 'styles/theme/theme';
 
-.root {
-  border-radius: 0 $d8x-border-radius $d8x-border-radius $d8x-border-radius;
-}
-
 .actionIcon {
   cursor: pointer;
   transition: opacity linear 200ms;
