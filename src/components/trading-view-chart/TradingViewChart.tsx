@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ISeriesApi } from 'lightweight-charts';
+import { ISeriesApi, Time } from 'lightweight-charts';
 import { memo, useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 
@@ -18,18 +18,33 @@ export const TradingViewChart = memo(() => {
   const [isCandleDataReady] = useAtom(candlesDataReadyAtom);
 
   const seriesRef = useRef<ISeriesApi<'Candlestick'>>(null);
+  const latestCandleTimeRef = useRef<Time>();
 
   const { width, ref } = useResizeDetector();
 
   useEffect(() => {
     const candlesLength = newCandles.length;
-    if (candlesLength === 0 || !seriesRef.current) {
+    if (candlesLength === 0 || !seriesRef.current || !latestCandleTimeRef.current) {
       return;
     }
 
-    seriesRef.current.update(newCandles[candlesLength - 1]);
+    const latestCandleTime = latestCandleTimeRef.current || 0;
+    const filteredNewCandles = newCandles.filter(({ time }) => time >= latestCandleTime);
+    if (filteredNewCandles.length > 0) {
+      const latestCandle = filteredNewCandles[filteredNewCandles.length - 1];
+      seriesRef.current.update(latestCandle);
+      latestCandleTimeRef.current = latestCandle.time;
+    }
     setNewCandles((prevData) => prevData.slice(newCandles.length));
   }, [newCandles, setNewCandles]);
+
+  useEffect(() => {
+    if (candles.length > 0) {
+      latestCandleTimeRef.current = candles[candles.length - 1].time;
+    } else {
+      latestCandleTimeRef.current = undefined;
+    }
+  }, [candles]);
 
   return (
     <Box className={styles.root} ref={ref}>
