@@ -1,4 +1,4 @@
-import { roundToLotString } from '@d8x/perpetuals-sdk';
+// import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -6,6 +6,7 @@ import { memo, useCallback, useMemo, useState } from 'react';
 import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
+import { roundToLotString } from 'helpers/roundToLotString';
 import { orderSizeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
 
