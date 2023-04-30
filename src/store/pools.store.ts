@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-// import { TraderInterface } from '@d8x/perpetuals-sdk';
+import { TraderInterface } from '@d8x/perpetuals-sdk';
 
 import type {
   MarginAccountI,
@@ -9,10 +9,9 @@ import type {
   PerpetualStaticInfoI,
   PoolI,
   OrderI,
-  TraderInterfaceI,
 } from 'types/types';
 
-export const traderAPIAtom = atom<TraderInterfaceI | null>(null);
+export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const poolsAtom = atom<PoolI[]>([]);
 export const poolFeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
