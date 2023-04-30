@@ -26,6 +26,9 @@
     filter: blur(250px);
     animation-delay: 0s;
     border-radius: 25%;
+    transform: translateZ(0);
+    -webkit-perspective: 1000px;
+    backface-visibility: hidden;
   }
 
   li[data-role='left-top-1'] {
@@ -158,6 +161,7 @@
 
     li {
       animation: none;
+      transition: none;
     }
   }
 }
