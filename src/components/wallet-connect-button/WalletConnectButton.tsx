@@ -1,4 +1,4 @@
-import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
+// import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
@@ -76,21 +76,22 @@ export const WalletConnectButton = memo(() => {
     setTraderAPI(null);
     // console.log(`reloading SDK on chainId ${chainId}`);
     loadingAPIRef.current = true;
-    const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(chainId));
-    // console.log(`proxy ${newTraderAPI.getProxyAddress()}`);
-    newTraderAPI
-      .createProxyInstance(provider)
-      .then(() => {
-        setTraderAPI(newTraderAPI);
-        loadingAPIRef.current = false;
-        // console.log(`SDK loaded on chain id ${chainId}`);
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => {
-        console.log(error);
-        setTraderAPI(null);
-        loadingAPIRef.current = false;
-      });
+    // const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(chainId));
+    // // console.log(`proxy ${newTraderAPI.getProxyAddress()}`);
+    // newTraderAPI
+    //   .createProxyInstance(provider)
+    //   .then(() => {
+    //     setTraderAPI(newTraderAPI);
+    //     loadingAPIRef.current = false;
+    //     // console.log(`SDK loaded on chain id ${chainId}`);
+    //   })
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   .catch((error: any) => {
+    //     console.log(error);
+    //     setTraderAPI(null);
+    //     loadingAPIRef.current = false;
+    //   });
+    loadingAPIRef.current = false;
   }, [isConnected, provider, chainId, setTraderAPI]);
 
   return (

@@ -1,5 +1,8 @@
+// import { TraderInterface, BUY_SIDE, SELL_SIDE, floatToABK64x64 } from '@d8x/perpetuals-sdk';
+
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
+import { floatToABK64x64 } from 'helpers/floatToABK64x64';
 import type {
   ExchangeInfoI,
   MarginAccountI,
@@ -7,19 +10,22 @@ import type {
   OrderI,
   PerpetualOpenOrdersI,
   PerpetualStaticInfoI,
+  TraderInterfaceI,
   ValidatedResponseI,
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
-import { TraderInterface, BUY_SIDE, SELL_SIDE, floatToABK64x64 } from '@d8x/perpetuals-sdk';
 
 function getApiUrlByChainId(chainId: number) {
   return config.apiUrl[`${chainId}`] || config.apiUrl.default;
 }
 
+const BUY_SIDE = 'BUY';
+const SELL_SIDE = 'SELL';
+
 export function getExchangeInfo(
   chainId: number,
-  traderAPI: TraderInterface | null
+  traderAPI: TraderInterfaceI | null
 ): Promise<ValidatedResponseI<ExchangeInfoI>> {
   if (traderAPI) {
     // console.log('exchangeInfo via SDK');
@@ -40,7 +46,7 @@ export function getExchangeInfo(
 
 export function getPerpetualStaticInfo(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string
 ): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
   if (traderAPI) {
@@ -76,7 +82,7 @@ export function getTraderLoyalty(chainId: number, address: string): Promise<Vali
 
 export function getPositionRisk(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
@@ -108,7 +114,7 @@ export function getPositionRisk(
 
 export function positionRiskOnTrade(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   order: OrderI,
   traderAddr: string,
   curAccount?: MarginAccountI
@@ -142,7 +148,7 @@ export function positionRiskOnTrade(
 
 export function positionRiskOnCollateralAction(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   traderAddr: string,
   amount: number,
   positionRisk: MarginAccountI
@@ -180,7 +186,7 @@ export function positionRiskOnCollateralAction(
 
 export function getOpenOrders(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   traderAddr: string,
   timestamp?: number
@@ -230,7 +236,7 @@ export function getPoolFee(
 
 export function getMaxOrderSizeForTrader(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   order: OrderI,
   traderAddr: string,
   timestamp?: number
@@ -300,7 +306,7 @@ export function orderDigest(
 
 export function getCancelOrder(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   orderId: string
 ): Promise<ValidatedResponseI<CancelOrderResponseI>> {
@@ -340,7 +346,7 @@ export function getCancelOrder(
 
 export function getAddCollateral(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   amount: number
 ): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
@@ -382,7 +388,7 @@ export function getAddCollateral(
 
 export function getAvailableMargin(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   traderAddr: string
 ): Promise<ValidatedResponseI<{ amount: number }>> {
@@ -406,7 +412,7 @@ export function getAvailableMargin(
 
 export function getRemoveCollateral(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string,
   amount: number
 ): Promise<ValidatedResponseI<CollateralChangeResponseI>> {
@@ -447,7 +453,7 @@ export function getRemoveCollateral(
 }
 
 export function getMarketClosedStatus(
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterfaceI | null,
   symbol: string
 ): Promise<ValidatedResponseI<{ isMarketClosed: boolean }>> {
   if (traderAPI) {
