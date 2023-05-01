@@ -65,7 +65,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     leverage: orderInfo.leverage,
     reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
     keepPositionLvg: orderInfo.keepPositionLeverage,
-    timestamp: Math.floor(Date.now() / 1000),
+    executionTimestamp: Math.floor(Date.now() / 1000),
     deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
 }
@@ -176,7 +176,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        timestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: Math.floor(Date.now() / 1000),
       });
     }
 
@@ -194,7 +194,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        timestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: Math.floor(Date.now() / 1000),
       });
     }
     return orders;
