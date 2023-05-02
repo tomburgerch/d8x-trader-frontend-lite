@@ -3,7 +3,7 @@
 .root {
   display: flex;
   justify-content: space-between;
-  margin-top: $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
   align-items: center;
 }
 
@@ -29,6 +29,7 @@
 
   :global(.MuiFormControlLabel-root) {
     margin-left: 0;
+    margin-right: 0;
   }
 }
 
