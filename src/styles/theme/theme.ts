@@ -250,6 +250,13 @@ export const theme = createTheme({
         },
       ],
     },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          padding: '0',
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
