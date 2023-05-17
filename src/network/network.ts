@@ -217,7 +217,7 @@ export function getPoolFee(
   traderAddr?: string
 ): Promise<ValidatedResponseI<number>> {
   return fetch(
-    `${getApiUrlByChainId(chainId)}/query-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`,
+    `${getApiUrlByChainId(chainId)}/trading-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`,
     getRequestOptions()
   ).then((data) => {
     if (!data.ok) {
