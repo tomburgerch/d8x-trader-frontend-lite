@@ -7,7 +7,7 @@ import { PaperProps } from '@mui/material/Paper/Paper';
 
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
-import { getOpenOrders, getPoolFee, getPositionRisk } from 'network/network';
+import { getOpenOrders, getTradingFee, getPositionRisk } from 'network/network';
 import {
   openOrdersAtom,
   poolFeeAtom,
@@ -54,7 +54,7 @@ export const CollateralsSelect = memo(() => {
   useEffect(() => {
     if (selectedPool !== null && address) {
       setPoolFee(undefined);
-      getPoolFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
+      getTradingFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
         setPoolFee(data);
       });
     }

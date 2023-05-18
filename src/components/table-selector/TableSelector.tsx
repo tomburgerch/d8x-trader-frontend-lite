@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import type { Dispatch, SetStateAction } from 'react';
 
 import { Box, Button, Card, CardContent, CardHeader } from '@mui/material';
 
@@ -13,7 +12,7 @@ export interface SelectorItemI {
 interface TableSelectorPropsI {
   selectorItems: SelectorItemI[];
   activeIndex: number;
-  setActiveIndex: Dispatch<SetStateAction<number>>;
+  setActiveIndex: (index: number) => void;
 }
 
 export const TableSelector = ({ selectorItems, activeIndex, setActiveIndex }: TableSelectorPropsI) => {
