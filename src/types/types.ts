@@ -139,8 +139,9 @@ export interface OrderI {
   stopPrice?: number | undefined;
   leverage?: number | undefined;
   deadline?: number | undefined;
-  timestamp: number;
-  submittedBlock?: number;
+  executionTimestamp: number;
+  submittedTimestamp?: number;
+  parentChildOrderIds?: [string, string];
 }
 
 export interface OrderWithIdI extends OrderI {
@@ -158,9 +159,9 @@ export interface SmartContractOrderI {
   fAmount: BigNumberish;
   fLimitPrice: BigNumberish;
   fTriggerPrice: BigNumberish;
-  fLeverage: BigNumberish;
+  leverageTDR: BigNumberish;
   iDeadline: BigNumberish;
-  createdTimestamp: BigNumberish;
+  executionTimestamp: BigNumberish;
   submittedTimestamp: BigNumberish;
 }
 

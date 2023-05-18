@@ -24,7 +24,7 @@ export function getExchangeInfo(
   if (traderAPI) {
     // console.log('exchangeInfo via SDK');
     return traderAPI.exchangeInfo().then((info) => {
-      return { type: 'exchangeInfo', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
+      return { type: 'exchange-info', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
     });
   } else {
     // console.log('exchangeInfo via BE');
@@ -46,7 +46,7 @@ export function getPerpetualStaticInfo(
   if (traderAPI) {
     // console.log('perpStaticInfo via SDK');
     const info = traderAPI.getPerpetualStaticInfo(symbol);
-    return Promise.resolve({ type: 'perpetualStaticInfo', msg: '', data: info });
+    return Promise.resolve({ type: 'perpetual-static-info', msg: '', data: info });
   } else {
     // console.log('perpStaticInfo via BE');
     return fetch(`${getApiUrlByChainId(chainId)}/perpetual-static-info?symbol=${symbol}`, getRequestOptions()).then(
@@ -92,7 +92,7 @@ export function getPositionRisk(
   if (traderAPI) {
     // console.log(`positionRisk via SDK ${symbol}`);
     return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
-      return { type: 'positionRisk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
+      return { type: 'position-risk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
     });
   } else {
     // console.log(`positionRisk via BE ${symbol}`);
@@ -116,7 +116,7 @@ export function positionRiskOnTrade(
   if (traderAPI) {
     // console.log('positionRiskOnTrade via SDK');
     return traderAPI.positionRiskOnTrade(traderAddr, order, curAccount).then((data) => {
-      return { type: 'positionRiskOnTrade', msg: '', data: data } as ValidatedResponseI<{
+      return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;
         orderCost: number;
       }>;
@@ -152,7 +152,7 @@ export function positionRiskOnCollateralAction(
     return traderAPI.positionRiskOnCollateralAction(amount, positionRisk).then((data) => {
       return traderAPI.getAvailableMargin(traderAddr, positionRisk.symbol).then((margin) => {
         return {
-          type: 'positionRiskOnCollateralAction',
+          type: 'position-risk-on-collateral-action',
           msg: '',
           data: { newPositionRisk: data, availableMargin: margin },
         } as ValidatedResponseI<{ newPositionRisk: MarginAccountI; availableMargin: number }>;
@@ -188,7 +188,7 @@ export function getOpenOrders(
   if (traderAPI) {
     // console.log(`openOrders via SDK ${symbol} `);
     return traderAPI.openOrders(traderAddr, symbol).then((data) => {
-      return { type: 'openOrders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
+      return { type: 'open-orders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
     });
   } else {
     // console.log(`openOrders via BE ${symbol}`);
@@ -244,7 +244,7 @@ export function getMaxOrderSizeForTrader(
           return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk).then((buy) => {
             return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk).then((sell) => {
               return {
-                type: 'maxOrderSizeForTrader',
+                type: 'max-order-size-for-trader',
                 msg: '',
                 data: { buy: buy, sell: sell },
               } as ValidatedResponseI<MaxOrderSizeResponseI>;
@@ -291,7 +291,7 @@ export function orderDigest(
       traderAddr,
     }),
   };
-  return fetch(`${getApiUrlByChainId(chainId)}/order_digest`, requestOptions).then((data) => {
+  return fetch(`${getApiUrlByChainId(chainId)}/order-digest`, requestOptions).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);
@@ -311,7 +311,7 @@ export function getCancelOrder(
     return traderAPI.cancelOrderDigest(symbol, orderId).then((digest) => {
       return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
         return {
-          type: 'cancelOrder',
+          type: 'cancel-order',
           msg: '',
           data: {
             OrderBookAddr: digest.OBContractAddr,
@@ -353,7 +353,7 @@ export function getAddCollateral(
     const amountHex = floatToABK64x64(amount);
     return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
       return {
-        type: 'addCollateral',
+        type: 'add-collateral',
         msg: '',
         data: {
           perpId: perpId,
@@ -390,7 +390,7 @@ export function getAvailableMargin(
 ): Promise<ValidatedResponseI<{ amount: number }>> {
   if (traderAPI) {
     return traderAPI.getAvailableMargin(traderAddr, symbol).then((margin) => {
-      return { type: 'availableMargin', msg: '', data: { amount: margin } };
+      return { type: 'available-margin', msg: '', data: { amount: margin } };
     });
   } else {
     return fetch(
@@ -419,7 +419,7 @@ export function getRemoveCollateral(
     const amountHex = floatToABK64x64(amount);
     return traderAPI.fetchLatestFeedPriceInfo(symbol).then((submission) => {
       return {
-        type: 'removeCollateral',
+        type: 'remove-collateral',
         msg: '',
         data: {
           perpId: perpId,
