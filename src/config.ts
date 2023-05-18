@@ -1,7 +1,8 @@
 const {
-  REACT_APP_API_URL: apiUrl = '',
-  REACT_APP_WEBSOCKET_URL: wsUrl = '',
-  REACT_APP_CANDLES_WEBSOCKET_URL: candlesWsUrl = '',
+  REACT_APP_API_URL: apiUrls = '',
+  REACT_APP_HISTORY_URL: historyUrls = '',
+  REACT_APP_WEBSOCKET_URL: wsUrls = '',
+  REACT_APP_CANDLES_WEBSOCKET_URL: candlesWsUrls = '',
 } = process.env;
 
 const URLS_SEPARATOR = ';';
@@ -20,7 +21,8 @@ function parseUrls(urlData: string): Record<string, string> {
 }
 
 export const config = {
-  apiUrl: parseUrls(apiUrl),
-  wsUrl: parseUrls(wsUrl),
-  candlesWsUrl: parseUrls(candlesWsUrl),
+  apiUrl: parseUrls(apiUrls),
+  historyUrl: parseUrls(historyUrls),
+  wsUrl: parseUrls(wsUrls),
+  candlesWsUrl: parseUrls(candlesWsUrls),
 };

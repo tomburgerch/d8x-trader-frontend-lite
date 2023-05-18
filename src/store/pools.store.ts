@@ -4,15 +4,19 @@ import { TraderInterface } from '@d8x/perpetuals-sdk';
 
 import type {
   MarginAccountI,
+  PerpetualDataI,
   PerpetualOpenOrdersI,
   PerpetualStatisticsI,
   PerpetualStaticInfoI,
   PoolI,
   OrderI,
+  TradeHistoryI,
+  FundingI,
 } from 'types/types';
 
 export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const poolsAtom = atom<PoolI[]>([]);
+export const perpetualsAtom = atom<PerpetualDataI[]>([]);
 export const poolFeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
 export const proxyAddrAtom = atom<string | undefined>(undefined);
@@ -24,6 +28,8 @@ export const webSocketReadyAtom = atom(false);
 export const loyaltyScoreAtom = atom(0);
 export const proxyABIAtom = atom<string[] | undefined>(undefined);
 export const poolTokenBalanceAtom = atom<number | undefined>(undefined);
+export const tradesHistoryAtom = atom<TradeHistoryI[]>([]);
+export const fundingListAtom = atom<FundingI[]>([]);
 
 const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
 const ordersAtom = atom<Record<string, OrderI>>({});

@@ -11,6 +11,7 @@ import {
   poolsAtom,
   proxyAddrAtom,
   selectedPoolAtom,
+  perpetualsAtom,
 } from 'store/pools.store';
 
 import { Container } from '../container/Container';
@@ -22,6 +23,8 @@ import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect'
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
+import { PerpetualDataI } from '../../types/types';
+import { createSymbol } from '../../helpers/createSymbol';
 
 // Might be used later
 // interface HeaderPropsI {
@@ -43,6 +46,7 @@ export const Header = memo(() => {
   const { address } = useAccount();
 
   const [, setPools] = useAtom(poolsAtom);
+  const [, setPerpetuals] = useAtom(perpetualsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
@@ -59,12 +63,31 @@ export const Header = memo(() => {
       setProxyAddr(undefined);
       getExchangeInfo(chainId, null).then(({ data }) => {
         setPools(data.pools);
+
+        const perpetuals: PerpetualDataI[] = [];
+        data.pools.forEach((pool) => {
+          perpetuals.push(
+            ...pool.perpetuals.map((perpetual) => ({
+              id: perpetual.id,
+              poolName: pool.poolSymbol,
+              baseCurrency: perpetual.baseCurrency,
+              quoteCurrency: perpetual.quoteCurrency,
+              symbol: createSymbol({
+                poolSymbol: pool.poolSymbol,
+                baseCurrency: perpetual.baseCurrency,
+                quoteCurrency: perpetual.quoteCurrency,
+              }),
+            }))
+          );
+        });
+        setPerpetuals(perpetuals);
+
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
       });
       requestRef.current = false;
     }
-  }, [chainId, setPools, setOracleFactoryAddr, setProxyAddr]);
+  }, [chainId, setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,

@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -9,6 +9,8 @@ import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PerpetualStats } from 'components/perpetual-stats/PerpetualStats';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
+import { FundingTable } from 'components/funding-table/FundingTable';
+import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
 
@@ -18,9 +20,11 @@ export const TraderPage = memo(() => {
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('xl'));
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeAllIndex, setActiveAllIndex] = useState(0);
+  const [activePositionIndex, setActivePositionIndex] = useState(0);
+  const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
 
-  const selectorItems: SelectorItemI[] = useMemo(
+  const positionItems: SelectorItemI[] = useMemo(
     () => [
       {
         label: 'Positions',
@@ -34,6 +38,52 @@ export const TraderPage = memo(() => {
     []
   );
 
+  const historyItems: SelectorItemI[] = useMemo(
+    () => [
+      {
+        label: 'Trade History',
+        item: <TradeHistoryTable />,
+      },
+      {
+        label: 'Funding',
+        item: <FundingTable />,
+      },
+    ],
+    []
+  );
+
+  const selectorForAllItems: SelectorItemI[] = useMemo(
+    () => [...positionItems, ...historyItems],
+    [positionItems, historyItems]
+  );
+
+  const handleActiveAllIndex = useCallback(
+    (index: number) => {
+      setActiveAllIndex(index);
+
+      const firstTableItems = positionItems.length;
+      if (index < firstTableItems) {
+        setActivePositionIndex(index);
+      } else {
+        setActiveHistoryIndex(index - firstTableItems);
+      }
+    },
+    [positionItems]
+  );
+
+  const handlePositionsIndex = useCallback((index: number) => {
+    setActiveAllIndex(index);
+    setActivePositionIndex(index);
+  }, []);
+
+  const handleHistoryIndex = useCallback(
+    (index: number) => {
+      setActiveAllIndex(index + positionItems.length);
+      setActiveHistoryIndex(index);
+    },
+    [positionItems]
+  );
+
   return (
     <Box className={styles.root}>
       <Header />
@@ -42,7 +92,11 @@ export const TraderPage = memo(() => {
           <Box className={styles.leftBlock}>
             <PerpetualStats />
             <TradingViewChart />
-            <TableSelector selectorItems={selectorItems} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+            <TableSelector
+              selectorItems={selectorForAllItems}
+              activeIndex={activeAllIndex}
+              setActiveIndex={handleActiveAllIndex}
+            />
           </Box>
           <Box className={styles.rightBlock}>
             <OrderBlock />
@@ -54,7 +108,16 @@ export const TraderPage = memo(() => {
           <PerpetualStats />
           <TradingViewChart />
           <OrderBlock />
-          <TableSelector selectorItems={selectorItems} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+          <TableSelector
+            selectorItems={positionItems}
+            activeIndex={activePositionIndex}
+            setActiveIndex={handlePositionsIndex}
+          />
+          <TableSelector
+            selectorItems={historyItems}
+            activeIndex={activeHistoryIndex}
+            setActiveIndex={handleHistoryIndex}
+          />
         </Container>
       )}
       <Footer />

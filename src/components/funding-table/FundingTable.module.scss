@@ -1,0 +1,85 @@
+@import 'styles/theme/theme';
+
+.refreshHolder {
+  text-align: right;
+  padding-right: 4 * $d8x-spacing;
+  padding-top: 2 * $d8x-spacing;
+}
+
+.actionIcon {
+  cursor: pointer;
+  transition: opacity linear 200ms;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.helperText {
+  text-align: right;
+  margin-top: $d8x-spacing / 2;
+}
+
+.tableHead {
+  background-color: var(--d8x-color-white);
+
+  :global(.MuiTypography-root) {
+    font-weight: 400;
+  }
+}
+
+.tableBody {
+  background-color: var(--d8x-color-white-opac);
+
+  :global(.MuiTypography-root) {
+    color: var(--d8x-color-purple);
+  }
+}
+
+.noData {
+  text-align: center;
+}
+
+.paginationHolder {
+  display: flex;
+  justify-content: center;
+}
+
+.dialog {
+
+  :global(.MuiPaper-root) {
+    max-width: 400px;
+    width: 100%;
+  }
+}
+
+.centered {
+  display: block;
+  text-align: center;
+}
+
+.newPositionHeader {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.newPositionDetails {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+@media screen and ($d8x-breakpoint-min-md) and ($d8x-breakpoint-max-lg) {
+
+  .root {
+
+    :global(.MuiTableCell-root) {
+      padding: 16px;
+    }
+  }
+}

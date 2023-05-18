@@ -19,6 +19,14 @@ export interface PerpetualI {
   isMarketClosed: boolean;
 }
 
+export interface PerpetualDataI {
+  id: number;
+  poolName: string;
+  baseCurrency: string;
+  quoteCurrency: string;
+  symbol: string;
+}
+
 export interface PerpetualStatisticsI {
   id: number;
   baseCurrency: string;
@@ -203,4 +211,25 @@ export interface TvChartCandleI {
   high: number;
   low: number;
   close: number;
+}
+
+export interface TradeHistoryI {
+  chainId: number;
+  perpetualId: number;
+  orderId: string;
+  orderFlags: string;
+  side: string;
+  price: number;
+  quantity: number;
+  fee: number;
+  realizedPnl: number;
+  transactionHash: string;
+  timestamp: string;
+}
+
+export interface FundingI {
+  perpetualId: number;
+  amount: number;
+  timestamp: string;
+  transactionHash: string;
 }

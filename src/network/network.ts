@@ -211,7 +211,7 @@ export function getOpenOrders(
 }
 
 // needs broker input, should go through backend
-export function getPoolFee(
+export function getTradingFee(
   chainId: number,
   poolSymbol: string,
   traderAddr?: string
