@@ -19,7 +19,7 @@ import {
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { getTradesHistory } from 'network/history';
-import { perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
+import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
 import type { TableHeaderI } from 'types/types';
 
@@ -31,6 +31,7 @@ import styles from './TradeHistoryTable.module.scss';
 export const TradeHistoryTable = memo(() => {
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
+  const [openOrders] = useAtom(openOrdersAtom);
 
   const updateTradesHistoryRef = useRef(false);
 
@@ -60,7 +61,7 @@ export const TradeHistoryTable = memo(() => {
 
   useEffect(() => {
     refreshTradesHistory();
-  }, [refreshTradesHistory]);
+  }, [openOrders, refreshTradesHistory]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
