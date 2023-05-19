@@ -19,7 +19,7 @@ import {
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { getFundingRatePayments } from 'network/history';
-import { fundingListAtom, perpetualsAtom } from 'store/pools.store';
+import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
 import type { TableHeaderI } from 'types/types';
 
@@ -31,6 +31,7 @@ import styles from './FundingTable.module.scss';
 export const FundingTable = memo(() => {
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
+  const [positions] = useAtom(positionsAtom);
 
   const updateTradesHistoryRef = useRef(false);
 
@@ -60,7 +61,7 @@ export const FundingTable = memo(() => {
 
   useEffect(() => {
     refreshFundingList();
-  }, [refreshFundingList]);
+  }, [positions, refreshFundingList]); // "positions" change should affect refresh for Funding table
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
