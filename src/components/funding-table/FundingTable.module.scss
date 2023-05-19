@@ -51,29 +51,6 @@
   justify-content: center;
 }
 
-.dialog {
-
-  :global(.MuiPaper-root) {
-    max-width: 400px;
-    width: 100%;
-  }
-}
-
-.centered {
-  display: block;
-  text-align: center;
-}
-
-.newPositionHeader {
-  margin-top: $d8x-spacing * 3;
-  margin-bottom: $d8x-spacing * 3;
-}
-
-.newPositionDetails {
-  margin-top: $d8x-spacing * 3;
-  margin-bottom: $d8x-spacing * 3;
-}
-
 @media screen and ($d8x-breakpoint-min-md) and ($d8x-breakpoint-max-lg) {
 
   .root {

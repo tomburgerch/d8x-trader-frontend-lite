@@ -78,7 +78,7 @@ export const TradeHistoryTable = memo(() => {
       { label: 'Side', align: AlignE.Left },
       // { label: 'Type', align: AlignE.Left },
       { label: 'Price', align: AlignE.Right },
-      { label: 'Quantity', align: AlignE.Left },
+      { label: 'Quantity', align: AlignE.Right },
       { label: 'Fee', align: AlignE.Right },
       { label: 'Realized Profit', align: AlignE.Right },
       { label: <RefreshIcon onClick={refreshTradesHistory} className={styles.actionIcon} />, align: AlignE.Center },
