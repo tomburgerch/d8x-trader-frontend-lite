@@ -18,8 +18,7 @@ export const OrderTypeSelector = memo(() => {
         <Button
           key={key}
           className={classNames({ [styles.selected]: key === orderType })}
-          variant={key === orderType ? 'primary' : 'secondary'}
-          size="small"
+          variant="link"
           onClick={() => setOrderType(key)}
         >
           {OrderTypeE[key]}

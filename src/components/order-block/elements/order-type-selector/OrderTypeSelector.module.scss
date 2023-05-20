@@ -2,6 +2,13 @@
 
 .root {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: $d8x-spacing * 2;
+  justify-content: flex-start;
+  gap: $d8x-spacing * 2;
+  margin-top: $d8x-spacing * 4;
+  margin-bottom: $d8x-spacing * 8;
+}
+
+.selected {
+  text-decoration: underline;
+  font-weight: bold;
 }

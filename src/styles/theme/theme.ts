@@ -57,6 +57,9 @@ declare module '@mui/material/Button' {
     success: true;
     warning: true;
     action: true;
+    link: true;
+    buy: true;
+    sell: true;
   }
   interface ButtonPropsSizeOverrides {
     small: true;
@@ -70,7 +73,7 @@ const MuiButtonSharedStyle = {
   transition: 'ease-in-out 250ms',
   borderRadius: '26px',
   padding: '10px 20px',
-  fontSize: '16px',
+  fontSize: '18px',
   fontWeight: 700,
 };
 
@@ -225,6 +228,55 @@ export const theme = createTheme({
             color: 'var(--d8x-color-purple)',
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+            },
+          },
+        },
+        {
+          props: { variant: 'buy' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'rgba(var(--d8x-background-buy-rgb), 1)',
+            color: 'var(--d8x-color-white)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-background-buy-rgb), 0.9)',
+              color: 'var(--d8x-color-white)',
+            },
+            ':disabled': {
+              backgroundColor: 'rgba(var(--d8x-background-buy-rgb), 0.5)',
+              color: 'var(--d8x-color-white)',
+            },
+          },
+        },
+        {
+          props: { variant: 'sell' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'rgba(var(--d8x-background-sell-rgb), 1)',
+            color: 'var(--d8x-color-white)',
+            ':hover': {
+              backgroundColor: 'rgba(var(--d8x-background-sell-rgb), 0.9)',
+              color: 'var(--d8x-color-white)',
+            },
+            ':disabled': {
+              backgroundColor: 'rgba(var(--d8x-background-sell-rgb), 0.5)',
+              color: 'var(--d8x-color-white)',
+            },
+          },
+        },
+        {
+          props: { variant: 'link' },
+          style: {
+            ...MuiButtonSharedStyle,
+            padding: '3px 16px',
+            fontWeight: 'normal',
+            minWidth: '60px',
+            border: 0,
+            borderRadius: '4px',
+            backgroundColor: 'transparent',
+            color: 'var(--d8x-color-purple)',
+            ':hover': {
+              backgroundColor: 'transparent',
+              textDecoration: 'underline',
             },
           },
         },
