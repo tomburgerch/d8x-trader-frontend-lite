@@ -267,7 +267,7 @@ export const theme = createTheme({
           props: { variant: 'link' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '3px 16px',
+            padding: '0px',
             fontWeight: 'normal',
             minWidth: '60px',
             border: 0,
@@ -277,6 +277,7 @@ export const theme = createTheme({
             ':hover': {
               backgroundColor: 'transparent',
               textDecoration: 'underline',
+              textUnderlineOffset: '8px',
             },
           },
         },
