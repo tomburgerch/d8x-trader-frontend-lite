@@ -17,11 +17,11 @@ import {
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
-  proxyAddrAtom,
-  selectedPoolAtom,
   positionsAtom,
-  traderAPIAtom,
+  proxyAddrAtom,
   selectedPerpetualAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
@@ -329,7 +329,7 @@ export const ActionBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Button
-        variant="primary"
+        variant={orderInfo?.orderBlock === OrderBlockE.Short ? 'sell' : 'buy'}
         disabled={!isBuySellButtonActive}
         onClick={openReviewOrderModal}
         className={styles.buyButton}
