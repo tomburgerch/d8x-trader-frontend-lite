@@ -86,9 +86,6 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     return null;
   }
   const poolFee = get(poolFeeAtom);
-  if (poolFee === undefined) {
-    return null;
-  }
 
   const newPositionRisk = get(newPositionRiskAtom);
   const collateralDeposit = get(collateralDepositAtom);
@@ -123,11 +120,14 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     leverage = newPositionRisk?.leverage ?? 0;
   }
 
-  let tradingFee = poolFee / 10;
-  if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
-    tradingFee = tradingFee * 3;
-  } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
-    tradingFee = tradingFee * 2;
+  let tradingFee = null;
+  if (poolFee) {
+    tradingFee = poolFee / 10;
+    if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
+      tradingFee = tradingFee * 3;
+    } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
+      tradingFee = tradingFee * 2;
+    }
   }
 
   let maxMinEntryPrice = null;

@@ -111,7 +111,7 @@ export interface OrderInfoI {
   leverage: number;
   size: number;
   midPrice: number;
-  tradingFee: number;
+  tradingFee: number | null;
   collateral: number;
   maxMinEntryPrice: number | null;
   keepPositionLeverage: boolean;
