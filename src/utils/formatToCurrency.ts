@@ -5,8 +5,8 @@ const mapCurrencyToFractionDigits: Record<string, number> = {
   ETH: 5,
 };
 
-export function formatToCurrency(value: number | undefined, currency = 'USD', fractionDigits?: number) {
-  if (value === undefined) {
+export function formatToCurrency(value: number | undefined | null, currency = 'USD', fractionDigits?: number) {
+  if (value == null) {
     return '-';
   }
   return `${new Intl.NumberFormat('en-US', {
