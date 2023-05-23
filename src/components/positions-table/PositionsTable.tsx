@@ -495,10 +495,22 @@ export const PositionsTable = memo(() => {
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
-              {positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((position) => (
-                <PositionRow key={position.symbol} position={position} handlePositionModify={handlePositionModify} />
-              ))}
-              {positions.length === 0 && <EmptyTableRow colSpan={positionsHeaders.length} text="No open positions" />}
+              {address &&
+                positions
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((position) => (
+                    <PositionRow
+                      key={position.symbol}
+                      position={position}
+                      handlePositionModify={handlePositionModify}
+                    />
+                  ))}
+              {(!address || positions.length === 0) && (
+                <EmptyTableRow
+                  colSpan={positionsHeaders.length}
+                  text={!address ? 'Please connect your wallet' : 'No open positions'}
+                />
+              )}
             </TableBody>
           </MuiTable>
         </TableContainer>
@@ -509,19 +521,24 @@ export const PositionsTable = memo(() => {
             <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />
           </Box>
           <Box>
-            {positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((position) => (
-              <PositionBlock
-                key={position.symbol}
-                headers={positionsHeaders}
-                position={position}
-                handlePositionModify={handlePositionModify}
-              />
-            ))}
-            {positions.length === 0 && <Box className={styles.noData}>No open positions</Box>}
+            {address &&
+              positions
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((position) => (
+                  <PositionBlock
+                    key={position.symbol}
+                    headers={positionsHeaders}
+                    position={position}
+                    handlePositionModify={handlePositionModify}
+                  />
+                ))}
+            {(!address || positions.length === 0) && (
+              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open positions'}</Box>
+            )}
           </Box>
         </Box>
       )}
-      {positions.length > 5 && (
+      {address && positions.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"

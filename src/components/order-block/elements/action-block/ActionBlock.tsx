@@ -11,7 +11,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
-import { orderInfoAtom } from 'store/order-block.store';
+import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
@@ -90,6 +90,7 @@ export const ActionBlock = memo(() => {
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [, clearInputsData] = useAtom(clearInputsDataAtom);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -222,6 +223,7 @@ export const ActionBlock = memo(() => {
               console.log(`postOrder tx hash: ${tx.hash}`);
               setShowReviewOrderModal(false);
               toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
+              clearInputsData();
             });
           });
         }
@@ -235,7 +237,7 @@ export const ActionBlock = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [parsedOrders, chainId, address, signer, selectedPool, proxyAddr, collateralDeposit]);
+  }, [parsedOrders, chainId, address, signer, selectedPool, proxyAddr, collateralDeposit, clearInputsData]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {

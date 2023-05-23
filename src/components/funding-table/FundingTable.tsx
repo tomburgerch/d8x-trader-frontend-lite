@@ -97,15 +97,23 @@ export const FundingTable = memo(() => {
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
-              {fundingList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((funding) => (
-                <FundingRow
-                  key={`${funding.perpetualId}-${funding.timestamp}`}
-                  headers={fundingListHeaders}
-                  perpetuals={perpetuals}
-                  funding={funding}
+              {address &&
+                fundingList
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((funding) => (
+                    <FundingRow
+                      key={`${funding.perpetualId}-${funding.timestamp}`}
+                      headers={fundingListHeaders}
+                      perpetuals={perpetuals}
+                      funding={funding}
+                    />
+                  ))}
+              {(!address || fundingList.length === 0) && (
+                <EmptyTableRow
+                  colSpan={fundingListHeaders.length}
+                  text={!address ? 'Please connect your wallet' : 'No funding data'}
                 />
-              ))}
-              {fundingList.length === 0 && <EmptyTableRow colSpan={fundingListHeaders.length} text="No funding data" />}
+              )}
             </TableBody>
           </MuiTable>
         </TableContainer>
@@ -116,19 +124,24 @@ export const FundingTable = memo(() => {
             <RefreshIcon onClick={refreshFundingList} className={styles.actionIcon} />
           </Box>
           <Box>
-            {fundingList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((funding) => (
-              <FundingBlock
-                key={`${funding.perpetualId}-${funding.timestamp}`}
-                headers={fundingListHeaders}
-                perpetuals={perpetuals}
-                funding={funding}
-              />
-            ))}
-            {fundingList.length === 0 && <Box className={styles.noData}>No funding data</Box>}
+            {address &&
+              fundingList
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((funding) => (
+                  <FundingBlock
+                    key={`${funding.perpetualId}-${funding.timestamp}`}
+                    headers={fundingListHeaders}
+                    perpetuals={perpetuals}
+                    funding={funding}
+                  />
+                ))}
+            {(!address || fundingList.length === 0) && (
+              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No funding data'}</Box>
+            )}
           </Box>
         </Box>
       )}
-      {fundingList.length > 5 && (
+      {address && fundingList.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"
