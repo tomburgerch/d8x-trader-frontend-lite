@@ -8,6 +8,7 @@ import { PaperProps } from '@mui/material/Paper/Paper';
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getOpenOrders, getTradingFee, getPositionRisk } from 'network/network';
+import { clearInputsDataAtom } from 'store/order-block.store';
 import {
   openOrdersAtom,
   poolFeeAtom,
@@ -48,6 +49,7 @@ export const CollateralsSelect = memo(() => {
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [, clearInputsData] = useAtom(clearInputsDataAtom);
 
   const traderAPIRef = useRef(traderAPI);
 
@@ -57,6 +59,8 @@ export const CollateralsSelect = memo(() => {
       getTradingFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
         setPoolFee(data);
       });
+    } else if (!address) {
+      setPoolFee(undefined);
     }
   }, [selectedPool, setPoolFee, chainId, address]);
 
@@ -100,6 +104,7 @@ export const CollateralsSelect = memo(() => {
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);
     setSelectedPerpetual(value.perpetuals[0].id);
+    clearInputsData();
   };
 
   return (

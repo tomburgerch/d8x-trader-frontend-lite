@@ -197,3 +197,19 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
     takeProfitPrice,
   };
 });
+
+export const clearInputsDataAtom = atom(null, (get, set) => {
+  // TODO: Check it if really required
+  set(orderTypeValueAtom, OrderTypeE.Market);
+
+  set(orderSizeAtom, 0);
+  set(limitPriceValueAtom, -1);
+  set(triggerPriceValueAtom, 0);
+  set(leverageAtom, 1);
+  set(slippageSliderAtom, 4);
+  set(keepPositionLeverageAtom, false);
+  set(reduceOnlyAtom, false);
+  set(expireDaysAtom, ExpiryE['60D']);
+  set(stopLossAtom, StopLossE.None);
+  set(takeProfitAtom, TakeProfitE.None);
+});

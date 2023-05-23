@@ -8,6 +8,7 @@ import { PaperProps } from '@mui/material/Paper/Paper';
 import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
+import { clearInputsDataAtom } from 'store/order-block.store';
 import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
@@ -21,8 +22,6 @@ import { PerpetualI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from './PerpetualsSelect.module.scss';
-import { orderTypeAtom } from 'store/order-block.store';
-import { OrderTypeE } from 'types/enums';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -50,7 +49,7 @@ export const PerpetualsSelect = memo(() => {
   const [, setNewCandles] = useAtom(newCandlesAtom);
   const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [, setOrderType] = useAtom(orderTypeAtom);
+  const [, clearInputsData] = useAtom(clearInputsDataAtom);
 
   const traderAPIRef = useRef(traderAPI);
 
@@ -110,7 +109,7 @@ export const PerpetualsSelect = memo(() => {
 
   const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
     setSelectedPerpetual(value.id);
-    setOrderType(OrderTypeE.Market);
+    clearInputsData();
   };
 
   return (

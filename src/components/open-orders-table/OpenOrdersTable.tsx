@@ -182,10 +182,16 @@ export const OpenOrdersTable = memo(() => {
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
-              {openOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />
-              ))}
-              {openOrders.length === 0 && <EmptyTableRow colSpan={openOrdersHeaders.length} text="No open orders" />}
+              {address &&
+                openOrders
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((order) => <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />)}
+              {(!address || openOrders.length === 0) && (
+                <EmptyTableRow
+                  colSpan={openOrdersHeaders.length}
+                  text={!address ? 'Please connect your wallet' : 'No open orders'}
+                />
+              )}
             </TableBody>
           </MuiTable>
         </TableContainer>
@@ -196,19 +202,24 @@ export const OpenOrdersTable = memo(() => {
             <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />
           </Box>
           <Box>
-            {openOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-              <OpenOrderBlock
-                key={order.id}
-                headers={openOrdersHeaders}
-                order={order}
-                handleOrderCancel={handleOrderCancel}
-              />
-            ))}
-            {openOrders.length === 0 && <Box className={styles.noData}>No open orders</Box>}
+            {address &&
+              openOrders
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((order) => (
+                  <OpenOrderBlock
+                    key={order.id}
+                    headers={openOrdersHeaders}
+                    order={order}
+                    handleOrderCancel={handleOrderCancel}
+                  />
+                ))}
+            {(!address || openOrders.length === 0) && (
+              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open orders'}</Box>
+            )}
           </Box>
         </Box>
       )}
-      {openOrders.length > 5 && (
+      {address && openOrders.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"

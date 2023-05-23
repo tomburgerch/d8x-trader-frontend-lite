@@ -102,16 +102,22 @@ export const TradeHistoryTable = memo(() => {
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
-              {tradesHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((tradeHistory) => (
-                <TradeHistoryRow
-                  key={tradeHistory.orderId}
-                  headers={tradeHistoryHeaders}
-                  perpetuals={perpetuals}
-                  tradeHistory={tradeHistory}
+              {address &&
+                tradesHistory
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((tradeHistory) => (
+                    <TradeHistoryRow
+                      key={tradeHistory.orderId}
+                      headers={tradeHistoryHeaders}
+                      perpetuals={perpetuals}
+                      tradeHistory={tradeHistory}
+                    />
+                  ))}
+              {(!address || tradesHistory.length === 0) && (
+                <EmptyTableRow
+                  colSpan={tradeHistoryHeaders.length}
+                  text={!address ? 'Please connect your wallet' : 'No trade history'}
                 />
-              ))}
-              {tradesHistory.length === 0 && (
-                <EmptyTableRow colSpan={tradeHistoryHeaders.length} text="No trade history" />
               )}
             </TableBody>
           </MuiTable>
@@ -123,19 +129,24 @@ export const TradeHistoryTable = memo(() => {
             <RefreshIcon onClick={refreshTradesHistory} className={styles.actionIcon} />
           </Box>
           <Box>
-            {tradesHistory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((tradeHistory) => (
-              <TradeHistoryBlock
-                key={tradeHistory.orderId}
-                headers={tradeHistoryHeaders}
-                perpetuals={perpetuals}
-                tradeHistory={tradeHistory}
-              />
-            ))}
-            {tradesHistory.length === 0 && <Box className={styles.noData}>No trade history</Box>}
+            {address &&
+              tradesHistory
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((tradeHistory) => (
+                  <TradeHistoryBlock
+                    key={tradeHistory.orderId}
+                    headers={tradeHistoryHeaders}
+                    perpetuals={perpetuals}
+                    tradeHistory={tradeHistory}
+                  />
+                ))}
+            {(!address || tradesHistory.length === 0) && (
+              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No trade history'}</Box>
+            )}
           </Box>
         </Box>
       )}
-      {tradesHistory.length > 5 && (
+      {address && tradesHistory.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"

@@ -1,7 +1,7 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -18,6 +18,8 @@ export const OrderSize = memo(() => {
 
   const [inputValue, setInputValue] = useState(`${orderSize}`);
 
+  const inputValueChangedRef = useRef(false);
+
   const handleInputCapture = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const targetValue = event.target.value;
@@ -28,9 +30,17 @@ export const OrderSize = memo(() => {
         setOrderSize(0);
         setInputValue('');
       }
+      inputValueChangedRef.current = true;
     },
     [setOrderSize]
   );
+
+  useEffect(() => {
+    if (!inputValueChangedRef.current) {
+      setInputValue(`${orderSize}`);
+    }
+    inputValueChangedRef.current = false;
+  }, [orderSize]);
 
   const handleInputBlur = useCallback(() => {
     if (perpetualStaticInfo) {
