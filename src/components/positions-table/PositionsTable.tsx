@@ -1,7 +1,9 @@
-import classnames from 'classnames';
 import { HashZero } from '@ethersproject/constants';
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
@@ -25,8 +27,6 @@ import {
   TablePagination,
   TableRow,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -61,6 +61,8 @@ import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
 
+const MIN_WIDTH_FOR_TABLE = 900;
+
 export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
@@ -71,12 +73,10 @@ export const PositionsTable = memo(() => {
   const traderAPIRef = useRef(traderAPI);
   const updatedPositionsRef = useRef(false);
 
-  const theme = useTheme();
-  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
-
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
   const { data: signer } = useSigner();
+  const { width, ref } = useResizeDetector();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
   const [closePositionChecked, setClosePositionChecked] = useState(false);
@@ -481,9 +481,9 @@ export const PositionsTable = memo(() => {
   }, [selectedPosition, address, modifyType, addCollateral, removeCollateral, newPositionRisk]);
 
   return (
-    <>
-      {!isFluidScreen && (
-        <TableContainer className={styles.root}>
+    <div className={styles.root} ref={ref}>
+      {width && width >= MIN_WIDTH_FOR_TABLE && (
+        <TableContainer className={styles.tableHolder}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
@@ -515,7 +515,7 @@ export const PositionsTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isFluidScreen && (
+      {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />
@@ -648,6 +648,6 @@ export const PositionsTable = memo(() => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 });

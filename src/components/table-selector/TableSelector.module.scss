@@ -1,7 +1,6 @@
 @import 'styles/theme/theme';
 
 .root {
-  max-width: 920px;
 
   &:global(.MuiPaper-root) {
     background-color: transparent;
@@ -51,4 +50,5 @@
 
 .content {
   padding: 0;
+  overflow-x: auto;
 }

@@ -1,5 +1,9 @@
 @import 'styles/theme/theme';
 
+.root {
+  overflow-x: auto;
+}
+
 .refreshHolder {
   text-align: right;
   padding-right: 4 * $d8x-spacing;
@@ -76,7 +80,7 @@
 
 @media screen and ($d8x-breakpoint-min-md) and ($d8x-breakpoint-max-lg) {
 
-  .root {
+  .tableHolder {
 
     :global(.MuiTableCell-root) {
       padding: 16px;

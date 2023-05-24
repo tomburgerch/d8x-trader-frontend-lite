@@ -1,5 +1,7 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
 import {
@@ -12,8 +14,6 @@ import {
   TablePagination,
   TableRow,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -28,6 +28,8 @@ import { TradeHistoryRow } from './elements/TradeHistoryRow';
 
 import styles from './TradeHistoryTable.module.scss';
 
+const MIN_WIDTH_FOR_TABLE = 900;
+
 export const TradeHistoryTable = memo(() => {
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
@@ -35,11 +37,9 @@ export const TradeHistoryTable = memo(() => {
 
   const updateTradesHistoryRef = useRef(false);
 
-  const theme = useTheme();
-  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
-
   const chainId = useChainId();
   const { address, isConnected } = useAccount();
+  const { width, ref } = useResizeDetector();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -88,9 +88,9 @@ export const TradeHistoryTable = memo(() => {
   );
 
   return (
-    <>
-      {!isFluidScreen && (
-        <TableContainer className={styles.root}>
+    <div className={styles.root} ref={ref}>
+      {width && width >= MIN_WIDTH_FOR_TABLE && (
+        <TableContainer className={styles.tableHolder}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
@@ -123,7 +123,7 @@ export const TradeHistoryTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isFluidScreen && (
+      {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshTradesHistory} className={styles.actionIcon} />
@@ -160,6 +160,6 @@ export const TradeHistoryTable = memo(() => {
           />
         </Box>
       )}
-    </>
+    </div>
   );
 });

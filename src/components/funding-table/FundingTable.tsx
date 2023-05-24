@@ -1,5 +1,7 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
 import {
@@ -12,8 +14,6 @@ import {
   TablePagination,
   TableRow,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -35,11 +35,9 @@ export const FundingTable = memo(() => {
 
   const updateTradesHistoryRef = useRef(false);
 
-  const theme = useTheme();
-  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
-
   const chainId = useChainId();
   const { address, isConnected } = useAccount();
+  const { width, ref } = useResizeDetector();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -83,8 +81,8 @@ export const FundingTable = memo(() => {
   );
 
   return (
-    <>
-      {!isFluidScreen && (
+    <div className={styles.root} ref={ref}>
+      {width && width >= 600 && (
         <TableContainer className={styles.root}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
@@ -118,7 +116,7 @@ export const FundingTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isFluidScreen && (
+      {(!width || width < 600) && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshFundingList} className={styles.actionIcon} />
@@ -155,6 +153,6 @@ export const FundingTable = memo(() => {
           />
         </Box>
       )}
-    </>
+    </div>
   );
 });
