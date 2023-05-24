@@ -36,6 +36,13 @@
   margin-left: $d8x-spacing * 2.5;
 }
 
+@media screen and ($d8x-breakpoint-max-lg) {
+  .rightBlock {
+    max-width: 475px;
+    min-width: 475px;
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .root {
