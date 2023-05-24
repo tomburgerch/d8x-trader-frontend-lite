@@ -83,7 +83,7 @@ export const theme = createTheme({
       xs: 0,
       sm: 600,
       md: 968,
-      lg: 1200,
+      lg: 1280,
       xl: 1650,
     },
   },
@@ -102,6 +102,14 @@ export const theme = createTheme({
           boxShadow: 'none',
           backgroundColor: 'transparent',
           color: 'var(--d8x-text-color)',
+        },
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          paddingLeft: '20px',
+          paddingRight: '20px',
         },
       },
     },
@@ -431,13 +439,19 @@ export const theme = createTheme({
   },
 });
 
-// Define table responsive typography
+// Define MuiContainer responsive styles
 
-if (theme.components?.MuiTableCell?.styleOverrides?.root) {
-  theme.components.MuiTableCell.styleOverrides.root = {
-    fontSize: 14,
-    fontWeight: 400,
-    whiteSpace: 'nowrap',
+if (theme.components?.MuiContainer?.styleOverrides?.root) {
+  theme.components.MuiContainer.styleOverrides.root = {
+    [theme.breakpoints.up('lg')]: {
+      paddingLeft: '16px !important',
+      paddingRight: '16px !important',
+    },
+    [theme.breakpoints.up('xl')]: {
+      paddingLeft: '32px !important',
+      paddingRight: '32px !important',
+      maxWidth: '100%',
+    },
   };
 }
 

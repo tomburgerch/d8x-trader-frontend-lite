@@ -1,5 +1,9 @@
 @import 'styles/theme/theme';
 
+.root {
+  overflow-x: auto;
+}
+
 .actionIcon {
   cursor: pointer;
   transition: opacity linear 200ms;
@@ -42,7 +46,7 @@
 
 @media screen and ($d8x-breakpoint-min-md) and ($d8x-breakpoint-max-lg) {
 
-  .root {
+  .tableHolder {
 
     :global(.MuiTableCell-root) {
       padding: 16px;

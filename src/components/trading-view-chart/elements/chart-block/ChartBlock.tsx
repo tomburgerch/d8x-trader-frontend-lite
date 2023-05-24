@@ -14,7 +14,7 @@ export const ChartBlock = memo(({ width, candles, seriesRef }: CandlesSeriesProp
   return (
     <Chart
       width={width}
-      height={Math.round(Math.max((width || 450) * 0.5, 300))}
+      height={Math.round(Math.min(Math.max((width || 450) * 0.5, 300), 450))}
       crosshair={{ mode: CrosshairMode.Normal }}
       timeScale={{ timeVisible: true, barSpacing: candles.length < 60 ? 22 : 8 }}
     >

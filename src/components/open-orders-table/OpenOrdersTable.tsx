@@ -17,8 +17,6 @@ import {
   TablePagination,
   TableRow,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 
 import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
@@ -37,14 +35,15 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
+import { useResizeDetector } from 'react-resize-detector';
+
+const MIN_WIDTH_FOR_TABLE = 900;
 
 export const OpenOrdersTable = memo(() => {
   const { address, isDisconnected } = useAccount();
   const chainId = useChainId();
   const { data: signer } = useSigner();
-
-  const theme = useTheme();
-  const isFluidScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { width, ref } = useResizeDetector();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
@@ -168,9 +167,9 @@ export const OpenOrdersTable = memo(() => {
   );
 
   return (
-    <>
-      {!isFluidScreen && (
-        <TableContainer className={styles.root}>
+    <div className={styles.root} ref={ref}>
+      {width && width >= MIN_WIDTH_FOR_TABLE && (
+        <TableContainer className={styles.tableHolder}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
@@ -196,7 +195,7 @@ export const OpenOrdersTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {isFluidScreen && (
+      {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />
@@ -245,6 +244,6 @@ export const OpenOrdersTable = memo(() => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 });

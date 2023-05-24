@@ -18,7 +18,7 @@ import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
-  const isBigScreen = useMediaQuery(theme.breakpoints.up('xl'));
+  const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
