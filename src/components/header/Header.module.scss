@@ -23,6 +23,7 @@
 .leftSide {
   display: flex;
   width: 900px;
+  flex: 1;
 }
 
 .logoLink {
@@ -32,7 +33,6 @@
 
 .selectBoxes {
   display: flex;
-  flex-grow: 2;
 }
 
 .mobileSelectBoxes {
@@ -47,7 +47,6 @@
 .walletConnect {
   justify-content: right;
   display: flex;
-  flex-grow: 1;
   gap: 15px;
 }
 
