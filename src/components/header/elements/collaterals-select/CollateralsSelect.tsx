@@ -66,19 +66,21 @@ export const CollateralsSelect = memo(() => {
 
   useEffect(() => {
     if (selectedPool !== null && address) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
+      getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
+        .then(({ data }) => {
+          data.map((o) => setOpenOrders(o));
+        })
+        .catch((err) => {
+          console.log(err);
         });
-        getOpenOrders(chainId, traderAPIRef.current, symbol, address).then(({ data }) => {
-          setOpenOrders(data);
+
+      getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address)
+        .then(({ data }) => {
+          data.map((p) => setPositions(p));
+        })
+        .catch((err) => {
+          console.log(err);
         });
-        getPositionRisk(chainId, traderAPIRef.current, symbol, address).then(({ data }) => {
-          setPositions(data);
-        });
-      });
     }
   }, [selectedPool, chainId, address, setOpenOrders, setPositions]);
 
