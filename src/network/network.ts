@@ -80,7 +80,7 @@ export function getPositionRisk(
   symbol: string,
   traderAddr: string,
   timestamp?: number
-): Promise<ValidatedResponseI<MarginAccountI>> {
+): Promise<ValidatedResponseI<MarginAccountI[]>> {
   const params = new URLSearchParams({
     symbol,
     traderAddr,
@@ -91,8 +91,8 @@ export function getPositionRisk(
 
   if (traderAPI) {
     // console.log(`positionRisk via SDK ${symbol}`);
-    return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI) => {
-      return { type: 'position-risk', msg: '', data: data } as ValidatedResponseI<MarginAccountI>;
+    return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI[]) => {
+      return { type: 'position-risk', msg: '', data: data } as ValidatedResponseI<MarginAccountI[]>;
     });
   } else {
     // console.log(`positionRisk via BE ${symbol}`);
@@ -184,11 +184,11 @@ export function getOpenOrders(
   symbol: string,
   traderAddr: string,
   timestamp?: number
-): Promise<ValidatedResponseI<PerpetualOpenOrdersI>> {
+): Promise<ValidatedResponseI<PerpetualOpenOrdersI[]>> {
   if (traderAPI) {
     // console.log(`openOrders via SDK ${symbol} `);
     return traderAPI.openOrders(traderAddr, symbol).then((data) => {
-      return { type: 'open-orders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI>;
+      return { type: 'open-orders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI[]>;
     });
   } else {
     // console.log(`openOrders via BE ${symbol}`);
@@ -241,8 +241,8 @@ export function getMaxOrderSizeForTrader(
       traderAPI
         .positionRisk(traderAddr, symbol)
         .then((positionRisk) => {
-          return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk).then((buy) => {
-            return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk).then((sell) => {
+          return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk[0]).then((buy) => {
+            return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk[0]).then((sell) => {
               return {
                 type: 'max-order-size-for-trader',
                 msg: '',

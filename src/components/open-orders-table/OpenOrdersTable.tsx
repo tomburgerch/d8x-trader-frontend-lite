@@ -25,7 +25,6 @@ import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { createSymbol } from 'helpers/createSymbol';
 import { getCancelOrder, getOpenOrders } from 'network/network';
 import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { AlignE } from 'types/enums';
@@ -131,16 +130,11 @@ export const OpenOrdersTable = memo(() => {
 
   const refreshOpenOrders = useCallback(() => {
     if (selectedPool !== null && address && !isDisconnected) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
-        });
-        getOpenOrders(chainId, traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
-          setOpenOrders(data);
-        });
-      });
+      getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
+        .then(({ data }) => {
+          data.map((o) => setOpenOrders(o));
+        })
+        .catch((err) => console.log(err));
     }
   }, [chainId, address, selectedPool, isDisconnected, setOpenOrders]);
 

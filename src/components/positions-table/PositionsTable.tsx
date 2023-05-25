@@ -89,7 +89,6 @@ export const PositionsTable = memo(() => {
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [positionRiskSent, setPositionRiskSent] = useState(false);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -281,21 +280,12 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(() => {
-    if (selectedPool?.perpetuals && address && isConnected && !positionRiskSent) {
-      setPositionRiskSent(true);
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
-        });
-        getPositionRisk(chainId, traderAPIRef.current, symbol, address, Date.now()).then(({ data }) => {
-          setPositions(data);
-        });
+    if (selectedPool?.perpetuals && address && isConnected) {
+      getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now()).then(({ data }) => {
+        data.map((p) => setPositions(p));
       });
-      setPositionRiskSent(false);
     }
-  }, [chainId, address, isConnected, selectedPool, positionRiskSent, setPositions]);
+  }, [chainId, address, isConnected, selectedPool, setPositions]);
 
   useEffect(() => {
     if (!updatedPositionsRef.current) {
