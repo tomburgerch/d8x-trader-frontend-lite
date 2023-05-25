@@ -3,6 +3,8 @@
 .root {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  max-width: 100%;
 }
 
 .sidesContainer {
@@ -37,6 +39,7 @@
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
+
   .rightBlock {
     max-width: 475px;
     min-width: 475px;
@@ -46,6 +49,6 @@
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .root {
-    margin: 0 12px;
+    padding: 0 12px;
   }
 }

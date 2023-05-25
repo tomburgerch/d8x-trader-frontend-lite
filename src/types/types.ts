@@ -5,6 +5,11 @@ import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
 
+export interface AppDimensionsI {
+  width?: number;
+  height?: number;
+}
+
 export interface PerpetualI {
   id: number;
   state: string;
