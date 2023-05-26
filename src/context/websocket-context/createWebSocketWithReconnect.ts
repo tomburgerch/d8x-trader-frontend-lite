@@ -5,6 +5,7 @@ const RECONNECT_TIMEOUT = 5000;
 export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
   let client: WebSocket;
   let isConnected = false;
+  let isDisconnecting = false;
   let reconnectOnClose = true;
   let messageListeners: Array<(message: string) => void> = [];
   let stateChangeListeners: ReactDispatchT[] = [];
@@ -37,7 +38,10 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
     // Close without reconnecting;
     client.close = () => {
       reconnectOnClose = false;
-      close.call(client);
+      if (isConnected && !isDisconnecting) {
+        isDisconnecting = true;
+        close.call(client);
+      }
     };
 
     client.onmessage = (event) => {
@@ -48,13 +52,13 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
 
     client.onclose = () => {
       isConnected = false;
+      isDisconnecting = false;
       stateChangeListeners.forEach((fn) => fn(false));
 
       if (!reconnectOnClose) {
         // console.log('ws closed by app');
         return;
       }
-
       // console.log('ws closed by server');
       setTimeout(start, RECONNECT_TIMEOUT);
     };
