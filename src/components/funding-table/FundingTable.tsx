@@ -28,6 +28,8 @@ import { FundingRow } from './elements/FundingRow';
 
 import styles from './FundingTable.module.scss';
 
+const MIN_WIDTH_FOR_TABLE = 900;
+
 export const FundingTable = memo(() => {
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
@@ -82,7 +84,7 @@ export const FundingTable = memo(() => {
 
   return (
     <div className={styles.root} ref={ref}>
-      {width && width >= 600 && (
+      {width && width >= MIN_WIDTH_FOR_TABLE && (
         <TableContainer className={styles.root}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
@@ -116,7 +118,7 @@ export const FundingTable = memo(() => {
           </MuiTable>
         </TableContainer>
       )}
-      {(!width || width < 600) && (
+      {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           <Box className={styles.refreshHolder}>
             <RefreshIcon onClick={refreshFundingList} className={styles.actionIcon} />

@@ -290,6 +290,12 @@ export const theme = createTheme({
           },
         },
         {
+          props: { variant: 'outlined' },
+          style: {
+            padding: '2px',
+          },
+        },
+        {
           props: { size: 'small' },
           style: {
             ...MuiButtonSharedStyle,
