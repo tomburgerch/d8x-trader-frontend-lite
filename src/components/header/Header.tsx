@@ -1,10 +1,13 @@
 import { useAtom } from 'jotai';
+import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
 import { useAccount, useBalance, useChainId } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
+import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo } from 'network/network';
+import { liquidityPoolsAtom } from 'store/liquidity-pools.store';
 import {
   oracleFactoryAddrAtom,
   poolTokenBalanceAtom,
@@ -13,32 +16,16 @@ import {
   selectedPoolAtom,
   perpetualsAtom,
 } from 'store/pools.store';
+import { PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
-import { CollateralsSelect } from './elements/collaterals-select/CollateralsSelect';
-import { PerpetualsSelect } from './elements/perpetuals-select/PerpetualsSelect';
-
-import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
-import { PerpetualDataI } from '../../types/types';
-import { createSymbol } from '../../helpers/createSymbol';
+import styles from './Header.module.scss';
 
-// Might be used later
-// interface HeaderPropsI {
-//   /**
-//    * Injected by the documentation to work in an iframe.
-//    * You won't need it on your project.
-//    */
-//   window?: () => Window;
-// }
-
-// Might be used later
-// const drawerWidth = 240;
-
-export const Header = memo(() => {
+export const Header = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -46,23 +33,25 @@ export const Header = memo(() => {
   const { address } = useAccount();
 
   const [, setPools] = useAtom(poolsAtom);
+  const [, setLiquidityPools] = useAtom(liquidityPoolsAtom);
+
   const [, setPerpetuals] = useAtom(perpetualsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
 
-  // Might be used later
-  // const [mobileOpen, setMobileOpen] = useState(false);
-
   const requestRef = useRef(false);
 
   useEffect(() => {
     if (!requestRef.current) {
       requestRef.current = true;
+
       setProxyAddr(undefined);
+
       getExchangeInfo(chainId, null).then(({ data }) => {
         setPools(data.pools);
+        setLiquidityPools(data.pools);
 
         const perpetuals: PerpetualDataI[] = [];
         data.pools.forEach((pool) => {
@@ -84,26 +73,17 @@ export const Header = memo(() => {
 
         setOracleFactoryAddr(data.oracleFactoryAddr);
         setProxyAddr(data.proxyAddr);
+
+        requestRef.current = false;
       });
-      requestRef.current = false;
     }
-  }, [chainId, setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
+  }, [chainId, setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
     chainId: chainId,
     enabled: !requestRef.current && address !== undefined,
-    // onSuccess(data) {
-    //   console.log(
-    //     `my ${selectedPool?.poolSymbol} (addr ${selectedPool?.marginTokenAddr} on chain ${chainId}) balance is ${data.formatted} ${data.symbol}`
-    //   );
-    // },
-    // onError() {
-    //   console.log(
-    //     `failed to fetch balance of ${selectedPool?.poolSymbol} margin token: ${selectedPool?.marginTokenAddr}, chain id ${chainId})`
-    //   );
-    // },
   });
 
   useEffect(() => {
@@ -111,23 +91,6 @@ export const Header = memo(() => {
       setPoolTokenBalance(Number(poolTokenBalance.formatted));
     }
   }, [selectedPool, chainId, poolTokenBalance, isError, setPoolTokenBalance]);
-
-  /*
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        <InteractiveLogo />
-      </Typography>
-      <Divider />
-    </Box>
-  );
-
-  const container = window !== undefined ? () => window().document.body : undefined;
-  */
 
   return (
     <Container className={styles.root}>
@@ -143,53 +106,15 @@ export const Header = memo(() => {
             </Box>
             {!isSmallScreen && (
               <Typography variant="h6" component="div" className={styles.selectBoxes}>
-                <CollateralsSelect />
-                <PerpetualsSelect />
+                {children}
               </Typography>
             )}
             <Typography variant="h6" component="div" className={styles.walletConnect}>
               <WalletConnectButton />
             </Typography>
-            {/*}
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { sm: 'none' } }} />
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ ml: 2, display: { sm: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            {*/}
           </Toolbar>
-          {isSmallScreen && (
-            <Box className={styles.mobileSelectBoxes}>
-              <CollateralsSelect />
-              <PerpetualsSelect />
-            </Box>
-          )}
+          {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
         </PageAppBar>
-        {/*}
-        <Box component="nav">
-          <Drawer
-            anchor="right"
-            container={container}
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
-            }}
-            sx={{
-              display: { xs: 'block', sm: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Box>
-        {*/}
       </Box>
     </Container>
   );

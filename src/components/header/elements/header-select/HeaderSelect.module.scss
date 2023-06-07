@@ -37,3 +37,38 @@
     min-width: 250px;
   }
 }
+
+.optionsHolder {
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.optionsHeader {
+  display: flex;
+  padding: 12px;
+  align-items: center;
+
+  .leftLabel {
+    flex: 1;
+  }
+
+  .rightLabel {
+    width: 100px;
+    text-align: right;
+  }
+}
+
+.optionHolder {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .label {
+    font-weight: bold;
+  }
+
+  .value {
+    text-align: right;
+    font-weight: bold;
+  }
+}

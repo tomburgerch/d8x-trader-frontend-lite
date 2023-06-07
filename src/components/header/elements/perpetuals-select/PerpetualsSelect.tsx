@@ -21,14 +21,14 @@ import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
-import styles from './PerpetualsSelect.module.scss';
+import styles from '../header-select/HeaderSelect.module.scss';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
     <Paper elevation={8} {...props}>
       <Box className={styles.optionsHeader}>
-        <Box className={styles.pair}>Pair</Box>
-        <Box className={styles.status}>Status</Box>
+        <Box className={styles.leftLabel}>Pair</Box>
+        <Box className={styles.rightLabel}>Status</Box>
       </Box>
       <Box className={styles.optionsHolder}>{children}</Box>
     </Paper>
@@ -126,10 +126,10 @@ export const PerpetualsSelect = memo(() => {
       renderOption={(props, option) => (
         <Box component="li" {...props}>
           <Box className={styles.optionHolder}>
-            <Box className={styles.pair}>
+            <Box className={styles.label}>
               {option.baseCurrency}/{option.quoteCurrency}
             </Box>
-            <Box className={styles.status}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
+            <Box className={styles.value}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
           </Box>
         </Box>
       )}

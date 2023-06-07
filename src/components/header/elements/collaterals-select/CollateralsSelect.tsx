@@ -22,14 +22,14 @@ import { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
-import styles from './CollateralsSelect.module.scss';
+import styles from '../header-select/HeaderSelect.module.scss';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
     <Paper elevation={8} {...props}>
       <Box className={styles.optionsHeader}>
-        <Box className={styles.symbol}>Collateral</Box>
-        <Box className={styles.count}>No. of perps</Box>
+        <Box className={styles.leftLabel}>Collateral</Box>
+        <Box className={styles.rightLabel}>No. of perps</Box>
       </Box>
       <Box className={styles.optionsHolder}>{children}</Box>
     </Paper>
@@ -122,8 +122,8 @@ export const CollateralsSelect = memo(() => {
       renderOption={(props, option) => (
         <Box component="li" {...props}>
           <Box className={styles.optionHolder}>
-            <Box className={styles.symbol}>{option.poolSymbol}</Box>
-            <Box className={styles.count}>{option.perpetuals.length}</Box>
+            <Box className={styles.label}>{option.poolSymbol}</Box>
+            <Box className={styles.value}>{option.perpetuals.length}</Box>
           </Box>
         </Box>
       )}

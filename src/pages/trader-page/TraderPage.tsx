@@ -15,6 +15,8 @@ import { SelectorItemI, TableSelector } from 'components/table-selector/TableSel
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
 
 import styles from './TraderPage.module.scss';
+import { CollateralsSelect } from '../../components/header/elements/collaterals-select/CollateralsSelect';
+import { PerpetualsSelect } from '../../components/header/elements/perpetuals-select/PerpetualsSelect';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
@@ -86,7 +88,10 @@ export const TraderPage = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Header />
+      <Header>
+        <CollateralsSelect />
+        <PerpetualsSelect />
+      </Header>
       {isBigScreen && (
         <Container className={styles.sidesContainer}>
           <Box className={styles.leftBlock}>

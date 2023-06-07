@@ -22,7 +22,7 @@ export const takeProfitAtom = atom(TakeProfitE.None);
 const limitPriceValueAtom = atom(-1);
 const triggerPriceValueAtom = atom(0);
 
-const orderTypeValueAtom = atom<OrderTypeE>(OrderTypeE.Market);
+const orderTypeValueAtom = atom(OrderTypeE.Market);
 
 export const orderTypeAtom = atom(
   (get) => {
