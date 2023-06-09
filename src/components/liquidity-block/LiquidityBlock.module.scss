@@ -17,10 +17,17 @@
 .actionBlock {
   flex: 1;
   background-color: var(--d8x-background-white);
-  padding: $d8x-spacing * 8;
+  padding: $d8x-spacing * 4;
 }
 
 .text {
   margin-top: $d8x-spacing * 4;
   margin-bottom: $d8x-spacing * 4;
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .infoBlock {
+    display: none;
+  }
 }

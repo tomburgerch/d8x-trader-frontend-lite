@@ -4,6 +4,7 @@
   width: 100%;
   margin-right: $d8x-spacing * 4;
   min-width: 260px;
+  max-width: 300px;
 }
 
 :global(.MuiFilledInput-root) {
@@ -22,19 +23,6 @@
 
   :global(.MuiInputLabel-root) {
     color: var(--d8x-color-black);
-  }
-}
-
-@media screen and ($d8x-breakpoint-max-md) {
-
-  .root {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .paper {
-    width: 100%;
-    min-width: 250px;
   }
 }
 
@@ -70,5 +58,26 @@
   .value {
     text-align: right;
     font-weight: bold;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .root {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .paper {
+    width: 100%;
+    min-width: 250px;
+    max-width: 300px;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+    max-width: 100%;
   }
 }

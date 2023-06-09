@@ -46,10 +46,38 @@
   white-space: nowrap;
 }
 
-@media screen and ($d8x-breakpoint-max-sm) {
+@media screen and ($d8x-breakpoint-max-md) {
 
-  .root {
-    justify-content: start;
-    overflow-x: auto;
+  .stats {
+    flex-direction: column;
+  }
+
+  .statsLeftBlock {
+    border-bottom: 1px solid var(--d8x-side-border-color);
+    border-right: none;
+    padding-bottom: $d8x-spacing * 4;
+    padding-right: 0;
+    gap: $d8x-spacing * 6;
+  }
+
+  .statsRightBlock {
+    padding-top: $d8x-spacing * 4;
+    padding-left: 0;
+    gap: $d8x-spacing * 6;
+  }
+
+  .statContainer {
+    flex: initial;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .statsLeftBlock {
+    flex-direction: column;
+  }
+
+  .statsRightBlock {
+    flex-direction: column;
   }
 }
