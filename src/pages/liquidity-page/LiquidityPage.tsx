@@ -1,4 +1,6 @@
-import { memo } from 'react';
+import { useAtom } from 'jotai';
+import { memo, useEffect, useRef } from 'react';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
 
@@ -9,10 +11,39 @@ import { Header } from 'components/header/Header';
 import { GlobalStats } from 'components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'components/liquidity-block/LiquidityBlock';
 import { PersonalStats } from 'components/personal-stats/PersonalStats';
+import { getOpenWithdrawals } from 'network/history';
+import { selectedLiquidityPoolAtom, withdrawalsAtom } from 'store/liquidity-pools.store';
 
 import styles from './LiquidityPage.module.scss';
 
 export const LiquidityPage = memo(() => {
+  const chainId = useChainId();
+  const { address } = useAccount();
+
+  const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [, setWithdrawals] = useAtom(withdrawalsAtom);
+
+  const withdrawalsRequestSentRef = useRef(false);
+
+  useEffect(() => {
+    if (!chainId || !selectedLiquidityPool || !address) {
+      setWithdrawals([]);
+      return;
+    }
+
+    if (withdrawalsRequestSentRef.current) {
+      return;
+    }
+
+    withdrawalsRequestSentRef.current = true;
+
+    getOpenWithdrawals(chainId, address, selectedLiquidityPool.poolSymbol)
+      .then((withdrawals) => setWithdrawals(withdrawals))
+      .finally(() => {
+        withdrawalsRequestSentRef.current = false;
+      });
+  }, [chainId, address, selectedLiquidityPool, setWithdrawals]);
+
   return (
     <Box className={styles.root}>
       <Header>

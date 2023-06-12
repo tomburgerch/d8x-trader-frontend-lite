@@ -1,11 +1,12 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import type { PoolI } from 'types/types';
+import type { OpenWithdrawalI, PoolI } from 'types/types';
 import { LiquidityTypeE } from '../types/enums';
 
 export const liquidityPoolsAtom = atom<PoolI[]>([]);
 export const liquidityTypeAtom = atom(LiquidityTypeE.Add);
+export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 
 const selectedLiquidityPoolNameLSAtom = atomWithStorage<string>('d8x_selectedLiquidityPoolName', '');
 

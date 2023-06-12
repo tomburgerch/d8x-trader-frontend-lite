@@ -49,7 +49,7 @@ export const GlobalStats = () => {
 
   useEffect(() => {
     if (traderAPI && selectedLiquidityPool) {
-      traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price: number) => setDPrice(price));
+      traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDPrice(price));
     } else {
       setDPrice(undefined);
     }
