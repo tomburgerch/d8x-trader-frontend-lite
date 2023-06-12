@@ -1,4 +1,4 @@
-import { BigNumberish } from '@ethersproject/bignumber';
+import type { SmartContractOrder } from '@d8x/perpetuals-sdk';
 import { BytesLike } from '@ethersproject/bytes';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
@@ -153,29 +153,12 @@ export interface OrderWithIdI extends OrderI {
   id: string;
 }
 
-export interface SmartContractOrderI {
-  flags: BigNumberish;
-  iPerpetualId: BigNumberish;
-  brokerFeeTbps: BigNumberish;
-  traderAddr: string;
-  brokerAddr: string;
-  referrerAddr: string;
-  brokerSignature: BytesLike;
-  fAmount: BigNumberish;
-  fLimitPrice: BigNumberish;
-  fTriggerPrice: BigNumberish;
-  leverageTDR: BigNumberish;
-  iDeadline: BigNumberish;
-  executionTimestamp: BigNumberish;
-  submittedTimestamp: BigNumberish;
-}
-
 export interface OrderDigestI {
   digests: string[];
   orderIds: string[];
   OrderBookAddr: string;
   abi: string | string[];
-  SCOrders: SmartContractOrderI[];
+  SCOrders: SmartContractOrder[];
 }
 
 export interface CancelOrderResponseI {
@@ -237,4 +220,21 @@ export interface FundingI {
   amount: number;
   timestamp: string;
   transactionHash: string;
+}
+
+export interface WeeklyApiI {
+  startTimestamp: number;
+  endTimestamp: number;
+  startPrice: number;
+  endPrice: number;
+  apy: number;
+}
+
+export interface EarningsI {
+  earnings: number;
+}
+
+export interface OpenWithdrawalI {
+  shareAmount: number;
+  timeElapsedSec: number;
 }
