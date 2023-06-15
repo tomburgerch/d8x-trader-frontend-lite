@@ -1,0 +1,26 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $d8x-spacing * 2.5;
+  overflow-x: auto;
+  margin: 0 auto;
+  flex: 1;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+    padding: 0 12px;
+  }
+}

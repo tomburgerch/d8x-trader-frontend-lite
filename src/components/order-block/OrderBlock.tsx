@@ -1,7 +1,8 @@
 import { memo } from 'react';
 
-import { Box, Card, CardContent } from '@mui/material';
+import { Card, CardContent } from '@mui/material';
 
+import { Separator } from '../separator/Separator';
 import { ActionBlock } from './elements/action-block/ActionBlock';
 import { ExpirySelector } from './elements/expiry-selector/ExpirySelector';
 import { InfoBlock } from './elements/info-block/InfoBlock';
@@ -23,18 +24,18 @@ export const OrderBlock = memo(() => {
       <OrderSelector />
       <CardContent>
         <OrderTypeSelector />
-        <Box className={styles.separator} />
+        <Separator />
         <OrderSize />
         <TriggerPrice />
         <LimitPrice />
-        <Box className={styles.separator} />
+        <Separator />
         <LeverageSelector />
         <OrderSettings />
-        <Box className={styles.separator} />
+        <Separator />
         <ExpirySelector />
         <StopLossSelector />
         <TakeProfitSelector />
-        <Box className={styles.separator} />
+        <Separator />
         <InfoBlock />
         <ActionBlock />
       </CardContent>

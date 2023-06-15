@@ -69,3 +69,9 @@ export enum TvChartPeriodE {
   '1Hour' = '1h',
   '1Day' = '1d',
 }
+
+export enum LiquidityTypeE {
+  Add = 'Add',
+  Initiate = 'Initiate',
+  Withdraw = 'Withdraw',
+}

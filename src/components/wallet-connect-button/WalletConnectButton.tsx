@@ -1,9 +1,9 @@
-import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
+import { LiquidityProviderTool, PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useConnect, useProvider } from 'wagmi';
+import { useAccount, useChainId, useConnect, useProvider, useSigner } from 'wagmi';
 
 import { Box, Button } from '@mui/material';
 
@@ -11,6 +11,7 @@ import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
 import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTraderLoyalty } from 'network/network';
+import { liqProvToolAtom } from 'store/liquidity-pools.store';
 import { loyaltyScoreAtom, traderAPIAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
@@ -26,10 +27,19 @@ const loyaltyMap: Record<number, string> = {
 
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
+  const [liqProvTool, setLiqProvTool] = useAtom(liqProvToolAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
+
+  const { data: signer } = useSigner({
+    onError(error) {
+      console.log(error);
+    },
+  });
 
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
+  const liqProvToolRef = useRef(liqProvTool);
+  const loadingLiqProvToolRef = useRef(false);
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -43,6 +53,13 @@ export const WalletConnectButton = memo(() => {
     }
     setTraderAPI(null);
   }, [setTraderAPI]);
+
+  const unloadLiqProvTool = useCallback(() => {
+    if (!liqProvToolRef.current) {
+      return;
+    }
+    setLiqProvTool(null);
+  }, [setLiqProvTool]);
 
   useEffect(() => {
     if (address) {
@@ -92,6 +109,34 @@ export const WalletConnectButton = memo(() => {
         loadingAPIRef.current = false;
       });
   }, [isConnected, provider, chainId, setTraderAPI]);
+
+  useEffect(() => {
+    if (isDisconnected || isReconnecting || liqProvToolRef.current) {
+      unloadLiqProvTool();
+    }
+  }, [isDisconnected, isReconnecting, unloadLiqProvTool]);
+
+  useEffect(() => {
+    if (loadingLiqProvToolRef.current || !chainId || !provider || !isConnected || !signer) {
+      return;
+    }
+    setLiqProvTool(null);
+    loadingLiqProvToolRef.current = true;
+    const newLiqProvTool = new LiquidityProviderTool(PerpetualDataHandler.readSDKConfig(chainId), signer);
+    newLiqProvTool
+      .createProxyInstance(provider)
+      .then(() => {
+        setLiqProvTool(newLiqProvTool);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        console.log(error);
+        setLiqProvTool(null);
+      })
+      .finally(() => {
+        loadingLiqProvToolRef.current = false;
+      });
+  }, [isConnected, chainId, provider, setLiqProvTool, signer]);
 
   return (
     <ConnectButton.Custom>

@@ -1,0 +1,19 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  justify-content: flex-start;
+  gap: $d8x-spacing * 8;
+  margin-top: $d8x-spacing * 2;
+  margin-bottom: $d8x-spacing * 4;
+
+  button {
+    min-width: 30px;
+  }
+}
+
+.selected {
+  text-decoration: underline;
+  text-underline-offset: $d8x-spacing * 2;
+  font-weight: bold;
+}

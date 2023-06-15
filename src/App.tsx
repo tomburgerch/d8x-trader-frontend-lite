@@ -13,6 +13,7 @@ import { appDimensionsAtom } from 'store/app.store';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import styles from './App.module.scss';
+import { LiquidityPage } from './pages/liquidity-page/LiquidityPage';
 
 export const App = memo(() => {
   const { width, height, ref } = useResizeDetector();
@@ -28,6 +29,7 @@ export const App = memo(() => {
       <Box className={styles.content}>
         <StaticBackground />
         <Routes>
+          <Route key="liquidity-page" path="/liquidity" element={<LiquidityPage />} />
           <Route key="trader-page" path="*" element={<TraderPage />} />
         </Routes>
         <ToastContainer position="top-left" autoClose={10_000} />

@@ -4,6 +4,7 @@
   width: 100%;
   margin-right: $d8x-spacing * 4;
   min-width: 260px;
+  max-width: 300px;
 }
 
 :global(.MuiFilledInput-root) {
@@ -25,6 +26,41 @@
   }
 }
 
+.optionsHolder {
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.optionsHeader {
+  display: flex;
+  padding: 12px;
+  align-items: center;
+
+  .leftLabel {
+    flex: 1;
+  }
+
+  .rightLabel {
+    width: 100px;
+    text-align: right;
+  }
+}
+
+.optionHolder {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .label {
+    font-weight: bold;
+  }
+
+  .value {
+    text-align: right;
+    font-weight: bold;
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-md) {
 
   .root {
@@ -35,5 +71,13 @@
   .paper {
     width: 100%;
     min-width: 250px;
+    max-width: 300px;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .root {
+    max-width: 100%;
   }
 }
