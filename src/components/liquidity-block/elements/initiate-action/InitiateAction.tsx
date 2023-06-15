@@ -1,28 +1,69 @@
+import { format } from 'date-fns';
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
-import { Separator } from 'components/separator/Separator';
+import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
-import { selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import { ToastContent } from 'components/toast-content/ToastContent';
+import { Separator } from 'components/separator/Separator';
+import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './InitiateAction.module.scss';
-import { formatToCurrency } from '../../../../utils/formatToCurrency';
-import { format } from 'date-fns';
 
 export const InitiateAction = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [liqProvTool] = useAtom(liqProvToolAtom);
+  const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
 
   const [initiateAmount, setInitiateAmount] = useState(0);
+  const [requestSent, setRequestSent] = useState(false);
+
+  const requestSentRef = useRef(false);
 
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setInitiateAmount(+event.target.value);
   }, []);
 
   const handleInitiateLiquidity = useCallback(() => {
-    console.log('Initiate liquidity:', initiateAmount);
-  }, [initiateAmount]);
+    if (requestSentRef.current) {
+      return;
+    }
+
+    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0) {
+      return;
+    }
+
+    requestSentRef.current = true;
+    setRequestSent(true);
+
+    liqProvTool
+      .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
+      .then(async (result) => {
+        const receipt = await result.wait();
+        if (receipt.status === 1) {
+          toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
+          // TODO: run data re-fetch
+        } else {
+          toast.error(<ToastContent title="Error initiating liquidity withdrawal" bodyLines={[]} />);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        requestSentRef.current = false;
+        setRequestSent(false);
+      });
+  }, [initiateAmount, liqProvTool, selectedLiquidityPool]);
+
+  const predictedAmount = useMemo(() => {
+    if (initiateAmount > 0 && dCurrencyPrice != null) {
+      return initiateAmount * dCurrencyPrice;
+    }
+    return 0;
+  }, [initiateAmount, dCurrencyPrice]);
 
   return (
     <div className={styles.root}>
@@ -56,16 +97,20 @@ export const InitiateAction = memo(() => {
       <Box className={styles.infoBlock}>
         <Box className={styles.row}>
           <Typography variant="body2">Amount</Typography>
-          <Typography variant="body2">{formatToCurrency(1222333, selectedLiquidityPool?.poolSymbol)}</Typography>
+          <Typography variant="body2">
+            {formatToCurrency(predictedAmount, selectedLiquidityPool?.poolSymbol)}
+          </Typography>
         </Box>
         <Box className={styles.row}>
           <Typography variant="body2">Can be withdrawn on:</Typography>
-          <Typography variant="body2">{format(new Date(), 'MMMM d yyyy HH:mm')}</Typography>
+          <Typography variant="body2">
+            {format(new Date(Date.now() + PERIOD_OF_2_DAYS), 'MMMM d yyyy HH:mm')}
+          </Typography>
         </Box>
       </Box>
       <Button
         variant="primary"
-        disabled={!initiateAmount}
+        disabled={!initiateAmount || requestSent}
         onClick={handleInitiateLiquidity}
         className={styles.actionButton}
       >

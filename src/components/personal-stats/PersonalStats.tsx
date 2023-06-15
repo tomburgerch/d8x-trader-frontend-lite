@@ -5,14 +5,13 @@ import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
+import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { getEarnings } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { selectedLiquidityPoolAtom, withdrawalsAtom } from 'store/liquidity-pools.store';
+import { selectedLiquidityPoolAtom, userAmountAtom, withdrawalsAtom } from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './PersonalStats.module.scss';
-
-const PERIOD_OF_ONE_DAY = 24 * 60 * 60 * 1000;
 
 export const PersonalStats = memo(() => {
   const chainId = useChainId();
@@ -20,22 +19,21 @@ export const PersonalStats = memo(() => {
 
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
+  const [userAmount, setUserAmount] = useAtom(userAmountAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
-  const [amount, setAmount] = useState<number>();
   const [estimatedEarnings, setEstimatedEarnings] = useState<number>();
 
   const earningsRequestSentRef = useRef(false);
 
   useEffect(() => {
+    setUserAmount(null);
     if (selectedLiquidityPool && traderAPI && address) {
-      traderAPI.getPoolShareTokenBalance(address, selectedLiquidityPool.poolSymbol).then((userAmount) => {
-        setAmount(userAmount);
+      traderAPI.getPoolShareTokenBalance(address, selectedLiquidityPool.poolSymbol).then((amount) => {
+        setUserAmount(amount);
       });
-    } else {
-      setAmount(undefined);
     }
-  }, [selectedLiquidityPool, traderAPI, address]);
+  }, [selectedLiquidityPool, traderAPI, address, setUserAmount]);
 
   useEffect(() => {
     if (!chainId || !selectedLiquidityPool || !address) {
@@ -63,10 +61,10 @@ export const PersonalStats = memo(() => {
     const currentTime = Date.now();
     const latestWithdrawalTimeElapsed = withdrawals[withdrawals.length - 1].timeElapsedSec * 1000;
 
-    const withdrawalTime = currentTime + 2 * PERIOD_OF_ONE_DAY - latestWithdrawalTimeElapsed;
+    const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
     if (currentTime < withdrawalTime) {
       return format(new Date(withdrawalTime), 'MMMM d yyyy HH:mm');
-    } else if (currentTime >= withdrawalTime + 2 * PERIOD_OF_ONE_DAY) {
+    } else if (currentTime >= withdrawalTime + PERIOD_OF_4_DAYS) {
       return 'Overdue';
     } else {
       // (currentTime >= withdrawalTime)
@@ -84,7 +82,7 @@ export const PersonalStats = memo(() => {
               Amount
             </Typography>
             <Typography variant="bodySmall" className={styles.statValue}>
-              {amount !== undefined ? formatToCurrency(amount, `d${selectedLiquidityPool?.poolSymbol}`) : '--'}
+              {userAmount !== undefined ? formatToCurrency(userAmount, `d${selectedLiquidityPool?.poolSymbol}`) : '--'}
             </Typography>
           </Box>
           <Box key="midPrice" className={styles.statContainer}>

@@ -1,6 +1,6 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
-import { EarningsI, FundingI, OpenWithdrawalI, TradeHistoryI, WeeklyApiI } from 'types/types';
+import { EarningsI, FundingI, OpenWithdrawalsI, TradeHistoryI, WeeklyApiI } from 'types/types';
 
 function getHistoryUrlByChainId(chainId: number) {
   return config.historyUrl[`${chainId}`] || config.historyUrl.default;
@@ -69,7 +69,7 @@ export function getEarnings(chainId: number, address: string, poolSymbol: string
   );
 }
 
-export function getOpenWithdrawals(chainId: number, address: string, poolSymbol: string): Promise<OpenWithdrawalI[]> {
+export function getOpenWithdrawals(chainId: number, address: string, poolSymbol: string): Promise<OpenWithdrawalsI> {
   const params = {
     lpAddr: address,
     poolSymbol,

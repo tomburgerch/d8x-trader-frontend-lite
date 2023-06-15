@@ -38,7 +38,7 @@ export const LiquidityPage = memo(() => {
     withdrawalsRequestSentRef.current = true;
 
     getOpenWithdrawals(chainId, address, selectedLiquidityPool.poolSymbol)
-      .then((withdrawals) => setWithdrawals(withdrawals))
+      .then(({ withdrawals }) => setWithdrawals(withdrawals))
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });

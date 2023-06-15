@@ -238,3 +238,7 @@ export interface OpenWithdrawalI {
   shareAmount: number;
   timeElapsedSec: number;
 }
+
+export interface OpenWithdrawalsI {
+  withdrawals: OpenWithdrawalI[];
+}

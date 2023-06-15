@@ -1,6 +1,6 @@
+import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { TraderInterface } from '@d8x/perpetuals-sdk';
 
 import type {
   MarginAccountI,

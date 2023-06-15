@@ -4,23 +4,22 @@ import { useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
+import { PERIOD_OF_7_DAYS } from 'app-constants';
 import { getWeeklyAPI } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import { dCurrencyPriceAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './GlobalStats.module.scss';
-
-const PERIOD_OF_7_DAYS = 7 * 24 * 60 * 60 * 1000;
 
 export const GlobalStats = () => {
   const chainId = useChainId();
 
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
-  const [dPrice, setDPrice] = useState<number>();
 
   const weeklyApiRequestSentRef = useRef(false);
 
@@ -48,22 +47,21 @@ export const GlobalStats = () => {
   }, [chainId, selectedLiquidityPool]);
 
   useEffect(() => {
+    setDCurrencyPrice(null);
     if (traderAPI && selectedLiquidityPool) {
-      traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDPrice(price));
-    } else {
-      setDPrice(undefined);
+      traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDCurrencyPrice(price));
     }
-  }, [traderAPI, selectedLiquidityPool]);
+  }, [traderAPI, selectedLiquidityPool, setDCurrencyPrice]);
 
   const dSupply = useMemo(() => {
-    if (selectedLiquidityPool && dPrice) {
+    if (selectedLiquidityPool && dCurrencyPrice) {
       return formatToCurrency(
-        selectedLiquidityPool.pnlParticipantCashCC / dPrice,
+        selectedLiquidityPool.pnlParticipantCashCC / dCurrencyPrice,
         `d${selectedLiquidityPool?.poolSymbol}`
       );
     }
     return '--';
-  }, [selectedLiquidityPool, dPrice]);
+  }, [selectedLiquidityPool, dCurrencyPrice]);
 
   return (
     <Box className={styles.root}>
@@ -90,7 +88,7 @@ export const GlobalStats = () => {
           d{selectedLiquidityPool?.poolSymbol} Price
         </Typography>
         <Typography variant="bodySmall" className={styles.statValue}>
-          {dPrice !== undefined ? formatToCurrency(dPrice, selectedLiquidityPool?.poolSymbol) : '--'}
+          {dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedLiquidityPool?.poolSymbol) : '--'}
         </Typography>
       </Box>
       <Box key="fundingRate" className={styles.statContainer}>
