@@ -96,7 +96,7 @@ export const AddAction = memo(() => {
         <Box className={styles.row}>
           <Typography variant="body2">You receive:</Typography>
           <Typography variant="body2">
-            {formatToCurrency(predictedAmount, selectedLiquidityPool?.poolSymbol)}
+            {formatToCurrency(predictedAmount, `d${selectedLiquidityPool?.poolSymbol}`)}
           </Typography>
         </Box>
       </Box>

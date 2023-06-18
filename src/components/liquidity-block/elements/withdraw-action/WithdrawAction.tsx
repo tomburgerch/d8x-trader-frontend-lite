@@ -102,7 +102,7 @@ export const WithdrawAction = memo(() => {
           />
         </Box>
         <Typography variant="body1" className={styles.value}>
-          {formatToCurrency(shareAmount, selectedLiquidityPool?.poolSymbol)}
+          {formatToCurrency(shareAmount, `d${selectedLiquidityPool?.poolSymbol}`)}
         </Typography>
       </Box>
       <Box className={styles.inputLine}>

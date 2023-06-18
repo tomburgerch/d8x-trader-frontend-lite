@@ -84,7 +84,7 @@ export const InitiateAction = memo(() => {
           id="initiate-amount-size"
           endAdornment={
             <InputAdornment position="end">
-              <Typography variant="adornment">{selectedLiquidityPool?.poolSymbol}</Typography>
+              <Typography variant="adornment">{`d${selectedLiquidityPool?.poolSymbol}`}</Typography>
             </InputAdornment>
           }
           type="number"
