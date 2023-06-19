@@ -4,6 +4,7 @@ import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
+import { SmartContractOrder } from '@d8x/perpetuals-sdk';
 
 export interface AppDimensionsI {
   width?: number;
@@ -51,7 +52,6 @@ export interface PoolI {
   poolShareTokenAddr: string;
   defaultFundCashCC: number;
   pnlParticipantCashCC: number;
-  totalAMMFundCashCC: number;
   totalTargetAMMFundSizeCC: number;
   brokerCollateralLotSize: number;
   perpetuals: PerpetualI[];
@@ -153,22 +153,7 @@ export interface OrderWithIdI extends OrderI {
   id: string;
 }
 
-export interface SmartContractOrderI {
-  flags: BigNumberish;
-  iPerpetualId: BigNumberish;
-  brokerFeeTbps: BigNumberish;
-  traderAddr: string;
-  brokerAddr: string;
-  referrerAddr: string;
-  brokerSignature: BytesLike;
-  fAmount: BigNumberish;
-  fLimitPrice: BigNumberish;
-  fTriggerPrice: BigNumberish;
-  leverageTDR: BigNumberish;
-  iDeadline: BigNumberish;
-  executionTimestamp: BigNumberish;
-  submittedTimestamp: BigNumberish;
-}
+export interface SmartContractOrderI extends SmartContractOrder {}
 
 export interface OrderDigestI {
   digests: string[];
