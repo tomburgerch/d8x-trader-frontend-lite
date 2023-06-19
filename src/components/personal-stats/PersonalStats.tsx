@@ -90,7 +90,9 @@ export const PersonalStats = memo(() => {
               Estimated earnings
             </Typography>
             <Typography variant="bodySmall" className={styles.statValue}>
-              {estimatedEarnings !== undefined ? formatToCurrency(estimatedEarnings, '%') : '--'}
+              {estimatedEarnings !== undefined
+                ? formatToCurrency(estimatedEarnings, selectedLiquidityPool?.poolSymbol)
+                : '--'}
             </Typography>
           </Box>
         </Box>
