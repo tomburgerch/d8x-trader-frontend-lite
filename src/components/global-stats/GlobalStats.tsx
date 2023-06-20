@@ -57,7 +57,6 @@ export const GlobalStats = () => {
   useEffect(() => {
     setTvl(null);
     if (traderAPI && selectedLiquidityPool) {
-      // traderAPI.getPoolState(selectedLiquidityPool.poolSymbol).then(PoolState => console.log(PoolState));
       traderAPI
         .getPoolState(selectedLiquidityPool.poolSymbol)
         .then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
