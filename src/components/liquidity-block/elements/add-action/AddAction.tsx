@@ -1,18 +1,30 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAccount, useSigner } from 'wagmi';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
+import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { proxyAddrAtom } from 'store/pools.store';
 
 import styles from './AddAction.module.scss';
 
 export const AddAction = memo(() => {
+  const { address } = useAccount();
+
+  const { data: signer } = useSigner({
+    onError(error) {
+      console.log(error);
+    },
+  });
+
+  const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
@@ -35,26 +47,34 @@ export const AddAction = memo(() => {
       return;
     }
 
+    if (!address || !signer || !proxyAddr) {
+      return;
+    }
+
     requestSentRef.current = true;
     setRequestSent(true);
 
-    liqProvTool
-      .addLiquidity(selectedLiquidityPool.poolSymbol, addAmount)
-      .then(async (result) => {
-        const receipt = await result.wait();
-        if (receipt.status === 1) {
-          toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-          // TODO: run data re-fetch
-        } else {
-          toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+    approveMarginToken(signer, selectedLiquidityPool.marginTokenAddr, proxyAddr, addAmount)
+      .then((res) => {
+        if (res?.hash) {
+          console.log(res.hash);
         }
+        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (result) => {
+          const receipt = await result.wait();
+          if (receipt.status === 1) {
+            toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+            // TODO: run data re-fetch
+          } else {
+            toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+          }
+        });
       })
       .catch(() => {})
       .finally(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [addAmount, liqProvTool, selectedLiquidityPool]);
+  }, [addAmount, liqProvTool, selectedLiquidityPool, address, proxyAddr, signer]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
