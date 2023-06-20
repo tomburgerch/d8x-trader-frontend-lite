@@ -1,4 +1,3 @@
-import { BigNumberish } from '@ethersproject/bignumber';
 import { BytesLike } from '@ethersproject/bytes';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
