@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { PERIOD_OF_7_DAYS } from 'app-constants';
 import { getWeeklyAPI } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { dCurrencyPriceAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import { dCurrencyPriceAtom, tvlAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './GlobalStats.module.scss';
@@ -18,6 +18,7 @@ export const GlobalStats = () => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
+  const [tvl, setTvl] = useAtom(tvlAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
 
@@ -53,15 +54,22 @@ export const GlobalStats = () => {
     }
   }, [traderAPI, selectedLiquidityPool, setDCurrencyPrice]);
 
+  useEffect(() => {
+    setTvl(null);
+    if (traderAPI && selectedLiquidityPool) {
+      // traderAPI.getPoolState(selectedLiquidityPool.poolSymbol).then(PoolState => console.log(PoolState));
+      traderAPI
+        .getPoolState(selectedLiquidityPool.poolSymbol)
+        .then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
+    }
+  }, [traderAPI, selectedLiquidityPool, setTvl]);
+
   const dSupply = useMemo(() => {
-    if (selectedLiquidityPool && dCurrencyPrice) {
-      return formatToCurrency(
-        selectedLiquidityPool.pnlParticipantCashCC / dCurrencyPrice,
-        `d${selectedLiquidityPool?.poolSymbol}`
-      );
+    if (selectedLiquidityPool && dCurrencyPrice && tvl) {
+      return formatToCurrency(tvl / dCurrencyPrice, `d${selectedLiquidityPool?.poolSymbol}`);
     }
     return '--';
-  }, [selectedLiquidityPool, dCurrencyPrice]);
+  }, [selectedLiquidityPool, dCurrencyPrice, tvl]);
 
   return (
     <Box className={styles.root}>
@@ -78,9 +86,7 @@ export const GlobalStats = () => {
           TVL
         </Typography>
         <Typography variant="bodySmall" className={styles.statValue}>
-          {selectedLiquidityPool
-            ? formatToCurrency(selectedLiquidityPool.pnlParticipantCashCC, selectedLiquidityPool.poolSymbol)
-            : '--'}
+          {selectedLiquidityPool && tvl != null ? formatToCurrency(tvl, selectedLiquidityPool.poolSymbol) : '--'}
         </Typography>
       </Box>
       <Box key="indexPrice" className={styles.statContainer}>

@@ -10,6 +10,7 @@ export const liquidityPoolsAtom = atom<PoolI[]>([]);
 export const liquidityTypeAtom = atom(LiquidityTypeE.Add);
 export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 export const dCurrencyPriceAtom = atom<number | null>(null);
+export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
 
 const selectedLiquidityPoolNameLSAtom = atomWithStorage<string>('d8x_selectedLiquidityPoolName', '');
