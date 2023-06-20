@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
 import { SmartContractOrder } from '@d8x/perpetuals-sdk';
+import { BigNumberish } from '@ethersproject/bignumber';
 
 export interface AppDimensionsI {
   width?: number;
@@ -151,8 +152,22 @@ export interface OrderI {
 export interface OrderWithIdI extends OrderI {
   id: string;
 }
-
-export interface SmartContractOrderI extends SmartContractOrder {}
+export interface SmartContractOrderI {
+  flags: BigNumberish;
+  iPerpetualId: number;
+  brokerFeeTbps: number;
+  traderAddr: string;
+  brokerAddr: string;
+  referrerAddr: string;
+  brokerSignature: BytesLike;
+  fAmount: BigNumberish;
+  fLimitPrice: BigNumberish;
+  fTriggerPrice: BigNumberish;
+  leverageTDR: number;
+  iDeadline: number;
+  executionTimestamp: number;
+  submittedTimestamp: number;
+}
 
 export interface OrderDigestI {
   digests: string[];
