@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useAccount, useBalance, useNetwork } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -15,8 +15,9 @@ import {
   proxyAddrAtom,
   selectedPoolAtom,
   perpetualsAtom,
+  traderAPIAtom,
+  chainIdAtom,
 } from 'store/pools.store';
-import { PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -24,12 +25,12 @@ import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButto
 
 import { PageAppBar } from './Header.styles';
 import styles from './Header.module.scss';
+import { ExchangeInfoI, PerpetualDataI } from '../../types/types';
 
 export const Header = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
-  // const chainId = useChainId();
   const { chain } = useNetwork();
   const { address } = useAccount();
 
@@ -41,43 +42,68 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
+  const [chainId, setChainId] = useAtom(chainIdAtom);
 
   const requestRef = useRef(false);
+  const chainIdRef = useRef(chainId);
 
-  useEffect(() => {
-    if (!requestRef.current && chain) {
-      requestRef.current = true;
+  const setExchangeInfo = useCallback(
+    (data: ExchangeInfoI | null) => {
+      if (!data) {
+        setProxyAddr(undefined);
+        return;
+      }
+      setPools(data.pools);
+      setLiquidityPools(data.pools);
 
-      setProxyAddr(undefined);
-      getExchangeInfo(chain.id, null).then(({ data }) => {
-        setPools(data.pools);
-        setLiquidityPools(data.pools);
-
-        const perpetuals: PerpetualDataI[] = [];
-        data.pools.forEach((pool) => {
-          perpetuals.push(
-            ...pool.perpetuals.map((perpetual) => ({
-              id: perpetual.id,
-              poolName: pool.poolSymbol,
+      const perpetuals: PerpetualDataI[] = [];
+      data.pools.forEach((pool) => {
+        perpetuals.push(
+          ...pool.perpetuals.map((perpetual) => ({
+            id: perpetual.id,
+            poolName: pool.poolSymbol,
+            baseCurrency: perpetual.baseCurrency,
+            quoteCurrency: perpetual.quoteCurrency,
+            symbol: createSymbol({
+              poolSymbol: pool.poolSymbol,
               baseCurrency: perpetual.baseCurrency,
               quoteCurrency: perpetual.quoteCurrency,
-              symbol: createSymbol({
-                poolSymbol: pool.poolSymbol,
-                baseCurrency: perpetual.baseCurrency,
-                quoteCurrency: perpetual.quoteCurrency,
-              }),
-            }))
-          );
-        });
-        setPerpetuals(perpetuals);
-
-        setOracleFactoryAddr(data.oracleFactoryAddr);
-        setProxyAddr(data.proxyAddr);
-
-        requestRef.current = false;
+            }),
+          }))
+        );
       });
+      setPerpetuals(perpetuals);
+      setOracleFactoryAddr(data.oracleFactoryAddr);
+      setProxyAddr(data.proxyAddr);
+    },
+    [setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]
+  );
+
+  useEffect(() => {
+    if (!requestRef.current && chain && chain.id !== chainIdRef.current) {
+      requestRef.current = true;
+      setExchangeInfo(null);
+      getExchangeInfo(chain.id, null)
+        .then(({ data }) => {
+          setExchangeInfo(data);
+          setChainId(chain.id);
+        })
+        .catch((err) => {
+          console.log(err);
+          // API call failed - try with SDK
+          if (traderAPI && chain.id) {
+            getExchangeInfo(chain.id, traderAPI).then(({ data }) => {
+              setExchangeInfo(data);
+              setChainId(chain.id);
+            });
+          }
+        })
+        .finally(() => {
+          requestRef.current = false;
+        });
     }
-  }, [chain, setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
+  }, [chain, traderAPI, setExchangeInfo, setChainId]); //setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
