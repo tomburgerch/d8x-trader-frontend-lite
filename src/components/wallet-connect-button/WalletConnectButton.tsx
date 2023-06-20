@@ -70,11 +70,15 @@ export const WalletConnectButton = memo(() => {
   }, [isDisconnected, isReconnecting, unloadTraderAPI]);
 
   useEffect(() => {
-    if (loadingAPIRef.current || !isConnected || !provider || !chainId) {
+    if (loadingAPIRef.current) {
       return;
     }
     setTraderAPI(null);
-    // console.log(`reloading SDK on chainId ${chainId}`);
+    if (!isConnected || !provider || !chainId) {
+      return;
+    }
+
+    console.log(`reloading SDK on chainId ${chainId}`);
     loadingAPIRef.current = true;
     const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(chainId));
     // console.log(`proxy ${newTraderAPI.getProxyAddress()}`);
@@ -83,7 +87,7 @@ export const WalletConnectButton = memo(() => {
       .then(() => {
         setTraderAPI(newTraderAPI);
         loadingAPIRef.current = false;
-        // console.log(`SDK loaded on chain id ${chainId}`);
+        console.log(`SDK loaded on chain id ${chainId}`);
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) => {
