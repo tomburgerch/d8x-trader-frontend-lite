@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect, useRef } from 'react';
-import { useAccount, useBalance, useChainId } from 'wagmi';
+import { memo, useEffect, useMemo, useRef } from 'react';
+import { useAccount, useBalance, useNetwork } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
@@ -29,7 +29,8 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const chainId = useChainId();
+  // const chainId = useChainId();
+  const { chain } = useNetwork();
   const { address } = useAccount();
 
   const [, setPools] = useAtom(poolsAtom);
@@ -44,12 +45,11 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const requestRef = useRef(false);
 
   useEffect(() => {
-    if (!requestRef.current) {
+    if (!requestRef.current && chain) {
       requestRef.current = true;
 
       setProxyAddr(undefined);
-
-      getExchangeInfo(chainId, null).then(({ data }) => {
+      getExchangeInfo(chain.id, null).then(({ data }) => {
         setPools(data.pools);
         setLiquidityPools(data.pools);
 
@@ -77,20 +77,20 @@ export const Header = memo(({ children }: PropsWithChildren) => {
         requestRef.current = false;
       });
     }
-  }, [chainId, setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
+  }, [chain, setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
-    chainId: chainId,
+    chainId: chain?.id,
     enabled: !requestRef.current && address !== undefined,
   });
 
   useEffect(() => {
-    if (poolTokenBalance && selectedPool && chainId && !isError) {
+    if (poolTokenBalance && selectedPool && chain && !isError) {
       setPoolTokenBalance(Number(poolTokenBalance.formatted));
     }
-  }, [selectedPool, chainId, poolTokenBalance, isError, setPoolTokenBalance]);
+  }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance]);
 
   return (
     <Container className={styles.root}>
