@@ -1,9 +1,9 @@
-import type { SmartContractOrder } from '@d8x/perpetuals-sdk';
 import { BytesLike } from '@ethersproject/bytes';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
+import { SmartContractOrder } from '@d8x/perpetuals-sdk';
 
 export interface AppDimensionsI {
   width?: number;
@@ -51,7 +51,6 @@ export interface PoolI {
   poolShareTokenAddr: string;
   defaultFundCashCC: number;
   pnlParticipantCashCC: number;
-  totalAMMFundCashCC: number;
   totalTargetAMMFundSizeCC: number;
   brokerCollateralLotSize: number;
   perpetuals: PerpetualI[];
@@ -152,6 +151,8 @@ export interface OrderI {
 export interface OrderWithIdI extends OrderI {
   id: string;
 }
+
+export interface SmartContractOrderI extends SmartContractOrder {}
 
 export interface OrderDigestI {
   digests: string[];
