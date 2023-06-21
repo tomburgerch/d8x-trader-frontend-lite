@@ -86,6 +86,10 @@ export const WithdrawAction = memo(() => {
     return 0;
   }, [userAmount, dCurrencyPrice]);
 
+  const isButtonDisabled = useMemo(() => {
+    return !userAmount || !shareAmount || requestSent;
+  }, [userAmount, shareAmount, requestSent]);
+
   return (
     <div className={styles.root}>
       <Separator />
@@ -134,7 +138,7 @@ export const WithdrawAction = memo(() => {
         variant="primary"
         onClick={handleWithdrawLiquidity}
         className={styles.actionButton}
-        disabled={shareAmount > 0 && requestSent}
+        disabled={isButtonDisabled}
       >
         Withdraw
       </Button>

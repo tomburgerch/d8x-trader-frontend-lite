@@ -14,6 +14,7 @@ import {
   liqProvToolAtom,
   userAmountAtom,
   selectedLiquidityPoolAtom,
+  withdrawalsAtom,
 } from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -26,6 +27,7 @@ export const InitiateAction = memo(() => {
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
+  const [withdrawals] = useAtom(withdrawalsAtom);
 
   const { data: signer } = useSigner();
 
@@ -72,6 +74,7 @@ export const InitiateAction = memo(() => {
     liqProvTool
       .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
       .then(async (tx) => {
+        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
         const receipt = await tx.wait();
         if (receipt.status === 1) {
           setInitiateAmount(0);
@@ -79,22 +82,27 @@ export const InitiateAction = memo(() => {
           toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
           // TODO: run data re-fetch
         } else {
-          const response = await signerRef.current!.call(
-            {
-              to: tx.to,
-              from: tx.from,
-              nonce: tx.nonce,
-              gasLimit: tx.gasLimit,
-              gasPrice: tx.gasPrice,
-              data: tx.data,
-              value: tx.value,
-              chainId: tx.chainId,
-              type: tx.type ?? undefined,
-              accessList: tx.accessList,
-            },
-            tx.blockNumber
-          );
-          let reason = toUtf8String('0x' + response.substring(138));
+          let reason: string;
+          if (signerRef.current) {
+            const response = await signerRef.current.call(
+              {
+                to: tx.to,
+                from: tx.from,
+                nonce: tx.nonce,
+                gasLimit: tx.gasLimit,
+                gasPrice: tx.gasPrice,
+                data: tx.data,
+                value: tx.value,
+                chainId: tx.chainId,
+                type: tx.type ?? undefined,
+                accessList: tx.accessList,
+              },
+              tx.blockNumber
+            );
+            reason = toUtf8String('0x' + response.substring(138));
+          } else {
+            reason = 'unknown';
+          }
           toast.error(
             <ToastContent
               title="Error initiating liquidity withdrawal"
@@ -117,13 +125,13 @@ export const InitiateAction = memo(() => {
     return 0;
   }, [initiateAmount, dCurrencyPrice]);
 
-  const isInputDisabled = useMemo(() => {
-    if (!userAmount || !initiateAmount || requestSent) {
+  const isButtonDisabled = useMemo(() => {
+    if (withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
       return true;
     } else {
       return userAmount < initiateAmount;
     }
-  }, [userAmount, initiateAmount, requestSent]);
+  }, [withdrawals, userAmount, initiateAmount, requestSent]);
 
   return (
     <div className={styles.root}>
@@ -170,7 +178,7 @@ export const InitiateAction = memo(() => {
       </Box>
       <Button
         variant="primary"
-        disabled={isInputDisabled}
+        disabled={isButtonDisabled}
         onClick={handleInitiateLiquidity}
         className={styles.actionButton}
       >

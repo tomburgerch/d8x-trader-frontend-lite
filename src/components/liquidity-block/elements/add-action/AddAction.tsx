@@ -12,7 +12,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { proxyAddrAtom } from 'store/pools.store';
-
+import { toUtf8String } from '@ethersproject/strings';
 import styles from './AddAction.module.scss';
 
 export const AddAction = memo(() => {
@@ -35,7 +35,7 @@ export const AddAction = memo(() => {
   const [inputValue, setInputValue] = useState(`${addAmount}`);
 
   const requestSentRef = useRef(false);
-
+  const signerRef = useRef(signer);
   const inputValueChangedRef = useRef(false);
 
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -78,17 +78,40 @@ export const AddAction = memo(() => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (result) => {
-          const receipt = await result.wait();
+        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (tx) => {
+          console.log(`addLiquidity tx hash: ${tx.hash}`);
+          const receipt = await tx.wait();
           if (receipt.status === 1) {
-            // status == 1 means the tx was a success
+            setAddAmount(0);
+            setInputValue('0');
             toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
             // TODO: run data re-fetch
           } else {
-            toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+            let reason: string;
+            if (signerRef.current) {
+              const response = await signerRef.current.call(
+                {
+                  to: tx.to,
+                  from: tx.from,
+                  nonce: tx.nonce,
+                  gasLimit: tx.gasLimit,
+                  gasPrice: tx.gasPrice,
+                  data: tx.data,
+                  value: tx.value,
+                  chainId: tx.chainId,
+                  type: tx.type ?? undefined,
+                  accessList: tx.accessList,
+                },
+                tx.blockNumber
+              );
+              reason = toUtf8String('0x' + response.substring(138));
+            } else {
+              reason = 'unknown';
+            }
+            toast.error(
+              <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'reason', value: reason }]} />
+            );
           }
-          setAddAmount(0);
-          setInputValue('0');
         });
       })
       .catch(() => {})

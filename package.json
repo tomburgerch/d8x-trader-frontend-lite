@@ -62,6 +62,7 @@
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/constants": "5.7.0",
     "@ethersproject/contracts": "5.7.0",
+    "@ethersproject/strings": "^5.7.0",
     "@ethersproject/units": "5.7.0",
     "@mui/material": "5.11.16",
     "@rainbow-me/rainbowkit": "0.12.9",
