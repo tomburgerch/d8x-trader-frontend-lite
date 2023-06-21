@@ -129,6 +129,12 @@ export const PositionsTable = memo(() => {
       orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
+            signer.provider!.getBlock('latest').then((block) => {
+              data.data.SCOrders = data.data.SCOrders.map((order) => ({
+                ...order,
+                executionTimestamp: block.timestamp,
+              }));
+            });
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
               .then((res) => {
                 if (res?.hash) {

@@ -210,6 +210,9 @@ export const ActionBlock = memo(() => {
     orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
+          signer.provider!.getBlock('latest').then((block) => {
+            data.data.SCOrders = data.data.SCOrders.map((order) => ({ ...order, executionTimestamp: block.timestamp }));
+          });
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then((res) => {
             if (res?.hash) {
               console.log(res.hash);
