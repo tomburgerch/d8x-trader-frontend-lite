@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
@@ -22,11 +22,30 @@ export const InitiateAction = memo(() => {
   const [initiateAmount, setInitiateAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
 
+  const [inputValue, setInputValue] = useState(`${initiateAmount}`);
+
   const requestSentRef = useRef(false);
 
+  const inputValueChangedRef = useRef(false);
+
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setInitiateAmount(+event.target.value);
+    const targetValue = event.target.value;
+    if (targetValue) {
+      setInitiateAmount(+targetValue);
+      setInputValue(targetValue);
+    } else {
+      setInitiateAmount(0);
+      setInputValue('');
+    }
+    inputValueChangedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!inputValueChangedRef.current) {
+      setInputValue(`${initiateAmount}`);
+    }
+    inputValueChangedRef.current = false;
+  }, [initiateAmount]);
 
   const handleInitiateLiquidity = useCallback(() => {
     if (requestSentRef.current) {
@@ -50,6 +69,10 @@ export const InitiateAction = memo(() => {
         } else {
           toast.error(<ToastContent title="Error initiating liquidity withdrawal" bodyLines={[]} />);
         }
+      })
+      .then(() => {
+        setInitiateAmount(0);
+        setInputValue('0');
       })
       .catch(() => {})
       .finally(() => {
@@ -89,7 +112,7 @@ export const InitiateAction = memo(() => {
           }
           type="number"
           inputProps={{ step: 1, min: 0 }}
-          value={initiateAmount}
+          value={inputValue}
           onChange={handleInputCapture}
         />
       </Box>
