@@ -65,7 +65,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     leverage: orderInfo.leverage,
     reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
     keepPositionLvg: orderInfo.keepPositionLeverage,
-    executionTimestamp: Math.floor(Date.now() / 1000),
+    executionTimestamp: 0,
     deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
 }
@@ -177,7 +177,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: 0,
       });
     }
 
@@ -195,7 +195,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: 0,
       });
     }
     return orders;
@@ -210,9 +210,6 @@ export const ActionBlock = memo(() => {
     orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          signer.provider!.getBlock('latest').then((block) => {
-            data.data.SCOrders = data.data.SCOrders.map((order) => ({ ...order, executionTimestamp: block.timestamp }));
-          });
           approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then((res) => {
             if (res?.hash) {
               console.log(res.hash);

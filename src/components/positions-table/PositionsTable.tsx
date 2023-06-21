@@ -121,7 +121,7 @@ export const PositionsTable = memo(() => {
         side: selectedPosition.side === 'BUY' ? 'SELL' : 'BUY',
         type: OrderTypeE.Market.toUpperCase(),
         quantity: selectedPosition.positionNotionalBaseCCY,
-        executionTimestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: 0,
         reduceOnly: true,
         leverage: selectedPosition.leverage,
       };
@@ -129,12 +129,6 @@ export const PositionsTable = memo(() => {
       orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
-            signer.provider!.getBlock('latest').then((block) => {
-              data.data.SCOrders = data.data.SCOrders.map((order) => ({
-                ...order,
-                executionTimestamp: block.timestamp,
-              }));
-            });
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
               .then((res) => {
                 if (res?.hash) {
