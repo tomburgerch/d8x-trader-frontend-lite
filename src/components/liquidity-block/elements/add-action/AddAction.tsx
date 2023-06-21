@@ -78,21 +78,18 @@ export const AddAction = memo(() => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool
-          .addLiquidity(selectedLiquidityPool.poolSymbol, addAmount)
-          .then(async (result) => {
-            const receipt = await result.wait();
-            if (receipt.status === 1) {
-              toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-              // TODO: run data re-fetch
-            } else {
-              toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
-            }
-          })
-          .then(() => {
-            setAddAmount(0);
-            setInputValue('0');
-          });
+        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (result) => {
+          const receipt = await result.wait();
+          if (receipt.status === 1) {
+            // status == 1 means the tx was a success
+            toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+            // TODO: run data re-fetch
+          } else {
+            toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+          }
+          setAddAmount(0);
+          setInputValue('0');
+        });
       })
       .catch(() => {})
       .finally(() => {
