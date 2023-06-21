@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useSigner } from 'wagmi';
 
@@ -32,11 +32,30 @@ export const AddAction = memo(() => {
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
 
+  const [inputValue, setInputValue] = useState(`${addAmount}`);
+
   const requestSentRef = useRef(false);
 
+  const inputValueChangedRef = useRef(false);
+
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setAddAmount(+event.target.value);
+    const targetValue = event.target.value;
+    if (targetValue) {
+      setAddAmount(+targetValue);
+      setInputValue(targetValue);
+    } else {
+      setAddAmount(0);
+      setInputValue('');
+    }
+    inputValueChangedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!inputValueChangedRef.current) {
+      setInputValue(`${addAmount}`);
+    }
+    inputValueChangedRef.current = false;
+  }, [addAmount]);
 
   const handleAddLiquidity = useCallback(() => {
     if (requestSentRef.current) {
@@ -59,15 +78,21 @@ export const AddAction = memo(() => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (result) => {
-          const receipt = await result.wait();
-          if (receipt.status === 1) {
-            toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-            // TODO: run data re-fetch
-          } else {
-            toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
-          }
-        });
+        liqProvTool
+          .addLiquidity(selectedLiquidityPool.poolSymbol, addAmount)
+          .then(async (result) => {
+            const receipt = await result.wait();
+            if (receipt.status === 1) {
+              toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+              // TODO: run data re-fetch
+            } else {
+              toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+            }
+          })
+          .then(() => {
+            setAddAmount(0);
+            setInputValue('0');
+          });
       })
       .catch(() => {})
       .finally(() => {
@@ -107,7 +132,7 @@ export const AddAction = memo(() => {
           }
           type="number"
           inputProps={{ step: 1, min: 0 }}
-          value={addAmount}
+          value={inputValue}
           onChange={handleInputCapture}
         />
       </Box>

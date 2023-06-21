@@ -121,7 +121,7 @@ export const PositionsTable = memo(() => {
         side: selectedPosition.side === 'BUY' ? 'SELL' : 'BUY',
         type: OrderTypeE.Market.toUpperCase(),
         quantity: selectedPosition.positionNotionalBaseCCY,
-        executionTimestamp: Math.floor(Date.now() / 1000),
+        executionTimestamp: 0,
         reduceOnly: true,
         leverage: selectedPosition.leverage,
       };
