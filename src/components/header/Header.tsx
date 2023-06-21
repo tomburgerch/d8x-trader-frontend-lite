@@ -45,6 +45,12 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [chainId, setChainId] = useAtom(chainIdAtom);
 
+  // const chainId = useMemo(() => {
+  //   if (chain) {
+  //     console.log(`switched chain id: ${chain.id}`);
+  //     return chain.id;
+  //   }
+  // }, [chain]);
   const requestRef = useRef(false);
   const chainIdRef = useRef(chainId);
 
@@ -56,7 +62,6 @@ export const Header = memo(({ children }: PropsWithChildren) => {
       }
       setPools(data.pools);
       setLiquidityPools(data.pools);
-
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
         perpetuals.push(
