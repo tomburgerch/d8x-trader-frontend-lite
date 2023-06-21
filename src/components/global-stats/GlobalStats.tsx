@@ -34,8 +34,8 @@ export const GlobalStats = () => {
       return;
     }
 
-    const fromTimestamp = Date.now() - PERIOD_OF_7_DAYS;
-    const toTimestamp = Date.now();
+    const fromTimestamp = Math.floor((Date.now() - PERIOD_OF_7_DAYS) / 1000);
+    const toTimestamp = Math.floor(Date.now() / 1000);
 
     weeklyApiRequestSentRef.current = true;
     getWeeklyAPI(chainId, fromTimestamp, toTimestamp, selectedLiquidityPool.poolSymbol)
