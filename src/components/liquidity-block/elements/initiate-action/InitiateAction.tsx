@@ -70,6 +70,10 @@ export const InitiateAction = memo(() => {
           toast.error(<ToastContent title="Error initiating liquidity withdrawal" bodyLines={[]} />);
         }
       })
+      .then(() => {
+        setInitiateAmount(0);
+        setInputValue('0');
+      })
       .catch(() => {})
       .finally(() => {
         requestSentRef.current = false;
