@@ -9,7 +9,12 @@ import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
-import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import {
+  dCurrencyPriceAtom,
+  liqProvToolAtom,
+  userAmountAtom,
+  selectedLiquidityPoolAtom,
+} from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './InitiateAction.module.scss';
@@ -18,6 +23,7 @@ export const InitiateAction = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
+  const [userAmount] = useAtom(userAmountAtom);
 
   const [initiateAmount, setInitiateAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -103,6 +109,14 @@ export const InitiateAction = memo(() => {
     return 0;
   }, [initiateAmount, dCurrencyPrice]);
 
+  const isInputDisabled = useMemo(() => {
+    if (!userAmount || !initiateAmount || requestSent) {
+      return true;
+    } else {
+      return userAmount < initiateAmount;
+    }
+  }, [userAmount, initiateAmount]);
+
   return (
     <div className={styles.root}>
       <Separator />
@@ -148,7 +162,7 @@ export const InitiateAction = memo(() => {
       </Box>
       <Button
         variant="primary"
-        disabled={!initiateAmount || requestSent}
+        disabled={isInputDisabled}
         onClick={handleInitiateLiquidity}
         className={styles.actionButton}
       >
