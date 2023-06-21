@@ -42,12 +42,27 @@ export const InitiateAction = memo(() => {
 
     liqProvTool
       .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
-      .then(async (result) => {
-        const receipt = await result.wait();
+      .then(async (tx) => {
+        const receipt = await tx.wait();
         if (receipt.status === 1) {
           toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
           // TODO: run data re-fetch
         } else {
+          // const response = await provider.call(
+          //   {
+          //     to: tx.to,
+          //     from: tx.from,
+          //     nonce: tx.nonce,
+          //     gasLimit: tx.gasLimit,
+          //     gasPrice: tx.gasPrice,
+          //     data: tx.data,
+          //     value: tx.value,
+          //     chainId: tx.chainId,
+          //     type: tx.type ?? undefined,
+          //     accessList: tx.accessList,
+          //   },
+          //   tx.blockNumber
+          // );
           toast.error(<ToastContent title="Error initiating liquidity withdrawal" bodyLines={[]} />);
         }
       })
