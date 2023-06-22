@@ -7,7 +7,13 @@ import { Box, Typography } from '@mui/material';
 import { PERIOD_OF_7_DAYS } from 'app-constants';
 import { getWeeklyAPI } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { dCurrencyPriceAtom, tvlAtom, selectedLiquidityPoolAtom, loadStatsAtom } from 'store/liquidity-pools.store';
+import {
+  dCurrencyPriceAtom,
+  tvlAtom,
+  selectedLiquidityPoolAtom,
+  loadStatsAtom,
+  sdkConnectedAtom,
+} from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './GlobalStats.module.scss';
@@ -20,6 +26,7 @@ export const GlobalStats = () => {
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
   const [loadStats] = useAtom(loadStatsAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
 
@@ -57,22 +64,22 @@ export const GlobalStats = () => {
       return;
     }
     setDCurrencyPrice(null);
-    if (traderAPI && selectedLiquidityPool) {
+    if (traderAPI && isSDKConnected && selectedLiquidityPool) {
       traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDCurrencyPrice(price));
     }
-  }, [traderAPI, selectedLiquidityPool, loadStats, setDCurrencyPrice]);
+  }, [traderAPI, selectedLiquidityPool, loadStats, isSDKConnected, setDCurrencyPrice]);
 
   useEffect(() => {
     if (!loadStats) {
       return;
     }
     setTvl(null);
-    if (traderAPI && selectedLiquidityPool) {
+    if (traderAPI && isSDKConnected && selectedLiquidityPool) {
       traderAPI
         .getPoolState(selectedLiquidityPool.poolSymbol)
         .then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
     }
-  }, [traderAPI, selectedLiquidityPool, loadStats, setTvl]);
+  }, [traderAPI, selectedLiquidityPool, loadStats, isSDKConnected, setTvl]);
 
   const dSupply = useMemo(() => {
     if (selectedLiquidityPool && dCurrencyPrice && tvl) {

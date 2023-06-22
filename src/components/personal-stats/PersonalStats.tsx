@@ -8,7 +8,13 @@ import { Box, Typography } from '@mui/material';
 import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { getEarnings } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { loadStatsAtom, selectedLiquidityPoolAtom, userAmountAtom, withdrawalsAtom } from 'store/liquidity-pools.store';
+import {
+  loadStatsAtom,
+  sdkConnectedAtom,
+  selectedLiquidityPoolAtom,
+  userAmountAtom,
+  withdrawalsAtom,
+} from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './PersonalStats.module.scss';
@@ -22,6 +28,7 @@ export const PersonalStats = memo(() => {
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [loadStats] = useAtom(loadStatsAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [estimatedEarnings, setEstimatedEarnings] = useState<number>();
 
@@ -33,12 +40,12 @@ export const PersonalStats = memo(() => {
     }
 
     setUserAmount(null);
-    if (selectedLiquidityPool && traderAPI && address) {
+    if (selectedLiquidityPool && traderAPI && isSDKConnected && address) {
       traderAPI.getPoolShareTokenBalance(address, selectedLiquidityPool.poolSymbol).then((amount) => {
         setUserAmount(amount);
       });
     }
-  }, [selectedLiquidityPool, traderAPI, address, loadStats, setUserAmount]);
+  }, [selectedLiquidityPool, traderAPI, isSDKConnected, address, loadStats, setUserAmount]);
 
   useEffect(() => {
     if (!loadStats) {
@@ -64,7 +71,7 @@ export const PersonalStats = memo(() => {
   }, [chainId, address, selectedLiquidityPool, loadStats]);
 
   const withdrawnOn = useMemo(() => {
-    if (withdrawals.length === 0) {
+    if (!withdrawals || withdrawals.length === 0) {
       return 'na';
     }
     const currentTime = Date.now();
@@ -111,7 +118,7 @@ export const PersonalStats = memo(() => {
               Withdrawal initiated?
             </Typography>
             <Typography variant="bodyMedium" className={styles.statValue}>
-              {withdrawals.length > 0 ? 'Yes' : 'No'}
+              {withdrawals && withdrawals.length > 0 ? 'Yes' : 'No'}
             </Typography>
           </Box>
           <Box key="indexPrice" className={styles.statContainer}>
@@ -119,7 +126,7 @@ export const PersonalStats = memo(() => {
               Withdrawal Amount
             </Typography>
             <Typography variant="bodyMedium" className={styles.statValue}>
-              {withdrawals.length > 0
+              {withdrawals && withdrawals.length > 0
                 ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, 'dMATIC')
                 : 'na'}
             </Typography>

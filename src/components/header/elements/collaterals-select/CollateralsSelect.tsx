@@ -68,7 +68,9 @@ export const CollateralsSelect = memo(() => {
     if (selectedPool !== null && address) {
       getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
-          data.map((o) => setOpenOrders(o));
+          if (data && data.length > 0) {
+            data.map((o) => setOpenOrders(o));
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -76,7 +78,9 @@ export const CollateralsSelect = memo(() => {
 
       getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address)
         .then(({ data }) => {
-          data.map((p) => setPositions(p));
+          if (data && data.length > 0) {
+            data.map((p) => setPositions(p));
+          }
         })
         .catch((err) => {
           console.log(err);
