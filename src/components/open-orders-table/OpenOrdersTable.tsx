@@ -132,7 +132,9 @@ export const OpenOrdersTable = memo(() => {
     if (selectedPool !== null && address && !isDisconnected) {
       getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
-          data.map((o) => setOpenOrders(o));
+          if (data) {
+            data.map((o) => setOpenOrders(o));
+          }
         })
         .catch((err) => console.log(err));
     }

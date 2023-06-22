@@ -13,6 +13,7 @@ export const dCurrencyPriceAtom = atom<number | null>(null);
 export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
 export const loadStatsAtom = atom(true);
+export const sdkConnectedAtom = atom(false);
 
 const selectedLiquidityPoolNameLSAtom = atomWithStorage<string>('d8x_selectedLiquidityPoolName', '');
 

@@ -11,11 +11,13 @@ import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
 import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTraderLoyalty } from 'network/network';
-import { liqProvToolAtom } from 'store/liquidity-pools.store';
+import { liqProvToolAtom, sdkConnectedAtom } from 'store/liquidity-pools.store';
 import { loyaltyScoreAtom, traderAPIAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
 import styles from './WalletConnectButton.module.scss';
+import { Signer } from '@ethersproject/abstract-signer';
+import { Provider } from '@ethersproject/abstract-provider';
 
 const loyaltyMap: Record<number, string> = {
   1: 'Diamond',
@@ -29,6 +31,7 @@ export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
   const [liqProvTool, setLiqProvTool] = useAtom(liqProvToolAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
+  const [, setSDKConnected] = useAtom(sdkConnectedAtom);
 
   const { data: signer } = useSigner({
     onError(error) {
@@ -39,7 +42,7 @@ export const WalletConnectButton = memo(() => {
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
   const liqProvToolRef = useRef(liqProvTool);
-  const loadingLiqProvToolRef = useRef(false);
+  // const loadingLiqProvToolRef = useRef(false);
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -47,12 +50,37 @@ export const WalletConnectButton = memo(() => {
   const { isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
 
-  const unloadTraderAPI = useCallback(() => {
-    if (!traderAPIRef.current) {
-      return;
+  const loadSDK = useCallback(
+    async (_signer: Signer, _provider: Provider, _chainId: number) => {
+      if (loadingAPIRef.current) {
+        return;
+      }
+      loadingAPIRef.current = true;
+      setTraderAPI(null);
+      setLiqProvTool(null);
+      setSDKConnected(false);
+      console.log(`loading SDK on chainId ${_chainId}`);
+      const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(_chainId));
+      const newLiqProvTool = new LiquidityProviderTool(PerpetualDataHandler.readSDKConfig(_chainId), _signer);
+      await Promise.all([newTraderAPI.createProxyInstance(_provider), newLiqProvTool.createProxyInstance(_provider)]);
+      setTraderAPI(newTraderAPI);
+      setLiqProvTool(newLiqProvTool);
+      loadingAPIRef.current = false;
+      setSDKConnected(true);
+      console.log(`SDK loaded on chain id ${_chainId}`);
+    },
+    [setTraderAPI, setLiqProvTool, setSDKConnected]
+  );
+
+  const unloadSDK = useCallback(() => {
+    if (traderAPIRef.current) {
+      setTraderAPI(null);
     }
-    setTraderAPI(null);
-  }, [setTraderAPI]);
+    if (liqProvToolRef.current) {
+      setLiqProvTool(null);
+    }
+    setSDKConnected(false);
+  }, [setTraderAPI, setLiqProvTool, setSDKConnected]);
 
   const unloadLiqProvTool = useCallback(() => {
     if (!liqProvToolRef.current) {
@@ -76,73 +104,30 @@ export const WalletConnectButton = memo(() => {
       toast.error(
         <ToastContent title="Connection error" bodyLines={[{ label: 'Reason', value: errorMessage.message }]} />
       );
-      unloadTraderAPI();
+      unloadSDK();
     }
-  }, [errorMessage, unloadTraderAPI]);
+  }, [errorMessage, unloadSDK]);
 
   useEffect(() => {
     if (isDisconnected || isReconnecting || traderAPIRef.current) {
-      unloadTraderAPI();
+      unloadSDK();
     }
-  }, [isDisconnected, isReconnecting, unloadTraderAPI]);
+  }, [isDisconnected, isReconnecting, unloadSDK]);
 
   useEffect(() => {
-    if (loadingAPIRef.current) {
+    if (loadingAPIRef.current || !isConnected || !provider || !signer || !chainId) {
       return;
     }
-    setTraderAPI(null);
-    if (!isConnected || !provider || !chainId) {
-      return;
-    }
-
-    console.log(`reloading SDK on chainId ${chainId}`);
-    loadingAPIRef.current = true;
-    const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(chainId));
-    // console.log(`proxy ${newTraderAPI.getProxyAddress()}`);
-    newTraderAPI
-      .createProxyInstance(provider)
-      .then(() => {
-        setTraderAPI(newTraderAPI);
-        loadingAPIRef.current = false;
-        console.log(`SDK (Trader API) loaded on chain id ${chainId}`);
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => {
-        console.log(error);
-        setTraderAPI(null);
-        loadingAPIRef.current = false;
-      });
-  }, [isConnected, provider, chainId, setTraderAPI]);
+    loadSDK(signer, provider, chainId)
+      .then(() => {})
+      .catch((err) => console.log(err));
+  }, [isConnected, provider, signer, chainId, loadSDK]);
 
   useEffect(() => {
     if (isDisconnected || isReconnecting || liqProvToolRef.current) {
       unloadLiqProvTool();
     }
   }, [isDisconnected, isReconnecting, unloadLiqProvTool]);
-
-  useEffect(() => {
-    if (loadingLiqProvToolRef.current || !chainId || !provider || !isConnected || !signer) {
-      return;
-    }
-    setLiqProvTool(null);
-    loadingLiqProvToolRef.current = true;
-    console.log(`reloading SDK (LP API) on chainId ${chainId}`);
-    const newLiqProvTool = new LiquidityProviderTool(PerpetualDataHandler.readSDKConfig(chainId), signer);
-    newLiqProvTool
-      .createProxyInstance(provider)
-      .then(() => {
-        console.log(`SDK (LP API) loaded on chain id ${chainId}`);
-        setLiqProvTool(newLiqProvTool);
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) => {
-        console.log(error);
-        setLiqProvTool(null);
-      })
-      .finally(() => {
-        loadingLiqProvToolRef.current = false;
-      });
-  }, [isConnected, chainId, provider, setLiqProvTool, signer]);
 
   return (
     <ConnectButton.Custom>

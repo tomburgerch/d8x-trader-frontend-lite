@@ -114,7 +114,7 @@ export const Header = memo(({ children }: PropsWithChildren) => {
     address: address,
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
     chainId: chain?.id,
-    enabled: !requestRef.current && address !== undefined,
+    enabled: !requestRef.current && address !== undefined && chainId === chain?.id,
   });
 
   useEffect(() => {

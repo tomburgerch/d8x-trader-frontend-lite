@@ -282,7 +282,9 @@ export const PositionsTable = memo(() => {
   const refreshPositions = useCallback(() => {
     if (selectedPool?.perpetuals && address && isConnected) {
       getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now()).then(({ data }) => {
-        data.map((p) => setPositions(p));
+        if (data) {
+          data.map((p) => setPositions(p));
+        }
       });
     }
   }, [chainId, address, isConnected, selectedPool, setPositions]);

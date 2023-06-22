@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { Box, Button, Typography } from '@mui/material';
 
-import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
+import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -100,6 +100,9 @@ export const WithdrawAction = memo(() => {
   }, [liqProvTool, selectedLiquidityPool, signer, setLoadStats]);
 
   const shareAmount = useMemo(() => {
+    if (!withdrawals) {
+      return;
+    }
     if (withdrawals.length === 0) {
       return 0;
     }

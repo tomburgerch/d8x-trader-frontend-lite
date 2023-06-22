@@ -131,7 +131,7 @@ export const InitiateAction = memo(() => {
   }, [initiateAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
-    if (withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
+    if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
       return true;
     } else {
       return userAmount < initiateAmount;

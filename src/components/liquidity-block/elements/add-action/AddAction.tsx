@@ -13,6 +13,7 @@ import {
   dCurrencyPriceAtom,
   liqProvToolAtom,
   loadStatsAtom,
+  sdkConnectedAtom,
   selectedLiquidityPoolAtom,
 } from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -34,6 +35,7 @@ export const AddAction = memo(() => {
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [, setLoadStats] = useAtom(loadStatsAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -67,7 +69,7 @@ export const AddAction = memo(() => {
       return;
     }
 
-    if (!liqProvTool || !selectedLiquidityPool || !addAmount || addAmount < 0) {
+    if (!liqProvTool || !isSDKConnected || !selectedLiquidityPool || !addAmount || addAmount < 0) {
       return;
     }
 
@@ -129,7 +131,7 @@ export const AddAction = memo(() => {
         setRequestSent(false);
         toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [addAmount, liqProvTool, selectedLiquidityPool, address, proxyAddr, signer, setLoadStats]);
+  }, [addAmount, liqProvTool, selectedLiquidityPool, address, proxyAddr, signer, isSDKConnected, setLoadStats]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -178,7 +180,7 @@ export const AddAction = memo(() => {
       </Box>
       <Button
         variant="primary"
-        disabled={!addAmount || requestSent}
+        disabled={!addAmount || requestSent || !isSDKConnected}
         onClick={handleAddLiquidity}
         className={styles.actionButton}
       >
