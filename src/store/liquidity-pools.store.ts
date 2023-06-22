@@ -12,6 +12,7 @@ export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 export const dCurrencyPriceAtom = atom<number | null>(null);
 export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
+export const loadStatsAtom = atom(true);
 
 const selectedLiquidityPoolNameLSAtom = atomWithStorage<string>('d8x_selectedLiquidityPoolName', '');
 
@@ -28,7 +29,7 @@ export const selectedLiquidityPoolAtom = atom(
       return foundPool;
     }
 
-    return allPools[0];
+    return allPools.length > 0 ? allPools[0] : null;
   },
   (get, set, newPool: string) => {
     set(selectedLiquidityPoolNameLSAtom, newPool);

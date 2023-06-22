@@ -15,6 +15,7 @@ import {
   userAmountAtom,
   selectedLiquidityPoolAtom,
   withdrawalsAtom,
+  loadStatsAtom,
 } from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -28,6 +29,7 @@ export const InitiateAction = memo(() => {
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
+  const [, setLoadStats] = useAtom(loadStatsAtom);
 
   const { data: signer } = useSigner();
 
@@ -37,7 +39,6 @@ export const InitiateAction = memo(() => {
   const [inputValue, setInputValue] = useState(`${initiateAmount}`);
 
   const requestSentRef = useRef(false);
-  const signerRef = useRef(signer);
   const inputValueChangedRef = useRef(false);
 
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -59,32 +60,38 @@ export const InitiateAction = memo(() => {
     inputValueChangedRef.current = false;
   }, [initiateAmount]);
 
-  const handleInitiateLiquidity = useCallback(() => {
+  const handleInitiateLiquidity = useCallback(async () => {
     if (requestSentRef.current) {
       return;
     }
 
-    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0 || !signerRef.current) {
+    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0 || !signer) {
       return;
     }
 
     requestSentRef.current = true;
     setRequestSent(true);
 
-    liqProvTool
+    await liqProvTool
       .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
-        const receipt = await tx.wait();
-        if (receipt.status === 1) {
-          setInitiateAmount(0);
-          setInputValue('0');
-          toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
-          // TODO: run data re-fetch
-        } else {
-          let reason: string;
-          if (signerRef.current) {
-            const response = await signerRef.current.call(
+        setLoadStats(false);
+        toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
+        tx.wait()
+          .then((receipt) => {
+            if (receipt.status === 1) {
+              setLoadStats(true);
+              setInitiateAmount(0);
+              setInputValue('0');
+              requestSentRef.current = false;
+              setRequestSent(false);
+              toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
+            }
+          })
+          .catch(async (err) => {
+            console.log(err);
+            const response = await signer.call(
               {
                 to: tx.to,
                 from: tx.from,
@@ -99,24 +106,22 @@ export const InitiateAction = memo(() => {
               },
               tx.blockNumber
             );
-            reason = toUtf8String('0x' + response.substring(138));
-          } else {
-            reason = 'unknown';
-          }
-          toast.error(
-            <ToastContent
-              title="Error initiating liquidity withdrawal"
-              bodyLines={[{ label: 'reason', value: reason }]}
-            />
-          );
-        }
+            const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+            setLoadStats(true);
+            requestSentRef.current = false;
+            setRequestSent(false);
+            toast.success(
+              <ToastContent title="Error initiating withdrawal" bodyLines={[{ label: 'Reason', value: reason }]} />
+            );
+          });
       })
-      .catch(() => {})
-      .finally(() => {
+      .catch(async () => {
+        setLoadStats(true);
         requestSentRef.current = false;
         setRequestSent(false);
+        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [initiateAmount, liqProvTool, selectedLiquidityPool]);
+  }, [initiateAmount, liqProvTool, signer, selectedLiquidityPool, setLoadStats]);
 
   const predictedAmount = useMemo(() => {
     if (initiateAmount > 0 && dCurrencyPrice != null) {

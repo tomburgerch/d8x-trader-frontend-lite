@@ -9,7 +9,12 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import {
+  dCurrencyPriceAtom,
+  liqProvToolAtom,
+  loadStatsAtom,
+  selectedLiquidityPoolAtom,
+} from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { proxyAddrAtom } from 'store/pools.store';
 import { toUtf8String } from '@ethersproject/strings';
@@ -28,6 +33,7 @@ export const AddAction = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
+  const [, setLoadStats] = useAtom(loadStatsAtom);
 
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -35,7 +41,6 @@ export const AddAction = memo(() => {
   const [inputValue, setInputValue] = useState(`${addAmount}`);
 
   const requestSentRef = useRef(false);
-  const signerRef = useRef(signer);
   const inputValueChangedRef = useRef(false);
 
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,7 +62,7 @@ export const AddAction = memo(() => {
     inputValueChangedRef.current = false;
   }, [addAmount]);
 
-  const handleAddLiquidity = useCallback(() => {
+  const handleAddLiquidity = useCallback(async () => {
     if (requestSentRef.current) {
       return;
     }
@@ -72,24 +77,28 @@ export const AddAction = memo(() => {
 
     requestSentRef.current = true;
     setRequestSent(true);
-
-    approveMarginToken(signer, selectedLiquidityPool.marginTokenAddr, proxyAddr, addAmount)
+    await approveMarginToken(signer, selectedLiquidityPool.marginTokenAddr, proxyAddr, addAmount)
       .then((res) => {
         if (res?.hash) {
           console.log(res.hash);
         }
         liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (tx) => {
           console.log(`addLiquidity tx hash: ${tx.hash}`);
-          const receipt = await tx.wait();
-          if (receipt.status === 1) {
-            setAddAmount(0);
-            setInputValue('0');
-            toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-            // TODO: run data re-fetch
-          } else {
-            let reason: string;
-            if (signerRef.current) {
-              const response = await signerRef.current.call(
+          setLoadStats(false);
+          tx.wait()
+            .then((receipt) => {
+              if (receipt.status === 1) {
+                setLoadStats(true);
+                setAddAmount(0);
+                setInputValue('0');
+                requestSentRef.current = false;
+                setRequestSent(false);
+                toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+              }
+            })
+            .catch(async (err) => {
+              console.log(err);
+              const response = await signer.call(
                 {
                   to: tx.to,
                   from: tx.from,
@@ -104,22 +113,23 @@ export const AddAction = memo(() => {
                 },
                 tx.blockNumber
               );
-              reason = toUtf8String('0x' + response.substring(138));
-            } else {
-              reason = 'unknown';
-            }
-            toast.error(
-              <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'reason', value: reason }]} />
-            );
-          }
+              const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+              setLoadStats(true);
+              requestSentRef.current = false;
+              setRequestSent(false);
+              toast.success(
+                <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+              );
+            });
         });
       })
-      .catch(() => {})
-      .finally(() => {
+      .catch(async () => {
+        setLoadStats(true);
         requestSentRef.current = false;
         setRequestSent(false);
+        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [addAmount, liqProvTool, selectedLiquidityPool, address, proxyAddr, signer]);
+  }, [addAmount, liqProvTool, selectedLiquidityPool, address, proxyAddr, signer, setLoadStats]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {

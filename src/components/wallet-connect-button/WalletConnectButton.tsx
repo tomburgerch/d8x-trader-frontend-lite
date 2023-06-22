@@ -104,7 +104,7 @@ export const WalletConnectButton = memo(() => {
       .then(() => {
         setTraderAPI(newTraderAPI);
         loadingAPIRef.current = false;
-        console.log(`SDK loaded on chain id ${chainId}`);
+        console.log(`SDK (Trader API) loaded on chain id ${chainId}`);
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) => {
@@ -126,10 +126,12 @@ export const WalletConnectButton = memo(() => {
     }
     setLiqProvTool(null);
     loadingLiqProvToolRef.current = true;
+    console.log(`reloading SDK (LP API) on chainId ${chainId}`);
     const newLiqProvTool = new LiquidityProviderTool(PerpetualDataHandler.readSDKConfig(chainId), signer);
     newLiqProvTool
       .createProxyInstance(provider)
       .then(() => {
+        console.log(`SDK (LP API) loaded on chain id ${chainId}`);
         setLiqProvTool(newLiqProvTool);
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
