@@ -11,6 +11,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import {
   dCurrencyPriceAtom,
   liqProvToolAtom,
+  loadStatsAtom,
   selectedLiquidityPoolAtom,
   userAmountAtom,
   withdrawalsAtom,
@@ -18,6 +19,8 @@ import {
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './WithdrawAction.module.scss';
+import { useSigner } from 'wagmi';
+import { toUtf8String } from '@ethersproject/strings';
 
 export const WithdrawAction = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
@@ -25,6 +28,9 @@ export const WithdrawAction = memo(() => {
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
+  const [, setLoadStats] = useAtom(loadStatsAtom);
+
+  const { data: signer } = useSigner();
 
   const [requestSent, setRequestSent] = useState(false);
 
@@ -35,7 +41,7 @@ export const WithdrawAction = memo(() => {
       return;
     }
 
-    if (!liqProvTool || !selectedLiquidityPool) {
+    if (!liqProvTool || !selectedLiquidityPool || !signer) {
       return;
     }
 
@@ -44,21 +50,54 @@ export const WithdrawAction = memo(() => {
 
     liqProvTool
       .executeLiquidityWithdrawal(selectedLiquidityPool.poolSymbol)
-      .then(async (result) => {
-        const receipt = await result.wait();
-        if (receipt.status === 1) {
-          toast.success(<ToastContent title="Liquidity withdrawn" bodyLines={[]} />);
-          // TODO: run data re-fetch
-        } else {
-          toast.error(<ToastContent title="Error executing withdrawal" bodyLines={[]} />);
-        }
+      .then(async (tx) => {
+        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        setLoadStats(false);
+        toast.success(<ToastContent title="Withdrawing liquidity" bodyLines={[]} />);
+        tx.wait()
+          .then((receipt) => {
+            if (receipt.status === 1) {
+              setLoadStats(true);
+              requestSentRef.current = false;
+              setRequestSent(false);
+              toast.success(<ToastContent title="Liquidity withdrawn" bodyLines={[]} />);
+            }
+          })
+          .catch(async (err) => {
+            console.log(err);
+            const response = await signer.call(
+              {
+                to: tx.to,
+                from: tx.from,
+                nonce: tx.nonce,
+                gasLimit: tx.gasLimit,
+                gasPrice: tx.gasPrice,
+                data: tx.data,
+                value: tx.value,
+                chainId: tx.chainId,
+                type: tx.type ?? undefined,
+                accessList: tx.accessList,
+              },
+              tx.blockNumber
+            );
+            const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+            setLoadStats(true);
+            requestSentRef.current = false;
+            setRequestSent(false);
+            toast.success(
+              <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+            );
+          });
       })
-      .catch(() => {})
-      .finally(() => {
+      .catch(async (err) => {
+        setLoadStats(true);
         requestSentRef.current = false;
         setRequestSent(false);
+        toast.error(
+          <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: err as string }]} />
+        );
       });
-  }, [liqProvTool, selectedLiquidityPool]);
+  }, [liqProvTool, selectedLiquidityPool, signer, setLoadStats]);
 
   const shareAmount = useMemo(() => {
     if (withdrawals.length === 0) {
@@ -85,6 +124,10 @@ export const WithdrawAction = memo(() => {
     }
     return 0;
   }, [userAmount, dCurrencyPrice]);
+
+  const isButtonDisabled = useMemo(() => {
+    return !userAmount || !shareAmount || requestSent;
+  }, [userAmount, shareAmount, requestSent]);
 
   return (
     <div className={styles.root}>
@@ -134,7 +177,7 @@ export const WithdrawAction = memo(() => {
         variant="primary"
         onClick={handleWithdrawLiquidity}
         className={styles.actionButton}
-        disabled={shareAmount > 0 && requestSent}
+        disabled={isButtonDisabled}
       >
         Withdraw
       </Button>

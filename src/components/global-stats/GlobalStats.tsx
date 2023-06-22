@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { PERIOD_OF_7_DAYS } from 'app-constants';
 import { getWeeklyAPI } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { dCurrencyPriceAtom, tvlAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import { dCurrencyPriceAtom, tvlAtom, selectedLiquidityPoolAtom, loadStatsAtom } from 'store/liquidity-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './GlobalStats.module.scss';
@@ -19,12 +19,17 @@ export const GlobalStats = () => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
+  const [loadStats] = useAtom(loadStatsAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
 
   const weeklyApiRequestSentRef = useRef(false);
 
   useEffect(() => {
+    if (!loadStats) {
+      return;
+    }
+
     if (!chainId || !selectedLiquidityPool) {
       setWeeklyAPI(undefined);
       return;
@@ -45,23 +50,29 @@ export const GlobalStats = () => {
       .finally(() => {
         weeklyApiRequestSentRef.current = false;
       });
-  }, [chainId, selectedLiquidityPool]);
+  }, [chainId, selectedLiquidityPool, loadStats]);
 
   useEffect(() => {
+    if (!loadStats) {
+      return;
+    }
     setDCurrencyPrice(null);
     if (traderAPI && selectedLiquidityPool) {
       traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDCurrencyPrice(price));
     }
-  }, [traderAPI, selectedLiquidityPool, setDCurrencyPrice]);
+  }, [traderAPI, selectedLiquidityPool, loadStats, setDCurrencyPrice]);
 
   useEffect(() => {
+    if (!loadStats) {
+      return;
+    }
     setTvl(null);
     if (traderAPI && selectedLiquidityPool) {
       traderAPI
         .getPoolState(selectedLiquidityPool.poolSymbol)
         .then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
     }
-  }, [traderAPI, selectedLiquidityPool, setTvl]);
+  }, [traderAPI, selectedLiquidityPool, loadStats, setTvl]);
 
   const dSupply = useMemo(() => {
     if (selectedLiquidityPool && dCurrencyPrice && tvl) {

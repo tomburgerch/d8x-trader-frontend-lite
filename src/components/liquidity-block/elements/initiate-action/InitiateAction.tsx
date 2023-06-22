@@ -9,15 +9,29 @@ import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
-import { dCurrencyPriceAtom, liqProvToolAtom, selectedLiquidityPoolAtom } from 'store/liquidity-pools.store';
+import {
+  dCurrencyPriceAtom,
+  liqProvToolAtom,
+  userAmountAtom,
+  selectedLiquidityPoolAtom,
+  withdrawalsAtom,
+  loadStatsAtom,
+} from 'store/liquidity-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './InitiateAction.module.scss';
+import { useSigner } from 'wagmi';
+import { toUtf8String } from '@ethersproject/strings';
 
 export const InitiateAction = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [liqProvTool] = useAtom(liqProvToolAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
+  const [userAmount] = useAtom(userAmountAtom);
+  const [withdrawals] = useAtom(withdrawalsAtom);
+  const [, setLoadStats] = useAtom(loadStatsAtom);
+
+  const { data: signer } = useSigner();
 
   const [initiateAmount, setInitiateAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -25,7 +39,6 @@ export const InitiateAction = memo(() => {
   const [inputValue, setInputValue] = useState(`${initiateAmount}`);
 
   const requestSentRef = useRef(false);
-
   const inputValueChangedRef = useRef(false);
 
   const handleInputCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -47,39 +60,68 @@ export const InitiateAction = memo(() => {
     inputValueChangedRef.current = false;
   }, [initiateAmount]);
 
-  const handleInitiateLiquidity = useCallback(() => {
+  const handleInitiateLiquidity = useCallback(async () => {
     if (requestSentRef.current) {
       return;
     }
 
-    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0) {
+    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0 || !signer) {
       return;
     }
 
     requestSentRef.current = true;
     setRequestSent(true);
 
-    liqProvTool
+    await liqProvTool
       .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
-      .then(async (result) => {
-        const receipt = await result.wait();
-        if (receipt.status === 1) {
-          toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
-          // TODO: run data re-fetch
-        } else {
-          toast.error(<ToastContent title="Error initiating liquidity withdrawal" bodyLines={[]} />);
-        }
+      .then(async (tx) => {
+        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        setLoadStats(false);
+        toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
+        tx.wait()
+          .then((receipt) => {
+            if (receipt.status === 1) {
+              setLoadStats(true);
+              setInitiateAmount(0);
+              setInputValue('0');
+              requestSentRef.current = false;
+              setRequestSent(false);
+              toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
+            }
+          })
+          .catch(async (err) => {
+            console.log(err);
+            const response = await signer.call(
+              {
+                to: tx.to,
+                from: tx.from,
+                nonce: tx.nonce,
+                gasLimit: tx.gasLimit,
+                gasPrice: tx.gasPrice,
+                data: tx.data,
+                value: tx.value,
+                chainId: tx.chainId,
+                type: tx.type ?? undefined,
+                accessList: tx.accessList,
+              },
+              tx.blockNumber
+            );
+            const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+            setLoadStats(true);
+            requestSentRef.current = false;
+            setRequestSent(false);
+            toast.success(
+              <ToastContent title="Error initiating withdrawal" bodyLines={[{ label: 'Reason', value: reason }]} />
+            );
+          });
       })
-      .then(() => {
-        setInitiateAmount(0);
-        setInputValue('0');
-      })
-      .catch(() => {})
-      .finally(() => {
+      .catch(async () => {
+        setLoadStats(true);
         requestSentRef.current = false;
         setRequestSent(false);
+        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [initiateAmount, liqProvTool, selectedLiquidityPool]);
+  }, [initiateAmount, liqProvTool, signer, selectedLiquidityPool, setLoadStats]);
 
   const predictedAmount = useMemo(() => {
     if (initiateAmount > 0 && dCurrencyPrice != null) {
@@ -87,6 +129,14 @@ export const InitiateAction = memo(() => {
     }
     return 0;
   }, [initiateAmount, dCurrencyPrice]);
+
+  const isButtonDisabled = useMemo(() => {
+    if (withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
+      return true;
+    } else {
+      return userAmount < initiateAmount;
+    }
+  }, [withdrawals, userAmount, initiateAmount, requestSent]);
 
   return (
     <div className={styles.root}>
@@ -133,7 +183,7 @@ export const InitiateAction = memo(() => {
       </Box>
       <Button
         variant="primary"
-        disabled={!initiateAmount || requestSent}
+        disabled={isButtonDisabled}
         onClick={handleInitiateLiquidity}
         className={styles.actionButton}
       >
