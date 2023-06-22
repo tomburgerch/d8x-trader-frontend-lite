@@ -110,8 +110,6 @@ export const WithdrawAction = memo(() => {
     const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
     if (currentTime < withdrawalTime) {
       return 0;
-    } else if (currentTime >= withdrawalTime + PERIOD_OF_4_DAYS) {
-      return 0;
     } else {
       // (currentTime >= withdrawalTime)
       return latestWithdrawal.shareAmount;
@@ -119,11 +117,11 @@ export const WithdrawAction = memo(() => {
   }, [withdrawals]);
 
   const predictedAmount = useMemo(() => {
-    if (userAmount && userAmount > 0 && dCurrencyPrice != null) {
-      return userAmount * dCurrencyPrice;
+    if (shareAmount && shareAmount > 0 && dCurrencyPrice != null) {
+      return shareAmount * dCurrencyPrice;
     }
     return 0;
-  }, [userAmount, dCurrencyPrice]);
+  }, [shareAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     return !userAmount || !shareAmount || requestSent;
