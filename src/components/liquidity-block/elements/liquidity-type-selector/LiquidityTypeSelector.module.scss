@@ -9,11 +9,13 @@
 
   button {
     min-width: 30px;
+    font-size: 16px;
   }
 }
 
 .selected {
   text-decoration: underline;
   text-underline-offset: $d8x-spacing * 2;
-  font-weight: bold;
+  font-weight: semi-bold;
+  color: var(--d8x-color-purple);
 }

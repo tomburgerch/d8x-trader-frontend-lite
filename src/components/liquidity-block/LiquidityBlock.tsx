@@ -20,7 +20,7 @@ export const LiquidityBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.infoBlock}>
-        <Typography variant="h4">{liquidityType} Liquidity</Typography>
+        <Typography variant="h5">{liquidityType} Liquidity</Typography>
         {liquidityType === LiquidityTypeE.Add && (
           <>
             <Typography variant="body2" className={styles.text}>

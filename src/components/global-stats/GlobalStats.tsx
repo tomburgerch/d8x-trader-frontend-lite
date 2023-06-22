@@ -84,34 +84,34 @@ export const GlobalStats = () => {
   return (
     <Box className={styles.root}>
       <Box key="midPrice" className={styles.statContainer}>
-        <Typography variant="bodySmall" className={styles.statLabel}>
+        <Typography variant="bodyTiny" className={styles.statLabel}>
           Weekly APY
         </Typography>
-        <Typography variant="bodySmall" className={styles.statValue}>
+        <Typography variant="bodyLarge" className={styles.statValue}>
           {weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '%') : '--'}
         </Typography>
       </Box>
       <Box key="markPrice" className={styles.statContainer}>
-        <Typography variant="bodySmall" className={styles.statLabel}>
+        <Typography variant="bodyTiny" className={styles.statLabel}>
           TVL
         </Typography>
-        <Typography variant="bodySmall" className={styles.statValue}>
+        <Typography variant="bodyLarge" className={styles.statValue}>
           {selectedLiquidityPool && tvl != null ? formatToCurrency(tvl, selectedLiquidityPool.poolSymbol) : '--'}
         </Typography>
       </Box>
       <Box key="indexPrice" className={styles.statContainer}>
-        <Typography variant="bodySmall" className={styles.statLabel}>
+        <Typography variant="bodyTiny" className={styles.statLabel}>
           d{selectedLiquidityPool?.poolSymbol} Price
         </Typography>
-        <Typography variant="bodySmall" className={styles.statValue}>
+        <Typography variant="bodyLarge" className={styles.statValue}>
           {dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedLiquidityPool?.poolSymbol) : '--'}
         </Typography>
       </Box>
       <Box key="fundingRate" className={styles.statContainer}>
-        <Typography variant="bodySmall" className={styles.statLabel}>
+        <Typography variant="bodyTiny" className={styles.statLabel}>
           d{selectedLiquidityPool?.poolSymbol} Supply
         </Typography>
-        <Typography variant="bodySmall" className={styles.statValue}>
+        <Typography variant="bodyLarge" className={styles.statValue}>
           {dSupply}
         </Typography>
       </Box>
