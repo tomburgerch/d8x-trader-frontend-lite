@@ -147,8 +147,9 @@ export const AddAction = memo(() => {
             title="Amount"
             content={
               <>
-                <Typography>Some text goes here for Add Amount.</Typography>
-                <Typography>More text goes here...</Typography>
+                <Typography>
+                  Specify the amount of {selectedLiquidityPool?.poolSymbol} you want to add to the pool.
+                </Typography>
               </>
             }
           />

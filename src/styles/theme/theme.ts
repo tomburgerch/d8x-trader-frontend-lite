@@ -23,6 +23,7 @@ declare module '@mui/material/styles' {
     bodyLarge: CSSProperties;
     bodyMedium: CSSProperties;
     bodySmall: CSSProperties;
+    bodyTiny: CSSProperties;
     adornment: CSSProperties;
     cellSmall: CSSProperties;
   }
@@ -33,6 +34,7 @@ declare module '@mui/material/styles' {
     bodyLarge?: CSSProperties;
     bodyMedium?: CSSProperties;
     bodySmall?: CSSProperties;
+    bodyTiny?: CSSProperties;
     adornment?: CSSProperties;
     cellSmall?: CSSProperties;
   }
@@ -45,6 +47,7 @@ declare module '@mui/material/Typography' {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    bodyTiny: true;
     adornment: true;
     cellSmall: true;
   }
@@ -182,6 +185,7 @@ export const theme = createTheme({
             backgroundColor: 'var(--d8x-color-purple)',
             border: '1px solid var(--d8x-color-purple)',
             color: 'var(--d8x-color-white)',
+            fontSize: '16px',
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.6)',
             },
@@ -281,7 +285,7 @@ export const theme = createTheme({
             border: 0,
             borderRadius: '4px',
             backgroundColor: 'transparent',
-            color: 'var(--d8x-color-purple)',
+            color: 'var(--d8x-color-black)',
             ':hover': {
               backgroundColor: 'transparent',
               textDecoration: 'underline',
@@ -504,6 +508,16 @@ theme.typography.h4 = {
   },
 };
 
+theme.typography.h5 = {
+  fontSize: 24,
+  fontWeight: 600,
+  lineHeight: '30px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: 18,
+    lineHeight: '24px',
+  },
+};
+
 theme.typography.bodyBig = {
   fontSize: 64,
   fontWeight: 400,
@@ -515,29 +529,35 @@ theme.typography.bodyBig = {
 };
 
 theme.typography.bodyLarge = {
-  fontSize: 32,
+  fontSize: 20,
   fontWeight: 400,
-  lineHeight: '38px',
+  lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
     fontSize: 20,
-    lineHeight: '25px',
+    lineHeight: '24px',
   },
 };
 
 theme.typography.bodyMedium = {
-  fontSize: 24,
+  fontSize: 16,
   fontWeight: 400,
-  lineHeight: '32px',
+  lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: 18,
-    lineHeight: '20px',
+    fontSize: 16,
+    lineHeight: '24px',
   },
 };
 
 theme.typography.bodySmall = {
   fontSize: 14,
   fontWeight: 400,
-  lineHeight: '18px',
+  lineHeight: '20px',
+};
+
+theme.typography.bodyTiny = {
+  fontSize: 12,
+  fontWeight: 400,
+  lineHeight: '16px',
 };
 
 theme.typography.adornment = {

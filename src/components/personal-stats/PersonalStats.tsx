@@ -83,22 +83,22 @@ export const PersonalStats = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Typography variant="h4">Your stats</Typography>
+      <Typography variant="h5">Your stats</Typography>
       <Box className={styles.stats}>
         <Box className={styles.statsLeftBlock}>
           <Box key="amount" className={styles.statContainer}>
-            <Typography variant="bodySmall" className={styles.statLabel}>
+            <Typography variant="bodyTiny" className={styles.statLabel}>
               Amount
             </Typography>
-            <Typography variant="bodySmall" className={styles.statValue}>
+            <Typography variant="bodyMedium" className={styles.statValue}>
               {userAmount !== undefined ? formatToCurrency(userAmount, `d${selectedLiquidityPool?.poolSymbol}`) : '--'}
             </Typography>
           </Box>
           <Box key="midPrice" className={styles.statContainer}>
-            <Typography variant="bodySmall" className={styles.statLabel}>
+            <Typography variant="bodyTiny" className={styles.statLabel}>
               Estimated earnings
             </Typography>
-            <Typography variant="bodySmall" className={styles.statValue}>
+            <Typography variant="bodyMedium" className={styles.statValue}>
               {estimatedEarnings !== undefined
                 ? formatToCurrency(estimatedEarnings, selectedLiquidityPool?.poolSymbol)
                 : '--'}
@@ -107,28 +107,28 @@ export const PersonalStats = memo(() => {
         </Box>
         <Box className={styles.statsRightBlock}>
           <Box key="markPrice" className={styles.statContainer}>
-            <Typography variant="bodySmall" className={styles.statLabel}>
+            <Typography variant="bodyTiny" className={styles.statLabel}>
               Withdrawal initiated?
             </Typography>
-            <Typography variant="bodySmall" className={styles.statValue}>
+            <Typography variant="bodyMedium" className={styles.statValue}>
               {withdrawals.length > 0 ? 'Yes' : 'No'}
             </Typography>
           </Box>
           <Box key="indexPrice" className={styles.statContainer}>
-            <Typography variant="bodySmall" className={styles.statLabel}>
+            <Typography variant="bodyTiny" className={styles.statLabel}>
               Withdrawal Amount
             </Typography>
-            <Typography variant="bodySmall" className={styles.statValue}>
+            <Typography variant="bodyMedium" className={styles.statValue}>
               {withdrawals.length > 0
                 ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, 'dMATIC')
                 : 'na'}
             </Typography>
           </Box>
           <Box key="fundingRate" className={styles.statContainer}>
-            <Typography variant="bodySmall" className={styles.statLabel}>
+            <Typography variant="bodyTiny" className={styles.statLabel}>
               Can be withdrawn on
             </Typography>
-            <Typography variant="bodySmall" className={styles.statValue}>
+            <Typography variant="bodyMedium" className={styles.statValue}>
               {withdrawnOn}
             </Typography>
           </Box>

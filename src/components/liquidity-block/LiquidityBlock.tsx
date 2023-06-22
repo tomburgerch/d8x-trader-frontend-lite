@@ -20,42 +20,41 @@ export const LiquidityBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.infoBlock}>
-        <Typography variant="h4">{liquidityType} Liquidity</Typography>
+        <Typography variant="h5">{liquidityType} Liquidity</Typography>
         {liquidityType === LiquidityTypeE.Add && (
           <>
-            <Typography variant="body1" className={styles.text}>
-              Add liquidity in {selectedLiquidityPool?.poolSymbol} and receive d{selectedLiquidityPool?.poolSymbol}, an
-              ERC-20 token representing your ownership in the liquidity pool.
+            <Typography variant="body2" className={styles.text}>
+              Add liquidity to the {selectedLiquidityPool?.poolSymbol} pool and receive d
+              {selectedLiquidityPool?.poolSymbol}, an ERC-20 token that represents your ownership in the liquidity pool.
             </Typography>
-            <Typography variant="body1" className={styles.text}>
-              LPs earn trading fees, funding rate payments and PnL, on all trades collateralized in{' '}
-              {selectedLiquidityPool?.poolSymbol}, d{selectedLiquidityPool?.poolSymbol} accumulates these fees in
-              real-time.
-            </Typography>
-            <Typography variant="body1" className={styles.text}>
-              LPs serve as the counterparty to all trades in the pool.
+            <Typography variant="body2" className={styles.text}>
+              As a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized
+              in {selectedLiquidityPool?.poolSymbol}. You'll also participate in the PnL of the pool. d
+              {selectedLiquidityPool?.poolSymbol} accumulates fees, funding rate payments and PnL in real-time.
             </Typography>
           </>
         )}
         {liquidityType === LiquidityTypeE.Initiate && (
           <>
-            <Typography variant="body1" className={styles.text}>
-              Initiate withdrawal of your {selectedLiquidityPool?.poolSymbol} in the liquidity pool. You will be able to
-              withdraw your funds 48 hours after you initiated the withdrawal.
+            <Typography variant="body2" className={styles.text}>
+              Are you looking to withdraw your {selectedLiquidityPool?.poolSymbol} from the liquidity pool? If so, you
+              can initiate a withdrawal request.
             </Typography>
-            <Typography variant="body1" className={styles.text}>
-              Please note that you can only initiate one withdrawal request at a time.
+            <Typography variant="body2" className={styles.text}>
+              Keep in mind that it takes 48 hours to process your request and you can only have one withdrawal request
+              at a time.
             </Typography>
           </>
         )}
         {liquidityType === LiquidityTypeE.Withdraw && (
           <>
-            <Typography variant="body1" className={styles.text}>
-              Withdraw your {selectedLiquidityPool?.poolSymbol} in exchange for your d
-              {selectedLiquidityPool?.poolSymbol}.
+            <Typography variant="body2" className={styles.text}>
+              Withdraw {selectedLiquidityPool?.poolSymbol} from the pool.
             </Typography>
-            <Typography variant="body1" className={styles.text}>
-              Please note that you first need to initiate a withdrawal before being able to withdraw.
+            <Typography variant="body2" className={styles.text}>
+              Keep in mind that you need to initiate a withdrawal request before you can withdraw your funds. Once done,
+              a withdrawable amount of d{selectedLiquidityPool?.poolSymbol} can be exchanged for{' '}
+              {selectedLiquidityPool?.poolSymbol} at d{selectedLiquidityPool?.poolSymbol} price.
             </Typography>
           </>
         )}

@@ -110,8 +110,6 @@ export const WithdrawAction = memo(() => {
     const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
     if (currentTime < withdrawalTime) {
       return 0;
-    } else if (currentTime >= withdrawalTime + PERIOD_OF_4_DAYS) {
-      return 0;
     } else {
       // (currentTime >= withdrawalTime)
       return latestWithdrawal.shareAmount;
@@ -119,11 +117,11 @@ export const WithdrawAction = memo(() => {
   }, [withdrawals]);
 
   const predictedAmount = useMemo(() => {
-    if (userAmount && userAmount > 0 && dCurrencyPrice != null) {
-      return userAmount * dCurrencyPrice;
+    if (shareAmount && shareAmount > 0 && dCurrencyPrice != null) {
+      return shareAmount * dCurrencyPrice;
     }
     return 0;
-  }, [userAmount, dCurrencyPrice]);
+  }, [shareAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     return !userAmount || !shareAmount || requestSent;
@@ -138,8 +136,10 @@ export const WithdrawAction = memo(() => {
             title="Withdrawable amount"
             content={
               <>
-                <Typography>Some text goes here for Withdrawable Amount.</Typography>
-                <Typography>More text goes here...</Typography>
+                <Typography>
+                  This amount can be converted to {selectedLiquidityPool?.poolSymbol}, which can be withdrawn from the
+                  pool.
+                </Typography>
               </>
             }
           />
@@ -154,8 +154,10 @@ export const WithdrawAction = memo(() => {
             title="dMATIC price"
             content={
               <>
-                <Typography>Some text goes here for d{selectedLiquidityPool?.poolSymbol} price.</Typography>
-                <Typography>More text goes here...</Typography>
+                <Typography>
+                  This is the price at which you can convert d{selectedLiquidityPool?.poolSymbol} to{' '}
+                  {selectedLiquidityPool?.poolSymbol}.
+                </Typography>
               </>
             }
           />

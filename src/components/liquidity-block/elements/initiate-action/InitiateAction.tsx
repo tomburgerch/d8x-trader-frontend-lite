@@ -147,8 +147,14 @@ export const InitiateAction = memo(() => {
             title="Amount"
             content={
               <>
-                <Typography>Some text goes here for Initiate Amount.</Typography>
-                <Typography>More text goes here...</Typography>
+                <Typography>
+                  Specify the amount of d{selectedLiquidityPool?.poolSymbol} you want to exchange for{' '}
+                  {selectedLiquidityPool?.poolSymbol}.
+                </Typography>
+                <Typography>
+                  After 48 hours, this amount can be converted to {selectedLiquidityPool?.poolSymbol} and can be
+                  withdrawn from the pool.
+                </Typography>
               </>
             }
           />
