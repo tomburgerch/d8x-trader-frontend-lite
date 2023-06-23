@@ -58,7 +58,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
 import { PositionBlock } from './elements/position-block/PositionBlock';
 import { PositionRow } from './elements/PositionRow';
-
+import { sdkConnectedAtom } from 'store/liquidity-pools.store';
 import styles from './PositionsTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 900;
@@ -69,6 +69,7 @@ export const PositionsTable = memo(() => {
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, removePosition] = useAtom(removePositionAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const updatedPositionsRef = useRef(false);
@@ -279,22 +280,30 @@ export const PositionsTable = memo(() => {
     setRemoveCollateral(+event.target.value);
   }, []);
 
-  const refreshPositions = useCallback(() => {
+  const refreshPositions = useCallback(async () => {
     if (selectedPool?.perpetuals && address && isConnected) {
-      getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now()).then(({ data }) => {
+      getPositionRisk(
+        chainId,
+        isSDKConnected ? traderAPIRef.current : null,
+        selectedPool.poolSymbol,
+        address,
+        Date.now()
+      ).then(({ data }) => {
         if (data) {
           data.map((p) => setPositions(p));
+        } else {
+          clearPositions();
         }
       });
     }
-  }, [chainId, address, isConnected, selectedPool, setPositions]);
+  }, [chainId, address, isConnected, selectedPool, isSDKConnected, setPositions, clearPositions]);
 
   useEffect(() => {
     if (!updatedPositionsRef.current) {
-      refreshPositions();
       updatedPositionsRef.current = true;
+      refreshPositions();
     }
-  }, [refreshPositions]);
+  });
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 
