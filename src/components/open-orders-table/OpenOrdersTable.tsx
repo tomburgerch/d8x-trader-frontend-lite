@@ -35,6 +35,7 @@ import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
 import { useResizeDetector } from 'react-resize-detector';
+import { sdkConnectedAtom } from 'store/liquidity-pools.store';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -48,6 +49,7 @@ export const OpenOrdersTable = memo(() => {
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
   const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
@@ -130,20 +132,22 @@ export const OpenOrdersTable = memo(() => {
 
   const refreshOpenOrders = useCallback(() => {
     if (selectedPool !== null && address && !isDisconnected) {
-      getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
+      getOpenOrders(chainId, isSDKConnected ? traderAPIRef.current : null, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
           if (data) {
             data.map((o) => setOpenOrders(o));
+          } else {
+            clearOpenOrders();
           }
         })
         .catch((err) => console.log(err));
     }
-  }, [chainId, address, selectedPool, isDisconnected, setOpenOrders]);
+  }, [chainId, address, selectedPool, isDisconnected, isSDKConnected, setOpenOrders, clearOpenOrders]);
 
   useEffect(() => {
     if (!openOrdersRefreshedRef.current) {
-      refreshOpenOrders();
       openOrdersRefreshedRef.current = true;
+      refreshOpenOrders();
     }
   });
 
