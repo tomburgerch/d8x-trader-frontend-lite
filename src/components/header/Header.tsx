@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { memo, useCallback, useEffect, useRef } from 'react';
-import { useAccount, useBalance, useNetwork } from 'wagmi';
+import { useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
 
 import { Box, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
@@ -31,6 +31,7 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
+  const chainId = useChainId();
   const { chain } = useNetwork();
   const { address } = useAccount();
 
@@ -43,7 +44,7 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [chainId, setChainId] = useAtom(chainIdAtom);
+  const [, setChainId] = useAtom(chainIdAtom);
 
   // const chainId = useMemo(() => {
   //   if (chain) {
@@ -86,29 +87,28 @@ export const Header = memo(({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    if (!requestRef.current && chain && chain.id !== chainIdRef.current) {
+    if (!requestRef.current && chainId) {
       requestRef.current = true;
       setExchangeInfo(null);
-      getExchangeInfo(chain.id, null)
+      getExchangeInfo(chainId, null)
         .then(({ data }) => {
           setExchangeInfo(data);
-          setChainId(chain.id);
+          setChainId(chainId);
+          requestRef.current = false;
         })
         .catch((err) => {
           console.log(err);
           // API call failed - try with SDK
-          if (traderAPI && chain.id) {
-            getExchangeInfo(chain.id, traderAPI).then(({ data }) => {
+          if (traderAPI && chainId == chainIdRef.current) {
+            getExchangeInfo(chainId, traderAPI).then(({ data }) => {
               setExchangeInfo(data);
-              setChainId(chain.id);
+              setChainId(chainId);
             });
           }
-        })
-        .finally(() => {
           requestRef.current = false;
         });
     }
-  }, [chain, traderAPI, setExchangeInfo, setChainId]); //setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
+  }, [chainId, traderAPI, setExchangeInfo, setChainId]); //setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
