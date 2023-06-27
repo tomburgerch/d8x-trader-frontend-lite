@@ -23,6 +23,7 @@ declare module '@mui/material/styles' {
     bodyLarge: CSSProperties;
     bodyMedium: CSSProperties;
     bodySmall: CSSProperties;
+    bodySmallSB: CSSProperties;
     bodyTiny: CSSProperties;
     adornment: CSSProperties;
     cellSmall: CSSProperties;
@@ -34,6 +35,7 @@ declare module '@mui/material/styles' {
     bodyLarge?: CSSProperties;
     bodyMedium?: CSSProperties;
     bodySmall?: CSSProperties;
+    bodySmallSB?: CSSProperties;
     bodyTiny?: CSSProperties;
     adornment?: CSSProperties;
     cellSmall?: CSSProperties;
@@ -47,6 +49,7 @@ declare module '@mui/material/Typography' {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    bodySmallSB: true;
     bodyTiny: true;
     adornment: true;
     cellSmall: true;
@@ -249,6 +252,7 @@ export const theme = createTheme({
             ...MuiButtonSharedStyle,
             backgroundColor: 'rgba(var(--d8x-background-buy-rgb), 1)',
             color: 'var(--d8x-color-white)',
+            fontWeight: '600',
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-background-buy-rgb), 0.9)',
               color: 'var(--d8x-color-white)',
@@ -265,6 +269,7 @@ export const theme = createTheme({
             ...MuiButtonSharedStyle,
             backgroundColor: 'rgba(var(--d8x-background-sell-rgb), 1)',
             color: 'var(--d8x-color-white)',
+            fontWeight: '600',
             ':hover': {
               backgroundColor: 'rgba(var(--d8x-background-sell-rgb), 0.9)',
               color: 'var(--d8x-color-white)',
@@ -279,24 +284,30 @@ export const theme = createTheme({
           props: { variant: 'link' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '0px',
+            padding: '8px',
             fontWeight: 'normal',
-            minWidth: '60px',
+            minWidth: '71px',
             border: 0,
-            borderRadius: '4px',
+            borderRadius: '8px',
             backgroundColor: 'transparent',
             color: 'var(--d8x-color-black)',
             ':hover': {
-              backgroundColor: 'transparent',
-              textDecoration: 'underline',
-              textUnderlineOffset: '8px',
+              backgroundColor: 'var(--d8x-color-purple-50)',
             },
           },
         },
         {
           props: { variant: 'outlined' },
           style: {
-            padding: '2px',
+            borderRadius: '8px',
+            borderWidth: '1px',
+            padding: '8px',
+            color: 'var(--d8x-color-black-maintext)',
+            borderColor: 'var(--d8x-color-black-opac)',
+            '&:hover': {
+              backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+              border: '0',
+            },
           },
         },
         {
@@ -325,6 +336,11 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           padding: '0 8px',
+          color: 'var(--d8x-color-purple)',
+
+          '.MuiSvgIcon-root': {
+            width: '15px',
+          },
         },
       },
     },
@@ -332,24 +348,32 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '8px',
-          backgroundColor: 'var(--d8x-background-purple)',
           border: 'none',
           width: '180px',
           ':hover': {
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--d8x-color-black-opac)',
+            },
           },
-          ':focus': {
+          ':focus-within': {
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
-          },
-          ':active': {
-            backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--d8x-color-black-opac)',
+              borderWidth: '1px',
+            },
           },
         },
         input: {
           padding: '8px 10px',
           width: 'auto',
           border: 'none',
-          fontSize: '18px',
+          fontSize: '16px',
+          fontWeight: '500',
+          color: 'var(--d8x-color-black-maintext)',
+        },
+        notchedOutline: {
+          borderColor: 'var(--d8x-color-black-opac)',
         },
       },
     },
@@ -392,7 +416,8 @@ export const theme = createTheme({
     MuiFormControlLabel: {
       styleOverrides: {
         label: {
-          fontSize: '14px',
+          fontSize: '12px',
+          lineHeight: '16px',
         },
       },
     },
@@ -407,11 +432,15 @@ export const theme = createTheme({
         rail: {
           color: 'var(--d8x-color-purple)',
         },
+        markLabel: {
+          fontSize: '12px',
+        },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
+          color: 'var(--d8x-color-black-maintext)',
           boxShadow: 'none',
         },
       },
@@ -554,6 +583,12 @@ theme.typography.bodySmall = {
   lineHeight: '20px',
 };
 
+theme.typography.bodySmallSB = {
+  fontSize: 14,
+  fontWeight: 600,
+  lineHeight: '20px',
+};
+
 theme.typography.bodyTiny = {
   fontSize: 12,
   fontWeight: 400,
@@ -561,9 +596,9 @@ theme.typography.bodyTiny = {
 };
 
 theme.typography.adornment = {
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: 400,
-  lineHeight: '18px',
+  lineHeight: '16px',
 };
 
 theme.typography.cellSmall = {

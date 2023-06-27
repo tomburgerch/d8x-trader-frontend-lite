@@ -9,7 +9,6 @@ import { InfoBlock } from './elements/info-block/InfoBlock';
 import { LeverageSelector } from './elements/leverage-selector/LeverageSelector';
 import { LimitPrice } from './elements/limit-price/LimitPrice';
 import { OrderSelector } from './elements/order-selector/OrderSelector';
-import { OrderSettings } from './elements/order-settings/OrderSettings';
 import { OrderSize } from './elements/order-size/OrderSize';
 import { OrderTypeSelector } from './elements/order-type-selector/OrderTypeSelector';
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
@@ -24,18 +23,17 @@ export const OrderBlock = memo(() => {
       <OrderSelector />
       <CardContent>
         <OrderTypeSelector />
-        <Separator />
         <OrderSize />
         <TriggerPrice />
         <LimitPrice />
         <Separator />
         <LeverageSelector />
-        <OrderSettings />
         <Separator />
         <ExpirySelector />
         <StopLossSelector />
         <TakeProfitSelector />
-        <Separator />
+      </CardContent>
+      <CardContent className={styles.card}>
         <InfoBlock />
         <ActionBlock />
       </CardContent>
