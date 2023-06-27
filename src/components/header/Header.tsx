@@ -99,7 +99,7 @@ export const Header = memo(({ children }: PropsWithChildren) => {
         .catch((err) => {
           console.log(err);
           // API call failed - try with SDK
-          if (traderAPI && chainId == chainIdRef.current) {
+          if (traderAPI && chainId === chainIdRef.current) {
             getExchangeInfo(chainId, traderAPI).then(({ data }) => {
               setExchangeInfo(data);
               setChainId(chainId);
