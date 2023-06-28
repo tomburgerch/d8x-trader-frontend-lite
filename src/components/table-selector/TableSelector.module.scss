@@ -3,53 +3,27 @@
 .root {
 
   &:global(.MuiPaper-root) {
-    background-color: transparent;
     border-radius: $d8x-border-radius;
+    padding: 4 * $d8x-spacing 6 * $d8x-spacing;
+  }
+
+  button {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+
+    &.selected {
+      color: var(--d8x-color-purple);
+      background-color: var(--d8x-color-purple-50);
+    }
   }
 }
 
-.header {
-  padding: 0;
-  background-color: var(--d8x-background-purple);
-}
-
-.rootOptions {
+.tableSelectorsWrapper {
   display: flex;
-  justify-content: center;
-
-  :global(.MuiButtonBase-root) {
-    flex: 1;
-    border-radius: 0;
-    padding: 10px 8px;
-    font-size: 18px;
-    line-height: 22px;
-    background-color: var(--d8x-background-inactive-tab);
-    border: solid var(--d8x-color-white);
-    border-width: 1px 1px 0 0;
-    margin-bottom: -1px;
-
-    &:first-of-type {
-      border-left-width: 1px;
-      border-top-left-radius: $d8x-spacing * 2;
-    }
-
-    &:last-of-type {
-      border-top-right-radius: $d8x-spacing * 2;
-    }
-
-    &:hover,
-    &.selected {
-      font-weight: bold;
-    }
-
-    &.selected {
-      font-weight: bold;
-      background-color: var(--d8x-background-card-details);
-    }
-  }
+  gap: 2 * $d8x-spacing;
 }
 
 .content {
-  padding: 0;
   overflow-x: auto;
 }

@@ -19,14 +19,14 @@ export const TableSelector = ({ selectorItems, activeIndex, setActiveIndex }: Ta
   return (
     <Card className={styles.root}>
       <CardHeader
-        className={styles.header}
         title={
-          <Box className={styles.rootOptions}>
+          <Box className={styles.tableSelectorsWrapper}>
             {selectorItems.map(({ label }, index) => (
               <Button
                 key={label}
-                className={classnames({ [styles.selected]: index === activeIndex })}
+                variant="link"
                 onClick={() => setActiveIndex(index)}
+                className={classnames({ [styles.selected]: activeIndex === index })}
               >
                 {label}
               </Button>

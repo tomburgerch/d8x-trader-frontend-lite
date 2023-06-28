@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { memo } from 'react';
 
@@ -17,7 +17,7 @@ export const OrderTypeSelector = memo(() => {
       {Object.values(OrderTypeE).map((key) => (
         <Button
           key={key}
-          className={classNames({ [styles.selected]: key === orderType })}
+          className={classnames({ [styles.selected]: key === orderType })}
           variant="link"
           onClick={() => setOrderType(key)}
         >

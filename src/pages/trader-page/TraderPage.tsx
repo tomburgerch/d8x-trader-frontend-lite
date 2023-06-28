@@ -13,10 +13,10 @@ import { FundingTable } from 'components/funding-table/FundingTable';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
-
-import styles from './TraderPage.module.scss';
 import { CollateralsSelect } from '../../components/header/elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from '../../components/header/elements/perpetuals-select/PerpetualsSelect';
+
+import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
