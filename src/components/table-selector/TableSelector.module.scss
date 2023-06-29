@@ -19,11 +19,22 @@
   }
 }
 
+.headerRoot {
+  padding: 0;
+}
+
+.headerWrapper {
+  display: flex;
+  align-items: center;
+}
+
 .tableSelectorsWrapper {
+  flex: 1;
   display: flex;
   gap: 2 * $d8x-spacing;
 }
 
 .content {
+  padding: 0 !important;
   overflow-x: auto;
 }

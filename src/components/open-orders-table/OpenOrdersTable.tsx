@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
+import { useResizeDetector } from 'react-resize-detector';
 
 import {
   Box,
@@ -19,7 +20,6 @@ import {
   Typography,
 } from '@mui/material';
 
-import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
@@ -27,15 +27,16 @@ import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getCancelOrder, getOpenOrders } from 'network/network';
 import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { AlignE } from 'types/enums';
+import { AlignE, TableTypeE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
-import styles from './OpenOrdersTable.module.scss';
-import { useResizeDetector } from 'react-resize-detector';
 import { sdkConnectedAtom } from 'store/liquidity-pools.store';
+import { tableRefreshHandlersAtom } from 'store/tables.store';
+
+import styles from './OpenOrdersTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -50,6 +51,7 @@ export const OpenOrdersTable = memo(() => {
   const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);
@@ -145,6 +147,10 @@ export const OpenOrdersTable = memo(() => {
   }, [chainId, address, selectedPool, isDisconnected, isSDKConnected, setOpenOrders, clearOpenOrders]);
 
   useEffect(() => {
+    setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
+  }, [refreshOpenOrders, setTableRefreshHandlers]);
+
+  useEffect(() => {
     if (!openOrdersRefreshedRef.current) {
       openOrdersRefreshedRef.current = true;
       refreshOpenOrders();
@@ -161,9 +167,8 @@ export const OpenOrdersTable = memo(() => {
       { label: 'Stop Price', align: AlignE.Right },
       { label: 'Leverage', align: AlignE.Right },
       { label: 'Good until', align: AlignE.Left },
-      { label: <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [refreshOpenOrders]
+    []
   );
 
   return (
@@ -197,25 +202,20 @@ export const OpenOrdersTable = memo(() => {
       )}
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
-          <Box className={styles.refreshHolder}>
-            <RefreshIcon onClick={refreshOpenOrders} className={styles.actionIcon} />
-          </Box>
-          <Box>
-            {address &&
-              openOrders
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((order) => (
-                  <OpenOrderBlock
-                    key={order.id}
-                    headers={openOrdersHeaders}
-                    order={order}
-                    handleOrderCancel={handleOrderCancel}
-                  />
-                ))}
-            {(!address || openOrders.length === 0) && (
-              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open orders'}</Box>
-            )}
-          </Box>
+          {address &&
+            openOrders
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order) => (
+                <OpenOrderBlock
+                  key={order.id}
+                  headers={openOrdersHeaders}
+                  order={order}
+                  handleOrderCancel={handleOrderCancel}
+                />
+              ))}
+          {(!address || openOrders.length === 0) && (
+            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open orders'}</Box>
+          )}
         </Box>
       )}
       {address && openOrders.length > 5 && (

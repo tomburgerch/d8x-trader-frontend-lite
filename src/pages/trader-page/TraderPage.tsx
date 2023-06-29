@@ -16,6 +16,8 @@ import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart
 import { CollateralsSelect } from '../../components/header/elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from '../../components/header/elements/perpetuals-select/PerpetualsSelect';
 
+import { TableTypeE } from 'types/enums';
+
 import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
@@ -31,10 +33,12 @@ export const TraderPage = memo(() => {
       {
         label: 'Positions',
         item: <PositionsTable />,
+        tableType: TableTypeE.POSITIONS,
       },
       {
         label: 'Open Orders',
         item: <OpenOrdersTable />,
+        tableType: TableTypeE.OPEN_ORDERS,
       },
     ],
     []
@@ -45,10 +49,12 @@ export const TraderPage = memo(() => {
       {
         label: 'Trade History',
         item: <TradeHistoryTable />,
+        tableType: TableTypeE.TRADE_HISTORY,
       },
       {
         label: 'Funding',
         item: <FundingTable />,
+        tableType: TableTypeE.FUNDING,
       },
     ],
     []

@@ -75,3 +75,10 @@ export enum LiquidityTypeE {
   Initiate = 'Initiate',
   Withdraw = 'Withdraw',
 }
+
+export enum TableTypeE {
+  POSITIONS,
+  OPEN_ORDERS,
+  TRADE_HISTORY,
+  FUNDING,
+}
