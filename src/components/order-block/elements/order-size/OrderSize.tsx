@@ -3,9 +3,12 @@ import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
+import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
+import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
+
 import { orderSizeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
 
@@ -84,19 +87,41 @@ export const OrderSize = memo(() => {
           }
         />
       </Box>
-      <OutlinedInput
-        id="order-size"
-        endAdornment={
-          <InputAdornment position="end">
-            <Typography variant="adornment">{selectedPerpetual?.baseCurrency}</Typography>
-          </InputAdornment>
-        }
-        type="number"
-        inputProps={{ step: orderSizeStep, min: 0 }}
-        value={inputValue}
-        onChange={handleInputCapture}
-        onBlur={handleInputBlur}
-      />
+      <Box className={styles.inputHolder}>
+        <Button
+          key="decrease-leverage"
+          variant="outlined"
+          size="small"
+          className={styles.decreaseButton}
+          // onClick={handleDecreaseLeverage}
+          // disabled={leverage === 1}
+        >
+          <DecreaseIcon />
+        </Button>
+        <OutlinedInput
+          id="order-size"
+          endAdornment={
+            <InputAdornment position="end">
+              <Typography variant="adornment">{selectedPerpetual?.baseCurrency}</Typography>
+            </InputAdornment>
+          }
+          type="number"
+          inputProps={{ step: orderSizeStep, min: 0 }}
+          value={inputValue}
+          onChange={handleInputCapture}
+          onBlur={handleInputBlur}
+        />
+        <Button
+          key="increase-leverage"
+          variant="outlined"
+          size="small"
+          className={styles.increaseButton}
+          // onClick={handleIncreaseLeverage}
+          // disabled={leverage >= maxLeverage}
+        >
+          <IncreaseIcon />
+        </Button>
+      </Box>
     </Box>
   );
 });
