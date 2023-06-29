@@ -11,6 +11,10 @@
   gap: $d8x-spacing * 4;
 }
 
+.connectWalletButton {
+  min-width: 195px;
+}
+
 .chainButton {
   display: flex;
   align-items: center;

@@ -381,16 +381,16 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '8px',
-          backgroundColor: 'var(--d8x-color-white) !important',
+          backgroundColor: 'transparent',
           minWidth: '180px',
           ':hover': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':focus': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':active': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':before': {
             border: 'none !important',
@@ -405,11 +405,11 @@ export const theme = createTheme({
       styleOverrides: {
         input: {
           fontWeight: '500',
-          color: 'var(--d8x-color-purple)',
+          color: 'var(--d8x-color-black)',
           padding: '3px 4px 3px 4px !important',
           width: 'auto',
           border: 'none',
-          fontSize: '18px',
+          fontSize: '16px',
         },
       },
     },

@@ -27,7 +27,7 @@ export const App = memo(() => {
   return (
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
-        <StaticBackground />
+        {/* <StaticBackground /> */}
         <Routes>
           <Route key="liquidity-page" path="/liquidity" element={<LiquidityPage />} />
           <Route key="trader-page" path="*" element={<TraderPage />} />

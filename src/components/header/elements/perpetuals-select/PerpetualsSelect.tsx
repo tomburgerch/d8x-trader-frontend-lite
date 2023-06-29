@@ -5,6 +5,8 @@ import { useNetwork } from 'wagmi';
 import { Box, Paper, Popper, PopperProps } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
+import { ReactComponent as PerpetualIcon } from 'assets/icons/perpetualIcon.svg';
+
 import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
@@ -23,6 +25,7 @@ import { PerpetualI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from '../header-select/HeaderSelect.module.scss';
+import perpetualStyles from './PerpetualsSelect.module.scss';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -116,26 +119,31 @@ export const PerpetualsSelect = memo(() => {
   };
 
   return (
-    <HeaderSelect<PerpetualI>
-      id="perpetuals-select"
-      label="Perpetual:"
-      items={selectedPool?.perpetuals ?? []}
-      width="100%"
-      value={selectedPerpetual}
-      onChange={handleChange}
-      PaperComponent={CustomPaper}
-      PopperComponent={CustomPopper}
-      getOptionLabel={(option) => `${option.baseCurrency}/${option.quoteCurrency}`}
-      renderOption={(props, option) => (
-        <Box component="li" {...props}>
-          <Box className={styles.optionHolder}>
-            <Box className={styles.label}>
-              {option.baseCurrency}/{option.quoteCurrency}
+    <Box className={perpetualStyles.root}>
+      <Box className={perpetualStyles.iconWrapper}>
+        <PerpetualIcon />
+      </Box>
+      <HeaderSelect<PerpetualI>
+        id="perpetuals-select"
+        label="Perpetual"
+        items={selectedPool?.perpetuals ?? []}
+        width="100%"
+        value={selectedPerpetual}
+        onChange={handleChange}
+        PaperComponent={CustomPaper}
+        PopperComponent={CustomPopper}
+        getOptionLabel={(option) => `${option.baseCurrency}/${option.quoteCurrency}`}
+        renderOption={(props, option) => (
+          <Box component="li" {...props}>
+            <Box className={styles.optionHolder}>
+              <Box className={styles.label}>
+                {option.baseCurrency}/{option.quoteCurrency}
+              </Box>
+              <Box className={styles.value}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
             </Box>
-            <Box className={styles.value}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
           </Box>
-        </Box>
-      )}
-    />
+        )}
+      />
+    </Box>
   );
 });
