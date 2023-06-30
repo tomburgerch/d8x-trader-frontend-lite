@@ -218,6 +218,9 @@ export const ActionBlock = memo(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(
               '0x0000000000000000000000000000000000000000000000000000000000000000'
             );
+            // release lock
+            requestSentRef.current = false;
+            setRequestSent(false);
             postOrder(signer, signatures, data.data).then((tx) => {
               // success submitting to mempool
               console.log(`postOrder tx hash: ${tx.hash}`);
@@ -230,12 +233,10 @@ export const ActionBlock = memo(() => {
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) => {
-        console.error(error);
-      })
-      .finally(() => {
         // release lock
         requestSentRef.current = false;
         setRequestSent(false);
+        console.error(error);
       });
   }, [parsedOrders, chainId, address, signer, selectedPool, proxyAddr, collateralDeposit, clearInputsData]);
 
