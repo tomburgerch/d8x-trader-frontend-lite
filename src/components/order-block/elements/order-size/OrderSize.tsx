@@ -67,6 +67,16 @@ export const OrderSize = memo(() => {
     return 0.1;
   }, [perpetualStaticInfo]);
 
+  const handleDecreaseOrderSize = () => {
+    setOrderSize((prev) => prev - +orderSizeStep);
+  };
+
+  const handleIncreaseOrderSize = () => {
+    setOrderSize((prev) => prev + +orderSizeStep);
+  };
+
+  console.log(orderSize);
+
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
@@ -89,12 +99,12 @@ export const OrderSize = memo(() => {
       </Box>
       <Box className={styles.inputHolder}>
         <Button
-          key="decrease-leverage"
+          key="decrease-order-size"
           variant="outlined"
           size="small"
           className={styles.decreaseButton}
-          // onClick={handleDecreaseLeverage}
-          // disabled={leverage === 1}
+          onClick={handleDecreaseOrderSize}
+          disabled={orderSize === 0}
         >
           <DecreaseIcon />
         </Button>
@@ -112,12 +122,11 @@ export const OrderSize = memo(() => {
           onBlur={handleInputBlur}
         />
         <Button
-          key="increase-leverage"
+          key="increase-order-size"
           variant="outlined"
           size="small"
           className={styles.increaseButton}
-          // onClick={handleIncreaseLeverage}
-          // disabled={leverage >= maxLeverage}
+          onClick={handleIncreaseOrderSize}
         >
           <IncreaseIcon />
         </Button>

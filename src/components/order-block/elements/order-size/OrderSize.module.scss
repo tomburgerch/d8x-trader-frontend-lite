@@ -22,12 +22,12 @@
       background-color: var(--d8x-background-purple);
     }
   }
+}
 
-  .decreaseButton,
-  .increaseButton {
-    display: none;
-    color: var(--d8x-color-purple);
-  }
+.decreaseButton,
+.increaseButton {
+  display: none;
+  color: var(--d8x-color-purple);
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
@@ -50,7 +50,6 @@
 
     :global(.MuiInputBase-root) {
       flex: 1;
-      width: 116px;
       padding-right: 0;
 
       input {
