@@ -1,25 +1,40 @@
 @import 'styles/theme/theme';
 
 .root {
-  display: flex;
-  margin-bottom: $d8x-spacing;
-}
-
-.dataBlock {
-  flex: 1;
-  background-color: var(--d8x-background);
-  padding: $d8x-spacing;
+  border: 1px solid var(--d8x-color-black-opac);
   border-radius: $d8x-border-radius;
-  margin: 4 * $d8x-spacing;
+  margin-top: 6 * $d8x-spacing;
 }
 
-.value {
+.headerWrapper,
+.dataWrapper {
+  padding: 4 * $d8x-spacing;
+}
+
+.headerWrapper {
+  background-color: var(--d8x-color-black-50);
+  display: flex;
+  align-items: center;
+}
+
+.leftSection {
+  flex: 1;
+}
+
+.dataWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2 * $d8x-spacing;
+}
+
+.symbol {
   color: var(--d8x-color-purple);
 }
 
-.actionBlock {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 4 * $d8x-spacing;
+.dataLabel {
+  font-weight: 500;
+}
+
+.dataValue {
+  color: var(--d8x-color-purple);
 }
