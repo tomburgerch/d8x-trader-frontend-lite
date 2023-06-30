@@ -75,8 +75,6 @@ export const OrderSize = memo(() => {
     setOrderSize((prev) => prev + +orderSizeStep);
   };
 
-  console.log(orderSize);
-
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
