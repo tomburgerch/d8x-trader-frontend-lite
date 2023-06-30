@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import type { PerpetualDataI, TradeHistoryI, TableHeaderI } from 'types/types';
@@ -19,34 +19,52 @@ export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHi
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.dataBlock}>
-        <SidesRow leftSide={headers[0].label} rightSide={time} rightSideStyles={styles.value} />
-        <SidesRow leftSide={headers[1].label} rightSide={perpetual?.symbol} rightSideStyles={styles.value} />
-        <SidesRow leftSide={headers[2].label} rightSide={tradeHistory.side} rightSideStyles={styles.value} />
-        {/*<SidesRow
-          leftSide={headers[3].label}
-          rightSide="Type"
-          rightSideStyles={styles.value}
-        />*/}
+      <Box className={styles.headerWrapper}>
+        <Box className={styles.leftSection}>
+          <Typography variant="bodySmall" component="p">
+            Symbol
+          </Typography>
+          <Typography variant="bodySmall" component="p" className={styles.symbol}>
+            {perpetual?.symbol}
+          </Typography>
+        </Box>
+      </Box>
+      <Box className={styles.dataWrapper}>
+        <SidesRow
+          leftSide={headers[0].label}
+          rightSide={time}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
+        <SidesRow
+          leftSide={headers[2].label}
+          rightSide={tradeHistory.side}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
         <SidesRow
           leftSide={headers[3].label}
           rightSide={perpetual ? formatToCurrency(tradeHistory.price, perpetual.quoteCurrency) : ''}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[4].label}
           rightSide={perpetual ? formatToCurrency(tradeHistory.quantity, perpetual.baseCurrency) : ''}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[5].label}
           rightSide={perpetual ? formatToCurrency(tradeHistory.fee, perpetual.poolName) : ''}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[6].label}
           rightSide={perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName) : ''}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
       </Box>
     </Box>
