@@ -2,7 +2,6 @@
 
 .root {
   padding: 0;
-  background-color: var(--d8x-background-purple);
 }
 
 .rootOptions {
@@ -32,7 +31,7 @@
 
     &:hover,
     &.selected {
-      font-weight: bold;
+      color: var(--d8x-color-purple);
     }
 
     &.selected {
