@@ -15,6 +15,7 @@ import type {
 } from 'types/types';
 
 export const traderAPIAtom = atom<TraderInterface | null>(null);
+export const traderAPIBusyAtom = atom(false);
 export const chainIdAtom = atom<number | undefined>(undefined);
 export const poolsAtom = atom<PoolI[]>([]);
 export const perpetualsAtom = atom<PerpetualDataI[]>([]);

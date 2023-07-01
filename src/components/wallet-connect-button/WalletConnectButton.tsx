@@ -12,7 +12,7 @@ import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTraderLoyalty } from 'network/network';
 import { liqProvToolAtom, sdkConnectedAtom } from 'store/liquidity-pools.store';
-import { loyaltyScoreAtom, traderAPIAtom } from 'store/pools.store';
+import { loyaltyScoreAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
 import styles from './WalletConnectButton.module.scss';
@@ -32,6 +32,7 @@ export const WalletConnectButton = memo(() => {
   const [liqProvTool, setLiqProvTool] = useAtom(liqProvToolAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
   const [, setSDKConnected] = useAtom(sdkConnectedAtom);
+  const [, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
   const { data: signer } = useSigner({
     onError(error) {
@@ -67,9 +68,10 @@ export const WalletConnectButton = memo(() => {
       setLiqProvTool(newLiqProvTool);
       loadingAPIRef.current = false;
       setSDKConnected(true);
+      setAPIBusy(false);
       console.log(`SDK loaded on chain id ${_chainId}`);
     },
-    [setTraderAPI, setLiqProvTool, setSDKConnected]
+    [setTraderAPI, setLiqProvTool, setSDKConnected, setAPIBusy]
   );
 
   const unloadSDK = useCallback(() => {
@@ -82,13 +84,6 @@ export const WalletConnectButton = memo(() => {
     setSDKConnected(false);
   }, [setTraderAPI, setLiqProvTool, setSDKConnected]);
 
-  const unloadLiqProvTool = useCallback(() => {
-    if (!liqProvToolRef.current) {
-      return;
-    }
-    setLiqProvTool(null);
-  }, [setLiqProvTool]);
-
   useEffect(() => {
     if (address) {
       getTraderLoyalty(chainId, address).then((data) => {
@@ -99,6 +94,7 @@ export const WalletConnectButton = memo(() => {
     }
   }, [chainId, address, setLoyaltyScore]);
 
+  // disconnect SDK on error
   useEffect(() => {
     if (errorMessage) {
       toast.error(
@@ -108,12 +104,14 @@ export const WalletConnectButton = memo(() => {
     }
   }, [errorMessage, unloadSDK]);
 
+  // disconnect SDK on wallet disconnected
   useEffect(() => {
     if (isDisconnected || isReconnecting || traderAPIRef.current) {
       unloadSDK();
     }
   }, [isDisconnected, isReconnecting, unloadSDK]);
 
+  // connect SDK on change of provider/chain/wallet
   useEffect(() => {
     if (loadingAPIRef.current || !isConnected || !provider || !signer || !chainId) {
       return;
@@ -122,12 +120,6 @@ export const WalletConnectButton = memo(() => {
       .then(() => {})
       .catch((err) => console.log(err));
   }, [isConnected, provider, signer, chainId, loadSDK]);
-
-  useEffect(() => {
-    if (isDisconnected || isReconnecting || liqProvToolRef.current) {
-      unloadLiqProvTool();
-    }
-  }, [isDisconnected, isReconnecting, unloadLiqProvTool]);
 
   return (
     <ConnectButton.Custom>
