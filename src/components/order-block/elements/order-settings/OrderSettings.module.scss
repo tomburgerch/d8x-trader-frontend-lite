@@ -11,16 +11,33 @@
   padding-right: $d8x-spacing;
 }
 
+.dialog {
+
+  :global(.MuiPaper-root) {
+    border-radius: $d8x-border-radius;
+  }
+}
+
 .dialogContent {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2 * $d8x-spacing !important;
+  padding-bottom: 6 * $d8x-spacing !important;
   min-width: 350px;
 
   :global(.MuiFormControlLabel-root) {
     flex: 1;
   }
+}
+
+.slippageBox {
+  padding-bottom: 24px;
+  padding-top: 24px;
+}
+
+.sliderHolder {
+  width: 100%;
+  padding-top: 24px;
 }
 
 .keepPosLeverage,
@@ -45,7 +62,7 @@
 
 .maxEntryPrice {
   margin-top: 3 * $d8x-spacing;
-  color: var(--d8x-color-black-opac);
+  color: var(--d8x-color-black-500);
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
