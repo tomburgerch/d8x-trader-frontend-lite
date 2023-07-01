@@ -125,6 +125,7 @@ export const theme = createTheme({
           fontSize: 14,
           fontWeight: 400,
           whiteSpace: 'nowrap',
+          border: 0,
         },
       },
     },

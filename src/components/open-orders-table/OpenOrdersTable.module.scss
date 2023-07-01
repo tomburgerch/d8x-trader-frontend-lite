@@ -18,6 +18,14 @@
   :global(.MuiTypography-root) {
     color: var(--d8x-color-purple);
   }
+
+  tr {
+    background-color: var(--d8x-color-black-50);
+
+    &:nth-child(2n) {
+      background-color: var(--d8x-color-white);
+    }
+  }
 }
 
 .noData {
