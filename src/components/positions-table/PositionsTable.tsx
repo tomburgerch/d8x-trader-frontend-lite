@@ -66,6 +66,7 @@ import { sdkConnectedAtom } from 'store/liquidity-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './PositionsTable.module.scss';
+import { Separator } from 'components/separator/Separator';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -620,6 +621,9 @@ export const PositionsTable = memo(() => {
               />
             )}
           </Box>
+        </DialogContent>
+        <Separator />
+        <DialogContent>
           <Box className={styles.newPositionHeader}>
             <Typography variant="bodyMedium" className={styles.centered}>
               New position details
@@ -640,6 +644,7 @@ export const PositionsTable = memo(() => {
             <SidesRow leftSide="Liquidation price:" rightSide={calculatedLiqPrice} />
           </Box>
         </DialogContent>
+        <Separator />
         <DialogActions>
           <Button onClick={closeModifyModal} variant="secondary" size="small">
             Cancel

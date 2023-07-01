@@ -469,7 +469,7 @@ export const theme = createTheme({
         root: {
           display: 'flex',
           justifyContent: 'space-between',
-          padding: '20px 40px',
+          padding: '20px 32px 48px 32px',
         },
       },
     },

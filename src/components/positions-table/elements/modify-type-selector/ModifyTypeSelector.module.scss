@@ -2,7 +2,9 @@
 
 .root {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: $d8x-spacing * 8;
+  padding-bottom: 20px;
 
   :global(.MuiButtonBase-root) {
 
@@ -10,4 +12,15 @@
       font-weight: bold;
     }
   }
+
+  button {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+}
+
+.selected {
+  color: var(--d8x-color-purple);
+  background-color: var(--d8x-color-purple-50);
 }
