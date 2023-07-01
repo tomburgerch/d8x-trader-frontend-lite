@@ -26,7 +26,13 @@ import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getCancelOrder, getOpenOrders } from 'network/network';
-import { clearOpenOrdersAtom, openOrdersAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import {
+  clearOpenOrdersAtom,
+  openOrdersAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+  traderAPIBusyAtom,
+} from 'store/pools.store';
 import { AlignE, TableTypeE } from 'types/enums';
 import { OrderWithIdI, TableHeaderI } from 'types/types';
 
@@ -51,6 +57,7 @@ export const OpenOrdersTable = memo(() => {
   const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
   const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
@@ -61,6 +68,7 @@ export const OpenOrdersTable = memo(() => {
 
   const traderAPIRef = useRef(traderAPI);
   const openOrdersRefreshedRef = useRef(false);
+  const isAPIBusyRef = useRef(isAPIBusy);
 
   useEffect(() => {
     if (isDisconnected) {
@@ -132,19 +140,30 @@ export const OpenOrdersTable = memo(() => {
     setPage(0);
   }, []);
 
-  const refreshOpenOrders = useCallback(() => {
-    if (selectedPool !== null && address && !isDisconnected) {
-      getOpenOrders(chainId, isSDKConnected ? traderAPIRef.current : null, selectedPool.poolSymbol, address, Date.now())
+  const refreshOpenOrders = useCallback(async () => {
+    if (selectedPool !== null && address && !isDisconnected && !isAPIBusyRef.current) {
+      setAPIBusy(true);
+      await getOpenOrders(
+        chainId,
+        isSDKConnected ? traderAPIRef.current : null,
+        selectedPool.poolSymbol,
+        address,
+        Date.now()
+      )
         .then(({ data }) => {
-          if (data) {
+          setAPIBusy(false);
+          if (data && data.length > 0) {
             data.map((o) => setOpenOrders(o));
           } else {
             clearOpenOrders();
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.error(err);
+          setAPIBusy(false);
+        });
     }
-  }, [chainId, address, selectedPool, isDisconnected, isSDKConnected, setOpenOrders, clearOpenOrders]);
+  }, [chainId, address, selectedPool, isDisconnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders]);
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));

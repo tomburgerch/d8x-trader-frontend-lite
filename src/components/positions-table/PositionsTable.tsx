@@ -57,11 +57,16 @@ import {
   orderDigest,
   positionRiskOnCollateralAction,
 } from 'network/network';
-
+import {
+  positionsAtom,
+  proxyAddrAtom,
+  removePositionAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+  traderAPIBusyAtom,
+} from 'store/pools.store';
 import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
-
-import { positionsAtom, proxyAddrAtom, removePositionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/liquidity-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 
@@ -81,10 +86,12 @@ export const PositionsTable = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, removePosition] = useAtom(removePositionAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
   const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const updatedPositionsRef = useRef(false);
+  const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
@@ -360,18 +367,20 @@ export const PositionsTable = memo(() => {
   }, [isDisconnected, clearPositions]);
 
   useEffect(() => {
-    if (!address || !selectedPosition) {
+    if (!address || !selectedPosition || !chainId || isAPIBusyRef.current) {
       return;
     }
 
     if (modifyType === ModifyTypeE.Remove) {
+      setAPIBusy(true);
       getAvailableMargin(chainId, traderAPIRef.current, selectedPosition.symbol, address).then(({ data }) => {
         setMaxCollateral(data.amount < 0 ? 0 : data.amount);
+        setAPIBusy(false);
       });
     } else {
       setMaxCollateral(undefined);
     }
-  }, [modifyType, chainId, address, selectedPosition]);
+  }, [modifyType, chainId, address, selectedPosition, setAPIBusy]);
 
   useEffect(() => {
     setNewPositionRisk(null);
@@ -386,22 +395,39 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(async () => {
-    if (selectedPool?.perpetuals && address && isConnected) {
-      getPositionRisk(
+    if (selectedPool?.poolSymbol && address && isConnected && chainId && !isAPIBusyRef.current) {
+      console.log('refreshing positions');
+      setAPIBusy(true);
+      await getPositionRisk(
         chainId,
         isSDKConnected ? traderAPIRef.current : null,
         selectedPool.poolSymbol,
         address,
         Date.now()
-      ).then(({ data }) => {
-        if (data) {
-          data.map((p) => setPositions(p));
-        } else {
-          clearPositions();
-        }
-      });
+      )
+        .then(({ data }) => {
+          setAPIBusy(false);
+          if (data && data.length > 0) {
+            data.map((p) => setPositions(p));
+          } else {
+            clearPositions();
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          setAPIBusy(false);
+        });
     }
-  }, [chainId, address, isConnected, selectedPool, isSDKConnected, setPositions, clearPositions]);
+  }, [
+    chainId,
+    address,
+    isConnected,
+    selectedPool?.poolSymbol,
+    isSDKConnected,
+    setAPIBusy,
+    setPositions,
+    clearPositions,
+  ]);
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
@@ -418,8 +444,8 @@ export const PositionsTable = memo(() => {
 
   const debouncedRemoveCollateral = useDebounce(removeCollateral, 500);
 
-  const handleRefreshPositionRisk = useCallback(() => {
-    if (!selectedPosition || !address || modifyType === ModifyTypeE.Close) {
+  const handleRefreshPositionRisk = useCallback(async () => {
+    if (!selectedPosition || !address || modifyType === ModifyTypeE.Close || isAPIBusyRef.current) {
       return;
     }
 
@@ -431,20 +457,27 @@ export const PositionsTable = memo(() => {
       return;
     }
 
-    positionRiskOnCollateralAction(
+    setAPIBusy(true);
+    await positionRiskOnCollateralAction(
       chainId,
       traderAPIRef.current,
       address,
       modifyType === ModifyTypeE.Add ? debouncedAddCollateral : -debouncedRemoveCollateral,
       selectedPosition
-    ).then((data) => {
-      setNewPositionRisk(data.data.newPositionRisk);
-      setMaxCollateral(data.data.availableMargin);
-    });
-  }, [chainId, address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral]);
+    )
+      .then((data) => {
+        setAPIBusy(false);
+        setNewPositionRisk(data.data.newPositionRisk);
+        setMaxCollateral(data.data.availableMargin);
+      })
+      .catch((err) => {
+        console.error(err);
+        setAPIBusy(false);
+      });
+  }, [chainId, address, selectedPosition, modifyType, debouncedAddCollateral, debouncedRemoveCollateral, setAPIBusy]);
 
   useEffect(() => {
-    return handleRefreshPositionRisk();
+    handleRefreshPositionRisk();
   }, [debouncedAddCollateral, debouncedRemoveCollateral, handleRefreshPositionRisk]);
 
   const handleMaxCollateral = useCallback(() => {
