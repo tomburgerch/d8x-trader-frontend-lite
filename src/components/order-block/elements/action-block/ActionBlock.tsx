@@ -104,7 +104,7 @@ export const ActionBlock = memo(() => {
     traderAPIRef.current = traderAPI;
   });
 
-  const openReviewOrderModal = useCallback(() => {
+  const openReviewOrderModal = useCallback(async () => {
     if (!orderInfo || !address) {
       return;
     }
@@ -113,7 +113,7 @@ export const ActionBlock = memo(() => {
     setNewPositionRisk(null);
 
     const mainOrder = createMainOrder(orderInfo);
-    positionRiskOnTrade(
+    await positionRiskOnTrade(
       chainId,
       traderAPIRef.current,
       mainOrder,
@@ -125,7 +125,7 @@ export const ActionBlock = memo(() => {
     });
 
     setMaxOrderSize(undefined);
-    getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
+    await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
     });
   }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
