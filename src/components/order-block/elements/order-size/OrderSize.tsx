@@ -97,11 +97,7 @@ export const OrderSize = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.label}>
         <InfoBlock
-          title={
-            <>
-              <Typography variant="bodySmall">Order size</Typography>
-            </>
-          }
+          title={'Order size'}
           content={
             <>
               <Typography> Sets the size of your order. </Typography>

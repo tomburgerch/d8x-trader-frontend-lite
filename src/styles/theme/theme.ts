@@ -315,8 +315,8 @@ export const theme = createTheme({
           props: { size: 'small' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '3px 16px',
-            fontSize: '18px',
+            padding: '8px 40px',
+            fontSize: '16px',
             fontWeight: 'normal',
             minWidth: '50px',
           },
@@ -457,6 +457,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           textAlign: 'center',
+          padding: '48px 32px 32px 32px',
         },
       },
     },
@@ -466,6 +467,13 @@ export const theme = createTheme({
           display: 'flex',
           justifyContent: 'space-between',
           padding: '20px 40px',
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          padding: '0px 32px 0px 32px',
         },
       },
     },
