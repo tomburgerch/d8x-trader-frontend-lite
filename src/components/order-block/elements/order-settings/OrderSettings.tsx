@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   Box,
@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  InputAdornment,
+  OutlinedInput,
   Slider,
   Typography,
 } from '@mui/material';
@@ -30,27 +32,32 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
 import styles from './OrderSettings.module.scss';
+import { Separator } from 'components/separator/Separator';
 
 const marks: MarkI[] = [
-  { value: 1, label: '0.1%' },
-  { value: 2, label: '0.5%' },
-  { value: 3, label: '1%' },
-  { value: 4, label: '1.5%' },
-  { value: 5, label: '2%' },
-  { value: 6, label: '3%' },
-  { value: 7, label: '4%' },
-  { value: 8, label: '5%' },
+  { value: 0.5, label: '0.5%' },
+  { value: 1, label: '1%' },
+  { value: 1.5, label: '1.5%' },
+  { value: 2, label: '2%' },
+  { value: 2.5, label: '2.5%' },
+  { value: 3, label: '3%' },
+  { value: 3.5, label: '3.5%' },
+  { value: 4, label: '4%' },
+  { value: 4.5, label: '4.5%' },
+  { value: 5, label: '5%' },
 ];
 
 const sliderToToleranceMap: Record<number, ToleranceE> = {
-  1: ToleranceE['0.1%'],
-  2: ToleranceE['0.5%'],
-  3: ToleranceE['1%'],
-  4: ToleranceE['1.5%'],
-  5: ToleranceE['2%'],
-  6: ToleranceE['3%'],
-  7: ToleranceE['4%'],
-  8: ToleranceE['5%'],
+  0.5: ToleranceE['0.5%'],
+  1: ToleranceE['1%'],
+  1.5: ToleranceE['1.5%'],
+  2: ToleranceE['2%'],
+  2.5: ToleranceE['2.5%'],
+  3: ToleranceE['3%'],
+  3.5: ToleranceE['3.5%'],
+  4: ToleranceE['4%'],
+  4.5: ToleranceE['4.5%'],
+  5: ToleranceE['5%'],
 };
 
 function valueLabelFormat(value: number) {
@@ -67,8 +74,10 @@ export const OrderSettings = memo(() => {
   // const [keepPositionLeverage, setKeepPositionLeverage] = useAtom(keepPositionLeverageAtom);
   const [reduceOnly, setReduceOnly] = useAtom(reduceOnlyAtom);
 
-  const [updatedSlippage, setUpdatedSlippage] = useState(4);
+  const [updatedSlippage, setUpdatedSlippage] = useState(2);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [inputValue, setInputValue] = useState(`${updatedSlippage}`);
+  const inputValueChangedRef = useRef(false);
 
   const openSettingsModal = useCallback(() => setShowSettingsModal(true), []);
 
@@ -87,6 +96,27 @@ export const OrderSettings = memo(() => {
       setUpdatedSlippage(newValue);
     }
   }, []);
+
+  const handleInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const targetValue = event.target.value;
+      if (targetValue) {
+        setUpdatedSlippage(+event.target.value);
+        setInputValue(targetValue);
+      } else {
+        setUpdatedSlippage(0.5);
+        setInputValue('');
+      }
+    },
+    [setUpdatedSlippage]
+  );
+
+  useEffect(() => {
+    if (!inputValueChangedRef.current) {
+      setInputValue(`${updatedSlippage}`);
+    }
+    inputValueChangedRef.current = false;
+  }, [updatedSlippage]);
 
   const entryPrice = useMemo(() => {
     if (perpetualStatistics) {
@@ -146,27 +176,44 @@ export const OrderSettings = memo(() => {
           )}
         </Box>
       </Box>
-      <Dialog open={showSettingsModal}>
+      <Dialog open={showSettingsModal} className={styles.dialog}>
         <DialogTitle>Slippage settings</DialogTitle>
         <DialogContent className={styles.dialogContent}>
-          <Typography variant="body1">Slippage tolerance</Typography>
-          <Slider
-            aria-label="Slippage tolerance values"
-            value={updatedSlippage}
-            min={1}
-            max={8}
-            step={1}
-            getAriaValueText={valueLabelFormat}
-            valueLabelFormat={valueLabelFormat}
-            valueLabelDisplay="auto"
-            marks={marks}
-            onChange={handleToleranceChange}
-          />
+          <Typography variant="bodyMedium">Choose slippage tolerance</Typography>
+          <Box className={styles.sliderHolder}>
+            <Slider
+              aria-label="Slippage tolerance values"
+              value={updatedSlippage}
+              min={0.5}
+              max={5}
+              step={0.5}
+              getAriaValueText={valueLabelFormat}
+              valueLabelFormat={valueLabelFormat}
+              valueLabelDisplay="auto"
+              marks={marks}
+              onChange={handleToleranceChange}
+            />
+          </Box>
+          <Box className={styles.slippageBox}>
+            <OutlinedInput
+              id="slippage"
+              type="number"
+              inputProps={{ min: 0.5, max: 5, step: 0.5 }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <Typography variant="adornment">%</Typography>
+                </InputAdornment>
+              }
+              onChange={handleInputChange}
+              value={inputValue}
+            />
+          </Box>
           <Typography variant="body2" className={styles.maxEntryPrice}>
             {orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:{' '}
             {formatToCurrency(entryPrice, selectedPerpetual?.quoteCurrency)}
           </Typography>
         </DialogContent>
+        <Separator />
         <DialogActions>
           <Button onClick={closeSettingsModal} variant="secondary" size="small">
             Cancel

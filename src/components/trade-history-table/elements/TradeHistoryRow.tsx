@@ -49,7 +49,7 @@ export const TradeHistoryRow = ({ headers, perpetuals, tradeHistory }: TradeHist
           {perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName) : ''}
         </Typography>
       </TableCell>
-      <TableCell align={headers[7].align} />
+      {/* <TableCell align={headers[7].align} /> */}
     </TableRow>
   );
 };

@@ -30,7 +30,6 @@ export const FundingRow = ({ headers, perpetuals, funding }: FundingRowPropsI) =
           {perpetual ? formatToCurrency(funding.amount, perpetual.poolName) : ''}
         </Typography>
       </TableCell>
-      <TableCell align={headers[3].align} />
     </TableRow>
   );
 };

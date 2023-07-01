@@ -16,15 +16,16 @@ import {
   Typography,
 } from '@mui/material';
 
-import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { getFundingRatePayments } from 'network/history';
 import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
-import { AlignE } from 'types/enums';
+import { AlignE, TableTypeE } from 'types/enums';
 import type { TableHeaderI } from 'types/types';
 
 import { FundingBlock } from './elements/funding-block/FundingBlock';
 import { FundingRow } from './elements/FundingRow';
+
+import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './FundingTable.module.scss';
 
@@ -34,6 +35,7 @@ export const FundingTable = memo(() => {
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [positions] = useAtom(positionsAtom);
+  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const updateTradesHistoryRef = useRef(false);
 
@@ -60,6 +62,10 @@ export const FundingTable = memo(() => {
   }, [chainId, address, isConnected, setFundingList]);
 
   useEffect(() => {
+    setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.FUNDING]: refreshFundingList }));
+  }, [refreshFundingList, setTableRefreshHandlers]);
+
+  useEffect(() => {
     refreshFundingList();
   }, [positions, refreshFundingList]); // "positions" change should affect refresh for Funding table
 
@@ -77,9 +83,8 @@ export const FundingTable = memo(() => {
       { label: 'Time', align: AlignE.Left },
       { label: 'Perpetual', align: AlignE.Left },
       { label: 'Funding Payment', align: AlignE.Right },
-      { label: <RefreshIcon onClick={refreshFundingList} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [refreshFundingList]
+    []
   );
 
   return (
@@ -120,25 +125,20 @@ export const FundingTable = memo(() => {
       )}
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
-          <Box className={styles.refreshHolder}>
-            <RefreshIcon onClick={refreshFundingList} className={styles.actionIcon} />
-          </Box>
-          <Box>
-            {address &&
-              fundingList
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((funding) => (
-                  <FundingBlock
-                    key={`${funding.perpetualId}-${funding.timestamp}`}
-                    headers={fundingListHeaders}
-                    perpetuals={perpetuals}
-                    funding={funding}
-                  />
-                ))}
-            {(!address || fundingList.length === 0) && (
-              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No funding data'}</Box>
-            )}
-          </Box>
+          {address &&
+            fundingList
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((funding) => (
+                <FundingBlock
+                  key={`${funding.perpetualId}-${funding.timestamp}`}
+                  headers={fundingListHeaders}
+                  perpetuals={perpetuals}
+                  funding={funding}
+                />
+              ))}
+          {(!address || fundingList.length === 0) && (
+            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No funding data'}</Box>
+          )}
         </Box>
       )}
       {address && fundingList.length > 5 && (

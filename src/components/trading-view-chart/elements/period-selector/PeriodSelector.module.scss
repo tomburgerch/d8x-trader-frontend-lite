@@ -6,27 +6,23 @@
 
   :global(.MuiButtonBase-root) {
     flex: 1;
-    width: 70px;
+    width: 64px;
+    height: 36px;
 
     &.selected {
-      font-weight: bold;
-      background-color: var(--d8x-background-purple);
-    }
-  }
-}
-
-@media screen and ($d8x-breakpoint-max-xs) {
-
-  .root {
-    width: 100%;
-
-    :global(.MuiButtonGroup-root) {
-      width: 100%;
+      background-color: var(--d8x-color-purple);
+      color: var(--d8x-color-white);
     }
 
-    :global(.MuiButtonBase-root) {
-      flex: 1;
-      width: calc(100% / 5);
+    &:not(:last-of-type) {
+      border-right-color: var(--d8x-color-black-opac);
+      border-right-width: 1px;
+      border-radius: 8px;
+      margin-right: 8px;
+    }
+
+    &:last-of-type {
+      border-radius: 8px;
     }
   }
 }

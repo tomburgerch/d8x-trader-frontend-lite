@@ -1,11 +1,11 @@
 @import 'styles/theme/theme';
 
 .root {
-  margin-top: $d8x-spacing;
-  margin-bottom: $d8x-spacing * 5;
+  margin-top: 4 * $d8x-spacing;
+  margin-bottom: 8 * $d8x-spacing;
 
   :global(.MuiPaper-root) {
-    height: 80px;
+    height: 48px;
   }
 
   :global(.MuiOutlinedInput-root) {
@@ -16,14 +16,46 @@
 
 .toolbar {
   align-items: center;
-  min-height: 100px;
   padding: 0;
 }
 
 .leftSide {
   display: flex;
-  width: 900px;
   flex: 1;
+  gap: 16 * $d8x-spacing;
+
+  .navWrapper {
+    display: flex;
+    gap: 8 * $d8x-spacing;
+  }
+}
+
+.navItem {
+  font-weight: 500;
+
+  &.inactive {
+    position: relative;
+
+    &:hover {
+      color: var(--d8x-color-purple);
+      cursor: pointer;
+      transition: 200ms ease-in-out;
+    }
+  }
+
+  &.active {
+    color: var(--d8x-color-purple);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -$d8x-spacing;
+      width: 100%;
+      border-bottom: 1px solid var(--d8x-color-purple-300);
+    }
+  }
 }
 
 .logoLink {
@@ -33,6 +65,8 @@
 
 .selectBoxes {
   display: flex;
+  gap: $d8x-spacing * 6;
+  margin-right: $d8x-spacing * 6;
 }
 
 .mobileSelectBoxes {
@@ -47,6 +81,7 @@
 .walletConnect {
   justify-content: right;
   display: flex;
+  height: 48px;
   gap: 15px;
 }
 
@@ -64,7 +99,7 @@
   }
 
   .toolbar {
-    min-height: 80px;
+    min-height: 48px;
   }
 }
 

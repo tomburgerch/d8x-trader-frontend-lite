@@ -1,0 +1,18 @@
+@import 'styles/theme/theme';
+
+.root {
+  border-radius: $d8x-border-radius;
+  padding: 6 * $d8x-spacing 4 * $d8x-spacing;
+  margin-top: 4 * $d8x-spacing;
+  background-color: var(--d8x-color-white);
+}
+
+.select {
+  width: 100%;
+  margin-bottom: 6 * $d8x-spacing;
+
+  div {
+    width: 100%;
+    padding: 4 * $d8x-spacing;
+  }
+}

@@ -134,6 +134,19 @@ export const Header = memo(({ children }: PropsWithChildren) => {
                   <InteractiveLogo />
                 </a>
               </Typography>
+              {!isSmallScreen && (
+                <nav className={styles.navWrapper}>
+                  <Typography variant="bodyMedium" className={`${styles.navItem} ${styles.active}`}>
+                    Trade
+                  </Typography>
+                  <Typography variant="bodyMedium" className={`${styles.navItem} ${styles.inactive}`}>
+                    Refer
+                  </Typography>
+                  <Typography variant="bodyMedium" className={`${styles.navItem} ${styles.inactive}`}>
+                    Vault
+                  </Typography>
+                </nav>
+              )}
             </Box>
             {!isSmallScreen && (
               <Typography variant="h6" component="div" className={styles.selectBoxes}>

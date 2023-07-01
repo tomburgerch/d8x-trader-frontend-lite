@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -24,36 +24,62 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.dataBlock}>
+      <Box className={styles.headerWrapper}>
+        <Box className={styles.leftSection}>
+          <Typography variant="bodySmall" component="p">
+            Symbol
+          </Typography>
+          <Typography variant="bodySmall" component="p" className={styles.symbol}>
+            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
+          </Typography>
+        </Box>
+        <Button variant="primary" size="tableSmall" onClick={() => handleOrderCancel(order)}>
+          Cancel
+        </Button>
+      </Box>
+      <Box className={styles.dataWrapper}>
         <SidesRow
-          leftSide={headers[0].label}
-          rightSide={`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
-          rightSideStyles={styles.value}
+          leftSide={headers[1].label}
+          rightSide={order.side}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
-        <SidesRow leftSide={headers[1].label} rightSide={order.side} rightSideStyles={styles.value} />
-        <SidesRow leftSide={headers[2].label} rightSide={typeToLabelMap[order.type]} rightSideStyles={styles.value} />
+        <SidesRow
+          leftSide={headers[2].label}
+          rightSide={typeToLabelMap[order.type]}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
         <SidesRow
           leftSide={headers[3].label}
           rightSide={formatToCurrency(order.quantity, parsedSymbol?.baseCurrency)}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[4].label}
           rightSide={order.limitPrice ? formatToCurrency(order.limitPrice, parsedSymbol?.quoteCurrency) : 'N/A'}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[5].label}
           rightSide={order.stopPrice ? formatToCurrency(order.stopPrice, parsedSymbol?.quoteCurrency) : 'N/A'}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
-        <SidesRow leftSide={headers[6].label} rightSide={`${leverage}x`} rightSideStyles={styles.value} />
-        <SidesRow leftSide={headers[7].label} rightSide={deadlineDate} rightSideStyles={styles.value} />
-      </Box>
-      <Box className={styles.actionBlock}>
-        <Button variant="primary" size="tableSmall" onClick={() => handleOrderCancel(order)}>
-          Cancel
-        </Button>
+        <SidesRow
+          leftSide={headers[6].label}
+          rightSide={`${leverage}x`}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
+        <SidesRow
+          leftSide={headers[7].label}
+          rightSide={deadlineDate}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
       </Box>
     </Box>
   );

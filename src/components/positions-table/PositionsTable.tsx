@@ -38,9 +38,17 @@ import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+
+import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
+import { PositionBlock } from './elements/position-block/PositionBlock';
+import { PositionRow } from './elements/PositionRow';
+
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
+import { formatNumber } from 'utils/formatNumber';
+import { formatToCurrency } from 'utils/formatToCurrency';
+
 import {
   getAddCollateral,
   getAvailableMargin,
@@ -57,17 +65,17 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
-import { AlignE, OrderTypeE } from 'types/enums';
+import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
 import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
-import { formatNumber } from 'utils/formatNumber';
-import { formatToCurrency } from 'utils/formatToCurrency';
-
-import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
-import { PositionBlock } from './elements/position-block/PositionBlock';
-import { PositionRow } from './elements/PositionRow';
 import { sdkConnectedAtom } from 'store/liquidity-pools.store';
+import { tableRefreshHandlersAtom } from 'store/tables.store';
+
 import styles from './PositionsTable.module.scss';
+
+import { Separator } from 'components/separator/Separator';
+
 import { toUtf8String } from '@ethersproject/strings';
+
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -79,6 +87,7 @@ export const PositionsTable = memo(() => {
   const [, removePosition] = useAtom(removePositionAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
+  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const updatedPositionsRef = useRef(false);
@@ -421,6 +430,10 @@ export const PositionsTable = memo(() => {
   ]);
 
   useEffect(() => {
+    setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
+  }, [refreshPositions, setTableRefreshHandlers]);
+
+  useEffect(() => {
     if (!updatedPositionsRef.current) {
       updatedPositionsRef.current = true;
       refreshPositions();
@@ -482,9 +495,8 @@ export const PositionsTable = memo(() => {
       { label: 'Liq. price', align: AlignE.Right },
       { label: `Margin (${selectedPool?.poolSymbol})`, align: AlignE.Right },
       { label: 'Unr. PnL', align: AlignE.Right },
-      { label: <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [selectedPool, refreshPositions]
+    [selectedPool]
   );
 
   const isConfirmButtonDisabled = useMemo(() => {
@@ -647,25 +659,20 @@ export const PositionsTable = memo(() => {
       )}
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
-          <Box className={styles.refreshHolder}>
-            <RefreshIcon onClick={refreshPositions} className={styles.actionIcon} />
-          </Box>
-          <Box>
-            {address &&
-              positions
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((position) => (
-                  <PositionBlock
-                    key={position.symbol}
-                    headers={positionsHeaders}
-                    position={position}
-                    handlePositionModify={handlePositionModify}
-                  />
-                ))}
-            {(!address || positions.length === 0) && (
-              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open positions'}</Box>
-            )}
-          </Box>
+          {address &&
+            positions
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((position) => (
+                <PositionBlock
+                  key={position.symbol}
+                  headers={positionsHeaders}
+                  position={position}
+                  handlePositionModify={handlePositionModify}
+                />
+              ))}
+          {(!address || positions.length === 0) && (
+            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open positions'}</Box>
+          )}
         </Box>
       )}
       {address && positions.length > 5 && (
@@ -744,6 +751,9 @@ export const PositionsTable = memo(() => {
               />
             )}
           </Box>
+        </DialogContent>
+        <Separator />
+        <DialogContent>
           <Box className={styles.newPositionHeader}>
             <Typography variant="bodyMedium" className={styles.centered}>
               New position details
@@ -764,6 +774,7 @@ export const PositionsTable = memo(() => {
             <SidesRow leftSide="Liquidation price:" rightSide={calculatedLiqPrice} />
           </Box>
         </DialogContent>
+        <Separator />
         <DialogActions>
           <Button onClick={closeModifyModal} variant="secondary" size="small">
             Cancel

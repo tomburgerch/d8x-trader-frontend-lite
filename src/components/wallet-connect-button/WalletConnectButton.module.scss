@@ -9,6 +9,11 @@
 .buttonsHolder {
   display: flex;
   gap: $d8x-spacing * 4;
+  height: 48px;
+}
+
+.connectWalletButton {
+  min-width: 195px;
 }
 
 .chainButton {

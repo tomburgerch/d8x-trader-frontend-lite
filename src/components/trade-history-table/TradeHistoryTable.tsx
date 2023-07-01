@@ -16,15 +16,16 @@ import {
   Typography,
 } from '@mui/material';
 
-import { ReactComponent as RefreshIcon } from 'assets/icons/refreshIcon.svg';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { getTradesHistory } from 'network/history';
 import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
-import { AlignE } from 'types/enums';
+import { AlignE, TableTypeE } from 'types/enums';
 import type { TableHeaderI } from 'types/types';
 
 import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
+
+import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './TradeHistoryTable.module.scss';
 
@@ -34,6 +35,7 @@ export const TradeHistoryTable = memo(() => {
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [openOrders] = useAtom(openOrdersAtom);
+  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const updateTradesHistoryRef = useRef(false);
 
@@ -60,6 +62,10 @@ export const TradeHistoryTable = memo(() => {
   }, [chainId, address, isConnected, setTradesHistory]);
 
   useEffect(() => {
+    setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.TRADE_HISTORY]: refreshTradesHistory }));
+  }, [refreshTradesHistory, setTableRefreshHandlers]);
+
+  useEffect(() => {
     refreshTradesHistory();
   }, [openOrders, refreshTradesHistory]);
 
@@ -82,9 +88,8 @@ export const TradeHistoryTable = memo(() => {
       { label: 'Quantity', align: AlignE.Right },
       { label: 'Fee', align: AlignE.Right },
       { label: 'Realized Profit', align: AlignE.Right },
-      { label: <RefreshIcon onClick={refreshTradesHistory} className={styles.actionIcon} />, align: AlignE.Center },
     ],
-    [refreshTradesHistory]
+    []
   );
 
   return (
@@ -125,25 +130,20 @@ export const TradeHistoryTable = memo(() => {
       )}
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
-          <Box className={styles.refreshHolder}>
-            <RefreshIcon onClick={refreshTradesHistory} className={styles.actionIcon} />
-          </Box>
-          <Box>
-            {address &&
-              tradesHistory
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((tradeHistory) => (
-                  <TradeHistoryBlock
-                    key={tradeHistory.orderId}
-                    headers={tradeHistoryHeaders}
-                    perpetuals={perpetuals}
-                    tradeHistory={tradeHistory}
-                  />
-                ))}
-            {(!address || tradesHistory.length === 0) && (
-              <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No trade history'}</Box>
-            )}
-          </Box>
+          {address &&
+            tradesHistory
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((tradeHistory) => (
+                <TradeHistoryBlock
+                  key={tradeHistory.orderId}
+                  headers={tradeHistoryHeaders}
+                  perpetuals={perpetuals}
+                  tradeHistory={tradeHistory}
+                />
+              ))}
+          {(!address || tradesHistory.length === 0) && (
+            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No trade history'}</Box>
+          )}
         </Box>
       )}
       {address && tradesHistory.length > 5 && (

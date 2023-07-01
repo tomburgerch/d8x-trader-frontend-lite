@@ -12,15 +12,19 @@ import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { FundingTable } from 'components/funding-table/FundingTable';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
-
-import styles from './TraderPage.module.scss';
 import { CollateralsSelect } from '../../components/header/elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from '../../components/header/elements/perpetuals-select/PerpetualsSelect';
+
+import { TableTypeE } from 'types/enums';
+
+import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
@@ -31,10 +35,12 @@ export const TraderPage = memo(() => {
       {
         label: 'Positions',
         item: <PositionsTable />,
+        tableType: TableTypeE.POSITIONS,
       },
       {
         label: 'Open Orders',
         item: <OpenOrdersTable />,
+        tableType: TableTypeE.OPEN_ORDERS,
       },
     ],
     []
@@ -45,10 +51,12 @@ export const TraderPage = memo(() => {
       {
         label: 'Trade History',
         item: <TradeHistoryTable />,
+        tableType: TableTypeE.TRADE_HISTORY,
       },
       {
         label: 'Funding',
         item: <FundingTable />,
+        tableType: TableTypeE.FUNDING,
       },
     ],
     []
@@ -113,16 +121,22 @@ export const TraderPage = memo(() => {
           <PerpetualStats />
           <TradingViewChart />
           <OrderBlock />
-          <TableSelector
-            selectorItems={positionItems}
-            activeIndex={activePositionIndex}
-            setActiveIndex={handlePositionsIndex}
-          />
-          <TableSelector
-            selectorItems={historyItems}
-            activeIndex={activeHistoryIndex}
-            setActiveIndex={handleHistoryIndex}
-          />
+          {isMobile ? (
+            <TableSelectorMobile selectorItems={selectorForAllItems} />
+          ) : (
+            <>
+              <TableSelector
+                selectorItems={positionItems}
+                activeIndex={activePositionIndex}
+                setActiveIndex={handlePositionsIndex}
+              />
+              <TableSelector
+                selectorItems={historyItems}
+                activeIndex={activeHistoryIndex}
+                setActiveIndex={handleHistoryIndex}
+              />
+            </>
+          )}
         </Container>
       )}
       <Footer />

@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
-import { Box } from '@mui/material';
+
+import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import type { PerpetualDataI, TableHeaderI, FundingI } from 'types/types';
@@ -19,17 +20,28 @@ export const FundingBlock = ({ headers, perpetuals, funding }: FundingRowPropsI)
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.dataBlock}>
-        <SidesRow leftSide={headers[0].label} rightSide={time} rightSideStyles={styles.value} />
+      <Box className={styles.headerWrapper}>
+        <Box className={styles.leftSection}>
+          <Typography variant="bodySmall" component="p">
+            Symbol
+          </Typography>
+          <Typography variant="bodySmall" component="p" className={styles.symbol}>
+            {perpetual ? `${perpetual.baseCurrency}-${perpetual.quoteCurrency}` : ''}
+          </Typography>
+        </Box>
+      </Box>
+      <Box className={styles.dataWrapper}>
         <SidesRow
-          leftSide={headers[1].label}
-          rightSide={perpetual ? `${perpetual.baseCurrency}-${perpetual.quoteCurrency}` : ''}
-          rightSideStyles={styles.value}
+          leftSide={headers[0].label}
+          rightSide={time}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[2].label}
           rightSide={perpetual ? formatToCurrency(funding.amount, perpetual.poolName) : ''}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
       </Box>
     </Box>
