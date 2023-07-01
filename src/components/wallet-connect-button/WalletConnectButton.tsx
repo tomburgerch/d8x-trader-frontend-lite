@@ -82,7 +82,8 @@ export const WalletConnectButton = memo(() => {
       setLiqProvTool(null);
     }
     setSDKConnected(false);
-  }, [setTraderAPI, setLiqProvTool, setSDKConnected]);
+    setAPIBusy(false);
+  }, [setTraderAPI, setLiqProvTool, setSDKConnected, setAPIBusy]);
 
   useEffect(() => {
     if (address) {

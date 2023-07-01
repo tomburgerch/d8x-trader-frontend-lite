@@ -386,12 +386,12 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(async () => {
-    if (selectedPool?.poolSymbol && address && isConnected && chainId) {
+    if (selectedPool?.poolSymbol && address && isConnected && chainId && !isAPIBusyRef.current) {
       console.log('refreshing positions');
       setAPIBusy(true);
       await getPositionRisk(
         chainId,
-        isSDKConnected && !isAPIBusyRef.current ? traderAPIRef.current : null,
+        isSDKConnected ? traderAPIRef.current : null,
         selectedPool.poolSymbol,
         address,
         Date.now()
