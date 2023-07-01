@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -18,22 +18,37 @@ export const PositionBlock = ({ headers, position, handlePositionModify }: Posit
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.dataBlock}>
+      <Box className={styles.headerWrapper}>
+        <Box className={styles.leftSection}>
+          <Typography variant="bodySmall" component="p">
+            Symbol
+          </Typography>
+          <Typography variant="bodySmall" component="p" className={styles.symbol}>
+            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
+          </Typography>
+        </Box>
+        <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
+          Modify
+        </Button>
+      </Box>
+      <Box className={styles.dataWrapper}>
         <SidesRow
-          leftSide={headers[0].label}
-          rightSide={`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
-          rightSideStyles={styles.value}
+          leftSide={headers[2].label}
+          rightSide={position.side}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[1].label}
           rightSide={formatToCurrency(position.positionNotionalBaseCCY, parsedSymbol?.baseCurrency)}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
-        <SidesRow leftSide={headers[2].label} rightSide={position.side} rightSideStyles={styles.value} />
         <SidesRow
           leftSide={headers[3].label}
           rightSide={formatToCurrency(position.entryPrice, parsedSymbol?.quoteCurrency)}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[4].label}
@@ -42,18 +57,21 @@ export const PositionBlock = ({ headers, position, handlePositionModify }: Posit
               ? `- ${parsedSymbol?.quoteCurrency}`
               : formatToCurrency(position.liquidationPrice[0], parsedSymbol?.quoteCurrency)
           }
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[5].label}
           rightSide={`${formatToCurrency(position.collateralCC, '')}(${Math.round(position.leverage * 100) / 100}x)`}
-          rightSideStyles={styles.value}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
         />
-      </Box>
-      <Box className={styles.actionBlock}>
-        <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
-          Modify
-        </Button>
+        <SidesRow
+          leftSide={headers[6].label}
+          rightSide={formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency)}
+          leftSideStyles={styles.dataLabel}
+          rightSideStyles={styles.dataValue}
+        />
       </Box>
     </Box>
   );

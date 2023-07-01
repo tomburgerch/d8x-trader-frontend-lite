@@ -3,9 +3,12 @@ import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
+import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
+import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
+
 import { orderSizeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
 
@@ -64,15 +67,37 @@ export const OrderSize = memo(() => {
     return 0.1;
   }, [perpetualStaticInfo]);
 
+  const handleDecreaseOrderSize = () => {
+    const parts = orderSizeStep.toString().split('.');
+    let decimalPlaces;
+    if (parts.length === 2) {
+      decimalPlaces = parts[1].length;
+    } else {
+      decimalPlaces = 0;
+    }
+    const rounded = Math.round((orderSize - +orderSizeStep) / +orderSizeStep) * +orderSizeStep;
+    const limited = rounded.toFixed(decimalPlaces);
+    setOrderSize(parseFloat(limited));
+  };
+
+  const handleIncreaseOrderSize = () => {
+    const parts = orderSizeStep.toString().split('.');
+    let decimalPlaces;
+    if (parts.length === 2) {
+      decimalPlaces = parts[1].length;
+    } else {
+      decimalPlaces = 0;
+    }
+    const rounded = Math.round((orderSize + +orderSizeStep) / +orderSizeStep) * +orderSizeStep;
+    const limited = rounded.toFixed(decimalPlaces);
+    setOrderSize(parseFloat(limited));
+  };
+
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
         <InfoBlock
-          title={
-            <>
-              <Typography variant="bodySmall">Order size</Typography>
-            </>
-          }
+          title={'Order size'}
           content={
             <>
               <Typography> Sets the size of your order. </Typography>
@@ -84,19 +109,40 @@ export const OrderSize = memo(() => {
           }
         />
       </Box>
-      <OutlinedInput
-        id="order-size"
-        endAdornment={
-          <InputAdornment position="end">
-            <Typography variant="adornment">{selectedPerpetual?.baseCurrency}</Typography>
-          </InputAdornment>
-        }
-        type="number"
-        inputProps={{ step: orderSizeStep, min: 0 }}
-        value={inputValue}
-        onChange={handleInputCapture}
-        onBlur={handleInputBlur}
-      />
+      <Box className={styles.inputHolder}>
+        <Button
+          key="decrease-order-size"
+          variant="outlined"
+          size="small"
+          className={styles.decreaseButton}
+          onClick={handleDecreaseOrderSize}
+          disabled={orderSize === 0}
+        >
+          <DecreaseIcon />
+        </Button>
+        <OutlinedInput
+          id="order-size"
+          endAdornment={
+            <InputAdornment position="end">
+              <Typography variant="adornment">{selectedPerpetual?.baseCurrency}</Typography>
+            </InputAdornment>
+          }
+          type="number"
+          inputProps={{ step: orderSizeStep, min: 0 }}
+          value={inputValue}
+          onChange={handleInputCapture}
+          onBlur={handleInputBlur}
+        />
+        <Button
+          key="increase-order-size"
+          variant="outlined"
+          size="small"
+          className={styles.increaseButton}
+          onClick={handleIncreaseOrderSize}
+        >
+          <IncreaseIcon />
+        </Button>
+      </Box>
     </Box>
   );
 });

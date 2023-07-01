@@ -125,6 +125,7 @@ export const theme = createTheme({
           fontSize: 14,
           fontWeight: 400,
           whiteSpace: 'nowrap',
+          border: 0,
         },
       },
     },
@@ -314,8 +315,8 @@ export const theme = createTheme({
           props: { size: 'small' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '3px 16px',
-            fontSize: '18px',
+            padding: '8px 40px',
+            fontSize: '16px',
             fontWeight: 'normal',
             minWidth: '50px',
           },
@@ -381,16 +382,16 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '8px',
-          backgroundColor: 'var(--d8x-color-white) !important',
+          backgroundColor: 'transparent',
           minWidth: '180px',
           ':hover': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':focus': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':active': {
-            backgroundColor: 'var(--d8x-color-white) !important',
+            backgroundColor: 'transparent',
           },
           ':before': {
             border: 'none !important',
@@ -405,11 +406,11 @@ export const theme = createTheme({
       styleOverrides: {
         input: {
           fontWeight: '500',
-          color: 'var(--d8x-color-purple)',
+          color: 'var(--d8x-color-black)',
           padding: '3px 4px 3px 4px !important',
           width: 'auto',
           border: 'none',
-          fontSize: '18px',
+          fontSize: '16px',
         },
       },
     },
@@ -455,7 +456,11 @@ export const theme = createTheme({
     MuiDialogTitle: {
       styleOverrides: {
         root: {
+          fontSize: '24px',
+          lineHeight: '32px',
+          fontWeight: '600',
           textAlign: 'center',
+          padding: '48px 32px 32px 32px',
         },
       },
     },
@@ -464,7 +469,14 @@ export const theme = createTheme({
         root: {
           display: 'flex',
           justifyContent: 'space-between',
-          padding: '20px 40px',
+          padding: '20px 32px 48px 32px',
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          padding: '0px 32px 0px 32px',
         },
       },
     },

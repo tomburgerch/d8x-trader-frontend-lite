@@ -5,6 +5,8 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box, Paper } from '@mui/material';
 import { PaperProps } from '@mui/material/Paper/Paper';
 
+import { ReactComponent as CollateralIcon } from 'assets/icons/collateralIcon.svg';
+
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getOpenOrders, getTradingFee, getPositionRisk } from 'network/network';
@@ -23,6 +25,7 @@ import { PoolI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from '../header-select/HeaderSelect.module.scss';
+import collateralStyles from './CollateralSelect.module.scss';
 
 const CustomPaper = ({ children, ...props }: PaperProps) => {
   return (
@@ -114,23 +117,28 @@ export const CollateralsSelect = memo(() => {
   };
 
   return (
-    <HeaderSelect<PoolI>
-      id="collaterals-select"
-      label="Collateral:"
-      items={pools}
-      width="100%"
-      value={selectedPool}
-      onChange={handleChange}
-      getOptionLabel={(option) => option.poolSymbol}
-      PaperComponent={CustomPaper}
-      renderOption={(props, option) => (
-        <Box component="li" {...props}>
-          <Box className={styles.optionHolder}>
-            <Box className={styles.label}>{option.poolSymbol}</Box>
-            <Box className={styles.value}>{option.perpetuals.length}</Box>
+    <Box className={collateralStyles.root}>
+      <Box className={collateralStyles.iconWrapper}>
+        <CollateralIcon />
+      </Box>
+      <HeaderSelect<PoolI>
+        id="collaterals-select"
+        label="Collateral"
+        items={pools}
+        width="100%"
+        value={selectedPool}
+        onChange={handleChange}
+        getOptionLabel={(option) => option.poolSymbol}
+        PaperComponent={CustomPaper}
+        renderOption={(props, option) => (
+          <Box component="li" {...props}>
+            <Box className={styles.optionHolder}>
+              <Box className={styles.label}>{option.poolSymbol}</Box>
+              <Box className={styles.value}>{option.perpetuals.length}</Box>
+            </Box>
           </Box>
-        </Box>
-      )}
-    />
+        )}
+      />
+    </Box>
   );
 });

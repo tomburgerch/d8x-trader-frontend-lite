@@ -1,12 +1,14 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback } from 'react';
 
-import { Box, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { limitPriceAtom, orderTypeAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
+import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
+import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
 
 import styles from './LimitPrice.module.scss';
 
@@ -21,6 +23,26 @@ export const LimitPrice = memo(() => {
     },
     [setLimitPrice]
   );
+
+  const handleDecreasePrice = () => {
+    let newPrice;
+    if (limitPrice) {
+      newPrice = (limitPrice - 1).toString();
+    } else {
+      newPrice = '0';
+    }
+    setLimitPrice(newPrice);
+  };
+
+  const handleIncreasePrice = () => {
+    let newPrice;
+    if (limitPrice) {
+      newPrice = (limitPrice + 1).toString();
+    } else {
+      newPrice = '1';
+    }
+    setLimitPrice(newPrice);
+  };
 
   if (orderType === OrderTypeE.Market) {
     return null;
@@ -45,19 +67,40 @@ export const LimitPrice = memo(() => {
           }
         />
       </Box>
-      <OutlinedInput
-        id="limit-size"
-        endAdornment={
-          <InputAdornment position="end">
-            <Typography variant="adornment">{selectedPerpetual?.quoteCurrency}</Typography>
-          </InputAdornment>
-        }
-        inputProps={{ step: 1, min: -1 }}
-        type="number"
-        placeholder="-"
-        onChange={handleLimitPriceChange}
-        value={limitPrice === null ? '' : limitPrice}
-      />
+      <Box className={styles.inputHolder}>
+        <Button
+          key="decrease-order-size"
+          variant="outlined"
+          size="small"
+          className={styles.decreaseButton}
+          onClick={handleDecreasePrice}
+          disabled={limitPrice === 0}
+        >
+          <DecreaseIcon />
+        </Button>
+        <OutlinedInput
+          id="limit-size"
+          endAdornment={
+            <InputAdornment position="end">
+              <Typography variant="adornment">{selectedPerpetual?.quoteCurrency}</Typography>
+            </InputAdornment>
+          }
+          inputProps={{ step: 1, min: -1 }}
+          type="number"
+          placeholder="-"
+          onChange={handleLimitPriceChange}
+          value={limitPrice === null ? '' : limitPrice}
+        />
+        <Button
+          key="increase-order-size"
+          variant="outlined"
+          size="small"
+          className={styles.increaseButton}
+          onClick={handleIncreasePrice}
+        >
+          <IncreaseIcon />
+        </Button>
+      </Box>
     </Box>
   );
 });
