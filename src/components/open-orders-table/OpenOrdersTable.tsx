@@ -232,15 +232,15 @@ export const OpenOrdersTable = memo(() => {
           />
         </Box>
       )}
-      <Dialog open={isCancelModalOpen}>
+      <Dialog open={isCancelModalOpen} className={styles.dialog}>
         <DialogTitle>Cancel Open Order</DialogTitle>
-        <DialogContent>Are you sure you want to cancel this order?</DialogContent>
+        <DialogContent className={styles.dialogContent}>Are you sure you want to cancel this order?</DialogContent>
         <DialogActions>
           <Button onClick={closeCancelModal} variant="secondary" size="small">
-            Cancel
+            Back
           </Button>
           <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={requestSent}>
-            Confirm
+            Cancel order
           </Button>
         </DialogActions>
       </Dialog>

@@ -33,6 +33,19 @@
   text-align: center;
 }
 
+.dialog {
+
+  :global(.MuiPaper-root) {
+    width: 100%;
+    max-width: 400px;
+    border-radius: $d8x-border-radius;
+  }
+}
+
+.dialogContent {
+  font-size: 14px;
+}
+
 .paginationHolder {
   display: flex;
   justify-content: center;
