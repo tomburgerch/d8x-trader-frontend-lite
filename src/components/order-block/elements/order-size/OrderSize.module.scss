@@ -64,11 +64,13 @@
 
       input[type='number'] {
         -moz-appearance: textfield;
+        appearance: textfield;
       }
 
       input[type='number']:hover,
       input[type='number']:focus {
         -moz-appearance: textfield;
+        appearance: textfield;
       }
 
       :global(.MuiInputAdornment-root) {

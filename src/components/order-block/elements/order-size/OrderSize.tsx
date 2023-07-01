@@ -68,11 +68,29 @@ export const OrderSize = memo(() => {
   }, [perpetualStaticInfo]);
 
   const handleDecreaseOrderSize = () => {
-    setOrderSize((prev) => prev - +orderSizeStep);
+    const parts = orderSizeStep.toString().split('.');
+    let decimalPlaces;
+    if (parts.length === 2) {
+      decimalPlaces = parts[1].length;
+    } else {
+      decimalPlaces = 0;
+    }
+    const rounded = Math.round((orderSize - +orderSizeStep) / +orderSizeStep) * +orderSizeStep;
+    const limited = rounded.toFixed(decimalPlaces);
+    setOrderSize(parseFloat(limited));
   };
 
   const handleIncreaseOrderSize = () => {
-    setOrderSize((prev) => prev + +orderSizeStep);
+    const parts = orderSizeStep.toString().split('.');
+    let decimalPlaces;
+    if (parts.length === 2) {
+      decimalPlaces = parts[1].length;
+    } else {
+      decimalPlaces = 0;
+    }
+    const rounded = Math.round((orderSize + +orderSizeStep) / +orderSizeStep) * +orderSizeStep;
+    const limited = rounded.toFixed(decimalPlaces);
+    setOrderSize(parseFloat(limited));
   };
 
   return (
