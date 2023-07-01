@@ -119,7 +119,7 @@ export const AddAction = memo(() => {
               setLoadStats(true);
               requestSentRef.current = false;
               setRequestSent(false);
-              toast.success(
+              toast.error(
                 <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
               );
             });

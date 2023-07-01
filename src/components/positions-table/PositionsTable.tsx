@@ -66,7 +66,11 @@ import { sdkConnectedAtom } from 'store/liquidity-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './PositionsTable.module.scss';
+
 import { Separator } from 'components/separator/Separator';
+
+import { toUtf8String } from '@ethersproject/strings';
+
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -113,7 +117,7 @@ export const PositionsTable = memo(() => {
     setSelectedPosition(null);
   }, []);
 
-  const handleModifyPositionConfirm = useCallback(() => {
+  const handleModifyPositionConfirm = useCallback(async () => {
     if (!selectedPosition || !address || !selectedPool || !proxyAddr || !signer) {
       return;
     }
@@ -135,7 +139,7 @@ export const PositionsTable = memo(() => {
         leverage: selectedPosition.leverage,
       };
 
-      orderDigest(chainId, [closeOrder], address)
+      await orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
             approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0)
@@ -151,6 +155,38 @@ export const PositionsTable = memo(() => {
                     setSelectedPosition(null);
                     console.log(`closePosition tx hash: ${tx.hash}`);
                     toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
+                    tx.wait()
+                      .then((receipt) => {
+                        if (receipt.status !== 1) {
+                          toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                        }
+                      })
+                      .catch(async (err) => {
+                        console.error(err);
+                        const response = await signer.call(
+                          {
+                            to: tx.to,
+                            from: tx.from,
+                            nonce: tx.nonce,
+                            gasLimit: tx.gasLimit,
+                            gasPrice: tx.gasPrice,
+                            data: tx.data,
+                            value: tx.value,
+                            chainId: tx.chainId,
+                            type: tx.type ?? undefined,
+                            accessList: tx.accessList,
+                          },
+                          tx.blockNumber
+                        );
+                        const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                        setRequestSent(false);
+                        toast.error(
+                          <ToastContent
+                            title="Error closing position"
+                            bodyLines={[{ label: 'Reason', value: reason }]}
+                          />
+                        );
+                      });
                   })
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   .catch((error: any) => {
@@ -185,6 +221,38 @@ export const PositionsTable = memo(() => {
                   setSelectedPosition(null);
                   console.log(`addCollateral tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
+                  tx.wait()
+                    .then((receipt) => {
+                      if (receipt.status !== 1) {
+                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                      }
+                    })
+                    .catch(async (err) => {
+                      console.error(err);
+                      const response = await signer.call(
+                        {
+                          to: tx.to,
+                          from: tx.from,
+                          nonce: tx.nonce,
+                          gasLimit: tx.gasLimit,
+                          gasPrice: tx.gasPrice,
+                          data: tx.data,
+                          value: tx.value,
+                          chainId: tx.chainId,
+                          type: tx.type ?? undefined,
+                          accessList: tx.accessList,
+                        },
+                        tx.blockNumber
+                      );
+                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                      setRequestSent(false);
+                      toast.error(
+                        <ToastContent
+                          title="Error adding collateral"
+                          bodyLines={[{ label: 'Reason', value: reason }]}
+                        />
+                      );
+                    });
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((error: any) => {
@@ -208,7 +276,7 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
+      await getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
           withdraw(signer, data)
             .then((tx) => {
@@ -217,6 +285,35 @@ export const PositionsTable = memo(() => {
               setSelectedPosition(null);
               console.log(`removeCollaeral tx hash: ${tx.hash}`);
               toast.success(<ToastContent title="Collateral remove processed" bodyLines={[]} />);
+              tx.wait()
+                .then((receipt) => {
+                  if (receipt.status !== 1) {
+                    toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                  }
+                })
+                .catch(async (err) => {
+                  console.error(err);
+                  const response = await signer.call(
+                    {
+                      to: tx.to,
+                      from: tx.from,
+                      nonce: tx.nonce,
+                      gasLimit: tx.gasLimit,
+                      gasPrice: tx.gasPrice,
+                      data: tx.data,
+                      value: tx.value,
+                      chainId: tx.chainId,
+                      type: tx.type ?? undefined,
+                      accessList: tx.accessList,
+                    },
+                    tx.blockNumber
+                  );
+                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                  setRequestSent(false);
+                  toast.error(
+                    <ToastContent title="Error removing collateral" bodyLines={[{ label: 'Reason', value: reason }]} />
+                  );
+                });
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {
@@ -372,15 +469,15 @@ export const PositionsTable = memo(() => {
   const isConfirmButtonDisabled = useMemo(() => {
     switch (modifyType) {
       case ModifyTypeE.Close:
-        return !closePositionChecked;
+        return requestSent || !closePositionChecked;
       case ModifyTypeE.Add:
-        return addCollateral <= 0 || addCollateral < 0;
+        return requestSent || addCollateral <= 0 || addCollateral < 0;
       case ModifyTypeE.Remove:
-        return removeCollateral <= 0 || maxCollateral === undefined || maxCollateral < removeCollateral;
+        return requestSent || removeCollateral <= 0 || maxCollateral === undefined || maxCollateral < removeCollateral;
       default:
         return false;
     }
-  }, [modifyType, closePositionChecked, addCollateral, removeCollateral, maxCollateral]);
+  }, [requestSent, modifyType, closePositionChecked, addCollateral, removeCollateral, maxCollateral]);
 
   const parsedSymbol = useMemo(() => {
     if (selectedPosition) {
