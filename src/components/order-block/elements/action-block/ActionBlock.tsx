@@ -32,6 +32,7 @@ import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 import styles from './ActionBlock.module.scss';
 import { useDebounce } from 'helpers/useDebounce';
 import { toUtf8String } from '@ethersproject/strings';
+import { HashZero } from '@ethersproject/constants';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -216,9 +217,7 @@ export const ActionBlock = memo(() => {
               console.log(res.hash);
             }
             // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-            const signatures = new Array<string>(data.data.digests.length).fill(
-              '0x0000000000000000000000000000000000000000000000000000000000000000'
-            );
+            const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(signer, signatures, data.data).then((tx) => {
               // success submitting to mempool
               console.log(`postOrder tx hash: ${tx.hash}`);
