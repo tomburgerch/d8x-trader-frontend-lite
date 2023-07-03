@@ -67,7 +67,7 @@ export const OpenOrdersTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const traderAPIRef = useRef(traderAPI);
-  const openOrdersRefreshedRef = useRef(false);
+  // const openOrdersRefreshedRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   useEffect(() => {
@@ -169,12 +169,12 @@ export const OpenOrdersTable = memo(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
   }, [refreshOpenOrders, setTableRefreshHandlers]);
 
-  useEffect(() => {
-    if (!openOrdersRefreshedRef.current) {
-      openOrdersRefreshedRef.current = true;
-      refreshOpenOrders();
-    }
-  });
+  // useEffect(() => {
+  //   if (!openOrdersRefreshedRef.current) {
+  //     openOrdersRefreshedRef.current = true;
+  //     refreshOpenOrders();
+  //   }
+  // });
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [
