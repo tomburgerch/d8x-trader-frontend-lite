@@ -89,7 +89,7 @@ export const PositionsTable = memo(() => {
   const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
-  const updatedPositionsRef = useRef(false);
+  // const updatedPositionsRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();
@@ -432,12 +432,12 @@ export const PositionsTable = memo(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
 
-  useEffect(() => {
-    if (!updatedPositionsRef.current) {
-      updatedPositionsRef.current = true;
-      refreshPositions();
-    }
-  });
+  // useEffect(() => {
+  //   if (!updatedPositionsRef.current) {
+  //     updatedPositionsRef.current = true;
+  //     refreshPositions();
+  //   }
+  // });
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 

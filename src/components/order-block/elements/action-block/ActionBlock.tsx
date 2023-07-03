@@ -213,57 +213,71 @@ export const ActionBlock = memo(() => {
     await orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit).then((res) => {
-            if (res?.hash) {
-              console.log(res.hash);
-            }
-            // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-            const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-            postOrder(signer, signatures, data.data).then((tx) => {
-              // success submitting to mempool
-              console.log(`postOrder tx hash: ${tx.hash}`);
-              setShowReviewOrderModal(false);
-              toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
-              clearInputsData();
-              // release lock
-              requestSentRef.current = false;
-              setRequestSent(false);
-              tx.wait()
-                .then((receipt) => {
-                  // can't use this since backend will send a websocket message in case of success
-                  // if (receipt.status === 1) {
-                  //   toast.success(<ToastContent title="Order submitted" bodyLines={[]} />);
-                  // }
-                  if (receipt.status !== 1) {
-                    toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
-                  }
-                })
-                .catch(async (err) => {
-                  console.log(err);
-                  const response = await signer.call(
-                    {
-                      to: tx.to,
-                      from: tx.from,
-                      nonce: tx.nonce,
-                      gasLimit: tx.gasLimit,
-                      gasPrice: tx.gasPrice,
-                      data: tx.data,
-                      value: tx.value,
-                      chainId: tx.chainId,
-                      type: tx.type ?? undefined,
-                      accessList: tx.accessList,
-                    },
-                    tx.blockNumber
-                  );
-                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
+            .then((res) => {
+              if (res?.hash) {
+                console.log(res.hash);
+              }
+              // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+              const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
+              postOrder(signer, signatures, data.data)
+                .then((tx) => {
+                  // success submitting to mempool
+                  console.log(`postOrder tx hash: ${tx.hash}`);
+                  setShowReviewOrderModal(false);
+                  toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
+                  clearInputsData();
+                  // release lock
                   requestSentRef.current = false;
                   setRequestSent(false);
-                  toast.error(
-                    <ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: reason }]} />
-                  );
+                  tx.wait()
+                    .then((receipt) => {
+                      // can't use this since backend will send a websocket message in case of success
+                      // if (receipt.status === 1) {
+                      //   toast.success(<ToastContent title="Order submitted" bodyLines={[]} />);
+                      // }
+                      if (receipt.status !== 1) {
+                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                      }
+                    })
+                    .catch(async (err) => {
+                      console.log(err);
+                      const response = await signer.call(
+                        {
+                          to: tx.to,
+                          from: tx.from,
+                          nonce: tx.nonce,
+                          gasLimit: tx.gasLimit,
+                          gasPrice: tx.gasPrice,
+                          data: tx.data,
+                          value: tx.value,
+                          chainId: tx.chainId,
+                          type: tx.type ?? undefined,
+                          accessList: tx.accessList,
+                        },
+                        tx.blockNumber
+                      );
+                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+                      toast.error(
+                        <ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      );
+                    });
+                })
+                .catch(async (error) => {
+                  // user rejected posting
+                  requestSentRef.current = false;
+                  setRequestSent(false);
+                  console.error(error);
                 });
+            })
+            .catch(async (error) => {
+              // user rejecting approving margin
+              requestSentRef.current = false;
+              setRequestSent(false);
+              console.error(error);
             });
-          });
         }
       })
       .catch(async (error) => {
