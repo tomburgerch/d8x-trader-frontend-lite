@@ -10,7 +10,7 @@ export function cancelOrder(
 ): Promise<ContractTransaction> {
   const contract = new Contract(data.OrderBookAddr, [data.abi], signer);
   return contract.cancelOrder(orderId, signature, data.priceUpdate.updateData, data.priceUpdate.publishTimes, {
-    gasLimit: 500_000,
+    gasLimit: 1_000_000,
     value: data.priceUpdate.updateFee,
   });
 }
