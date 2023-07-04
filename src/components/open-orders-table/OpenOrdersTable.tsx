@@ -87,7 +87,7 @@ export const OpenOrdersTable = memo(() => {
     setSelectedOrder(null);
   }, []);
 
-  const handleCancelOrderConfirm = useCallback(() => {
+  const handleCancelOrderConfirm = useCallback(async () => {
     if (!selectedOrder) {
       return;
     }
@@ -101,7 +101,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
+    await getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           signMessages(signer, [data.data.digest])
@@ -118,6 +118,9 @@ export const OpenOrdersTable = memo(() => {
                       if (receipt.status !== 1) {
                         toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
                       }
+                      // else {
+                      //   toast.success(<ToastContent title="Order cancelled" bodyLines={[]} />);
+                      // }
                     })
                     .catch(async (err) => {
                       console.error(err);
