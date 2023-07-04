@@ -347,10 +347,7 @@ export const ActionBlock = memo(() => {
     ) {
       return 'Warning: order size below minimal position size';
     }
-    if (
-      orderInfo.orderType === OrderTypeE.Market &&
-      (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit)
-    ) {
+    if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     return 'Good to go';
