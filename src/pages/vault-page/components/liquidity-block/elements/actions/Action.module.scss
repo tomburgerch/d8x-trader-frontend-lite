@@ -1,0 +1,123 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+}
+
+.infoBlock {
+  width: 100%;
+  max-width: 280px;
+  padding: $d8x-spacing * 8 $d8x-spacing * 8 $d8x-spacing * 8 0;
+  border-right: 1px solid var(--d8x-separator-border-color);
+
+  .text {
+    color: var(--d8x-color-black-400);
+    margin-top: $d8x-spacing * 4;
+    margin-bottom: $d8x-spacing * 4;
+  }
+}
+
+.contentBlock {
+  width: 100%;
+  max-width: 470px;
+  padding: $d8x-spacing * 8;
+}
+
+.iconSeparator {
+  margin: $d8x-spacing * 8 0;
+}
+
+.inputLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2 * $d8x-spacing;
+  margin-bottom: 2 * $d8x-spacing;
+  height: 40px;
+
+  .label {
+    display: flex;
+    align-items: center;
+    padding-right: $d8x-spacing;
+    gap: 8px;
+  }
+}
+
+.summaryBlock {
+  margin-top: $d8x-spacing * 8;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $d8x-spacing / 2;
+    color: var(--d8x-color-black-maintext);
+  }
+}
+
+.actionButton {
+  margin-top: $d8x-spacing * 8;
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .inputLine {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+
+    .label {
+      margin-bottom: $d8x-spacing * 2;
+    }
+
+    .inputHolder {
+
+      :global(.MuiInputBase-root) {
+        width: 100%;
+        padding-right: $d8x-spacing * 2;
+
+        input {
+          width: 90%;
+        }
+      }
+
+      :global(.MuiInputAdornment-root) {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .root {
+    display: block;
+  }
+
+  .infoBlock {
+    display: none;
+  }
+
+  .contentBlock {
+    padding: $d8x-spacing * 8 0;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .inputLine {
+
+    .inputHolder {
+
+      :global(.MuiInputBase-root) {
+        padding-right: 0;
+
+        input {
+          width: 45%;
+          text-align: right;
+        }
+      }
+    }
+  }
+}

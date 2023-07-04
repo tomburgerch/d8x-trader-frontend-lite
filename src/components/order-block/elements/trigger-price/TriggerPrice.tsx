@@ -1,51 +1,51 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
+import { InfoBlock } from 'components/info-block/InfoBlock';
+import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
-import { selectedPerpetualAtom } from 'store/pools.store';
+import { selectedPerpetualAtom, perpetualStatisticsAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
-import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
-import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
 
 import styles from './TriggerPrice.module.scss';
-import { InfoBlock } from '../../../info-block/InfoBlock';
 
 export const TriggerPrice = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
   const [triggerPrice, setTriggerPrice] = useAtom(triggerPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [inputValue, setInputValue] = useState(`${triggerPrice}`);
+  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+
+  const inputValueChangedRef = useRef(false);
 
   const handleTriggerPriceChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const targetValue = event.target.value;
+    (targetValue: string) => {
       if (targetValue) {
         setTriggerPrice(targetValue);
+        setInputValue(targetValue);
+      } else {
+        const initialTrigger =
+          perpetualStatistics?.markPrice === undefined ? -1 : Math.round(100 * perpetualStatistics?.markPrice) / 100;
+        setTriggerPrice(`${initialTrigger}`);
+        setInputValue('');
       }
+      inputValueChangedRef.current = true;
     },
-    [setTriggerPrice]
+    [setTriggerPrice, perpetualStatistics]
   );
 
-  const handleDecreasePrice = () => {
-    let newPrice;
-    if (triggerPrice) {
-      newPrice = (triggerPrice - 1).toString();
-    } else {
-      newPrice = '0';
+  useEffect(() => {
+    if (!inputValueChangedRef.current) {
+      setInputValue(`${triggerPrice}`);
     }
-    setTriggerPrice(newPrice);
-  };
+    inputValueChangedRef.current = false;
+  }, [triggerPrice]);
 
-  const handleIncreasePrice = () => {
-    let newPrice;
-    if (triggerPrice) {
-      newPrice = (triggerPrice + 1).toString();
-    } else {
-      newPrice = '1';
-    }
-    setTriggerPrice(newPrice);
-  };
+  const handleInputBlur = useCallback(() => {
+    setInputValue(`${triggerPrice}`);
+  }, [triggerPrice]);
 
   if (orderType !== OrderTypeE.Stop) {
     return null;
@@ -71,39 +71,15 @@ export const TriggerPrice = memo(() => {
           }
         />
       </Box>
-      <Box className={styles.inputHolder}>
-        <Button
-          key="decrease-order-size"
-          variant="outlined"
-          size="small"
-          className={styles.decreaseButton}
-          onClick={handleDecreasePrice}
-          disabled={triggerPrice === 0}
-        >
-          <DecreaseIcon />
-        </Button>
-        <OutlinedInput
-          id="trigger-size"
-          endAdornment={
-            <InputAdornment position="end">
-              <Typography variant="adornment">{selectedPerpetual?.quoteCurrency}</Typography>
-            </InputAdornment>
-          }
-          inputProps={{ step: 1, min: 0 }}
-          type="number"
-          onChange={handleTriggerPriceChange}
-          value={triggerPrice === null ? '' : triggerPrice}
-        />
-        <Button
-          key="increase-order-size"
-          variant="outlined"
-          size="small"
-          className={styles.increaseButton}
-          onClick={handleIncreasePrice}
-        >
-          <IncreaseIcon />
-        </Button>
-      </Box>
+      <ResponsiveInput
+        id="trigger-size"
+        inputValue={inputValue}
+        setInputValue={handleTriggerPriceChange}
+        handleInputBlur={handleInputBlur}
+        currency={selectedPerpetual?.quoteCurrency}
+        step="1"
+        min={0}
+      />
     </Box>
   );
 });
