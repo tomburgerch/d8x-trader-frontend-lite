@@ -81,7 +81,6 @@ export function getPositionRisk(
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MarginAccountI[]>> {
-  console.log('calling open positions');
   const params = new URLSearchParams({
     symbol,
     traderAddr,
