@@ -89,7 +89,6 @@ export const PositionsTable = memo(() => {
   const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
-  const updatedPositionsRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();

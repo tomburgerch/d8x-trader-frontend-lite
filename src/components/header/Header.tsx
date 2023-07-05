@@ -58,7 +58,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const requestRef = useRef(false);
-  const chainIdRef = useRef(chainId);
 
   const setExchangeInfo = useCallback(
     (data: ExchangeInfoI | null) => {
