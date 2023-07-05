@@ -89,7 +89,7 @@ export const PositionsTable = memo(() => {
   const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
-  // const updatedPositionsRef = useRef(false);
+  const updatedPositionsRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();
@@ -394,16 +394,12 @@ export const PositionsTable = memo(() => {
   }, []);
 
   const refreshPositions = useCallback(async () => {
-    if (selectedPool?.poolSymbol && address && isConnected && chainId && !isAPIBusyRef.current) {
-      console.log('refreshing positions');
+    if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
+      if (isAPIBusyRef.current || !traderAPIRef.current) {
+        return;
+      }
       setAPIBusy(true);
-      await getPositionRisk(
-        chainId,
-        isSDKConnected ? traderAPIRef.current : null,
-        selectedPool.poolSymbol,
-        address,
-        Date.now()
-      )
+      await getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
           setAPIBusy(false);
           if (data && data.length > 0) {
@@ -429,15 +425,16 @@ export const PositionsTable = memo(() => {
   ]);
 
   useEffect(() => {
+    if (!updatedPositionsRef.current && traderAPI) {
+      traderAPIRef.current = traderAPI;
+      updatedPositionsRef.current = true;
+      refreshPositions();
+    }
+  }, [traderAPI, refreshPositions]);
+
+  useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
-
-  // useEffect(() => {
-  //   if (!updatedPositionsRef.current) {
-  //     updatedPositionsRef.current = true;
-  //     refreshPositions();
-  //   }
-  // });
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 
