@@ -1,4 +1,4 @@
-import { LiquidityProviderTool, PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
+import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Provider } from '@ethersproject/abstract-provider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -13,7 +13,7 @@ import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
 import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTraderLoyalty } from 'network/network';
-import { liqProvToolAtom, sdkConnectedAtom } from 'store/vault-pools.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { loyaltyScoreAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
@@ -29,7 +29,6 @@ const loyaltyMap: Record<number, string> = {
 
 export const WalletConnectButton = memo(() => {
   const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
-  const [liqProvTool, setLiqProvTool] = useAtom(liqProvToolAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
   const [, setSDKConnected] = useAtom(sdkConnectedAtom);
   const [, setAPIBusy] = useAtom(traderAPIBusyAtom);
@@ -42,8 +41,6 @@ export const WalletConnectButton = memo(() => {
 
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
-  const liqProvToolRef = useRef(liqProvTool);
-  // const loadingLiqProvToolRef = useRef(false);
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -58,32 +55,26 @@ export const WalletConnectButton = memo(() => {
       }
       loadingAPIRef.current = true;
       setTraderAPI(null);
-      setLiqProvTool(null);
       setSDKConnected(false);
       console.log(`loading SDK on chainId ${_chainId}`);
       const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(_chainId));
-      const newLiqProvTool = new LiquidityProviderTool(PerpetualDataHandler.readSDKConfig(_chainId), _signer);
-      await Promise.all([newTraderAPI.createProxyInstance(_provider), newLiqProvTool.createProxyInstance(_provider)]);
+      await newTraderAPI.createProxyInstance(_provider);
       setTraderAPI(newTraderAPI);
-      setLiqProvTool(newLiqProvTool);
       loadingAPIRef.current = false;
       setSDKConnected(true);
       setAPIBusy(false);
       console.log(`SDK loaded on chain id ${_chainId}`);
     },
-    [setTraderAPI, setLiqProvTool, setSDKConnected, setAPIBusy]
+    [setTraderAPI, setSDKConnected, setAPIBusy]
   );
 
   const unloadSDK = useCallback(() => {
     if (traderAPIRef.current) {
       setTraderAPI(null);
     }
-    if (liqProvToolRef.current) {
-      setLiqProvTool(null);
-    }
     setSDKConnected(false);
     setAPIBusy(false);
-  }, [setTraderAPI, setLiqProvTool, setSDKConnected, setAPIBusy]);
+  }, [setTraderAPI, setSDKConnected, setAPIBusy]);
 
   useEffect(() => {
     if (address) {

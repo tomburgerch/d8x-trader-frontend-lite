@@ -14,7 +14,6 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
 import {
   dCurrencyPriceAtom,
-  liqProvToolAtom,
   userAmountAtom,
   selectedLiquidityPoolAtom,
   withdrawalsAtom,
@@ -23,10 +22,11 @@ import {
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
+import { traderAPIAtom } from 'store/pools.store';
 
 export const Initiate = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
-  const [liqProvTool] = useAtom(liqProvToolAtom);
+  const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
@@ -73,7 +73,7 @@ export const Initiate = memo(() => {
     setRequestSent(true);
 
     await liqProvTool
-      .initiateLiquidityWithdrawal(selectedLiquidityPool.poolSymbol, initiateAmount)
+      .initiateLiquidityWithdrawal(signer, selectedLiquidityPool.poolSymbol, initiateAmount)
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
         setLoadStats(false);
