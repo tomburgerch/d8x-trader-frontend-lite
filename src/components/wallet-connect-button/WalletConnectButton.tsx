@@ -4,7 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useConnect, useProvider, useSigner } from 'wagmi';
+import { useAccount, useChainId, useConnect, useProvider } from 'wagmi';
 
 import { Box, Button } from '@mui/material';
 
@@ -27,12 +27,11 @@ const loyaltyMap: Record<number, string> = {
 };
 
 export const WalletConnectButton = memo(() => {
-  const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
+  const [, setTraderAPI] = useAtom(traderAPIAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
   const [, setSDKConnected] = useAtom(sdkConnectedAtom);
   const [, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
-  const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
 
   const { address } = useAccount();
@@ -49,24 +48,35 @@ export const WalletConnectButton = memo(() => {
       loadingAPIRef.current = true;
       setTraderAPI(null);
       setSDKConnected(false);
+      setAPIBusy(true);
       console.log(`loading SDK on chainId ${_chainId}`);
       const newTraderAPI = new TraderInterface(PerpetualDataHandler.readSDKConfig(_chainId));
-      await newTraderAPI.createProxyInstance(_provider);
+      await newTraderAPI
+        .createProxyInstance(_provider)
+        .then(() => {
+          loadingAPIRef.current = false;
+          setAPIBusy(false);
+          setSDKConnected(true);
+          console.log(`SDK loaded on chain id ${_chainId}`);
+        })
+        .catch((err) => {
+          console.log(`error loading SDK `);
+          loadingAPIRef.current = false;
+          setAPIBusy(false);
+          console.error(err);
+          if (err?.code) {
+            console.log('error code', err.code);
+          }
+        });
       setTraderAPI(newTraderAPI);
-      loadingAPIRef.current = false;
-      setSDKConnected(true);
-      setAPIBusy(false);
-      console.log(`SDK loaded on chain id ${_chainId}`);
     },
     [setTraderAPI, setSDKConnected, setAPIBusy]
   );
 
   const unloadSDK = useCallback(() => {
-    if (traderAPIRef.current) {
-      setTraderAPI(null);
-    }
     setSDKConnected(false);
     setAPIBusy(false);
+    setTraderAPI(null);
   }, [setTraderAPI, setSDKConnected, setAPIBusy]);
 
   useEffect(() => {
@@ -91,7 +101,7 @@ export const WalletConnectButton = memo(() => {
 
   // disconnect SDK on wallet disconnected
   useEffect(() => {
-    if (isDisconnected || isReconnecting || traderAPIRef.current) {
+    if (isDisconnected || isReconnecting) {
       unloadSDK();
     }
   }, [isDisconnected, isReconnecting, unloadSDK]);

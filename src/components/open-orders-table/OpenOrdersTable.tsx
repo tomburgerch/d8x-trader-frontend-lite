@@ -175,17 +175,16 @@ export const OpenOrdersTable = memo(() => {
 
   const refreshOpenOrders = useCallback(async () => {
     if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current) {
+      if (isAPIBusyRef.current || chainId !== traderAPIRef.current?.chainId) {
         return;
       }
       setAPIBusy(true);
       await getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
           setAPIBusy(false);
+          clearOpenOrders();
           if (data && data.length > 0) {
             data.map((o) => setOpenOrders(o));
-          } else {
-            clearOpenOrders();
           }
         })
         .catch((err) => {

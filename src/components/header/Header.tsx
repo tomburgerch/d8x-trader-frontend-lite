@@ -18,7 +18,6 @@ import {
   proxyAddrAtom,
   selectedPoolAtom,
   perpetualsAtom,
-  traderAPIAtom,
   chainIdAtom,
 } from 'store/pools.store';
 import { ExchangeInfoI, PerpetualDataI } from 'types/types';
@@ -55,17 +54,9 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
   const [, setChainId] = useAtom(chainIdAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  // const chainId = useMemo(() => {
-  //   if (chain) {
-  //     console.log(`switched chain id: ${chain.id}`);
-  //     return chain.id;
-  //   }
-  // }, [chain]);
   const requestRef = useRef(false);
   const chainIdRef = useRef(chainId);
 
@@ -111,18 +102,11 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
           requestRef.current = false;
         })
         .catch((err) => {
-          console.log(err);
-          // API call failed - try with SDK
-          if (traderAPI && chainId === chainIdRef.current) {
-            getExchangeInfo(chainId, traderAPI).then(({ data }) => {
-              setExchangeInfo(data);
-              setChainId(chainId);
-            });
-          }
+          console.error(err);
           requestRef.current = false;
         });
     }
-  }, [chainId, traderAPI, setExchangeInfo, setChainId]); //setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]);
+  }, [chainId, setExchangeInfo, setChainId]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
