@@ -1,5 +1,4 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
-import { Signer } from '@ethersproject/abstract-signer';
 import { Provider } from '@ethersproject/abstract-provider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
@@ -33,12 +32,6 @@ export const WalletConnectButton = memo(() => {
   const [, setSDKConnected] = useAtom(sdkConnectedAtom);
   const [, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
-  const { data: signer } = useSigner({
-    onError(error) {
-      console.log(error);
-    },
-  });
-
   const traderAPIRef = useRef(traderAPI);
   const loadingAPIRef = useRef(false);
 
@@ -49,7 +42,7 @@ export const WalletConnectButton = memo(() => {
   const { error: errorMessage } = useConnect();
 
   const loadSDK = useCallback(
-    async (_signer: Signer, _provider: Provider, _chainId: number) => {
+    async (_provider: Provider, _chainId: number) => {
       if (loadingAPIRef.current) {
         return;
       }
@@ -105,13 +98,13 @@ export const WalletConnectButton = memo(() => {
 
   // connect SDK on change of provider/chain/wallet
   useEffect(() => {
-    if (loadingAPIRef.current || !isConnected || !provider || !signer || !chainId) {
+    if (loadingAPIRef.current || !isConnected || !provider || !chainId) {
       return;
     }
-    loadSDK(signer, provider, chainId)
+    loadSDK(provider, chainId)
       .then(() => {})
       .catch((err) => console.log(err));
-  }, [isConnected, provider, signer, chainId, loadSDK]);
+  }, [isConnected, provider, chainId, loadSDK]);
 
   return (
     <ConnectButton.Custom>
