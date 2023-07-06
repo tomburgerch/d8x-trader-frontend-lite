@@ -189,14 +189,16 @@ export const Withdraw = memo(() => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="primary"
-          onClick={handleWithdrawLiquidity}
-          className={styles.actionButton}
-          disabled={isButtonDisabled}
-        >
-          Withdraw
-        </Button>
+        <Box className={styles.buttonHolder}>
+          <Button
+            variant="primary"
+            onClick={handleWithdrawLiquidity}
+            className={styles.actionButton}
+            disabled={isButtonDisabled}
+          >
+            Withdraw
+          </Button>
+        </Box>
       </Box>
     </div>
   );

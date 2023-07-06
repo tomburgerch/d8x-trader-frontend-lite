@@ -64,19 +64,29 @@
   .figures {
 
     li[data-role='left-top-1'] {
-      display: block;
+      width: 708.433px;
+      height: 603px;
+      left: -87px;
+      top: 404px;
     }
 
     li[data-role='right-top-1'] {
-      display: block;
+      width: 708.433px;
+      height: 603px;
+      right: -545px;
+      top: -567px;
     }
 
     li[data-role='center-bottom-1'] {
-      display: block;
+      width: 429.74px;
+      height: 366px;
+      right: -175px;
+      top: calc(100% - 366px - 36px);
+      filter: blur(150px);
     }
 
     li[data-role='center-bottom-2'] {
-      display: block;
+      display: none;
     }
   }
 }

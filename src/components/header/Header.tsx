@@ -24,6 +24,7 @@ import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
+import { Separator } from '../separator/Separator';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { PageAppBar } from './Header.styles';
@@ -42,6 +43,7 @@ const drawerWidth = 240;
 export const Header = memo(({ window, children }: HeaderPropsI) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const chainId = useChainId();
   const { chain } = useNetwork();
@@ -157,7 +159,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
                   <InteractiveLogo />
                 </a>
               </Typography>
-              {!isSmallScreen && (
+              {!isTabletScreen && (
                 <nav className={styles.navWrapper}>
                   {pages.map((page) => (
                     <NavLink
@@ -183,12 +185,13 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
               onClick={handleDrawerToggle}
               variant="primary"
               className={styles.menuButton}
-              sx={{ ml: 2, display: { sm: 'none' } }}
+              sx={{ ml: 2, display: { md: 'none' } }}
             >
               <MenuIcon />
             </Button>
           </Toolbar>
           {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
+          {isTabletScreen && <Separator className={styles.mobileSeparator} />}
         </PageAppBar>
         <Box component="nav">
           <Drawer
@@ -201,7 +204,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
               keepMounted: true, // Better open performance on mobile.
             }}
             sx={{
-              display: { xs: 'block', sm: 'none' },
+              display: { sm: 'block', md: 'none' },
               '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
             }}
           >

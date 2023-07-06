@@ -16,12 +16,13 @@
 
 .expiryOptions {
   width: 100%;
-  height: 36px;
   display: flex;
   justify-content: center;
 
   :global(.MuiButtonGroup-root) {
     width: 100%;
+    flex-wrap: wrap;
+    gap: $d8x-spacing;
   }
 
   :global(.MuiButtonBase-root) {
@@ -36,11 +37,21 @@
       border-right-color: var(--d8x-color-black-opac);
       border-right-width: 1px;
       border-radius: 8px;
-      margin-right: 8px;
     }
 
     &:last-of-type {
       border-radius: 8px;
+    }
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .expiryOptions {
+
+    :global(.MuiButtonBase-root) {
+      min-width: 64px;
+      max-width: 64px;
     }
   }
 }
