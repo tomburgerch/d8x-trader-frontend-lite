@@ -17,7 +17,7 @@
 .actionBlock {
   flex: 1;
   background-color: var(--d8x-background-white);
-  padding: $d8x-spacing * 4;
+  padding: $d8x-spacing * 8;
 }
 
 .separator {
@@ -39,10 +39,12 @@
     background-color: var(--d8x-background-white);
     border-radius: $d8x-border-radius;
     margin-bottom: $d8x-spacing * 4;
+    padding: $d8x-spacing * 6;
     width: auto;
   }
 
   .actionBlock {
     border-radius: $d8x-border-radius;
+    padding: $d8x-spacing * 6;
   }
 }

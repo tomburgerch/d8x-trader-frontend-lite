@@ -45,7 +45,13 @@
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .buttonsHolder {
-    gap: $d8x-spacing;
+    gap: $d8x-spacing * 2;
+  }
+
+  .connectWalletButton {
+    padding-left: 20px;
+    padding-right: 20px;
+    min-width: 50px;
   }
 
   .chainButton {

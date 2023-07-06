@@ -34,7 +34,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmall">Fees</Typography>
         <Typography variant="bodySmallSB">
           {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
-          {formatToCurrency(orderInfo?.tradingFee, 'bps', 1)}
+          {formatToCurrency(orderInfo?.tradingFee, 'bps', false, 1)}
           {')'}
         </Typography>
       </Box>

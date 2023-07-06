@@ -200,14 +200,16 @@ export const Initiate = memo(() => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="primary"
-          disabled={isButtonDisabled}
-          onClick={handleInitiateLiquidity}
-          className={styles.actionButton}
-        >
-          Initiate withdrawal
-        </Button>
+        <Box className={styles.buttonHolder}>
+          <Button
+            variant="primary"
+            disabled={isButtonDisabled}
+            onClick={handleInitiateLiquidity}
+            className={styles.actionButton}
+          >
+            Initiate withdrawal
+          </Button>
+        </Box>
       </Box>
     </div>
   );
