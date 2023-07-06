@@ -185,7 +185,6 @@ export function getOpenOrders(
   traderAddr: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI[]>> {
-  console.log('calling open orders');
   if (traderAPI) {
     // console.log(`openOrders via SDK ${symbol} `);
     return traderAPI.openOrders(traderAddr, symbol).then((data) => {

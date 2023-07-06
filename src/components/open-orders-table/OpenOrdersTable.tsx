@@ -68,14 +68,13 @@ export const OpenOrdersTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const traderAPIRef = useRef(traderAPI);
-  // const openOrdersRefreshedRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   useEffect(() => {
-    if (isDisconnected) {
+    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
       clearOpenOrders();
     }
-  }, [isDisconnected, clearOpenOrders]);
+  }, [isDisconnected, chainId, clearOpenOrders]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);

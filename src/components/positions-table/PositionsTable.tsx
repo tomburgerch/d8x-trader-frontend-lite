@@ -359,10 +359,10 @@ export const PositionsTable = memo(() => {
   }, [selectedPool, removePosition]);
 
   useEffect(() => {
-    if (isDisconnected) {
+    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
       clearPositions();
     }
-  }, [isDisconnected, clearPositions]);
+  }, [isDisconnected, chainId, clearPositions]);
 
   useEffect(() => {
     if (!address || !selectedPosition || !chainId || isAPIBusyRef.current) {
@@ -425,9 +425,8 @@ export const PositionsTable = memo(() => {
   // useEffect(() => {
   //   if (isSDKConnected) {
   //     traderAPIRef.current = traderAPI;
-  //     clearPositions();
   //   }
-  // }, [traderAPI, isSDKConnected, clearPositions]);
+  // }, [traderAPI, isSDKConnected]);
 
   // useEffect(() => {
   //   if (!updatedPositionsRef.current && isSDKConnected) {
