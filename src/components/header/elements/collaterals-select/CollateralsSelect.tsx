@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, SyntheticEvent, useEffect, useRef } from 'react';
+import { memo, SyntheticEvent, useCallback, useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Paper } from '@mui/material';
@@ -9,7 +9,7 @@ import { ReactComponent as CollateralIcon } from 'assets/icons/collateralIcon.sv
 
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
-import { getOpenOrders, getTradingFee, getPositionRisk } from 'network/network';
+import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import {
   openOrdersAtom,
@@ -50,10 +50,8 @@ export const CollateralsSelect = memo(() => {
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
-
-  const traderAPIRef = useRef(traderAPI);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   useEffect(() => {
     if (selectedPool !== null && address) {
@@ -65,30 +63,6 @@ export const CollateralsSelect = memo(() => {
       setPoolFee(undefined);
     }
   }, [selectedPool, setPoolFee, chainId, address]);
-
-  useEffect(() => {
-    if (selectedPool !== null && address) {
-      getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
-        .then(({ data }) => {
-          if (data && data.length > 0) {
-            data.map((o) => setOpenOrders(o));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address)
-        .then(({ data }) => {
-          if (data && data.length > 0) {
-            data.map((p) => setPositions(p));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [selectedPool, chainId, address, setOpenOrders, setPositions]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {
@@ -108,6 +82,50 @@ export const CollateralsSelect = memo(() => {
       });
     }
   }, [selectedPool, isConnected, send, address]);
+
+  const fetchPositions = useCallback(
+    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+      if (!traderAPI || traderAPI.chainId !== _chainId) {
+        return;
+      }
+      await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            data.map((p) => setPositions(p));
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    [traderAPI, setPositions]
+  );
+
+  const fetchOpenOrders = useCallback(
+    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+      if (!traderAPI) {
+        return;
+      }
+      await getOpenOrders(_chainId, traderAPI, _poolSymbol, _address)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            data.map((orders) => setOpenOrders(orders));
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    [traderAPI, setOpenOrders]
+  );
+
+  useEffect(() => {
+    if (selectedPool !== null && address) {
+      fetchPositions(chainId, selectedPool.poolSymbol, address).then(() => {
+        fetchOpenOrders(chainId, selectedPool.poolSymbol, address);
+      });
+    }
+  }, [selectedPool, chainId, address, fetchOpenOrders, fetchPositions]);
 
   const handleChange = (event: SyntheticEvent, value: PoolI) => {
     setSelectedPool(value.poolSymbol);

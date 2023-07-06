@@ -48,7 +48,7 @@ import { toUtf8String } from '@ethersproject/strings';
 const MIN_WIDTH_FOR_TABLE = 900;
 
 export const OpenOrdersTable = memo(() => {
-  const { address, isDisconnected } = useAccount();
+  const { address, isDisconnected, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: signer } = useSigner();
   const { width, ref } = useResizeDetector();
@@ -68,14 +68,13 @@ export const OpenOrdersTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const traderAPIRef = useRef(traderAPI);
-  // const openOrdersRefreshedRef = useRef(false);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   useEffect(() => {
-    if (isDisconnected) {
+    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
       clearOpenOrders();
     }
-  }, [isDisconnected, clearOpenOrders]);
+  }, [isDisconnected, chainId, clearOpenOrders]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -174,21 +173,17 @@ export const OpenOrdersTable = memo(() => {
   }, []);
 
   const refreshOpenOrders = useCallback(async () => {
-    if (selectedPool !== null && address && !isDisconnected && !isAPIBusyRef.current) {
+    if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
+      if (isAPIBusyRef.current || chainId !== traderAPIRef.current?.chainId) {
+        return;
+      }
       setAPIBusy(true);
-      await getOpenOrders(
-        chainId,
-        isSDKConnected ? traderAPIRef.current : null,
-        selectedPool.poolSymbol,
-        address,
-        Date.now()
-      )
+      await getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
           setAPIBusy(false);
+          clearOpenOrders();
           if (data && data.length > 0) {
             data.map((o) => setOpenOrders(o));
-          } else {
-            clearOpenOrders();
           }
         })
         .catch((err) => {
@@ -196,7 +191,7 @@ export const OpenOrdersTable = memo(() => {
           setAPIBusy(false);
         });
     }
-  }, [chainId, address, selectedPool, isDisconnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders]);
+  }, [chainId, address, selectedPool, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders]);
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));

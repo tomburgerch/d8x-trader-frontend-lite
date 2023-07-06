@@ -13,13 +13,12 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import {
   dCurrencyPriceAtom,
-  liqProvToolAtom,
   loadStatsAtom,
   sdkConnectedAtom,
   selectedLiquidityPoolAtom,
 } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { proxyAddrAtom } from 'store/pools.store';
+import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 
 import styles from './Action.module.scss';
 
@@ -34,7 +33,7 @@ export const Add = memo(() => {
 
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
-  const [liqProvTool] = useAtom(liqProvToolAtom);
+  const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [, setLoadStats] = useAtom(loadStatsAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
@@ -85,7 +84,7 @@ export const Add = memo(() => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool.addLiquidity(selectedLiquidityPool.poolSymbol, addAmount).then(async (tx) => {
+        liqProvTool.addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount).then(async (tx) => {
           console.log(`addLiquidity tx hash: ${tx.hash}`);
           setLoadStats(false);
           tx.wait()
