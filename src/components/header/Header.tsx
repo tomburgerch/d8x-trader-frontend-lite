@@ -25,11 +25,11 @@ import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
+import { Separator } from '../separator/Separator';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { PageAppBar } from './Header.styles';
 import styles from './Header.module.scss';
-import { Separator } from '../separator/Separator';
 
 interface HeaderPropsI extends PropsWithChildren {
   /**
