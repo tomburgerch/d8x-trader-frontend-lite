@@ -204,14 +204,16 @@ export const Add = memo(() => {
             />
           </Box>
         </Box>
-        <Button
-          variant="primary"
-          disabled={!addAmount || requestSent || !isSDKConnected}
-          onClick={handleAddLiquidity}
-          className={styles.actionButton}
-        >
-          Add
-        </Button>
+        <Box className={styles.buttonHolder}>
+          <Button
+            variant="primary"
+            disabled={!addAmount || requestSent || !isSDKConnected}
+            onClick={handleAddLiquidity}
+            className={styles.actionButton}
+          >
+            Add
+          </Button>
+        </Box>
       </Box>
     </div>
   );

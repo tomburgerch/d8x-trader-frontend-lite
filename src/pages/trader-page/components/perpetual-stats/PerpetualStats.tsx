@@ -15,21 +15,21 @@ export const PerpetualStats = () => {
         id: 'midPrice',
         label: 'Mid Price',
         value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency)
+          ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
       },
       {
         id: 'markPrice',
         label: 'Mark Price',
         value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency)
+          ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
       },
       {
         id: 'indexPrice',
         label: 'Index Price',
         value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency)
+          ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
       },
       {
@@ -41,7 +41,7 @@ export const PerpetualStats = () => {
         id: 'openInterestBC',
         label: 'Open Interest',
         value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.openInterestBC, perpetualStatistics.baseCurrency)
+          ? formatToCurrency(perpetualStatistics.openInterestBC, perpetualStatistics.baseCurrency, true)
           : '--',
       },
     ],

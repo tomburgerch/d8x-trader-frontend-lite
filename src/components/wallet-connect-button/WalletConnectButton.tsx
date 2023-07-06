@@ -138,7 +138,7 @@ export const WalletConnectButton = memo(() => {
               if (!connected) {
                 return (
                   <Button onClick={openConnectModal} variant="primary" className={styles.connectWalletButton}>
-                    Connect wallet
+                    Connect
                   </Button>
                 );
               }

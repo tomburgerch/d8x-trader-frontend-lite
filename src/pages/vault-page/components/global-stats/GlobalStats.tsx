@@ -81,7 +81,7 @@ export const GlobalStats = () => {
 
   const dSupply = useMemo(() => {
     if (selectedLiquidityPool && dCurrencyPrice && tvl) {
-      return formatToCurrency(tvl / dCurrencyPrice, `d${selectedLiquidityPool?.poolSymbol}`);
+      return formatToCurrency(tvl / dCurrencyPrice, `d${selectedLiquidityPool?.poolSymbol}`, true);
     }
     return '--';
   }, [selectedLiquidityPool, dCurrencyPrice, tvl]);
@@ -91,17 +91,19 @@ export const GlobalStats = () => {
       {
         id: 'weeklyAPY',
         label: 'Weekly APY',
-        value: weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '%') : '--',
+        value: weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '%', true, 2) : '--',
       },
       {
         id: 'tvl',
         label: 'TVL',
-        value: selectedLiquidityPool && tvl != null ? formatToCurrency(tvl, selectedLiquidityPool.poolSymbol) : '--',
+        value:
+          selectedLiquidityPool && tvl != null ? formatToCurrency(tvl, selectedLiquidityPool.poolSymbol, true) : '--',
       },
       {
         id: 'dSymbolPrice',
         label: `d${selectedLiquidityPool?.poolSymbol} Price`,
-        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedLiquidityPool?.poolSymbol) : '--',
+        value:
+          dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedLiquidityPool?.poolSymbol, true) : '--',
       },
       {
         id: 'dSymbolSupply',
