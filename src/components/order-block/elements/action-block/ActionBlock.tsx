@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 import { Separator } from 'components/separator/Separator';
 
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
@@ -94,6 +94,7 @@ export const ActionBlock = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -101,6 +102,7 @@ export const ActionBlock = memo(() => {
 
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
+  const validityCheckRef = useRef(false);
 
   useEffect(() => {
     traderAPIRef.current = traderAPI;
@@ -110,7 +112,7 @@ export const ActionBlock = memo(() => {
     if (!orderInfo || !address) {
       return;
     }
-
+    validityCheckRef.current = true;
     setShowReviewOrderModal(true);
     setNewPositionRisk(null);
 
@@ -129,11 +131,13 @@ export const ActionBlock = memo(() => {
     setMaxOrderSize(undefined);
     await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
       setMaxOrderSize(data.data);
+      validityCheckRef.current = false;
     });
   }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
     setShowReviewOrderModal(false);
+    setIsValidityCheckDone(false);
   }, []);
 
   const isBuySellButtonActive = useMemo(() => {
@@ -209,6 +213,7 @@ export const ActionBlock = memo(() => {
       return;
     }
     setRequestSent(true);
+    setIsValidityCheckDone(false);
     requestSentRef.current = true;
     await orderDigest(chainId, parsedOrders, address)
       .then((data) => {
@@ -317,7 +322,13 @@ export const ActionBlock = memo(() => {
   );
 
   const validityCheckText = useMemo(() => {
-    if (!maxOrderSize || !orderInfo?.orderBlock || !selectedPerpetualStaticInfo) {
+    if (
+      !showReviewOrderModal ||
+      validityCheckRef.current ||
+      !maxOrderSize ||
+      !orderInfo?.orderBlock ||
+      !selectedPerpetualStaticInfo
+    ) {
       return '-';
     }
     if (isMarketClosed) {
@@ -361,6 +372,7 @@ export const ActionBlock = memo(() => {
     isMarketClosed,
     collateralDeposit,
     positionToModify,
+    showReviewOrderModal,
   ]);
 
   const isOrderValid = useMemo(() => {
@@ -381,9 +393,21 @@ export const ActionBlock = memo(() => {
     if (validityCheckText === 'Good to go') {
       return 'Passed';
     } else if (validityCheckText === '-') {
-      return '-';
+      return ' ';
     }
     return 'Failed';
+  }, [validityCheckText]);
+
+  useEffect(() => {
+    if (validityCheckText === 'Good to go') {
+      setIsValidityCheckDone(true);
+      return;
+    } else if (validityCheckText === '-') {
+      setIsValidityCheckDone(false);
+      return;
+    }
+    setIsValidityCheckDone(true);
+    return;
   }, [validityCheckText]);
 
   return (
@@ -567,18 +591,28 @@ export const ActionBlock = memo(() => {
                 </Typography>
               }
               rightSide={
-                <Typography variant="bodyMedium" className={styles.bold} style={{ color: validityColor }}>
-                  {validityResult}
-                </Typography>
+                !isValidityCheckDone ? (
+                  <Box className={styles.loaderHolder}>
+                    <CircularProgress color="primary" />
+                  </Box>
+                ) : (
+                  <Typography variant="bodyMedium" className={styles.bold} style={{ color: validityColor }}>
+                    {validityResult}
+                  </Typography>
+                )
               }
             />
           </Box>
           <DialogContent>
-            <Box className={styles.goMessage}>
-              <Typography variant="bodySmall" className={styles.centered} style={{ color: validityColor }}>
-                {validityCheckText}
-              </Typography>
-            </Box>
+            {isValidityCheckDone ? (
+              <Box className={styles.goMessage}>
+                <Typography variant="bodySmall" className={styles.centered} style={{ color: validityColor }}>
+                  {validityCheckText}
+                </Typography>
+              </Box>
+            ) : (
+              ''
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
