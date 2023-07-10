@@ -29,7 +29,8 @@ const loyaltyMap: Record<number, string> = {
 
 export const WalletConnectButton = memo(() => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [, setTraderAPI] = useAtom(traderAPIAtom);
   const [loyaltyScore, setLoyaltyScore] = useAtom(loyaltyScoreAtom);
   const [, setSDKConnected] = useAtom(sdkConnectedAtom);
@@ -154,7 +155,7 @@ export const WalletConnectButton = memo(() => {
                     <img src={chain.iconUrl} alt={chain.name} title={chain.name} />
                   </Button>
                   <Button onClick={openAccountModal} variant="primary" className={styles.addressButton}>
-                    {!isSmallScreen && (
+                    {!isMobileScreen && (
                       <Box className={styles.starsHolder} title={loyaltyMap[loyaltyScore]}>
                         {loyaltyScore < 5 ? <FilledStar /> : <EmptyStar />}
                         {loyaltyScore < 4 ? <FilledStar /> : <EmptyStar />}
@@ -162,8 +163,8 @@ export const WalletConnectButton = memo(() => {
                         {loyaltyScore < 2 ? <FilledStar /> : <EmptyStar />}
                       </Box>
                     )}
-                    {!isSmallScreen && cutAddressName(account.address)}
-                    {isSmallScreen && <WalletIcon />}
+                    {!isMobileScreen && cutAddressName(account.address)}
+                    {isMobileScreen && <WalletIcon />}
                   </Button>
                 </div>
               );

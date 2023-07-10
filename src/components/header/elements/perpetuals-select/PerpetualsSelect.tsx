@@ -1,12 +1,10 @@
 import { useAtom } from 'jotai/index';
-import { memo, SyntheticEvent, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useNetwork } from 'wagmi';
 
-import { Box, Paper, Popper, PopperProps } from '@mui/material';
-import { PaperProps } from '@mui/material/Paper/Paper';
+import { Box, MenuItem } from '@mui/material';
 
 import { ReactComponent as PerpetualIcon } from 'assets/icons/perpetualIcon.svg';
-
 import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
@@ -23,23 +21,17 @@ import { candlesAtom, candlesDataReadyAtom, newCandlesAtom, selectedPeriodAtom }
 import { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
+import { SelectItemI } from '../header-select/types';
 
 import styles from '../header-select/HeaderSelect.module.scss';
 
-const CustomPaper = ({ children, ...props }: PaperProps) => {
+const OptionsHeader = () => {
   return (
-    <Paper elevation={8} {...props}>
-      <Box className={styles.optionsHeader}>
-        <Box className={styles.leftLabel}>Pair</Box>
-        <Box className={styles.rightLabel}>Status</Box>
-      </Box>
-      <Box className={styles.optionsHolder}>{children}</Box>
-    </Paper>
+    <MenuItem className={styles.optionsHeader} disabled>
+      <Box className={styles.leftLabel}>Pair</Box>
+      <Box className={styles.rightLabel}>Status</Box>
+    </MenuItem>
   );
-};
-
-const CustomPopper = (props: PopperProps) => {
-  return <Popper {...props} placement="auto" />;
 };
 
 export const PerpetualsSelect = memo(() => {
@@ -112,10 +104,14 @@ export const PerpetualsSelect = memo(() => {
     }
   }, [chain, chainId, symbol, setPerpetualStaticInfo]);
 
-  const handleChange = (event: SyntheticEvent, value: PerpetualI) => {
-    setSelectedPerpetual(value.id);
+  const handleChange = (newItem: PerpetualI) => {
+    setSelectedPerpetual(newItem.id);
     clearInputsData();
   };
+
+  const selectItems: SelectItemI<PerpetualI>[] = useMemo(() => {
+    return (selectedPool?.perpetuals ?? []).map((perpetual) => ({ value: `${perpetual.id}`, item: perpetual }));
+  }, [selectedPool]);
 
   return (
     <Box className={styles.holderRoot}>
@@ -125,22 +121,21 @@ export const PerpetualsSelect = memo(() => {
       <HeaderSelect<PerpetualI>
         id="perpetuals-select"
         label="Perpetual"
-        items={selectedPool?.perpetuals ?? []}
+        items={selectItems}
         width="100%"
-        value={selectedPerpetual}
-        onChange={handleChange}
-        PaperComponent={CustomPaper}
-        PopperComponent={CustomPopper}
-        getOptionLabel={(option) => `${option.baseCurrency}/${option.quoteCurrency}`}
-        renderOption={(props, option) => (
-          <Box component="li" {...props}>
+        value={`${selectedPerpetual?.id}`}
+        handleChange={handleChange}
+        OptionsHeader={OptionsHeader}
+        renderLabel={(value) => `${value.baseCurrency}/${value.quoteCurrency}`}
+        renderOption={(option) => (
+          <MenuItem key={option.value} value={option.value} selected={option.value === `${selectedPerpetual?.id}`}>
             <Box className={styles.optionHolder}>
               <Box className={styles.label}>
-                {option.baseCurrency}/{option.quoteCurrency}
+                {option.item.baseCurrency}/{option.item.quoteCurrency}
               </Box>
-              <Box className={styles.value}>{option.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
+              <Box className={styles.value}>{option.item.isMarketClosed ? 'CLOSED' : 'OPEN'}</Box>
             </Box>
-          </Box>
+          </MenuItem>
         )}
       />
     </Box>

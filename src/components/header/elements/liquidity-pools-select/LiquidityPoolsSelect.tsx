@@ -1,26 +1,23 @@
 import { useAtom } from 'jotai';
-import { memo, SyntheticEvent } from 'react';
+import { memo, useMemo } from 'react';
 
-import { Box, Paper } from '@mui/material';
-import { PaperProps } from '@mui/material/Paper/Paper';
+import { Box, MenuItem } from '@mui/material';
 
+import { ReactComponent as CollateralIcon } from 'assets/icons/collateralIcon.svg';
 import { liquidityPoolsAtom, selectedLiquidityPoolAtom } from 'store/vault-pools.store';
 import { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
+import type { SelectItemI } from '../header-select/types';
 
 import styles from '../header-select/HeaderSelect.module.scss';
-import { ReactComponent as CollateralIcon } from '../../../../assets/icons/collateralIcon.svg';
 
-const CustomPaper = ({ children, ...props }: PaperProps) => {
+const OptionsHeader = () => {
   return (
-    <Paper elevation={8} {...props}>
-      <Box className={styles.optionsHeader}>
-        <Box className={styles.leftLabel}>Liquidity Pool</Box>
-        <Box className={styles.rightLabel}>No. of perps</Box>
-      </Box>
-      <Box className={styles.optionsHolder}>{children}</Box>
-    </Paper>
+    <MenuItem className={styles.optionsHeader} disabled>
+      <Box className={styles.leftLabel}>Liquidity Pool</Box>
+      <Box className={styles.rightLabel}>No. of perps</Box>
+    </MenuItem>
   );
 };
 
@@ -28,9 +25,13 @@ export const LiquidityPoolsSelect = memo(() => {
   const [liquidityPools] = useAtom(liquidityPoolsAtom);
   const [selectedLiquidityPool, setSelectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
 
-  const handleChange = (event: SyntheticEvent, value: PoolI) => {
-    setSelectedLiquidityPool(value.poolSymbol);
+  const handleChange = (newItem: PoolI) => {
+    setSelectedLiquidityPool(newItem.poolSymbol);
   };
+
+  const selectItems: SelectItemI<PoolI>[] = useMemo(() => {
+    return liquidityPools.map((pool) => ({ value: pool.poolSymbol, item: pool }));
+  }, [liquidityPools]);
 
   return (
     <Box className={styles.holderRoot}>
@@ -39,20 +40,24 @@ export const LiquidityPoolsSelect = memo(() => {
       </Box>
       <HeaderSelect<PoolI>
         id="liquidity-pools-select"
-        label="Liquidity pool:"
-        items={liquidityPools}
+        label="Liquidity pool"
+        items={selectItems}
         width="100%"
-        value={selectedLiquidityPool}
-        onChange={handleChange}
-        getOptionLabel={(option) => option.poolSymbol}
-        PaperComponent={CustomPaper}
-        renderOption={(props, option) => (
-          <Box component="li" {...props}>
+        value={selectedLiquidityPool?.poolSymbol}
+        handleChange={handleChange}
+        OptionsHeader={OptionsHeader}
+        renderLabel={(value) => value.poolSymbol}
+        renderOption={(option) => (
+          <MenuItem
+            key={option.value}
+            value={option.value}
+            selected={option.value === selectedLiquidityPool?.poolSymbol}
+          >
             <Box className={styles.optionHolder}>
-              <Box className={styles.label}>{option.poolSymbol}</Box>
-              <Box className={styles.value}>{option.perpetuals.length}</Box>
+              <Box className={styles.label}>{option.item.poolSymbol}</Box>
+              <Box className={styles.value}>{option.item.perpetuals.length}</Box>
             </Box>
-          </Box>
+          </MenuItem>
         )}
       />
     </Box>
