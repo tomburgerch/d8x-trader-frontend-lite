@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import { Box } from '@mui/material';
 
 import { StaticBackground } from 'components/static-background/StaticBackground';
+import { ReferPage } from 'pages/refer-page/ReferPage';
 import { TraderPage } from 'pages/trader-page/TraderPage';
 import { VaultPage } from 'pages/vault-page/VaultPage';
 import { appDimensionsAtom } from 'store/app.store';
@@ -31,6 +32,7 @@ export const App = memo(() => {
         <StaticBackground />
         <Routes>
           <Route key="vault-page" path={PageE.Vault} element={<VaultPage />} />
+          <Route key="refer-page" path={PageE.Refer} element={<ReferPage />} />
           <Route key="trader-page" path="*" element={<TraderPage />} />
         </Routes>
         <ToastContainer position="top-left" autoClose={10_000} />
