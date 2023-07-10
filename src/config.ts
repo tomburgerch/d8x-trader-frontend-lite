@@ -1,4 +1,5 @@
 const {
+  REACT_APP_PROJECT_ID: projectId = '',
   REACT_APP_API_URL: apiUrls = '',
   REACT_APP_HISTORY_URL: historyUrls = '',
   REACT_APP_WEBSOCKET_URL: wsUrls = '',
@@ -21,6 +22,7 @@ function parseUrls(urlData: string): Record<string, string> {
 }
 
 export const config = {
+  projectId: projectId,
   apiUrl: parseUrls(apiUrls),
   historyUrl: parseUrls(historyUrls),
   wsUrl: parseUrls(wsUrls),

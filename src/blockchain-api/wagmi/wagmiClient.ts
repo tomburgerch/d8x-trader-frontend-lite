@@ -8,6 +8,7 @@ import polygonMainIcon from 'assets/networks/polygonMain.svg';
 import polygonTestIcon from 'assets/networks/polygonTest.svg';
 import zkMainIcon from 'assets/networks/zkEvmMain.svg';
 import zkTestIcon from 'assets/networks/zkEvmTest.svg';
+import { config } from 'config';
 
 const defaultChains: Chain[] = [
   { ...polygon, iconUrl: polygonMainIcon, iconBackground: 'transparent' },
@@ -18,7 +19,7 @@ const defaultChains: Chain[] = [
 
 const { chains, provider } = configureChains(defaultChains, [publicProvider()]);
 
-const projectId = 'eaff775af64a83b1564223ce858cb56c';
+const projectId = config.projectId;
 
 const connectors = connectorsForWallets([
   {
