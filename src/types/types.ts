@@ -264,3 +264,43 @@ export interface PageI {
   path: PageE | string;
   title: string;
 }
+
+export interface ReferralVolumeI {
+  poolId: number;
+  quantityCC: number;
+  code: string;
+}
+
+export interface EarnedRebateI {
+  poolId: number;
+  amountCC: number;
+  code: string;
+}
+
+export interface TraderDataI {
+  code: string;
+  activeSince: string;
+  traderRebatePerc?: number;
+}
+
+export interface OpenTraderRebateI {
+  amountCC: number;
+}
+
+export interface ReferrerDataI {
+  code: string;
+  referrerAddr: string;
+  agencyAddr: string;
+  brokerAddr: string;
+  traderRebatePerc: number;
+  agencyRebatePerc: number;
+  referrerRebatePerc: number;
+  createdOn: string;
+  expiry: string;
+}
+
+export interface ReferralCodeI {
+  trader: TraderDataI;
+  referrer: ReferrerDataI[];
+  agency: ReferrerDataI[];
+}

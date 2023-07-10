@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 
 import { Box } from '@mui/material';
 
-import { LiquidityPoolsSelect } from 'components/header/elements/liquidity-pools-select/LiquidityPoolsSelect';
+import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
 import { Header } from 'components/header/Header';
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
@@ -23,7 +23,7 @@ export const ReferPage = memo(() => {
   return (
     <Box className={styles.root}>
       <Header>
-        <LiquidityPoolsSelect />
+        <CollateralsSelect />
       </Header>
       <Container className={styles.container}>
         <TabSelector activeTab={activeTabIndex} onTabChange={handleTabChange} />

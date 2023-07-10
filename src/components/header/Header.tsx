@@ -10,7 +10,6 @@ import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTh
 import { createSymbol } from 'helpers/createSymbol';
 import { pages } from 'navigation/pages';
 import { getExchangeInfo } from 'network/network';
-import { liquidityPoolsAtom } from 'store/vault-pools.store';
 import {
   oracleFactoryAddrAtom,
   poolTokenBalanceAtom,
@@ -50,7 +49,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const { address } = useAccount();
 
   const [, setPools] = useAtom(poolsAtom);
-  const [, setLiquidityPools] = useAtom(liquidityPoolsAtom);
   const [, setPerpetuals] = useAtom(perpetualsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
@@ -68,7 +66,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
         return;
       }
       setPools(data.pools);
-      setLiquidityPools(data.pools);
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
         perpetuals.push(
@@ -89,7 +86,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },
-    [setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]
+    [setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]
   );
 
   useEffect(() => {

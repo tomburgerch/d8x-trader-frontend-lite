@@ -34,7 +34,11 @@ const OptionsHeader = () => {
   );
 };
 
-export const CollateralsSelect = memo(() => {
+interface CollateralsSelectPropsI {
+  label?: string;
+}
+
+export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
   const { address } = useAccount();
   const chainId = useChainId();
 
@@ -140,7 +144,7 @@ export const CollateralsSelect = memo(() => {
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
-        label="Collateral"
+        label={label ? label : 'Collateral'}
         items={selectItems}
         width="100%"
         value={selectedPool?.poolSymbol}

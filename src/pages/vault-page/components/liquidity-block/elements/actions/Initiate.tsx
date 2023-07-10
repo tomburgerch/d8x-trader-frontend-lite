@@ -12,20 +12,14 @@ import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
-import {
-  dCurrencyPriceAtom,
-  userAmountAtom,
-  selectedLiquidityPoolAtom,
-  withdrawalsAtom,
-  loadStatsAtom,
-} from 'store/vault-pools.store';
+import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { dCurrencyPriceAtom, userAmountAtom, withdrawalsAtom, loadStatsAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
-import { traderAPIAtom } from 'store/pools.store';
 
 export const Initiate = memo(() => {
-  const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
@@ -65,7 +59,7 @@ export const Initiate = memo(() => {
       return;
     }
 
-    if (!liqProvTool || !selectedLiquidityPool || !initiateAmount || initiateAmount < 0 || !signer) {
+    if (!liqProvTool || !selectedPool || !initiateAmount || initiateAmount < 0 || !signer) {
       return;
     }
 
@@ -73,7 +67,7 @@ export const Initiate = memo(() => {
     setRequestSent(true);
 
     await liqProvTool
-      .initiateLiquidityWithdrawal(signer, selectedLiquidityPool.poolSymbol, initiateAmount)
+      .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount)
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
         setLoadStats(false);
@@ -121,7 +115,7 @@ export const Initiate = memo(() => {
         setRequestSent(false);
         toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [initiateAmount, liqProvTool, signer, selectedLiquidityPool, setLoadStats]);
+  }, [initiateAmount, liqProvTool, signer, selectedPool, setLoadStats]);
 
   const predictedAmount = useMemo(() => {
     if (initiateAmount > 0 && dCurrencyPrice != null) {
@@ -143,8 +137,8 @@ export const Initiate = memo(() => {
       <Box className={styles.infoBlock}>
         <Typography variant="h5">Initiate withdrawal</Typography>
         <Typography variant="body2" className={styles.text}>
-          Are you looking to withdraw your {selectedLiquidityPool?.poolSymbol} from the liquidity pool? If so, you can
-          initiate a withdrawal request.
+          Are you looking to withdraw your {selectedPool?.poolSymbol} from the liquidity pool? If so, you can initiate a
+          withdrawal request.
         </Typography>
         <Typography variant="body2" className={styles.text}>
           Keep in mind that it takes 48 hours to process your request and you can only have one withdrawal request at a
@@ -157,18 +151,18 @@ export const Initiate = memo(() => {
             <InfoBlock
               title={
                 <>
-                  Amount of <strong>{selectedLiquidityPool?.poolSymbol}</strong>
+                  Amount of <strong>{selectedPool?.poolSymbol}</strong>
                 </>
               }
               content={
                 <>
                   <Typography>
-                    Specify the amount of d{selectedLiquidityPool?.poolSymbol} you want to exchange for{' '}
-                    {selectedLiquidityPool?.poolSymbol}.
+                    Specify the amount of d{selectedPool?.poolSymbol} you want to exchange for{' '}
+                    {selectedPool?.poolSymbol}.
                   </Typography>
                   <Typography>
-                    After 48 hours, this amount can be converted to {selectedLiquidityPool?.poolSymbol} and can be
-                    withdrawn from the pool.
+                    After 48 hours, this amount can be converted to {selectedPool?.poolSymbol} and can be withdrawn from
+                    the pool.
                   </Typography>
                 </>
               }
@@ -179,7 +173,7 @@ export const Initiate = memo(() => {
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={`d${selectedLiquidityPool?.poolSymbol}`}
+            currency={`d${selectedPool?.poolSymbol}`}
             step="1"
             min={0}
           />
@@ -188,9 +182,7 @@ export const Initiate = memo(() => {
         <Box className={styles.summaryBlock}>
           <Box className={styles.row}>
             <Typography variant="body2">Amount</Typography>
-            <Typography variant="body2">
-              {formatToCurrency(predictedAmount, selectedLiquidityPool?.poolSymbol)}
-            </Typography>
+            <Typography variant="body2">{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</Typography>
           </Box>
           <Separator />
           <Box className={styles.row}>
