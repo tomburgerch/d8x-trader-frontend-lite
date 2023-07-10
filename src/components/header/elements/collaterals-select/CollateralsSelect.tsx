@@ -1,12 +1,10 @@
 import { useAtom } from 'jotai';
-import { memo, SyntheticEvent, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
-import { Box, Paper } from '@mui/material';
-import { PaperProps } from '@mui/material/Paper/Paper';
+import { Box, MenuItem } from '@mui/material';
 
 import { ReactComponent as CollateralIcon } from 'assets/icons/collateralIcon.svg';
-
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
@@ -25,16 +23,14 @@ import { PoolI } from 'types/types';
 import { HeaderSelect } from '../header-select/HeaderSelect';
 
 import styles from '../header-select/HeaderSelect.module.scss';
+import { SelectItemI } from '../header-select/types';
 
-const CustomPaper = ({ children, ...props }: PaperProps) => {
+const OptionsHeader = () => {
   return (
-    <Paper elevation={8} {...props}>
-      <Box className={styles.optionsHeader}>
-        <Box className={styles.leftLabel}>Collateral</Box>
-        <Box className={styles.rightLabel}>No. of perps</Box>
-      </Box>
-      <Box className={styles.optionsHolder}>{children}</Box>
-    </Paper>
+    <MenuItem className={styles.optionsHeader} disabled>
+      <Box className={styles.leftLabel}>Collateral</Box>
+      <Box className={styles.rightLabel}>No. of perps</Box>
+    </MenuItem>
   );
 };
 
@@ -122,16 +118,20 @@ export const CollateralsSelect = memo(() => {
   useEffect(() => {
     if (selectedPool !== null && address) {
       fetchPositions(chainId, selectedPool.poolSymbol, address).then(() => {
-        fetchOpenOrders(chainId, selectedPool.poolSymbol, address);
+        fetchOpenOrders(chainId, selectedPool.poolSymbol, address).then();
       });
     }
   }, [selectedPool, chainId, address, fetchOpenOrders, fetchPositions]);
 
-  const handleChange = (event: SyntheticEvent, value: PoolI) => {
-    setSelectedPool(value.poolSymbol);
-    setSelectedPerpetual(value.perpetuals[0].id);
+  const handleChange = (newItem: PoolI) => {
+    setSelectedPool(newItem.poolSymbol);
+    setSelectedPerpetual(newItem.perpetuals[0].id);
     clearInputsData();
   };
+
+  const selectItems: SelectItemI<PoolI>[] = useMemo(() => {
+    return pools.map((pool) => ({ value: pool.poolSymbol, item: pool }));
+  }, [pools]);
 
   return (
     <Box className={styles.holderRoot}>
@@ -141,19 +141,19 @@ export const CollateralsSelect = memo(() => {
       <HeaderSelect<PoolI>
         id="collaterals-select"
         label="Collateral"
-        items={pools}
+        items={selectItems}
         width="100%"
-        value={selectedPool}
-        onChange={handleChange}
-        getOptionLabel={(option) => option.poolSymbol}
-        PaperComponent={CustomPaper}
-        renderOption={(props, option) => (
-          <Box component="li" {...props}>
+        value={selectedPool?.poolSymbol}
+        handleChange={handleChange}
+        OptionsHeader={OptionsHeader}
+        renderLabel={(value) => value.poolSymbol}
+        renderOption={(option) => (
+          <MenuItem key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
             <Box className={styles.optionHolder}>
-              <Box className={styles.label}>{option.poolSymbol}</Box>
-              <Box className={styles.value}>{option.perpetuals.length}</Box>
+              <Box className={styles.label}>{option.item.poolSymbol}</Box>
+              <Box className={styles.value}>{option.item.perpetuals.length}</Box>
             </Box>
-          </Box>
+          </MenuItem>
         )}
       />
     </Box>

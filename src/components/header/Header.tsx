@@ -191,7 +191,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
             </Button>
           </Toolbar>
           {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
-          {isTabletScreen && <Separator className={styles.mobileSeparator} />}
+          {isSmallScreen && <Separator className={styles.mobileSeparator} />}
         </PageAppBar>
         <Box component="nav">
           <Drawer

@@ -1,63 +1,69 @@
-import type { HTMLAttributes, JSXElementConstructor, ReactNode, SyntheticEvent } from 'react';
+import type { HTMLAttributes, JSXElementConstructor, ReactNode } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { Box, FormControl, TextField, Autocomplete, PopperProps } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 
-import { ReactComponent as ArrowDropIcon } from 'assets/icons/arrowDropIcon.svg';
 import { genericMemo } from 'helpers/genericMemo';
+
+import { SelectItemI } from './types';
 
 import styles from './HeaderSelect.module.scss';
 
 interface HeaderSelectI<T> {
   id: string;
   label: string;
-  items: T[];
+  items: SelectItemI<T>[];
   width?: string | number;
-  PaperComponent?: JSXElementConstructor<HTMLAttributes<HTMLElement>>;
-  PopperComponent?: JSXElementConstructor<PopperProps>;
-  onChange: (event: SyntheticEvent, value: T, reason: string) => void;
-  value: T | null;
-  getOptionLabel?: (option: T) => string;
-  renderOption?: (props: HTMLAttributes<HTMLLIElement>, option: T) => ReactNode;
+  OptionsHeader?: JSXElementConstructor<HTMLAttributes<HTMLElement>>;
+  handleChange: (newItem: T) => void;
+  value: string | null | undefined;
+  renderLabel: (value: T) => ReactNode;
+  renderOption: (option: SelectItemI<T>) => ReactNode;
 }
 
 function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
-  if (!props.value) {
+  const { OptionsHeader, items, renderOption, renderLabel, label, id, value, width, handleChange } = props;
+
+  const children = useMemo(() => {
+    return items.map((item) => renderOption(item));
+  }, [items, renderOption]);
+
+  const onChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newValue = event.target.value;
+      if (newValue) {
+        const foundItem = items.find((item) => item.value === newValue);
+        if (foundItem) {
+          handleChange(foundItem.item);
+        }
+      }
+    },
+    [items, handleChange]
+  );
+
+  const renderValue = useCallback(
+    (valueForLabel: string) => {
+      const foundItem = items.find((item) => item.value === valueForLabel);
+      if (foundItem) {
+        return renderLabel(foundItem.item);
+      }
+      return null;
+    },
+    [items, renderLabel]
+  );
+
+  if (!value) {
     return null;
   }
 
   return (
     <Box className={styles.root}>
-      <FormControl fullWidth>
-        <Autocomplete
-          id={props.id}
-          sx={{ width: props.width ?? 300 }}
-          options={props.items}
-          autoHighlight
-          classes={{
-            paper: styles.paper,
-          }}
-          className={styles.autocomplete}
-          disableClearable
-          value={props.value}
-          // freeSolo={true}
-          onChange={props.onChange}
-          getOptionLabel={props.getOptionLabel}
-          popupIcon={<ArrowDropIcon width={20} height={20} />}
-          PaperComponent={props.PaperComponent}
-          PopperComponent={props.PopperComponent}
-          renderOption={props.renderOption}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={props.label}
-              inputProps={{
-                ...params.inputProps,
-                autoComplete: 'new-password', // disable autocomplete and autofill
-              }}
-              variant="filled"
-            />
-          )}
-        />
+      <FormControl fullWidth variant="filled" className={styles.autocomplete}>
+        <InputLabel id={`${id}-label`}>{label}:</InputLabel>
+        <Select id={id} sx={{ width: width ?? 300 }} value={value} onChange={onChange} renderValue={renderValue}>
+          {OptionsHeader && <OptionsHeader />}
+          {children}
+        </Select>
       </FormControl>
     </Box>
   );
