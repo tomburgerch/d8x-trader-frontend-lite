@@ -1,0 +1,32 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+}
+
+.tab {
+  padding: 3 * $d8x-spacing 10 * $d8x-spacing;
+
+  &:first-child {
+    border-radius: $d8x-border-radius 0 0 $d8x-border-radius;
+  }
+
+  &:last-child {
+    border-radius: 0 $d8x-border-radius $d8x-border-radius 0;
+  }
+
+  span {
+    font-weight: 600;
+  }
+
+  &.active {
+    background-color: var(--d8x-color-purple-200);
+    color: var(--d8x-color-purple);
+  }
+
+  &.inactive {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: var(--d8x-color-black-300);
+    cursor: pointer;
+  }
+}
