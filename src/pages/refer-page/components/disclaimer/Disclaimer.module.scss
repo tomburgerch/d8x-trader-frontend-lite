@@ -1,0 +1,18 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6 * $d8x-spacing;
+  box-sizing: content-box;
+  max-width: 250px;
+  padding: 10 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.text {
+  color: var(--d8x-color-black-400);
+}

@@ -7,14 +7,18 @@ import { Header } from 'components/header/Header';
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
 
-import { TabSelector } from 'pages/refer-page/components/tab-selector/TabSelector';
+import { TabSelector } from './components/tab-selector/TabSelector';
+import { ReferrerTab } from './components/referrer-tab/ReferrerTab';
+import { TraderTab } from './components/trader-tab/TraderTab';
 
 import styles from './ReferPage.module.scss';
 
-export const ReferPage = memo(() => {
-  const [activeTab, setActiveTab] = useState(0);
+const tabComponents = [<ReferrerTab key="referrerTab" />, <TraderTab key="traderTab" />];
 
-  const handleTabChange = (newIndex: number) => setActiveTab(newIndex);
+export const ReferPage = memo(() => {
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  const handleTabChange = (newIndex: number) => setActiveTabIndex(newIndex);
 
   return (
     <Box className={styles.root}>
@@ -22,7 +26,8 @@ export const ReferPage = memo(() => {
         <LiquidityPoolsSelect />
       </Header>
       <Container className={styles.container}>
-        <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
+        <TabSelector activeTab={activeTabIndex} onTabChange={handleTabChange} />
+        {tabComponents[activeTabIndex]}
       </Container>
       <Footer />
     </Box>
