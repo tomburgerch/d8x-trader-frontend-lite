@@ -6,7 +6,7 @@ import styles from './Overview.module.scss';
 
 export interface OverviewItemI {
   title: string;
-  value: number;
+  value: number | string;
   poolSymbol: PoolI['poolSymbol'];
 }
 
