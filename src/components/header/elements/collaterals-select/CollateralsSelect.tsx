@@ -16,6 +16,7 @@ import {
   positionsAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
+  selectedPoolIdAtom,
   traderAPIAtom,
 } from 'store/pools.store';
 import { PoolI } from 'types/types';
@@ -49,6 +50,7 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
+  const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
@@ -129,6 +131,7 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
 
   const handleChange = (newItem: PoolI) => {
     setSelectedPool(newItem.poolSymbol);
+    setSelectedPoolId(traderAPI?.getPoolIdFromSymbol(newItem.poolSymbol) ?? null);
     setSelectedPerpetual(newItem.perpetuals[0].id);
     clearInputsData();
   };

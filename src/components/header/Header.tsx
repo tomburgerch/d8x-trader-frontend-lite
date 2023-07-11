@@ -17,7 +17,8 @@ import {
   proxyAddrAtom,
   selectedPoolAtom,
   perpetualsAtom,
-  chainIdAtom,
+  selectedPoolIdAtom,
+  traderAPIAtom,
 } from 'store/pools.store';
 import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
@@ -48,13 +49,14 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const { chain } = useNetwork();
   const { address } = useAccount();
 
-  const [, setPools] = useAtom(poolsAtom);
+  const [pools, setPools] = useAtom(poolsAtom);
   const [, setPerpetuals] = useAtom(perpetualsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
-  const [, setChainId] = useAtom(chainIdAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const requestRef = useRef(false);
@@ -90,13 +92,20 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   );
 
   useEffect(() => {
+    if (traderAPI && pools.length > 0) {
+      setSelectedPoolId(traderAPI.getPoolIdFromSymbol(pools[0].poolSymbol));
+    } else {
+      setSelectedPoolId(null);
+    }
+  }, [pools, traderAPI, setSelectedPoolId]);
+
+  useEffect(() => {
     if (!requestRef.current && chainId) {
       requestRef.current = true;
       setExchangeInfo(null);
       getExchangeInfo(chainId, null)
         .then(({ data }) => {
           setExchangeInfo(data);
-          setChainId(chainId);
           requestRef.current = false;
         })
         .catch((err) => {
@@ -104,7 +113,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
           requestRef.current = false;
         });
     }
-  }, [chainId, setExchangeInfo, setChainId]);
+  }, [chainId, setExchangeInfo]);
 
   const { data: poolTokenBalance, isError } = useBalance({
     address: address,
