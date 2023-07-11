@@ -5,15 +5,23 @@ import { Box, Button, Typography } from '@mui/material';
 import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
 import { ReferralCodesTable } from 'components/referral-codes-table/ReferralCodesTable';
 import { NormalReferrerCreateDialog } from '../normal-referrer-create-dialog/NormalReferrerCreateDialog';
+import { AgencyReferrerCreateDialog } from '../agency-referrer-create-dialog/AgencyReferrerCreateDialog';
 
 import { useDialog } from 'hooks/useDialog';
 
 import styles from './ReferralsBlock.module.scss';
 
+enum ReferrerTypeE {
+  Normal,
+  Agency,
+}
+
 export const ReferralsBlock = () => {
   const { address } = useAccount();
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
+
+  const referrerType: ReferrerTypeE = ReferrerTypeE.Agency;
 
   return (
     <Box className={styles.root}>
@@ -39,7 +47,12 @@ export const ReferralsBlock = () => {
           </Typography>
         </>
       )}
-      {dialogOpen && <NormalReferrerCreateDialog />}
+      {dialogOpen && (referrerType as ReferrerTypeE) === ReferrerTypeE.Normal && (
+        <NormalReferrerCreateDialog onClose={closeDialog} />
+      )}
+      {dialogOpen && (referrerType as ReferrerTypeE) === ReferrerTypeE.Agency && (
+        <AgencyReferrerCreateDialog onClose={closeDialog} />
+      )}
     </Box>
   );
 };

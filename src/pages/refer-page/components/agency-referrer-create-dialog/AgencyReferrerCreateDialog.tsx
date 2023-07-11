@@ -2,13 +2,13 @@ import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 
-import styles from './NormalReferrerCreateDialog.module.scss';
+import styles from './AgencyReferrerCreateDialog.module.scss';
 
-interface NormalReferrerCreateDialogPropsI {
+interface AgencyReferrerCreateDialogPropsI {
   onClose: () => void;
 }
 
-export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDialogPropsI) => {
+export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDialogPropsI) => {
   return (
     <Dialog open onClose={onClose}>
       <Box className={styles.dialogRoot}>
@@ -20,27 +20,44 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
             Your Base Rebate Rate:
           </Typography>
           <Typography variant="bodyMedium" fontWeight={600}>
-            20%
+            75%
           </Typography>
         </Box>
         <Box className={styles.receivalContainer}>
           <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">You receive</Typography>
+            <Typography variant="bodySmall">Agency</Typography>
             <Typography variant="bodyMedium" fontWeight={600}>
               15%
             </Typography>
           </Box>
           <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">Trader receives</Typography>
+            <Typography variant="bodySmall">Referrer</Typography>
             <Typography variant="bodyMedium" fontWeight={600}>
-              5%
+              40%
+            </Typography>
+          </Box>
+          <Box className={styles.receivalRow}>
+            <Typography variant="bodySmall">Trader</Typography>
+            <Typography variant="bodyMedium" fontWeight={600}>
+              10%
             </Typography>
           </Box>
         </Box>
         <div className={styles.divider} />
-        <Box className={styles.kickbackRateInputContainer}>
+        <Box className={styles.inputContainer}>
+          <Typography variant="bodySmall">Set Referrer's Kickback Rate:</Typography>
+          <OutlinedInput value={40} className={styles.kickbackInput} endAdornment="%" />
+        </Box>
+        <Box className={styles.traderKickbackInputContainer}>
           <Typography variant="bodySmall">Set Trader's Kickback Rate:</Typography>
-          <OutlinedInput value={5} className={styles.kickbackInput} endAdornment="%" />
+          <OutlinedInput value={10} className={styles.kickbackInput} endAdornment="%" />
+        </Box>
+        <div className={styles.divider} />
+        <Box className={styles.codeInputContainer}>
+          <Typography variant="bodySmall" className={styles.codeInputLabel} component="p">
+            Enter Referrer Address:
+          </Typography>
+          <OutlinedInput placeholder="Enter an address" value={''} className={styles.codeInput} />
         </Box>
         <div className={styles.divider} />
         <Box className={styles.codeInputContainer}>

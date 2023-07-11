@@ -35,11 +35,16 @@
   border-bottom: 1px solid var(--d8x-color-black-150);
 }
 
-.kickbackRateInputContainer {
+.inputContainer,
+.traderKickbackInputContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.traderKickbackInputContainer {
+  padding-top: 0;
 }
 
 .kickbackInput {
@@ -52,15 +57,18 @@
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }
 
+.codeInputLabel {
+  margin-bottom: 3 * $d8x-spacing;
+}
+
 .codeInput {
   background-color: var(--d8x-color-black-100);
   width: 100%;
-  margin-bottom: 6 * $d8x-spacing;
 }
 
 .dialogActionsContainer {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   padding: 0 8 * $d8x-spacing;
 }
 
