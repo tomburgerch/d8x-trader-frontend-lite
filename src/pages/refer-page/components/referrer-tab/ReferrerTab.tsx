@@ -7,6 +7,7 @@ import { selectedPoolAtom } from 'store/pools.store';
 
 import { Overview, type OverviewItemI } from '../overview/Overview';
 import { Disclaimer } from '../disclaimer/Disclaimer';
+import { ReferralsBlock } from '../referrals-block/ReferralsBlock';
 
 import styles from './ReferrerTab.module.scss';
 
@@ -19,6 +20,7 @@ export const ReferrerTab = () => {
   const [selectedPool] = useAtom(selectedPoolAtom);
 
   const { address } = useAccount();
+
   // TODO: MJO: Change hardcoded values
   const overviewItems: OverviewItemI[] = [
     {
@@ -34,6 +36,7 @@ export const ReferrerTab = () => {
       <Overview title="Your referrals" items={overviewItems} />
       <Disclaimer title="Refer & Earn" textBlocks={disclaimerTextBlocks} />
       <div className={styles.divider} />
+      <ReferralsBlock />
     </Box>
   );
 };
