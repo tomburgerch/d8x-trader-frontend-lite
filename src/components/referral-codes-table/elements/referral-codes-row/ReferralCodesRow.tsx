@@ -2,6 +2,10 @@ import classnames from 'classnames';
 
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
+import { NormalReferrerModifyDialog } from 'pages/refer-page/components/normal-referrer-modify-dialog/NormalReferrerModifyDialog';
+
+import { useDialog } from 'hooks/useDialog';
+
 import styles from './ReferralCodesRow.module.scss';
 
 interface ReferralCodesRowDataI {
@@ -15,20 +19,25 @@ interface ReferralCodesRowPropsI {
 }
 
 export const ReferralCodesRow = ({ data }: ReferralCodesRowPropsI) => {
+  const { dialogOpen, openDialog, closeDialog } = useDialog();
+
   return (
-    <TableRow className={styles.root}>
-      <TableCell className={classnames(styles.bodyCell, styles.codeCell)}>{data.code}</TableCell>
-      <TableCell align="right" className={styles.bodyCell}>
-        {data.refRebateRate}
-      </TableCell>
-      <TableCell align="right" className={styles.bodyCell}>
-        {data.traderRebateRate}
-      </TableCell>
-      <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
-        <Button variant="primary" className={styles.modifyButton}>
-          <Typography variant="bodyTiny">Modify</Typography>
-        </Button>
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow className={styles.root}>
+        <TableCell className={classnames(styles.bodyCell, styles.codeCell)}>{data.code}</TableCell>
+        <TableCell align="right" className={styles.bodyCell}>
+          {data.refRebateRate}
+        </TableCell>
+        <TableCell align="right" className={styles.bodyCell}>
+          {data.traderRebateRate}
+        </TableCell>
+        <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
+          <Button variant="primary" onClick={openDialog} className={styles.modifyButton}>
+            <Typography variant="bodyTiny">Modify</Typography>
+          </Button>
+        </TableCell>
+      </TableRow>
+      {dialogOpen && <NormalReferrerModifyDialog onClose={closeDialog} />}
+    </>
   );
 };

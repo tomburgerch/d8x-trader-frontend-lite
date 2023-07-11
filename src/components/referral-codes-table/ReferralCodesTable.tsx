@@ -3,8 +3,9 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 import { AlignE } from 'types/enums';
 import { type TableHeaderI } from 'types/types';
 
-import styles from './ReferralCodesTable.module.scss';
 import { ReferralCodesRow } from './elements/referral-codes-row/ReferralCodesRow';
+
+import styles from './ReferralCodesTable.module.scss';
 
 export const ReferralCodesTable = () => {
   const referralCodesHeaders: TableHeaderI[] = [
