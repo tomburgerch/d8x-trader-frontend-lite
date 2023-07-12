@@ -19,7 +19,7 @@ const defaultChains: Chain[] = [
 
 const { chains, provider } = configureChains(defaultChains, [publicProvider()]);
 
-const projectId = config.projectId ?? 'eaff775af64a83b1564223ce858cb56c';
+const projectId = config.projectId;
 
 const connectors = connectorsForWallets([
   {
