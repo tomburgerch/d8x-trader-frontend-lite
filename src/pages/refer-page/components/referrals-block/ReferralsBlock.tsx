@@ -10,6 +10,7 @@ import { AgencyReferrerCreateDialog } from '../agency-referrer-create-dialog/Age
 import { useDialog } from 'hooks/useDialog';
 
 import styles from './ReferralsBlock.module.scss';
+import { Separator } from '../../../../components/separator/Separator';
 
 enum ReferrerTypeE {
   Normal,
@@ -34,7 +35,7 @@ export const ReferralsBlock = () => {
           <WalletConnectButton />
         )}
       </Box>
-      <div className={styles.divider} />
+      <Separator className={styles.divider} />
       {address ? (
         <ReferralCodesTable />
       ) : (

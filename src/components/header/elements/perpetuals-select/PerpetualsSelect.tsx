@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai/index';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { useNetwork } from 'wagmi';
+import { useChainId, useNetwork } from 'wagmi';
 
 import { Box, MenuItem } from '@mui/material';
 
@@ -10,7 +10,6 @@ import { createSymbol } from 'helpers/createSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import {
-  chainIdAtom,
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   selectedPerpetualAtom,
@@ -45,10 +44,11 @@ export const PerpetualsSelect = memo(() => {
   const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
-  const [chainId] = useAtom(chainIdAtom);
+
+  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const traderAPIRef = useRef(traderAPI);
-  const { chain } = useNetwork();
 
   // const chainId = useChainId();
 

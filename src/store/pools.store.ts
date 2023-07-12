@@ -16,8 +16,8 @@ import type {
 
 export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const traderAPIBusyAtom = atom(false);
-export const chainIdAtom = atom<number | undefined>(undefined);
 export const poolsAtom = atom<PoolI[]>([]);
+export const selectedPoolIdAtom = atom<number | null>(null);
 export const perpetualsAtom = atom<PerpetualDataI[]>([]);
 export const poolFeeAtom = atom<number | undefined>(undefined);
 export const oracleFactoryAddrAtom = atom('');
