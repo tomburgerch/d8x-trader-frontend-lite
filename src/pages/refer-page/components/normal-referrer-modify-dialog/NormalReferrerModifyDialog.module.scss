@@ -23,6 +23,11 @@
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }
 
+.sidesRowValue {
+  font-weight: 600;
+  font-size: 16px;
+}
+
 .divider {
   border-bottom: 1px solid var(--d8x-color-black-150);
 }

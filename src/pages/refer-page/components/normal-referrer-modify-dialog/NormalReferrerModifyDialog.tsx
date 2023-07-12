@@ -24,8 +24,8 @@ export const NormalReferrerModifyDialog = ({ onClose }: NormalReferrerModifyDial
           </Typography>
         </Box>
         <Box className={styles.paddedContainer}>
-          <SidesRow leftSide="You receive" rightSide="15%" />
-          <SidesRow leftSide="Trader receives" rightSide="5%" />
+          <SidesRow leftSide="You receive" rightSide="15%" rightSideStyles={styles.sidesRowValue} />
+          <SidesRow leftSide="Trader receives" rightSide="5%" rightSideStyles={styles.sidesRowValue} />
         </Box>
         <div className={styles.divider} />
         <Box className={styles.kickbackRateInputContainer}>
@@ -34,7 +34,7 @@ export const NormalReferrerModifyDialog = ({ onClose }: NormalReferrerModifyDial
         </Box>
         <div className={styles.divider} />
         <Box className={styles.paddedContainer}>
-          <SidesRow leftSide="Your code" rightSide="MYCODE_1" />
+          <SidesRow leftSide="Your code" rightSide="MYCODE_1" rightSideStyles={styles.sidesRowValue} />
         </Box>
         <Box className={styles.dialogActionsContainer}>
           <Button variant="secondary" onClick={onClose}>

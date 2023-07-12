@@ -18,24 +18,23 @@
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }
 
-.receivalContainer {
+.paddedContainer {
   display: flex;
   flex-direction: column;
   gap: 5 * $d8x-spacing;
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
 
-  .receivalRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.sidesRowValue {
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .divider {
   border-bottom: 1px solid var(--d8x-color-black-150);
 }
 
-.inputContainer,
+.referrerKickbackInputContainer,
 .traderKickbackInputContainer {
   display: flex;
   justify-content: space-between;

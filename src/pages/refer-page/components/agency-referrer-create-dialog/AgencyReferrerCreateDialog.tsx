@@ -1,6 +1,7 @@
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { SidesRow } from 'components/sides-row/SidesRow';
 
 import styles from './AgencyReferrerCreateDialog.module.scss';
 
@@ -23,28 +24,13 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
             75%
           </Typography>
         </Box>
-        <Box className={styles.receivalContainer}>
-          <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">Agency</Typography>
-            <Typography variant="bodyMedium" fontWeight={600}>
-              15%
-            </Typography>
-          </Box>
-          <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">Referrer</Typography>
-            <Typography variant="bodyMedium" fontWeight={600}>
-              40%
-            </Typography>
-          </Box>
-          <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">Trader</Typography>
-            <Typography variant="bodyMedium" fontWeight={600}>
-              10%
-            </Typography>
-          </Box>
+        <Box className={styles.paddedContainer}>
+          <SidesRow leftSide="Agency" rightSide="15%" rightSideStyles={styles.sidesRowValue} />
+          <SidesRow leftSide="Referrer" rightSide="40%" rightSideStyles={styles.sidesRowValue} />
+          <SidesRow leftSide="Trader" rightSide="10%" rightSideStyles={styles.sidesRowValue} />
         </Box>
         <div className={styles.divider} />
-        <Box className={styles.inputContainer}>
+        <Box className={styles.referrerKickbackInputContainer}>
           <Typography variant="bodySmall">Set Referrer's Kickback Rate:</Typography>
           <OutlinedInput value={40} className={styles.kickbackInput} endAdornment="%" />
         </Box>

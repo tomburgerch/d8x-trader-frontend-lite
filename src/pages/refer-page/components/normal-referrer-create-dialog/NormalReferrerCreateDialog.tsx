@@ -1,6 +1,7 @@
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { SidesRow } from 'components/sides-row/SidesRow';
 
 import styles from './NormalReferrerCreateDialog.module.scss';
 
@@ -23,19 +24,9 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
             20%
           </Typography>
         </Box>
-        <Box className={styles.receivalContainer}>
-          <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">You receive</Typography>
-            <Typography variant="bodyMedium" fontWeight={600}>
-              15%
-            </Typography>
-          </Box>
-          <Box className={styles.receivalRow}>
-            <Typography variant="bodySmall">Trader receives</Typography>
-            <Typography variant="bodyMedium" fontWeight={600}>
-              5%
-            </Typography>
-          </Box>
+        <Box className={styles.paddedContainer}>
+          <SidesRow leftSide="You receive" rightSide="15%" rightSideStyles={styles.sidesRowValue} />
+          <SidesRow leftSide="Trader receives" rightSide="5%" rightSideStyles={styles.sidesRowValue} />
         </Box>
         <div className={styles.divider} />
         <Box className={styles.kickbackRateInputContainer}>
