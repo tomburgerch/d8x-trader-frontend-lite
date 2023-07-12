@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
 import { NormalReferrerModifyDialog } from 'pages/refer-page/components/normal-referrer-modify-dialog/NormalReferrerModifyDialog';
+import { AgencyReferrerModifyDialog } from 'pages/refer-page/components/agency-referrer-modify-dialog/AgencyReferrerModifyDialog';
 
 import { useDialog } from 'hooks/useDialog';
 
@@ -37,7 +38,7 @@ export const ReferralCodesRow = ({ data }: ReferralCodesRowPropsI) => {
           </Button>
         </TableCell>
       </TableRow>
-      {dialogOpen && <NormalReferrerModifyDialog onClose={closeDialog} />}
+      {dialogOpen && <AgencyReferrerModifyDialog onClose={closeDialog} />}
     </>
   );
 };
