@@ -1,16 +1,18 @@
 import { Box, Button, Dialog, OutlinedInput, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
+import type { ReferrerDataI } from 'types/types';
 
 import styles from './NormalReferrerModifyDialog.module.scss';
 
 interface NormalReferrerModifyDialogPropsI {
+  data: ReferrerDataI;
   onClose: () => void;
 }
 
 export const NormalReferrerModifyDialog = ({ onClose }: NormalReferrerModifyDialogPropsI) => {
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open={true} onClose={onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           Modify Referral Code

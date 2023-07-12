@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 
 import { getEarnedRebate, getReferralVolume } from 'network/referral';
 import { selectedPoolAtom, selectedPoolIdAtom } from 'store/pools.store';
+import { RebateTypeE } from 'types/enums';
 import type { EarnedRebateI, ReferralVolumeI } from 'types/types';
 
 import { Overview, type OverviewItemI } from '../overview/Overview';
@@ -13,7 +14,6 @@ import { Disclaimer } from '../disclaimer/Disclaimer';
 import { ReferralsBlock } from '../referrals-block/ReferralsBlock';
 
 import styles from './ReferrerTab.module.scss';
-import { RebateTypeE } from '../../../../types/enums';
 
 const disclaimerTextBlocks = [
   'Earn rebates by inviting traders to trade on D8X. Rebates are airdropped to your wallet weekly.',
