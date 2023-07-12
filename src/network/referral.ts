@@ -1,6 +1,7 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
 import { EarnedRebateI, OpenTraderRebateI, ReferralCodeI, ReferralVolumeI, ValidatedResponseI } from '../types/types';
+import { RebateTypeE } from '../types/enums';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
@@ -29,11 +30,15 @@ export function getReferralVolume(chainId: number, traderAddr: string): Promise<
   });
 }
 
-export function getEarnedRebate(chainId: number, traderAddr: string): Promise<ValidatedResponseI<EarnedRebateI[]>> {
-  return fetch(
-    `${getReferralUrlByChainId(chainId)}/earned-rebate?referrerAddr=${traderAddr}`,
-    getRequestOptions()
-  ).then((data) => {
+export function getEarnedRebate(
+  chainId: number,
+  address: string,
+  rebateType: RebateTypeE
+): Promise<ValidatedResponseI<EarnedRebateI[]>> {
+  const params = new URLSearchParams();
+  params.append(`${rebateType}Addr`, address);
+
+  return fetch(`${getReferralUrlByChainId(chainId)}/earned-rebate?${params}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);

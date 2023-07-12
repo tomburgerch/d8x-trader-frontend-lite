@@ -13,6 +13,7 @@ import { Disclaimer } from '../disclaimer/Disclaimer';
 import { ReferralsBlock } from '../referrals-block/ReferralsBlock';
 
 import styles from './ReferrerTab.module.scss';
+import { RebateTypeE } from '../../../../types/enums';
 
 const disclaimerTextBlocks = [
   'Earn rebates by inviting traders to trade on D8X. Rebates are airdropped to your wallet weekly.',
@@ -60,7 +61,7 @@ export const ReferrerTab = memo(() => {
 
       earnedRebateRequestRef.current = true;
 
-      getEarnedRebate(chainId, address)
+      getEarnedRebate(chainId, address, RebateTypeE.Referrer)
         .then(({ data }) => {
           setEarnedRebates(data);
         })
