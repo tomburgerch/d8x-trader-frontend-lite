@@ -1,28 +1,26 @@
+import { useAtom } from 'jotai';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
-import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
+import { Separator } from 'components/separator/Separator';
 import { ReferralCodesTable } from 'components/referral-codes-table/ReferralCodesTable';
+import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
+import { useDialog } from 'hooks/useDialog';
+import { isAgencyAtom, referralCodeAtom } from 'store/refer.store';
+
 import { NormalReferrerCreateDialog } from '../normal-referrer-create-dialog/NormalReferrerCreateDialog';
 import { AgencyReferrerCreateDialog } from '../agency-referrer-create-dialog/AgencyReferrerCreateDialog';
 
-import { useDialog } from 'hooks/useDialog';
-
 import styles from './ReferralsBlock.module.scss';
-import { Separator } from '../../../../components/separator/Separator';
-
-enum ReferrerTypeE {
-  Normal,
-  Agency,
-}
 
 export const ReferralsBlock = () => {
+  const [isAgency] = useAtom(isAgencyAtom);
+  const [referralCode] = useAtom(referralCodeAtom);
+
   const { address } = useAccount();
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
-
-  const referrerType: ReferrerTypeE = ReferrerTypeE.Agency;
 
   return (
     <Box className={styles.root}>
@@ -36,8 +34,8 @@ export const ReferralsBlock = () => {
         )}
       </Box>
       <Separator className={styles.divider} />
-      {address ? (
-        <ReferralCodesTable />
+      {address && referralCode ? (
+        <ReferralCodesTable isAgency={isAgency} codes={isAgency ? referralCode.agency : referralCode.referrer} />
       ) : (
         <>
           <Typography variant="bodySmall" component="p" className={styles.dataTitle}>
@@ -48,12 +46,8 @@ export const ReferralsBlock = () => {
           </Typography>
         </>
       )}
-      {dialogOpen && (referrerType as ReferrerTypeE) === ReferrerTypeE.Normal && (
-        <NormalReferrerCreateDialog onClose={closeDialog} />
-      )}
-      {dialogOpen && (referrerType as ReferrerTypeE) === ReferrerTypeE.Agency && (
-        <AgencyReferrerCreateDialog onClose={closeDialog} />
-      )}
+      {dialogOpen && !isAgency && <NormalReferrerCreateDialog onClose={closeDialog} />}
+      {dialogOpen && isAgency && <AgencyReferrerCreateDialog onClose={closeDialog} />}
     </Box>
   );
 };
