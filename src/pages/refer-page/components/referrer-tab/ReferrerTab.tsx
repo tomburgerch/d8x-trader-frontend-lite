@@ -41,7 +41,7 @@ export const ReferrerTab = memo(() => {
       referralVolumeRequestRef.current = true;
 
       getReferralVolume(chainId, address)
-        .then((data) => {
+        .then(({ data }) => {
           setReferralVolumes(data);
         })
         .finally(() => {
@@ -61,7 +61,7 @@ export const ReferrerTab = memo(() => {
       earnedRebateRequestRef.current = true;
 
       getEarnedRebate(chainId, address)
-        .then((data) => {
+        .then(({ data }) => {
           setEarnedRebates(data);
         })
         .finally(() => {

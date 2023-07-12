@@ -1,12 +1,12 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
-import { EarnedRebateI, OpenTraderRebateI, ReferralCodeI, ReferralVolumeI } from '../types/types';
+import { EarnedRebateI, OpenTraderRebateI, ReferralCodeI, ReferralVolumeI, ValidatedResponseI } from '../types/types';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
 }
 
-export function getIsAgency(chainId: number, traderAddr: string): Promise<boolean> {
+export function getIsAgency(chainId: number, traderAddr: string): Promise<ValidatedResponseI<boolean>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/is-agency?addr=${traderAddr}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
@@ -16,7 +16,7 @@ export function getIsAgency(chainId: number, traderAddr: string): Promise<boolea
   });
 }
 
-export function getReferralVolume(chainId: number, traderAddr: string): Promise<ReferralVolumeI[]> {
+export function getReferralVolume(chainId: number, traderAddr: string): Promise<ValidatedResponseI<ReferralVolumeI[]>> {
   return fetch(
     `${getReferralUrlByChainId(chainId)}/referral-volume?referrerAddr=${traderAddr}`,
     getRequestOptions()
@@ -29,7 +29,7 @@ export function getReferralVolume(chainId: number, traderAddr: string): Promise<
   });
 }
 
-export function getEarnedRebate(chainId: number, traderAddr: string): Promise<EarnedRebateI[]> {
+export function getEarnedRebate(chainId: number, traderAddr: string): Promise<ValidatedResponseI<EarnedRebateI[]>> {
   return fetch(
     `${getReferralUrlByChainId(chainId)}/earned-rebate?referrerAddr=${traderAddr}`,
     getRequestOptions()
@@ -42,7 +42,7 @@ export function getEarnedRebate(chainId: number, traderAddr: string): Promise<Ea
   });
 }
 
-export function getReferralCodes(chainId: number, traderAddr: string): Promise<ReferralCodeI> {
+export function getReferralCodes(chainId: number, traderAddr: string): Promise<ValidatedResponseI<ReferralCodeI>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/my-referral-codes?addr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
       if (!data.ok) {
@@ -54,7 +54,10 @@ export function getReferralCodes(chainId: number, traderAddr: string): Promise<R
   );
 }
 
-export function getOpenTraderRebate(chainId: number, traderAddr: string): Promise<OpenTraderRebateI> {
+export function getOpenTraderRebate(
+  chainId: number,
+  traderAddr: string
+): Promise<ValidatedResponseI<OpenTraderRebateI>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/open-trader-rebate?addr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
       if (!data.ok) {
@@ -66,7 +69,7 @@ export function getOpenTraderRebate(chainId: number, traderAddr: string): Promis
   );
 }
 
-export function getReferralRebate(chainId: number, traderAddr: string): Promise<ReferralCodeI> {
+export function getReferralRebate(chainId: number, traderAddr: string): Promise<ValidatedResponseI<ReferralCodeI>> {
   return fetch(
     `${getReferralUrlByChainId(chainId)}/referral-rebate?referrerAddr=${traderAddr}`,
     getRequestOptions()
@@ -79,7 +82,7 @@ export function getReferralRebate(chainId: number, traderAddr: string): Promise<
   });
 }
 
-export function getAgencyRebate(chainId: number): Promise<ReferralCodeI> {
+export function getAgencyRebate(chainId: number): Promise<ValidatedResponseI<ReferralCodeI>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/agency-rebate`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
