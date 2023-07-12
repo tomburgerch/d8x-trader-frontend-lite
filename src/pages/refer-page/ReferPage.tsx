@@ -16,7 +16,7 @@ import styles from './ReferPage.module.scss';
 const tabComponents = [<ReferrerTab key="referrerTab" />, <TraderTab key="traderTab" />];
 
 export const ReferPage = memo(() => {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useState(1);
 
   const handleTabChange = (newIndex: number) => setActiveTabIndex(newIndex);
 

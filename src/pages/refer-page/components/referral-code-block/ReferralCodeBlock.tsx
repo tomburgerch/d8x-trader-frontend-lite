@@ -9,7 +9,12 @@ import { EnterCodeDialog } from '../enter-code-dialog/EnterCodeDialog';
 
 import styles from './ReferralCodeBlock.module.scss';
 
-export const ReferralCodeBlock = () => {
+interface ReferralCodeBlockPropsI {
+  referralCode: string;
+  traderRebatePercentage: number;
+}
+
+export const ReferralCodeBlock = ({ referralCode, traderRebatePercentage }: ReferralCodeBlockPropsI) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { address } = useAccount();
 
@@ -21,7 +26,7 @@ export const ReferralCodeBlock = () => {
             Your rebate rate
           </Typography>
           <Typography variant="bodyLarge" className={styles.dataValue}>
-            {address ? '5%' : 'N/A'} {/* TODO: MJO: Change hardcoded value */}
+            {address && traderRebatePercentage ? `${traderRebatePercentage * 100}%` : 'N/A'}
           </Typography>
         </Box>
         {address ? (
@@ -37,7 +42,7 @@ export const ReferralCodeBlock = () => {
         Your active code
       </Typography>
       <Typography variant="bodyLarge" className={styles.dataValue}>
-        {address ? '2jsd_sdad_990x' : 'N/A'} {/* TODO: MJO: Change hardcoded value */}
+        {address && referralCode ? referralCode : 'N/A'}
       </Typography>
       {dialogOpen && <EnterCodeDialog onClose={() => setDialogOpen(false)} />}
     </Box>

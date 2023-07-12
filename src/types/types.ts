@@ -284,6 +284,7 @@ export interface TraderDataI {
 }
 
 export interface OpenTraderRebateI {
+  poolId: number;
   amountCC: number;
 }
 

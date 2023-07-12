@@ -62,7 +62,7 @@ export function getReferralCodes(chainId: number, traderAddr: string): Promise<V
 export function getOpenTraderRebate(
   chainId: number,
   traderAddr: string
-): Promise<ValidatedResponseI<OpenTraderRebateI>> {
+): Promise<ValidatedResponseI<OpenTraderRebateI[]>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/open-trader-rebate?addr=${traderAddr}`, getRequestOptions()).then(
     (data) => {
       if (!data.ok) {
