@@ -129,7 +129,7 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
           <Typography variant="bodySmall">Set Referrer's Kickback Rate:</Typography>
           <OutlinedInput
             type="number"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, max: baseRebate }}
             value={referrersKickbackRate}
             onChange={(event) => handleKickbackRateChange(event, KickbackRateTypeE.REFERRER)}
             className={styles.kickbackInput}
@@ -140,7 +140,7 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
           <Typography variant="bodySmall">Set Trader's Kickback Rate:</Typography>
           <OutlinedInput
             type="number"
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, max: baseRebate }}
             value={tradersKickbackRate}
             onChange={(event) => handleKickbackRateChange(event, KickbackRateTypeE.TRADER)}
             className={styles.kickbackInput}

@@ -37,6 +37,10 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
 
   const handleKickbackRateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
+    if (+value > baseRebate) {
+      setKickbackRateInputValue(String(baseRebate));
+      return;
+    }
     setKickbackRateInputValue(value);
   };
 
@@ -87,7 +91,7 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
           <OutlinedInput
             type="number"
             value={kickbackRateInputValue}
-            inputProps={{ min: 0 }}
+            inputProps={{ min: 0, max: baseRebate }}
             onChange={handleKickbackRateChange}
             className={styles.kickbackInput}
             endAdornment="%"
