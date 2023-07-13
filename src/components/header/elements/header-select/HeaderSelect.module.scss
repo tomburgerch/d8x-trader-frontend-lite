@@ -44,6 +44,7 @@
   display: flex;
   padding: 12px;
   align-items: center;
+  gap: $d8x-spacing * 4;
 
   .leftLabel {
     flex: 1;
