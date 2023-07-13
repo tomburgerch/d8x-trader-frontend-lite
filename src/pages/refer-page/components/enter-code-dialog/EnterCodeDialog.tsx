@@ -1,11 +1,11 @@
 import { useCallback, useState, type ChangeEvent, useRef } from 'react';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 
-import { getCodeExists } from 'network/referral';
+import { getReferralCodeExists, postUseReferralCode } from 'network/referral';
 
 import styles from './EnterCodeDialog.module.scss';
 
@@ -25,13 +25,15 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
 
   const checkedCodesRef = useRef<string[]>([]);
 
+  const { data: signer } = useSigner();
+  const { address } = useAccount();
   const chainId = useChainId();
 
   const inputDisabled = codeState !== CodeStateE.CODE_USABLE;
 
   const checkCodeExists = useCallback(
     async (value: string) => {
-      const codeExistsResponse = await getCodeExists(chainId, value);
+      const codeExistsResponse = await getReferralCodeExists(chainId, value);
       return !codeExistsResponse.data.length ? false : true;
     },
     [chainId]
@@ -70,6 +72,10 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
 
   const handleUseCode = async () => {
     /* Handle POST code used */
+    if (!address || !signer) {
+      return;
+    }
+    await postUseReferralCode(chainId, address, inputValue, signer);
   };
 
   return (

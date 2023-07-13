@@ -1,13 +1,55 @@
-import { config } from 'config';
+import { type APIReferralCodeSelectionPayload, ReferralCodeSigner } from '@d8x/perpetuals-sdk';
+import { Signer } from '@ethersproject/abstract-signer';
+
 import { getRequestOptions } from 'helpers/getRequestOptions';
-import { EarnedRebateI, OpenTraderRebateI, ReferralCodeI, ReferralVolumeI, ValidatedResponseI } from '../types/types';
-import { RebateTypeE } from '../types/enums';
+
+import {
+  type EarnedRebateI,
+  type OpenTraderRebateI,
+  type ReferralCodeI,
+  type ReferralVolumeI,
+  type ValidatedResponseI,
+} from '../types/types';
+import { RebateTypeE, RequestMethodE } from '../types/enums';
+
+import { config } from 'config';
+
+const RPC = 'https://matic-mumbai.chainstacklabs.com';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
 }
 
-export function getCodeExists(chainId: number, code: string): Promise<ValidatedResponseI<{ code: string }[]>> {
+export async function postUseReferralCode(chainId: number, address: string, code: string, signer: Signer) {
+  const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
+
+  const payload: APIReferralCodeSelectionPayload = {
+    code,
+    traderAddr: address,
+    createdOn: Date.now(),
+    signature: '',
+  };
+
+  payload.signature = await referralCodeSigner.getSignatureForCodeSelection(payload);
+
+  if (!(await ReferralCodeSigner.checkCodeSelectionSignature(payload))) {
+    throw new Error('signature not valid');
+  } else {
+    return fetch(`${getReferralUrlByChainId(chainId)}/select-referral-code`, {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify(payload),
+    }).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+
+      return data.json();
+    });
+  }
+}
+
+export function getReferralCodeExists(chainId: number, code: string): Promise<ValidatedResponseI<{ code: string }[]>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/code-info?code=${code}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
