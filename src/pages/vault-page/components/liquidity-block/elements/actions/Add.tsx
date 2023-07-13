@@ -84,46 +84,48 @@ export const Add = memo(() => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool.addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount).then(async (tx) => {
-          console.log(`addLiquidity tx hash: ${tx.hash}`);
-          setLoadStats(false);
-          tx.wait()
-            .then((receipt) => {
-              if (receipt.status === 1) {
+        liqProvTool
+          .addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
+          .then(async (tx) => {
+            console.log(`addLiquidity tx hash: ${tx.hash}`);
+            setLoadStats(false);
+            tx.wait()
+              .then((receipt) => {
+                if (receipt.status === 1) {
+                  setLoadStats(true);
+                  setAddAmount(0);
+                  setInputValue('0');
+                  requestSentRef.current = false;
+                  setRequestSent(false);
+                  toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+                }
+              })
+              .catch(async (err) => {
+                console.log(err);
+                const response = await signer.call(
+                  {
+                    to: tx.to,
+                    from: tx.from,
+                    nonce: tx.nonce,
+                    gasLimit: tx.gasLimit,
+                    gasPrice: tx.gasPrice,
+                    data: tx.data,
+                    value: tx.value,
+                    chainId: tx.chainId,
+                    type: tx.type ?? undefined,
+                    accessList: tx.accessList,
+                  },
+                  tx.blockNumber
+                );
+                const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                 setLoadStats(true);
-                setAddAmount(0);
-                setInputValue('0');
                 requestSentRef.current = false;
                 setRequestSent(false);
-                toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-              }
-            })
-            .catch(async (err) => {
-              console.log(err);
-              const response = await signer.call(
-                {
-                  to: tx.to,
-                  from: tx.from,
-                  nonce: tx.nonce,
-                  gasLimit: tx.gasLimit,
-                  gasPrice: tx.gasPrice,
-                  data: tx.data,
-                  value: tx.value,
-                  chainId: tx.chainId,
-                  type: tx.type ?? undefined,
-                  accessList: tx.accessList,
-                },
-                tx.blockNumber
-              );
-              const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-              setLoadStats(true);
-              requestSentRef.current = false;
-              setRequestSent(false);
-              toast.error(
-                <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
-              );
-            });
-        });
+                toast.error(
+                  <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+                );
+              });
+          });
       })
       .catch(async () => {
         setLoadStats(true);
