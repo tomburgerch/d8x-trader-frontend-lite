@@ -72,14 +72,13 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
     }
     const { agencyRate, referrerRate, traderRate } = sidesRowValues;
 
-    const traderRebatePerc =
-      (100 * Number(traderRate)) / (Number(agencyRate) + Number(referrerRate) + Number(traderRate));
+    const rateSum = Number(agencyRate) + Number(referrerRate) + Number(traderRate);
 
-    const agencyRebatePerc =
-      (100 * Number(agencyRate)) / (Number(agencyRate) + Number(referrerRate) + Number(traderRate));
+    const traderRebatePerc = (100 * Number(traderRate)) / rateSum;
 
-    const referrerRebatePerc =
-      (100 * Number(referrerRate)) / (Number(agencyRate) + Number(referrerRate) + Number(traderRate));
+    const agencyRebatePerc = (100 * Number(agencyRate)) / rateSum;
+
+    const referrerRebatePerc = (100 * Number(referrerRate)) / rateSum;
 
     // TODO: MJO: Check - What are the possible return types? What if `type` === 'error'?
     await postUpsertReferralCode(

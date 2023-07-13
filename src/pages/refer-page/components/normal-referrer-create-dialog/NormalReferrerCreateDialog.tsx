@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
@@ -28,6 +28,13 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
   const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
   useEffect(() => setKickbackRateInputValue((0.33 * baseRebate).toFixed(3)), [baseRebate]);
 
+  const sidesRowValues = useMemo(() => {
+    const traderRate = +kickbackRateInputValue;
+    const userRate = baseRebate - traderRate;
+
+    return { userRate: userRate.toFixed(3), traderRate: traderRate.toFixed(3) };
+  }, [baseRebate, kickbackRateInputValue]);
+
   const handleKickbackRateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setKickbackRateInputValue(value);
@@ -37,12 +44,13 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
     if (!address || !signer) {
       return;
     }
-    const traderRebatePerc =
-      (100 * Number(kickbackRateInputValue)) /
-      (baseRebate - Number(kickbackRateInputValue) + Number(kickbackRateInputValue));
-    const referrerRebatePerc =
-      (100 * (baseRebate - Number(kickbackRateInputValue))) /
-      (baseRebate - Number(kickbackRateInputValue) + Number(kickbackRateInputValue));
+
+    const { userRate, traderRate } = sidesRowValues;
+
+    const rateSum = Number(userRate) + Number(traderRate);
+
+    const traderRebatePerc = (100 * Number(traderRate)) / rateSum;
+    const referrerRebatePerc = (100 * Number(userRate)) / rateSum;
 
     await postUpsertReferralCode(chainId, address, '', codeInputValue, traderRebatePerc, 0, referrerRebatePerc, signer);
   };
@@ -64,12 +72,12 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
         <Box className={styles.paddedContainer}>
           <SidesRow
             leftSide="You receive"
-            rightSide={`${(baseRebate - Number(kickbackRateInputValue)).toFixed(3)}%`}
+            rightSide={`${sidesRowValues.userRate}%`}
             rightSideStyles={styles.sidesRowValue}
           />
           <SidesRow
             leftSide="Trader receives"
-            rightSide={`${kickbackRateInputValue}%`}
+            rightSide={`${sidesRowValues.traderRate}%`}
             rightSideStyles={styles.sidesRowValue}
           />
         </Box>
