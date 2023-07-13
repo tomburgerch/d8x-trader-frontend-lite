@@ -5,7 +5,8 @@ import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 
-import { getReferralCodeExists, postUseReferralCode } from 'network/referral';
+import { postUseReferralCode } from 'network/referral';
+import { checkCodeExists } from 'pages/refer-page/helpers';
 
 import styles from './EnterCodeDialog.module.scss';
 
@@ -31,14 +32,6 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
 
   const inputDisabled = codeState !== CodeStateE.CODE_USABLE;
 
-  const checkCodeExists = useCallback(
-    async (value: string) => {
-      const codeExistsResponse = await getReferralCodeExists(chainId, value);
-      return !codeExistsResponse.data.length ? false : true;
-    },
-    [chainId]
-  );
-
   const handleChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
@@ -56,7 +49,7 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
 
       // only check code on every keystroke if code has not been checked before (ref)
       if (!checkedCodesRef.current.find((element) => element === value)) {
-        codeExists = await checkCodeExists(value);
+        codeExists = await checkCodeExists(chainId, value);
         checkedCodesRef.current.push(value);
       }
 
@@ -67,15 +60,14 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
 
       setCodeState(CodeStateE.CODE_USABLE);
     },
-    [checkCodeExists]
+    [chainId]
   );
 
   const handleUseCode = async () => {
-    /* Handle POST code used */
     if (!address || !signer) {
       return;
     }
-    await postUseReferralCode(chainId, address, inputValue, signer);
+    await postUseReferralCode(chainId, address, inputValue, signer); // TODO: MJO: Needs to be tested
   };
 
   return (

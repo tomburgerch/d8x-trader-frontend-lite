@@ -1,4 +1,8 @@
-import { type APIReferralCodeSelectionPayload, ReferralCodeSigner } from '@d8x/perpetuals-sdk';
+import {
+  type APIReferralCodeSelectionPayload,
+  ReferralCodeSigner,
+  type APIReferralCodePayload,
+} from '@d8x/perpetuals-sdk';
 import { Signer } from '@ethersproject/abstract-signer';
 
 import { getRequestOptions } from 'helpers/getRequestOptions';
@@ -14,10 +18,50 @@ import { RebateTypeE, RequestMethodE } from '../types/enums';
 
 import { config } from 'config';
 
+// TODO: MJO: temporary - change this
 const RPC = 'https://matic-mumbai.chainstacklabs.com';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
+}
+
+export async function postUpsertReferralCodeNormal(
+  chainId: number,
+  address: string,
+  code: string,
+  traderRebatePerc: number,
+  referrerRebatePerc: number,
+  signer: Signer
+) {
+  const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
+  const payload: APIReferralCodePayload = {
+    code,
+    referrerAddr: address,
+    agencyAddr: '',
+    createdOn: Date.now(),
+    traderRebatePerc,
+    agencyRebatePerc: 0,
+    referrerRebatePerc,
+    signature: '',
+  };
+
+  payload.signature = await referralCodeSigner.getSignatureForNewCode(payload);
+
+  if (!(await ReferralCodeSigner.checkNewCodeSignature(payload))) {
+    throw new Error('signature not valid');
+  } else {
+    return fetch(`${getReferralUrlByChainId(chainId)}/upsert-referral-code`, {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify(payload),
+    }).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+
+      return;
+    });
+  }
 }
 
 export async function postUseReferralCode(chainId: number, address: string, code: string, signer: Signer) {
@@ -44,7 +88,7 @@ export async function postUseReferralCode(chainId: number, address: string, code
         throw new Error(data.statusText);
       }
 
-      return data.json();
+      return;
     });
   }
 }
@@ -125,7 +169,10 @@ export function getOpenTraderRebate(
   );
 }
 
-export function getReferralRebate(chainId: number, address: string): Promise<ValidatedResponseI<ReferralCodeI>> {
+export function getReferralRebate(
+  chainId: number,
+  address: string
+): Promise<ValidatedResponseI<{ percentageCut: number }>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/referral-rebate?referrerAddr=${address}`, getRequestOptions()).then(
     (data) => {
       if (!data.ok) {
