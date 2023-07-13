@@ -1,10 +1,19 @@
-import { useState, type ChangeEvent } from 'react';
+import { useCallback, useState, type ChangeEvent, useRef } from 'react';
+import { useChainId } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 
+import { getCodeExists } from 'network/referral';
+
 import styles from './EnterCodeDialog.module.scss';
+
+enum CodeStateE {
+  DEFAULT,
+  CODE_NOT_FOUND,
+  CODE_USABLE,
+}
 
 interface EnterCodeDialogPropsI {
   onClose: () => void;
@@ -12,10 +21,55 @@ interface EnterCodeDialogPropsI {
 
 export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
   const [inputValue, setInputValue] = useState('');
+  const [codeState, setCodeState] = useState(CodeStateE.DEFAULT);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setInputValue(value);
+  const checkedCodesRef = useRef<string[]>([]);
+
+  const chainId = useChainId();
+
+  const inputDisabled = codeState !== CodeStateE.CODE_USABLE;
+
+  const checkCodeExists = useCallback(
+    async (value: string) => {
+      const codeExistsResponse = await getCodeExists(chainId, value);
+      return !codeExistsResponse.data.length ? false : true;
+    },
+    [chainId]
+  );
+
+  const handleChange = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setInputValue(value);
+
+      // if user resets input reset code state to default
+      if (value === '') {
+        setCodeState(CodeStateE.DEFAULT);
+        return;
+      }
+
+      // if input is filled
+
+      let codeExists = false;
+
+      // only check code on every keystroke if code has not been checked before (ref)
+      if (!checkedCodesRef.current.find((element) => element === value)) {
+        codeExists = await checkCodeExists(value);
+        checkedCodesRef.current.push(value);
+      }
+
+      if (!codeExists) {
+        setCodeState(CodeStateE.CODE_NOT_FOUND);
+        return;
+      }
+
+      setCodeState(CodeStateE.CODE_USABLE);
+    },
+    [checkCodeExists]
+  );
+
+  const handleUseCode = async () => {
+    /* Handle POST code used */
   };
 
   return (
@@ -29,8 +83,10 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
           <Button variant="secondary" className={styles.cancelButton} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" disabled={!inputValue} className={styles.enterCodeButton}>
-            Enter new code
+          <Button variant="primary" disabled={inputDisabled} onClick={handleUseCode} className={styles.enterCodeButton}>
+            {codeState === CodeStateE.DEFAULT && 'Enter code'}
+            {codeState === CodeStateE.CODE_NOT_FOUND && 'Code not found'}
+            {codeState === CodeStateE.CODE_USABLE && 'Use code'}
           </Button>
         </Box>
       </Box>

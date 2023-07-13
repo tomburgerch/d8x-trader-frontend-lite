@@ -7,6 +7,16 @@ function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
 }
 
+export function getCodeExists(chainId: number, code: string): Promise<ValidatedResponseI<{ code: string }[]>> {
+  return fetch(`${getReferralUrlByChainId(chainId)}/code-info?code=${code}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
 export function getIsAgency(chainId: number, address: string): Promise<ValidatedResponseI<{ isAgency: boolean }>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/is-agency?addr=${address}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
