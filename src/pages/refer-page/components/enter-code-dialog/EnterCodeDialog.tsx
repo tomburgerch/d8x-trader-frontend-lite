@@ -67,7 +67,7 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
     if (!address || !signer) {
       return;
     }
-    await postUseReferralCode(chainId, address, inputValue, signer); // TODO: MJO: Needs to be tested
+    await postUseReferralCode(chainId, address, inputValue, signer);
   };
 
   return (

@@ -25,22 +25,24 @@ function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
 }
 
-export async function postUpsertReferralCodeNormal(
+export async function postUpsertReferralCode(
   chainId: number,
-  address: string,
+  referrerAddr: string,
+  agencyAddr: string,
   code: string,
   traderRebatePerc: number,
+  agencyRebatePerc: number,
   referrerRebatePerc: number,
   signer: Signer
 ) {
   const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
   const payload: APIReferralCodePayload = {
     code,
-    referrerAddr: address,
-    agencyAddr: '',
+    referrerAddr,
+    agencyAddr,
     createdOn: Date.now(),
     traderRebatePerc,
-    agencyRebatePerc: 0,
+    agencyRebatePerc,
     referrerRebatePerc,
     signature: '',
   };
@@ -184,7 +186,7 @@ export function getReferralRebate(
   );
 }
 
-export function getAgencyRebate(chainId: number): Promise<ValidatedResponseI<ReferralCodeI>> {
+export function getAgencyRebate(chainId: number): Promise<ValidatedResponseI<{ percentageCut: number }>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/agency-rebate`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });

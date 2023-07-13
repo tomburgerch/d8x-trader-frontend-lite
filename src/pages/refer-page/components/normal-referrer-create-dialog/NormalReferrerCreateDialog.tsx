@@ -1,4 +1,4 @@
-import { type ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
@@ -6,88 +6,32 @@ import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 
-import { getReferralRebate, postUpsertReferralCodeNormal } from 'network/referral';
+import { postUpsertReferralCode } from 'network/referral';
 
-import { checkCodeExists } from 'pages/refer-page/helpers';
+import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
 import styles from './NormalReferrerCreateDialog.module.scss';
-
-enum CodeStateE {
-  DEFAULT,
-  CODE_TAKEN,
-  CODE_AVAILABLE,
-}
 
 interface NormalReferrerCreateDialogPropsI {
   onClose: () => void;
 }
 
 export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDialogPropsI) => {
-  const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
-  const [baseRebate, setBaseRebate] = useState(0);
-
-  const [codeInputValue, setCodeInputValue] = useState('');
-  const [codeState, setCodeState] = useState(CodeStateE.DEFAULT);
-
-  const checkedCodesRef = useRef<string[]>([]);
-
-  const codeInputDisabled = codeState !== CodeStateE.CODE_AVAILABLE;
-
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const getBaseRebateAsync = useCallback(async () => {
-    if (address) {
-      const baseRebateResponse = await getReferralRebate(chainId, address);
-      return baseRebateResponse.data.percentageCut;
-    }
+  const { codeInputValue, handleCodeChange, codeState, codeInputDisabled } = useCodeInput(chainId);
 
-    return 0;
-  }, [address, chainId]);
+  const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.NORMAL);
 
-  useEffect(() => {
-    getBaseRebateAsync().then((percentageCut: number) => {
-      setBaseRebate(percentageCut);
-      setKickbackRateInputValue(`${0.25 * percentageCut}`);
-    });
-  }, [getBaseRebateAsync, baseRebate]);
+  const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
+  useEffect(() => setKickbackRateInputValue((0.33 * baseRebate).toFixed(3)), [baseRebate]);
 
   const handleKickbackRateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setKickbackRateInputValue(value);
   };
-
-  const handleCodeChange = useCallback(
-    async (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      setCodeInputValue(value);
-
-      // if user resets input reset code state to default
-      if (value === '') {
-        setCodeState(CodeStateE.DEFAULT);
-        return;
-      }
-
-      // if input is filled
-
-      let codeExists = false;
-
-      // only check code on every keystroke if code has not been checked before (ref)
-      if (!checkedCodesRef.current.find((element) => element === value)) {
-        codeExists = await checkCodeExists(chainId, value);
-        checkedCodesRef.current.push(value);
-      }
-
-      if (!codeExists) {
-        setCodeState(CodeStateE.CODE_AVAILABLE);
-        return;
-      }
-
-      setCodeState(CodeStateE.CODE_TAKEN);
-    },
-    [chainId]
-  );
 
   const handleCreateCode = async () => {
     if (!address || !signer) {
@@ -100,7 +44,7 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
       (100 * (baseRebate - Number(kickbackRateInputValue))) /
       (baseRebate - Number(kickbackRateInputValue) + Number(kickbackRateInputValue));
 
-    await postUpsertReferralCodeNormal(chainId, address, codeInputValue, traderRebatePerc, referrerRebatePerc, signer);
+    await postUpsertReferralCode(chainId, address, '', codeInputValue, traderRebatePerc, 0, referrerRebatePerc, signer);
   };
 
   return (

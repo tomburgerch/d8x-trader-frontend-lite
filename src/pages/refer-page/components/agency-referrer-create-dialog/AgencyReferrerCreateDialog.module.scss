@@ -47,7 +47,7 @@
 
 .kickbackInput {
   background-color: var(--d8x-color-black-100);
-  max-width: 90px;
+  max-width: 120px;
   color: var(--d8x-color-black-400);
 }
 
@@ -62,6 +62,10 @@
 .codeInput {
   background-color: var(--d8x-color-black-100);
   width: 100%;
+
+  input {
+    width: 100%;
+  }
 }
 
 .dialogActionsContainer {
@@ -71,5 +75,5 @@
 }
 
 .enterCodeButton {
-  width: 170px;
+  width: 200px;
 }
