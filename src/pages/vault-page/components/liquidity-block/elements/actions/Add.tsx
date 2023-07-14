@@ -160,6 +160,13 @@ export const Add = memo(() => {
     return 0;
   }, [addAmount, dCurrencyPrice]);
 
+  const isButtonDisabled = useMemo(() => {
+    if (!addAmount || requestSent || !isSDKConnected || !selectedLiquidityPool?.brokerCollateralLotSize) {
+      return true;
+    }
+    return addAmount < selectedLiquidityPool.brokerCollateralLotSize;
+  }, [addAmount, requestSent, isSDKConnected, selectedLiquidityPool]);
+
   return (
     <div className={styles.root}>
       <Box className={styles.infoBlock}>
@@ -226,7 +233,7 @@ export const Add = memo(() => {
         <Box className={styles.buttonHolder}>
           <Button
             variant="primary"
-            disabled={!addAmount || requestSent || !isSDKConnected}
+            disabled={isButtonDisabled}
             onClick={handleAddLiquidity}
             className={styles.actionButton}
           >
