@@ -10,13 +10,30 @@ import { postUpsertReferralCode } from 'network/referral';
 
 import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
-import styles from './NormalReferrerCreateDialog.module.scss';
+import styles from './NormalReferrerDialog.module.scss';
 
-interface NormalReferrerCreateDialogPropsI {
+export enum NormalReferrerDialogE {
+  CREATE,
+  MODIFY,
+}
+
+interface NormalReferrerDialogCreatePropsI {
+  type: NormalReferrerDialogE.CREATE;
   onClose: () => void;
 }
 
-export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDialogPropsI) => {
+/**
+ * If the dialog is responsible for modifying 
+ */
+interface NormalReferrerDialogModifyPropsI {
+  type: NormalReferrerDialogE.MODIFY;
+  code: string;
+  onClose: () => void;
+}
+
+type UpdatedNormalReferrerDialogPropsT = NormalReferrerDialogCreatePropsI | NormalReferrerDialogModifyPropsI;
+
+export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) => {
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
@@ -44,7 +61,7 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
     setKickbackRateInputValue(value);
   };
 
-  const handleCreateCode = async () => {
+  const handleUpsertCode = async () => {
     if (!address || !signer) {
       return;
     }
@@ -56,11 +73,13 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
     const traderRebatePerc = (100 * Number(traderRate)) / rateSum;
     const referrerRebatePerc = (100 * Number(userRate)) / rateSum;
 
-    await postUpsertReferralCode(chainId, address, '', codeInputValue, traderRebatePerc, 0, referrerRebatePerc, signer);
+    const code = props.type === NormalReferrerDialogE.MODIFY ? props.code : codeInputValue;
+
+    await postUpsertReferralCode(chainId, address, '', code, traderRebatePerc, 0, referrerRebatePerc, signer);
   };
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           Create Referral Code
@@ -98,28 +117,42 @@ export const NormalReferrerCreateDialog = ({ onClose }: NormalReferrerCreateDial
           />
         </Box>
         <div className={styles.divider} />
-        <Box className={styles.codeInputContainer}>
-          <OutlinedInput
-            placeholder="Enter a code"
-            value={codeInputValue}
-            onChange={handleCodeChange}
-            className={styles.codeInput}
-          />
-        </Box>
+        {props.type === NormalReferrerDialogE.CREATE && (
+          <Box className={styles.codeInputContainer}>
+            <OutlinedInput
+              placeholder="Enter a code"
+              value={codeInputValue}
+              onChange={handleCodeChange}
+              className={styles.codeInput}
+            />
+          </Box>
+        )}
+        {props.type === NormalReferrerDialogE.MODIFY && (
+          <Box className={styles.paddedContainer}>
+            <SidesRow leftSide="Your code" rightSide={props.code} rightSideStyles={styles.sidesRowValue} />
+          </Box>
+        )}
         <Box className={styles.dialogActionsContainer}>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            disabled={codeInputDisabled}
-            onClick={handleCreateCode}
-            className={styles.enterCodeButton}
-          >
-            {codeState === CodeStateE.DEFAULT && 'Enter a code'}
-            {codeState === CodeStateE.CODE_TAKEN && 'Code already taken'}
-            {codeState === CodeStateE.CODE_AVAILABLE && 'Create code'}
-          </Button>
+          {props.type === NormalReferrerDialogE.CREATE && (
+            <Button
+              variant="primary"
+              disabled={codeInputDisabled}
+              onClick={handleUpsertCode}
+              className={styles.enterCodeButton}
+            >
+              {codeState === CodeStateE.DEFAULT && 'Enter a code'}
+              {codeState === CodeStateE.CODE_TAKEN && 'Code already taken'}
+              {codeState === CodeStateE.CODE_AVAILABLE && 'Create code'}
+            </Button>
+          )}
+          {props.type === NormalReferrerDialogE.MODIFY && (
+            <Button variant="primary" onClick={handleUpsertCode} className={styles.enterCodeButton}>
+              Modify
+            </Button>
+          )}
         </Box>
       </Box>
     </Dialog>
