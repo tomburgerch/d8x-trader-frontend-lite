@@ -109,9 +109,9 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
       traderRebatePerc,
       agencyRebatePerc,
       referrerRebatePerc,
-      signer
+      signer,
+      props.onClose
     );
-    props.onClose();
     toast.success(
       <ToastContent
         title={`Code ${props.type === ReferralDialogActionE.CREATE ? 'created' : 'modified'} successfully`}

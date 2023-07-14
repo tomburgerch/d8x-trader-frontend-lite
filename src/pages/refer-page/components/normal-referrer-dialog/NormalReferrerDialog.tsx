@@ -71,8 +71,17 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
 
     const code = props.type === ReferralDialogActionE.MODIFY ? props.code : codeInputValue;
 
-    await postUpsertReferralCode(chainId, address, '', code, traderRebatePerc, 0, referrerRebatePerc, signer);
-    props.onClose();
+    await postUpsertReferralCode(
+      chainId,
+      address,
+      '',
+      code,
+      traderRebatePerc,
+      0,
+      referrerRebatePerc,
+      signer,
+      props.onClose
+    );
     toast.success(
       <ToastContent
         title={`Code ${props.type === ReferralDialogActionE.CREATE ? 'created' : 'modified'} successfully`}

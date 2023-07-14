@@ -33,7 +33,8 @@ export async function postUpsertReferralCode(
   traderRebatePerc: number,
   agencyRebatePerc: number,
   referrerRebatePerc: number,
-  signer: Signer
+  signer: Signer,
+  onSignatureSuccess: () => void
 ) {
   const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
   const payload: APIReferralCodePayload = {
@@ -52,6 +53,7 @@ export async function postUpsertReferralCode(
   if (!(await ReferralCodeSigner.checkNewCodeSignature(payload))) {
     throw new Error('signature not valid');
   } else {
+    onSignatureSuccess();
     return fetch(`${getReferralUrlByChainId(chainId)}/upsert-referral-code`, {
       ...getRequestOptions(RequestMethodE.Post),
       body: JSON.stringify(payload),
@@ -66,7 +68,13 @@ export async function postUpsertReferralCode(
   }
 }
 
-export async function postUseReferralCode(chainId: number, address: string, code: string, signer: Signer) {
+export async function postUseReferralCode(
+  chainId: number,
+  address: string,
+  code: string,
+  signer: Signer,
+  onSignatureSuccess: () => void
+) {
   const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
 
   const payload: APIReferralCodeSelectionPayload = {
@@ -81,6 +89,7 @@ export async function postUseReferralCode(chainId: number, address: string, code
   if (!(await ReferralCodeSigner.checkCodeSelectionSignature(payload))) {
     throw new Error('signature not valid');
   } else {
+    onSignatureSuccess();
     return fetch(`${getReferralUrlByChainId(chainId)}/select-referral-code`, {
       ...getRequestOptions(RequestMethodE.Post),
       body: JSON.stringify(payload),
