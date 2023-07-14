@@ -22,9 +22,6 @@ interface NormalReferrerDialogCreatePropsI {
   onClose: () => void;
 }
 
-/**
- * If the dialog is responsible for modifying 
- */
 interface NormalReferrerDialogModifyPropsI {
   type: NormalReferrerDialogE.MODIFY;
   code: string;
