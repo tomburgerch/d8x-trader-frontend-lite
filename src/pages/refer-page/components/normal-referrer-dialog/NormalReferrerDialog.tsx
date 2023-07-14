@@ -1,10 +1,12 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 
 import { postUpsertReferralCode } from 'network/referral';
 
@@ -70,6 +72,13 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
     const code = props.type === ReferralDialogActionE.MODIFY ? props.code : codeInputValue;
 
     await postUpsertReferralCode(chainId, address, '', code, traderRebatePerc, 0, referrerRebatePerc, signer);
+    props.onClose();
+    toast.success(
+      <ToastContent
+        title={`Code ${props.type === ReferralDialogActionE.CREATE ? 'created' : 'modified'} successfully`}
+        bodyLines={[]}
+      />
+    );
   };
 
   return (

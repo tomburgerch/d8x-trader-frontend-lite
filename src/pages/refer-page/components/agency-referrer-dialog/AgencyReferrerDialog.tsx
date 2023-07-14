@@ -1,10 +1,12 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, Checkbox, OutlinedInput, Typography } from '@mui/material';
-import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { ToastContent } from 'components/toast-content/ToastContent';
 
 import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
@@ -108,6 +110,13 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
       agencyRebatePerc,
       referrerRebatePerc,
       signer
+    );
+    props.onClose();
+    toast.success(
+      <ToastContent
+        title={`Code ${props.type === ReferralDialogActionE.CREATE ? 'created' : 'modified'} successfully`}
+        bodyLines={[]}
+      />
     );
   };
 

@@ -1,9 +1,11 @@
 import { useCallback, useState, type ChangeEvent, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { ToastContent } from 'components/toast-content/ToastContent';
 
 import { postUseReferralCode } from 'network/referral';
 import { checkCodeExists } from 'pages/refer-page/helpers';
@@ -68,6 +70,8 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
       return;
     }
     await postUseReferralCode(chainId, address, inputValue, signer);
+    onClose();
+    toast.success(<ToastContent title="Code applied successfully" bodyLines={[]} />);
   };
 
   return (
