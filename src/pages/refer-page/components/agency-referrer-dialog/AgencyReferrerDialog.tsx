@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, Checkbox, OutlinedInput, Typography } from '@mui/material';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Dialog } from 'components/dialog/Dialog';
@@ -12,18 +12,30 @@ import { postUpsertReferralCode } from 'network/referral';
 
 import { isValidAddress } from 'utils/isValidAddress';
 
-import styles from './AgencyReferrerCreateDialog.module.scss';
+import { ReferralDialogActionE } from 'types/enums';
+
+import styles from './AgencyReferrerDialog.module.scss';
 
 enum KickbackRateTypeE {
   REFERRER,
   TRADER,
 }
 
-interface AgencyReferrerCreateDialogPropsI {
+interface NormalReferrerDialogCreatePropsI {
+  type: ReferralDialogActionE.CREATE;
   onClose: () => void;
 }
 
-export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDialogPropsI) => {
+interface NormalReferrerDialogModifyPropsI {
+  type: ReferralDialogActionE.MODIFY;
+  code: string;
+  referrerAddr: string;
+  onClose: () => void;
+}
+
+type UpdatedAgencyReferrerDialogPropsT = NormalReferrerDialogCreatePropsI | NormalReferrerDialogModifyPropsI;
+
+export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) => {
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
@@ -38,7 +50,11 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
   const [tradersKickbackRate, setTradersKickbackRate] = useState('0');
   useEffect(() => setTradersKickbackRate((0.33 * baseRebate).toFixed(3)), [baseRebate]);
 
-  const [referrerAddressInputValue, setReferrerAddressInputValue] = useState('');
+  const [referrerAddressInputValue, setReferrerAddressInputValue] = useState(
+    props.type === ReferralDialogActionE.CREATE ? '' : props.referrerAddr
+  );
+
+  const [boxChecked, setBoxChecked] = useState(false);
 
   const sidesRowValues = useMemo(() => {
     const agencyRate = baseRebate - Number(referrersKickbackRate) - Number(tradersKickbackRate);
@@ -65,7 +81,7 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
     setReferrerAddressInputValue(value);
   };
 
-  const handleCreateCode = async () => {
+  const handleUpsertCode = async () => {
     const isValidAddressEntered = isValidAddress(referrerAddressInputValue);
     if (!address || !signer || !isValidAddressEntered) {
       return;
@@ -80,12 +96,14 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
 
     const referrerRebatePerc = (100 * Number(referrerRate)) / rateSum;
 
+    const code = props.type === ReferralDialogActionE.MODIFY ? props.code : codeInputValue;
+
     // TODO: MJO: Check - What are the possible return types? What if `type` === 'error'?
     await postUpsertReferralCode(
       chainId,
       referrerAddressInputValue,
       address,
-      codeInputValue,
+      code,
       traderRebatePerc,
       agencyRebatePerc,
       referrerRebatePerc,
@@ -94,7 +112,7 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
   };
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           Create Referral Code
@@ -148,40 +166,73 @@ export const AgencyReferrerCreateDialog = ({ onClose }: AgencyReferrerCreateDial
           />
         </Box>
         <div className={styles.divider} />
-        <Box className={styles.codeInputContainer}>
-          <Typography variant="bodySmall" className={styles.codeInputLabel} component="p">
-            Enter Referrer Address:
-          </Typography>
-          <OutlinedInput
-            placeholder="Enter an address"
-            value={referrerAddressInputValue}
-            onChange={handleReferrerAddressChange}
-            className={styles.codeInput}
-          />
-        </Box>
+        {props.type === ReferralDialogActionE.CREATE && (
+          <Box className={styles.codeInputContainer}>
+            <Typography variant="bodySmall" className={styles.codeInputLabel} component="p">
+              Enter Referrer Address:
+            </Typography>
+            <OutlinedInput
+              placeholder="Enter an address"
+              value={referrerAddressInputValue}
+              onChange={handleReferrerAddressChange}
+              className={styles.codeInput}
+            />
+          </Box>
+        )}
+        {props.type === ReferralDialogActionE.MODIFY && (
+          <Box className={styles.referrerChangeContainer}>
+            <Box className={styles.referrerChangeFlexWrapper}>
+              <Typography variant="bodySmall" className={styles.codeInputLabel} component="p">
+                Change Referrer Address?
+              </Typography>
+              <Checkbox checked={boxChecked} onChange={() => setBoxChecked((prev) => !prev)} />
+            </Box>
+            <OutlinedInput
+              placeholder="Enter an address"
+              value={referrerAddressInputValue}
+              onChange={handleReferrerAddressChange}
+              disabled={!boxChecked}
+              className={styles.codeInput}
+            />
+          </Box>
+        )}
         <div className={styles.divider} />
-        <Box className={styles.codeInputContainer}>
-          <OutlinedInput
-            placeholder="Enter a code"
-            value={codeInputValue}
-            onChange={handleCodeChange}
-            className={styles.codeInput}
-          />
-        </Box>
+        {props.type === ReferralDialogActionE.CREATE && (
+          <Box className={styles.codeInputContainer}>
+            <OutlinedInput
+              placeholder="Enter a code"
+              value={codeInputValue}
+              onChange={handleCodeChange}
+              className={styles.codeInput}
+            />
+          </Box>
+        )}
+        {props.type === ReferralDialogActionE.MODIFY && (
+          <Box className={styles.paddedContainer}>
+            <SidesRow leftSide="Your code" rightSide={props.code} rightSideStyles={styles.sidesRowValue} />
+          </Box>
+        )}
         <Box className={styles.dialogActionsContainer}>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            disabled={codeInputDisabled}
-            onClick={handleCreateCode}
-            className={styles.enterCodeButton}
-          >
-            {codeState === CodeStateE.DEFAULT && 'Enter a code'}
-            {codeState === CodeStateE.CODE_TAKEN && 'Code already taken'}
-            {codeState === CodeStateE.CODE_AVAILABLE && 'Create code'}
-          </Button>
+          {props.type === ReferralDialogActionE.CREATE && (
+            <Button
+              variant="primary"
+              disabled={codeInputDisabled}
+              onClick={handleUpsertCode}
+              className={styles.enterCodeButton}
+            >
+              {codeState === CodeStateE.DEFAULT && 'Enter a code'}
+              {codeState === CodeStateE.CODE_TAKEN && 'Code already taken'}
+              {codeState === CodeStateE.CODE_AVAILABLE && 'Create code'}
+            </Button>
+          )}
+          {props.type === ReferralDialogActionE.MODIFY && (
+            <Button variant="primary" onClick={handleUpsertCode} className={styles.enterCodeButton}>
+              Modify
+            </Button>
+          )}
         </Box>
       </Box>
     </Dialog>

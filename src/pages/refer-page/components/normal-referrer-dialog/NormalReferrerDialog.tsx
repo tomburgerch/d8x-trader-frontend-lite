@@ -10,20 +10,17 @@ import { postUpsertReferralCode } from 'network/referral';
 
 import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
+import { ReferralDialogActionE } from 'types/enums';
+
 import styles from './NormalReferrerDialog.module.scss';
 
-export enum NormalReferrerDialogE {
-  CREATE,
-  MODIFY,
-}
-
 interface NormalReferrerDialogCreatePropsI {
-  type: NormalReferrerDialogE.CREATE;
+  type: ReferralDialogActionE.CREATE;
   onClose: () => void;
 }
 
 interface NormalReferrerDialogModifyPropsI {
-  type: NormalReferrerDialogE.MODIFY;
+  type: ReferralDialogActionE.MODIFY;
   code: string;
   onClose: () => void;
 }
@@ -70,7 +67,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
     const traderRebatePerc = (100 * Number(traderRate)) / rateSum;
     const referrerRebatePerc = (100 * Number(userRate)) / rateSum;
 
-    const code = props.type === NormalReferrerDialogE.MODIFY ? props.code : codeInputValue;
+    const code = props.type === ReferralDialogActionE.MODIFY ? props.code : codeInputValue;
 
     await postUpsertReferralCode(chainId, address, '', code, traderRebatePerc, 0, referrerRebatePerc, signer);
   };
@@ -114,7 +111,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
           />
         </Box>
         <div className={styles.divider} />
-        {props.type === NormalReferrerDialogE.CREATE && (
+        {props.type === ReferralDialogActionE.CREATE && (
           <Box className={styles.codeInputContainer}>
             <OutlinedInput
               placeholder="Enter a code"
@@ -124,7 +121,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
             />
           </Box>
         )}
-        {props.type === NormalReferrerDialogE.MODIFY && (
+        {props.type === ReferralDialogActionE.MODIFY && (
           <Box className={styles.paddedContainer}>
             <SidesRow leftSide="Your code" rightSide={props.code} rightSideStyles={styles.sidesRowValue} />
           </Box>
@@ -133,7 +130,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
           <Button variant="secondary" onClick={props.onClose}>
             Cancel
           </Button>
-          {props.type === NormalReferrerDialogE.CREATE && (
+          {props.type === ReferralDialogActionE.CREATE && (
             <Button
               variant="primary"
               disabled={codeInputDisabled}
@@ -145,7 +142,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
               {codeState === CodeStateE.CODE_AVAILABLE && 'Create code'}
             </Button>
           )}
-          {props.type === NormalReferrerDialogE.MODIFY && (
+          {props.type === ReferralDialogActionE.MODIFY && (
             <Button variant="primary" onClick={handleUpsertCode} className={styles.enterCodeButton}>
               Modify
             </Button>

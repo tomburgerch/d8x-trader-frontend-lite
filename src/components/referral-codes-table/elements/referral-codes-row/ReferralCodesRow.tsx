@@ -2,14 +2,15 @@ import classnames from 'classnames';
 
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
+import { AgencyReferrerDialog } from 'pages/refer-page/components/agency-referrer-dialog/AgencyReferrerDialog';
+import { NormalReferrerDialog } from 'pages/refer-page/components/normal-referrer-dialog/NormalReferrerDialog';
+
 import { useDialog } from 'hooks/useDialog';
-import { AgencyReferrerModifyDialog } from 'pages/refer-page/components/agency-referrer-modify-dialog/AgencyReferrerModifyDialog';
-import {
-  NormalReferrerDialog,
-  NormalReferrerDialogE,
-} from 'pages/refer-page/components/normal-referrer-dialog/NormalReferrerDialog';
-import type { ReferrerDataI } from 'types/types';
+
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import type { ReferrerDataI } from 'types/types';
+import { ReferralDialogActionE } from 'types/enums';
 
 import styles from './ReferralCodesRow.module.scss';
 
@@ -42,9 +43,16 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
           </Button>
         </TableCell>
       </TableRow>
-      {dialogOpen && isAgency && <AgencyReferrerModifyDialog onClose={closeDialog} data={data} />}
+      {dialogOpen && isAgency && (
+        <AgencyReferrerDialog
+          code={data.code}
+          referrerAddr={data.referrerAddr}
+          type={ReferralDialogActionE.MODIFY}
+          onClose={closeDialog}
+        />
+      )}
       {dialogOpen && !isAgency && (
-        <NormalReferrerDialog code={data.code} type={NormalReferrerDialogE.MODIFY} onClose={closeDialog} />
+        <NormalReferrerDialog code={data.code} type={ReferralDialogActionE.MODIFY} onClose={closeDialog} />
       )}
     </>
   );

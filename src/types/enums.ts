@@ -96,3 +96,8 @@ export enum RebateTypeE {
   Trader = 'trader',
   Referrer = 'referrer',
 }
+
+export enum ReferralDialogActionE {
+  CREATE,
+  MODIFY,
+}

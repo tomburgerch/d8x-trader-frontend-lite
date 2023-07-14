@@ -51,6 +51,16 @@
   color: var(--d8x-color-black-400);
 }
 
+.referrerChangeContainer {
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.referrerChangeFlexWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .codeInputContainer {
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }

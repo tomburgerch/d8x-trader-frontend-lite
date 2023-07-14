@@ -55,6 +55,10 @@
   background-color: var(--d8x-color-black-100);
   width: 100%;
   margin-bottom: 6 * $d8x-spacing;
+
+  input {
+    width: 100%;
+  }
 }
 
 .dialogActionsContainer {

@@ -9,8 +9,10 @@ import { WalletConnectButton } from 'components/wallet-connect-button/WalletConn
 import { useDialog } from 'hooks/useDialog';
 import { isAgencyAtom, referralCodeAtom } from 'store/refer.store';
 
-import { NormalReferrerDialog, NormalReferrerDialogE } from '../normal-referrer-dialog/NormalReferrerDialog';
-import { AgencyReferrerCreateDialog } from '../agency-referrer-create-dialog/AgencyReferrerCreateDialog';
+import { NormalReferrerDialog } from '../normal-referrer-dialog/NormalReferrerDialog';
+import { AgencyReferrerDialog } from '../agency-referrer-dialog/AgencyReferrerDialog';
+
+import { ReferralDialogActionE } from 'types/enums';
 
 import styles from './ReferralsBlock.module.scss';
 
@@ -46,8 +48,8 @@ export const ReferralsBlock = () => {
           </Typography>
         </>
       )}
-      {dialogOpen && !isAgency && <NormalReferrerDialog type={NormalReferrerDialogE.CREATE} onClose={closeDialog} />}
-      {dialogOpen && isAgency && <AgencyReferrerCreateDialog onClose={closeDialog} />}
+      {dialogOpen && !isAgency && <NormalReferrerDialog type={ReferralDialogActionE.CREATE} onClose={closeDialog} />}
+      {dialogOpen && isAgency && <AgencyReferrerDialog type={ReferralDialogActionE.CREATE} onClose={closeDialog} />}
     </Box>
   );
 };
