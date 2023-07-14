@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { type ChangeEvent, useEffect, useMemo, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
@@ -56,6 +56,8 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     props.type === ReferralDialogActionE.CREATE ? '' : props.referrerAddr
   );
 
+  const referrerAddressInputTouchedRef = useRef(false);
+
   const [boxChecked, setBoxChecked] = useState(false);
 
   const sidesRowValues = useMemo(() => {
@@ -79,9 +81,25 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   };
 
   const handleReferrerAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!referrerAddressInputTouchedRef.current) {
+      referrerAddressInputTouchedRef.current = true;
+    }
+
     const { value } = event.target;
     setReferrerAddressInputValue(value);
   };
+
+  const isAddressValid = useMemo(() => {
+    if (!referrerAddressInputValue || referrerAddressInputValue.length > 42) {
+      return false;
+    }
+
+    if (isValidAddress(referrerAddressInputValue)) {
+      return true;
+    }
+
+    return false;
+  }, [referrerAddressInputValue]);
 
   const handleUpsertCode = async () => {
     const isValidAddressEntered = isValidAddress(referrerAddressInputValue);
@@ -186,6 +204,11 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
               onChange={handleReferrerAddressChange}
               className={styles.codeInput}
             />
+            {!isAddressValid && referrerAddressInputTouchedRef.current && (
+              <Typography variant="bodySmall" color="red" component="p" mt={1}>
+                Please enter a valid address
+              </Typography>
+            )}
           </Box>
         )}
         {props.type === ReferralDialogActionE.MODIFY && (
@@ -203,6 +226,11 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
               disabled={!boxChecked}
               className={styles.codeInput}
             />
+            {!isAddressValid && referrerAddressInputTouchedRef.current && (
+              <Typography variant="bodySmall" color="red" component="p" mt={1}>
+                Please enter a valid address
+              </Typography>
+            )}
           </Box>
         )}
         <div className={styles.divider} />
@@ -228,7 +256,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
           {props.type === ReferralDialogActionE.CREATE && (
             <Button
               variant="primary"
-              disabled={codeInputDisabled}
+              disabled={codeInputDisabled || !isAddressValid}
               onClick={handleUpsertCode}
               className={styles.enterCodeButton}
             >
