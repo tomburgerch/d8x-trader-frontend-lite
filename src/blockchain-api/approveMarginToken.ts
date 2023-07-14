@@ -15,7 +15,6 @@ export function approveMarginToken(
 ) {
   const marginToken = new Contract(marginTokenAddr, erc20ABI, signer);
   const amount = MaxUint256;
-  console.log('decimals', decimals);
   const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
   return signer.getAddress().then((addr: string) => {
     return marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
