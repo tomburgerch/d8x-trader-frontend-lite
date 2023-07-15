@@ -5,6 +5,7 @@ import { parseUnits } from '@ethersproject/units';
 import { MaxUint256 } from '@ethersproject/constants';
 
 import { erc20ABI } from 'wagmi';
+import { decNToFloat } from '@d8x/perpetuals-sdk';
 
 export function approveMarginToken(
   signer: Signer,
@@ -18,6 +19,7 @@ export function approveMarginToken(
   const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
   return signer.getAddress().then((addr: string) => {
     return marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
+      console.log('allowance =', decNToFloat(allowance, decimals), 'minAmount =', minAmount);
       if (allowance.gt(minAmountBN)) {
         return Promise.resolve(null);
       } else {

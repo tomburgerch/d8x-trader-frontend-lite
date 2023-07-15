@@ -241,23 +241,6 @@ export const ActionBlock = memo(() => {
                   setRequestSent(false);
                   tx.wait()
                     .then((receipt) => {
-                      // if (receipt.status !== 1) {
-                      //   toast.error(<ToastContent title="Transaction Failed" bodyLines={[]} />);
-                      // } else {
-                      //   getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
-                      //     ({ data: d }) => {
-                      //       if (d) {
-                      //         d.map((o) => setOpenOrders(o));
-                      //       }
-                      //     }
-                      //   );
-                      //   toast.success(
-                      //     <ToastContent
-                      //       title="Order Submitted"
-                      //       bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
-                      //     />
-                      //   );
-                      // }
                       if (receipt.status === 1) {
                         getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
                           ({ data: d }) => {
@@ -269,20 +252,28 @@ export const ActionBlock = memo(() => {
                         toast.success(
                           <ToastContent
                             title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }].concat(
-                              parsedOrders.map((o) => ({
-                                label: `${o.type.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())} ${o.side
-                                  .toLowerCase()
-                                  .replace(/^\w/, (c) => c.toUpperCase())}`,
-                                value: formatToCurrency(o.quantity, o.symbol.split('-')[0]),
-                              }))
-                            )}
+                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]} //.concat(
+                            //   parsedOrders
+                            //     .map((o) => [
+                            //       {
+                            //         label: 'Type',
+                            //         value: `${o.type
+                            //           .toLowerCase()
+                            //           .replace(/_/, ' ')
+                            //           .replace(/^\w/, (c) => c.toUpperCase())} ${o.side
+                            //           .toLowerCase()
+                            //           .replace(/^\w/, (c) => c.toUpperCase())}`,
+                            //       },
+                            //       { label: 'Amount', value: formatToCurrency(o.quantity, o.symbol.split('-')[0]) },
+                            //     ])
+                            //     .reduce((prev, cur) => prev.concat(cur))
+                            // )}
                           />
                         );
                       }
                     })
                     .catch(async (err) => {
-                      console.log(err);
+                      console.error(err);
                       const response = await signer.call(
                         {
                           to: tx.to,
@@ -305,6 +296,14 @@ export const ActionBlock = memo(() => {
                         toast.error(
                           <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                         );
+                      } else {
+                        // false positive, probably just metamask
+                        toast.success(
+                          <ToastContent
+                            title="Order Submitted"
+                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]} //.concat(
+                          />
+                        );
                       }
                     });
                 })
@@ -324,18 +323,12 @@ export const ActionBlock = memo(() => {
         }
       })
       .catch(async (error) => {
-        if (error?.message) {
-          toast.error(
-            <ToastContent
-              title="Error Processing Transaction"
-              bodyLines={[{ label: 'Reason', value: error.message }]}
-            />
-          );
-        } else {
-          toast.error(
-            <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: error }]} />
-          );
-        }
+        toast.error(
+          <ToastContent
+            title="Error Processing Transaction"
+            bodyLines={[{ label: 'Reason', value: error?.message ?? error }]}
+          />
+        );
         // release lock
         requestSentRef.current = false;
         setRequestSent(false);
