@@ -11,11 +11,12 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
+import { getMaxOrderSizeForTrader, getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
 import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
+  openOrdersAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -96,6 +97,7 @@ export const ActionBlock = memo(() => {
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
@@ -232,19 +234,44 @@ export const ActionBlock = memo(() => {
                   // success submitting to mempool
                   console.log(`postOrder tx hash: ${tx.hash}`);
                   setShowReviewOrderModal(false);
-                  toast.success(<ToastContent title="Order submission processed" bodyLines={[]} />);
+                  toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
                   clearInputsData();
                   // release lock
                   requestSentRef.current = false;
                   setRequestSent(false);
                   tx.wait()
                     .then((receipt) => {
-                      // can't use this since backend will send a websocket message in case of success
-                      // if (receipt.status === 1) {
-                      //   toast.success(<ToastContent title="Order submitted" bodyLines={[]} />);
+                      // if (receipt.status !== 1) {
+                      //   toast.error(<ToastContent title="Transaction Failed" bodyLines={[]} />);
+                      // } else {
+                      //   getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
+                      //     ({ data: d }) => {
+                      //       if (d) {
+                      //         d.map((o) => setOpenOrders(o));
+                      //       }
+                      //     }
+                      //   );
+                      //   toast.success(
+                      //     <ToastContent
+                      //       title="Order Submitted"
+                      //       bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                      //     />
+                      //   );
                       // }
-                      if (receipt.status !== 1) {
-                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                      if (receipt.status === 1) {
+                        getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
+                          ({ data: d }) => {
+                            if (d) {
+                              d.map((o) => setOpenOrders(o));
+                            }
+                          }
+                        );
+                        toast.success(
+                          <ToastContent
+                            title="Order Submitted"
+                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                          />
+                        );
                       }
                     })
                     .catch(async (err) => {
@@ -268,7 +295,7 @@ export const ActionBlock = memo(() => {
                       requestSentRef.current = false;
                       setRequestSent(false);
                       toast.error(
-                        <ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: reason }]} />
+                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                       );
                     });
                 })
@@ -288,7 +315,14 @@ export const ActionBlock = memo(() => {
         }
       })
       .catch(async (error) => {
-        toast.error(<ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: error }]} />);
+        if (error?.message) {
+          toast.error(
+            <ToastContent
+              title="Error Processing Transaction"
+              bodyLines={[{ label: 'Reason', value: error.message }]}
+            />
+          );
+        }
         // release lock
         requestSentRef.current = false;
         setRequestSent(false);
@@ -304,6 +338,8 @@ export const ActionBlock = memo(() => {
     collateralDeposit,
     poolTokenDecimals,
     clearInputsData,
+    // getOpenOrders,
+    setOpenOrders,
   ]);
 
   const atPrice = useMemo(() => {
@@ -370,7 +406,7 @@ export const ActionBlock = memo(() => {
     ) {
       return 'Warning: order size below minimal position size';
     }
-    if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
+    if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     return 'Good to go';
