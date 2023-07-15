@@ -159,11 +159,16 @@ export const PositionsTable = memo(() => {
                     setModifyModalOpen(false);
                     setSelectedPosition(null);
                     console.log(`closePosition tx hash: ${tx.hash}`);
-                    toast.success(<ToastContent title="Order close processed" bodyLines={[]} />);
+                    toast.success(<ToastContent title="Submitting Closing Order" bodyLines={[]} />);
                     tx.wait()
                       .then((receipt) => {
-                        if (receipt.status !== 1) {
-                          toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                        // if (receipt.status !== 1) {
+                        //   toast.error(<ToastContent title="Transaction Failed" bodyLines={[]} />);
+                        // } else {
+                        //   toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
+                        // }
+                        if (receipt.status === 1) {
+                          toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
                         }
                       })
                       .catch(async (err) => {
@@ -186,10 +191,7 @@ export const PositionsTable = memo(() => {
                         const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                         setRequestSent(false);
                         toast.error(
-                          <ToastContent
-                            title="Error closing position"
-                            bodyLines={[{ label: 'Reason', value: reason }]}
-                          />
+                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                         );
                       });
                   })
@@ -207,6 +209,14 @@ export const PositionsTable = memo(() => {
           }
         })
         .catch((error) => {
+          if (error?.message) {
+            toast.error(
+              <ToastContent
+                title="Error Processing Transaction"
+                bodyLines={[{ label: 'Reason', value: error.message }]}
+              />
+            );
+          }
           console.error(error);
           setRequestSent(false);
         });
@@ -225,11 +235,21 @@ export const PositionsTable = memo(() => {
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
                   console.log(`addCollateral tx hash: ${tx.hash}`);
-                  toast.success(<ToastContent title="Collateral add processed" bodyLines={[]} />);
+                  toast.success(<ToastContent title="Adding Collateral" bodyLines={[]} />);
                   tx.wait()
                     .then((receipt) => {
                       if (receipt.status !== 1) {
-                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
+                        toast.error(<ToastContent title="Transaction Failed" bodyLines={[]} />);
+                      } else {
+                        toast.success(
+                          <ToastContent
+                            title="Collateral Added"
+                            bodyLines={[
+                              { label: 'Symbol', value: selectedPosition.symbol },
+                              { label: 'Amount', value: formatToCurrency(addCollateral, selectedPool.poolSymbol) },
+                            ]}
+                          />
+                        );
                       }
                     })
                     .catch(async (err) => {
@@ -252,10 +272,7 @@ export const PositionsTable = memo(() => {
                       const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                       setRequestSent(false);
                       toast.error(
-                        <ToastContent
-                          title="Error adding collateral"
-                          bodyLines={[{ label: 'Reason', value: reason }]}
-                        />
+                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                       );
                     });
                 })
@@ -272,6 +289,14 @@ export const PositionsTable = memo(() => {
             });
         })
         .catch((error) => {
+          if (error?.message) {
+            toast.error(
+              <ToastContent
+                title="Error Processing Transaction"
+                bodyLines={[{ label: 'Reason', value: error.message }]}
+              />
+            );
+          }
           console.error(error);
           setRequestSent(false);
         });
