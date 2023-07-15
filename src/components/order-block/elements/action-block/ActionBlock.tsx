@@ -269,7 +269,14 @@ export const ActionBlock = memo(() => {
                         toast.success(
                           <ToastContent
                             title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                            bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }].concat(
+                              parsedOrders.map((o) => ({
+                                label: `${o.type.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())} ${o.side
+                                  .toLowerCase()
+                                  .replace(/^\w/, (c) => c.toUpperCase())}`,
+                                value: formatToCurrency(o.quantity, o.symbol.split('-')[0]),
+                              }))
+                            )}
                           />
                         );
                       }
@@ -294,9 +301,11 @@ export const ActionBlock = memo(() => {
                       const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                       requestSentRef.current = false;
                       setRequestSent(false);
-                      toast.error(
-                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                      );
+                      if (reason !== '') {
+                        toast.error(
+                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                        );
+                      }
                     });
                 })
                 .catch(async (error) => {
@@ -321,6 +330,10 @@ export const ActionBlock = memo(() => {
               title="Error Processing Transaction"
               bodyLines={[{ label: 'Reason', value: error.message }]}
             />
+          );
+        } else {
+          toast.error(
+            <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: error }]} />
           );
         }
         // release lock
