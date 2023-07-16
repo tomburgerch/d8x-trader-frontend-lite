@@ -100,67 +100,74 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    await getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
-      .then((data) => {
-        if (data.data.digest) {
-          signMessages(signer, [data.data.digest])
-            .then((signatures) => {
-              cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
-                .then((tx) => {
-                  setCancelModalOpen(false);
-                  setSelectedOrder(null);
-                  setRequestSent(false);
-                  console.log(`cancelOrder tx hash: ${tx.hash}`);
-                  toast.success(<ToastContent title="Cancel order processed" bodyLines={[]} />);
-                  tx.wait()
-                    .then((receipt) => {
-                      if (receipt.status !== 1) {
-                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
-                      }
-                      // else {
-                      //   toast.success(<ToastContent title="Order cancelled" bodyLines={[]} />);
-                      // }
-                    })
-                    .catch(async (err) => {
-                      console.error(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                      setRequestSent(false);
-                      toast.error(
-                        <ToastContent title="Error cancelling order" bodyLines={[{ label: 'Reason', value: reason }]} />
-                      );
-                    });
+    await getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id).then((data) => {
+      if (data.data.digest) {
+        signMessages(signer, [data.data.digest]).then((signatures) => {
+          cancelOrder(signer, signatures[0], data.data, selectedOrder.id)
+            .then(async (tx) => {
+              setCancelModalOpen(false);
+              setSelectedOrder(null);
+              setRequestSent(false);
+              console.log(`cancelOrder tx hash: ${tx.hash}`);
+              toast.success(<ToastContent title="Cancelling Order" bodyLines={[]} />);
+              await tx
+                .wait()
+                .then((receipt) => {
+                  if (receipt.status === 1) {
+                    toast.success(
+                      <ToastContent
+                        title="Order Cancelled"
+                        bodyLines={[{ label: 'Symbol', value: selectedOrder.symbol }]}
+                      />
+                    );
+                  }
                 })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .catch((error: any) => {
-                  console.error(error);
+                .catch(async (err) => {
+                  console.error(err);
+                  const response = await signer.call(
+                    {
+                      to: tx.to,
+                      from: tx.from,
+                      nonce: tx.nonce,
+                      gasLimit: tx.gasLimit,
+                      gasPrice: tx.gasPrice,
+                      data: tx.data,
+                      value: tx.value,
+                      chainId: tx.chainId,
+                      type: tx.type ?? undefined,
+                      accessList: tx.accessList,
+                    },
+                    tx.blockNumber
+                  );
+                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                   setRequestSent(false);
+                  if (reason !== '') {
+                    toast.error(
+                      <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                    );
+                  } else {
+                    // false positive, probably just metamask
+                    toast.success(
+                      <ToastContent
+                        title="Order Cancelled"
+                        bodyLines={[{ label: 'Symbol', value: selectedOrder.symbol }]}
+                      />
+                    );
+                  }
                 });
             })
             .catch((error) => {
               console.error(error);
               setRequestSent(false);
+              let msg = (error?.message ?? error) as string;
+              msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+              toast.error(
+                <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+              );
             });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        setRequestSent(false);
-      });
+        });
+      }
+    });
   }, [selectedOrder, requestSent, isDisconnected, signer, chainId]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
