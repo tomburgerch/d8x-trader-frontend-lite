@@ -11,11 +11,12 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
+import { getMaxOrderSizeForTrader, getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
 import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
+  openOrdersAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -96,6 +97,7 @@ export const ActionBlock = memo(() => {
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
@@ -217,83 +219,95 @@ export const ActionBlock = memo(() => {
     setRequestSent(true);
     setIsValidityCheckDone(false);
     requestSentRef.current = true;
-    await orderDigest(chainId, parsedOrders, address)
-      .then((data) => {
-        if (data.data.digests.length > 0) {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit, poolTokenDecimals)
-            .then((res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
-              // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-              const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              postOrder(signer, signatures, data.data)
-                .then((tx) => {
-                  // success submitting to mempool
-                  console.log(`postOrder tx hash: ${tx.hash}`);
-                  setShowReviewOrderModal(false);
-                  toast.success(<ToastContent title="Order submission processed" bodyLines={[]} />);
-                  clearInputsData();
-                  // release lock
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  tx.wait()
-                    .then((receipt) => {
-                      // can't use this since backend will send a websocket message in case of success
-                      // if (receipt.status === 1) {
-                      //   toast.success(<ToastContent title="Order submitted" bodyLines={[]} />);
-                      // }
-                      if (receipt.status !== 1) {
-                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.log(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+    await orderDigest(chainId, parsedOrders, address).then((data) => {
+      if (data.data.digests.length > 0) {
+        approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit, poolTokenDecimals).then(
+          (res) => {
+            if (res?.hash) {
+              console.log(res.hash);
+            }
+            // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+            const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
+            postOrder(signer, signatures, data.data)
+              .then(async (tx) => {
+                // success submitting to mempool
+                console.log(`postOrder tx hash: ${tx.hash}`);
+                setShowReviewOrderModal(false);
+                toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
+                clearInputsData();
+                // release lock
+                requestSentRef.current = false;
+                setRequestSent(false);
+                await tx
+                  .wait()
+                  .then((receipt) => {
+                    if (receipt.status === 1) {
                       requestSentRef.current = false;
                       setRequestSent(false);
-                      toast.error(
-                        <ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
+                        ({ data: d }) => {
+                          if (d) {
+                            d.map((o) => setOpenOrders(o));
+                          }
+                        }
                       );
-                    });
-                })
-                .catch(async (error) => {
-                  // user rejected posting
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  console.error(error);
-                });
-            })
-            .catch(async (error) => {
-              // user rejecting approving margin
-              requestSentRef.current = false;
-              setRequestSent(false);
-              console.error(error);
-            });
-        }
-      })
-      .catch(async (error) => {
-        toast.error(<ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: error }]} />);
-        // release lock
-        requestSentRef.current = false;
-        setRequestSent(false);
-        console.error(error);
-      });
+                      toast.success(
+                        <ToastContent
+                          title="Order Submitted"
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                    }
+                  })
+                  .catch(async (err) => {
+                    console.error(err);
+                    const response = await signer.call(
+                      {
+                        to: tx.to,
+                        from: tx.from,
+                        nonce: tx.nonce,
+                        gasLimit: tx.gasLimit,
+                        gasPrice: tx.gasPrice,
+                        data: tx.data,
+                        value: tx.value,
+                        chainId: tx.chainId,
+                        type: tx.type ?? undefined,
+                        accessList: tx.accessList,
+                      },
+                      tx.blockNumber
+                    );
+                    const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                    requestSentRef.current = false;
+                    setRequestSent(false);
+                    if (reason !== '') {
+                      toast.error(
+                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      );
+                    } else {
+                      // false positive, probably just metamask
+                      toast.success(
+                        <ToastContent
+                          title="Order Submitted"
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                    }
+                  });
+              })
+              .catch(async (error) => {
+                requestSentRef.current = false;
+                setRequestSent(false);
+                console.error(error);
+                let msg = (error?.message ?? error) as string;
+                msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+                toast.error(
+                  <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                );
+              });
+          }
+        );
+      }
+    });
   }, [
     parsedOrders,
     chainId,
@@ -304,6 +318,8 @@ export const ActionBlock = memo(() => {
     collateralDeposit,
     poolTokenDecimals,
     clearInputsData,
+    // getOpenOrders,
+    setOpenOrders,
   ]);
 
   const atPrice = useMemo(() => {
@@ -370,7 +386,7 @@ export const ActionBlock = memo(() => {
     ) {
       return 'Warning: order size below minimal position size';
     }
-    if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
+    if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     return 'Good to go';

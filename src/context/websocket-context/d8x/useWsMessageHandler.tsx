@@ -1,20 +1,20 @@
 import { useAtom } from 'jotai';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { getOpenOrders } from 'network/network';
+// import { getOpenOrders } from 'network/network';
 import {
   failOrderAtom,
-  openOrdersAtom,
+  // openOrdersAtom,
   perpetualStatisticsAtom,
   positionsAtom,
   removeOpenOrderAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
-  traderAPIAtom,
+  // traderAPIAtom,
   webSocketReadyAtom,
 } from 'store/pools.store';
 import { PerpetualStatisticsI } from 'types/types';
@@ -73,19 +73,19 @@ function isExecutionFailedMessage(message: CommonWsMessageI): message is OnExecu
 
 export function useWsMessageHandler() {
   const { address } = useAccount();
-  const chainId = useChainId();
+  // const chainId = useChainId();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, setWebSocketReady] = useAtom(webSocketReadyAtom);
   const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [, setPositions] = useAtom(positionsAtom);
-  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  // const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
   const [, failOpenOrder] = useAtom(failOrderAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
+  // const [traderAPI] = useAtom(traderAPIAtom);
 
-  const traderAPIRef = useRef(traderAPI);
+  // const traderAPIRef = useRef(traderAPI);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -162,18 +162,20 @@ export function useWsMessageHandler() {
           return;
         }
 
-        getOpenOrders(chainId, traderAPIRef.current, parsedMessage.data.obj.symbol, address).then(({ data }) => {
-          if (data) {
-            data.map((o) => setOpenOrders(o));
-          }
-        });
+        // handled directly in ActionBlock
 
-        toast.success(
-          <ToastContent
-            title="Order submitted"
-            bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
-          />
-        );
+        // getOpenOrders(chainId, traderAPIRef.current, parsedMessage.data.obj.symbol, address).then(({ data }) => {
+        //   if (data) {
+        //     data.map((o) => setOpenOrders(o));
+        //   }
+        // });
+
+        // toast.success(
+        //   <ToastContent
+        //     title="Order submitted"
+        //     bodyLines={[{ label: 'Symbol', value: parsedMessage.data.obj.symbol }]}
+        //   />
+        // );
       } else if (isPerpetualLimitOrderCancelledMessage(parsedMessage)) {
         removeOpenOrder(parsedMessage.data.obj.orderId);
       } else if (isTradeMessage(parsedMessage)) {
@@ -207,10 +209,10 @@ export function useWsMessageHandler() {
       updatePerpetualStats,
       setWebSocketReady,
       setPositions,
-      setOpenOrders,
+      // setOpenOrders,
       removeOpenOrder,
       failOpenOrder,
-      chainId,
+      // chainId,
       address,
     ]
   );
