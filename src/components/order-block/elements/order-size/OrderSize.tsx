@@ -7,19 +7,31 @@ import { Box, Typography } from '@mui/material';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 
-import { orderSizeAtom } from 'store/order-block.store';
-import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
+import { orderBlockAtom, orderSizeAtom } from 'store/order-block.store';
+import { perpetualStaticInfoAtom, selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
 
 import styles from './OrderSize.module.scss';
+import { useAccount, useChainId } from 'wagmi';
+import { getMaxOrderSizeForTrader } from 'network/network';
+import { OrderBlockE } from 'types/enums';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
 
 export const OrderSize = memo(() => {
   const [orderSize, setOrderSize] = useAtom(orderSizeAtom);
   const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
+  const [orderBlock] = useAtom(orderBlockAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [inputValue, setInputValue] = useState(`${orderSize}`);
+  const [maxOrderSize, setMaxOrderSize] = useState<number | undefined>(undefined);
+
+  const { address } = useAccount();
+  const chainId = useChainId();
 
   const inputValueChangedRef = useRef(false);
+  const traderAPIRef = useRef(traderAPI);
 
   const handleOrderSizeChange = useCallback(
     (orderSizeValue: string) => {
@@ -64,6 +76,31 @@ export const OrderSize = memo(() => {
     return '0.1';
   }, [perpetualStaticInfo]);
 
+  useEffect(() => {
+    if (perpetualStaticInfo && address && traderAPIRef.current && isSDKConnected) {
+      const symbol = traderAPIRef.current.getSymbolFromPerpId(perpetualStaticInfo.id);
+      if (!symbol) {
+        return;
+      }
+      getMaxOrderSizeForTrader(chainId, traderAPIRef.current, address, symbol).then((data) => {
+        let maxAmount: number;
+        if (orderBlock === OrderBlockE.Long) {
+          maxAmount = data.data.buy;
+        } else {
+          maxAmount = data.data.sell;
+        }
+        maxAmount = +roundToLotString(maxAmount, perpetualStaticInfo.lotSizeBC);
+        setMaxOrderSize(maxAmount);
+      });
+    }
+  }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock]);
+
+  useEffect(() => {
+    if (isSDKConnected) {
+      traderAPIRef.current = traderAPI;
+    }
+  }, [traderAPI, isSDKConnected]);
+
   return (
     <Box className={styles.root}>
       <Box className={styles.label}>
@@ -73,8 +110,10 @@ export const OrderSize = memo(() => {
             <>
               <Typography> Sets the size of your order. </Typography>
               <Typography>
-                The minimal position size is {minPositionString} {selectedPerpetual?.baseCurrency}, with a step size of{' '}
-                {orderSizeStep} {selectedPerpetual?.baseCurrency}.
+                Your maximal order size, based on your open positions and the state of the exchange, is {maxOrderSize}{' '}
+                {selectedPerpetual?.baseCurrency}. The minimal position size for this perpetual is {minPositionString}{' '}
+                {selectedPerpetual?.baseCurrency}, with a step size of {orderSizeStep} {selectedPerpetual?.baseCurrency}
+                .
               </Typography>
             </>
           }
@@ -88,7 +127,7 @@ export const OrderSize = memo(() => {
         currency={selectedPerpetual?.baseCurrency}
         step={orderSizeStep}
         min={0}
-        max={undefined}
+        max={maxOrderSize}
       />
     </Box>
   );

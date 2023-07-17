@@ -37,9 +37,16 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
 
   const handleValueChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setInputValue(event.target.value);
+      const value = +event.target.value;
+      if (value < min) {
+        setInputValue(`${min}`);
+      } else if (max && value > max) {
+        setInputValue(`${max}`);
+      } else {
+        setInputValue(event.target.value);
+      }
     },
-    [setInputValue]
+    [setInputValue, max, min]
   );
 
   const handleValueDecrease = useCallback(() => {

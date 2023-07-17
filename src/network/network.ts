@@ -11,7 +11,7 @@ import type {
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
-import { TraderInterface, BUY_SIDE, SELL_SIDE, floatToABK64x64 } from '@d8x/perpetuals-sdk';
+import { TraderInterface, floatToABK64x64 } from '@d8x/perpetuals-sdk';
 
 function getApiUrlByChainId(chainId: number) {
   return config.apiUrl[`${chainId}`] || config.apiUrl.default;
@@ -222,32 +222,24 @@ export function getTradingFee(
 export function getMaxOrderSizeForTrader(
   chainId: number,
   traderAPI: TraderInterface | null,
-  order: OrderI,
   traderAddr: string,
+  symbol: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
-  const symbol = order.symbol;
   if (traderAPI) {
-    return (
-      traderAPI
-        .positionRisk(traderAddr, symbol)
-        .then((positionRisk) => {
-          return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk[0]).then((buy) => {
-            return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk[0]).then((sell) => {
-              return {
-                type: 'max-order-size-for-trader',
-                msg: '',
-                data: { buy: buy, sell: sell },
-              } as ValidatedResponseI<MaxOrderSizeResponseI>;
-            });
-          });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((error: any) => {
-          console.log(error);
-          throw new Error(error);
-        })
-    );
+    return traderAPI
+      .maxOrderSizeForTrader(traderAddr, symbol)
+      .then(({ buy, sell }) => {
+        return {
+          type: 'max-order-size-for-trader',
+          msg: '',
+          data: { buy: buy, sell: sell },
+        } as ValidatedResponseI<MaxOrderSizeResponseI>;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error(error);
+      });
   } else {
     const params = new URLSearchParams({
       symbol,
