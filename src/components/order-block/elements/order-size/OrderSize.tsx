@@ -88,6 +88,7 @@ export const OrderSize = memo(() => {
         currency={selectedPerpetual?.baseCurrency}
         step={orderSizeStep}
         min={0}
+        max={undefined}
       />
     </Box>
   );
