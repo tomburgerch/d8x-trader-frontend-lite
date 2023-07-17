@@ -34,7 +34,7 @@ export const PerpetualStats = () => {
       },
       {
         id: 'fundingRate',
-        label: 'Funding Price',
+        label: 'Funding Rate',
         value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(2)} %` : '--',
       },
       {

@@ -11,7 +11,7 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { getMaxOrderSizeForTrader, getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
+import { getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
 import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
@@ -27,7 +27,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
+import { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -102,7 +102,7 @@ export const ActionBlock = memo(() => {
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
-  const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
+  const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
 
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
@@ -113,13 +113,13 @@ export const ActionBlock = memo(() => {
   });
 
   const openReviewOrderModal = useCallback(async () => {
-    if (!orderInfo || !address) {
+    if (!orderInfo || !address || !traderAPIRef.current) {
       return;
     }
     validityCheckRef.current = true;
     setShowReviewOrderModal(true);
     setNewPositionRisk(null);
-
+    setMaxOrderSize(undefined);
     const mainOrder = createMainOrder(orderInfo);
     await positionRiskOnTrade(
       chainId,
@@ -130,13 +130,15 @@ export const ActionBlock = memo(() => {
     ).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
-    });
-
-    setMaxOrderSize(undefined);
-    await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
-      setMaxOrderSize(data.data);
+      setMaxOrderSize({ maxBuy: data.data.maxLongTrade, maxSell: data.data.maxShortTrade });
       validityCheckRef.current = false;
     });
+
+    // setMaxOrderSize(undefined);
+    // await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
+    //   setMaxOrderSize(data.data);
+    //   validityCheckRef.current = false;
+    // });
   }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
@@ -364,9 +366,9 @@ export const ActionBlock = memo(() => {
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isTooLarge = orderInfo.size > maxOrderSize.buy;
+      isTooLarge = orderInfo.size > maxOrderSize.maxBuy;
     } else {
-      isTooLarge = orderInfo.size > maxOrderSize.sell;
+      isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
       return 'Order will fail: order size is too large';

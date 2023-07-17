@@ -65,7 +65,7 @@ export const Initiate = memo(() => {
     setRequestSent(true);
 
     await liqProvTool
-      .initiateLiquidityWithdrawal(signer, selectedLiquidityPool.poolSymbol, initiateAmount)
+      .initiateLiquidityWithdrawal(signer, selectedLiquidityPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
         setLoadStats(false);
