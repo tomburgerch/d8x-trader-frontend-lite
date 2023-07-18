@@ -83,14 +83,14 @@ export const OrderSize = memo(() => {
         if (!symbol) {
           return;
         }
-        const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol);
-        let maxAmount: number;
+        const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch(console.error);
+        let maxAmount: number | undefined;
         if (_isLong) {
-          maxAmount = data.data.buy;
+          maxAmount = data?.data?.buy;
         } else {
-          maxAmount = data.data.sell;
+          maxAmount = data?.data?.sell;
         }
-        return +roundToLotString(maxAmount, _lotSizeBC);
+        return maxAmount === undefined ? undefined : +roundToLotString(maxAmount, _lotSizeBC);
       }
     },
     [traderAPI]

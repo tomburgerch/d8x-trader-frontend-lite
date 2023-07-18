@@ -94,11 +94,15 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   );
 
   useEffect(() => {
+    let poolId = null;
     if (traderAPI && pools.length > 0) {
-      setSelectedPoolId(traderAPI.getPoolIdFromSymbol(pools[0].poolSymbol));
-    } else {
-      setSelectedPoolId(null);
+      try {
+        poolId = traderAPI.getPoolIdFromSymbol(pools[0].poolSymbol);
+      } catch (error) {
+        console.log(error);
+      }
     }
+    setSelectedPoolId(poolId);
   }, [pools, traderAPI, setSelectedPoolId]);
 
   useEffect(() => {
