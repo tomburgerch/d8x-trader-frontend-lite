@@ -230,6 +230,7 @@ export function getMaxOrderSizeForTrader(
     return traderAPI
       .maxOrderSizeForTrader(traderAddr, symbol)
       .then(({ buy, sell }) => {
+        console.log('max buy/sell =', buy, sell);
         return {
           type: 'max-order-size-for-trader',
           msg: '',

@@ -76,24 +76,37 @@ export const OrderSize = memo(() => {
     return '0.1';
   }, [perpetualStaticInfo]);
 
-  useEffect(() => {
-    if (perpetualStaticInfo && address && traderAPIRef.current && isSDKConnected) {
-      const symbol = traderAPIRef.current.getSymbolFromPerpId(perpetualStaticInfo.id);
-      if (!symbol) {
-        return;
-      }
-      getMaxOrderSizeForTrader(chainId, traderAPIRef.current, address, symbol).then((data) => {
+  const fetchMaxOrderSize = useCallback(
+    async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
+      if (traderAPI) {
+        const symbol = traderAPI.getSymbolFromPerpId(_perpId);
+        if (!symbol) {
+          return;
+        }
+        const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol);
         let maxAmount: number;
-        if (orderBlock === OrderBlockE.Long) {
+        if (_isLong) {
           maxAmount = data.data.buy;
         } else {
           maxAmount = data.data.sell;
         }
-        maxAmount = +roundToLotString(maxAmount, perpetualStaticInfo.lotSizeBC);
-        setMaxOrderSize(maxAmount);
-      });
+        return +roundToLotString(maxAmount, _lotSizeBC);
+      }
+    },
+    [traderAPI]
+  );
+
+  useEffect(() => {
+    if (perpetualStaticInfo && address && isSDKConnected) {
+      fetchMaxOrderSize(
+        chainId,
+        address,
+        perpetualStaticInfo.lotSizeBC,
+        perpetualStaticInfo.id,
+        orderBlock === OrderBlockE.Long
+      ).then(setMaxOrderSize);
     }
-  }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock]);
+  }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock, fetchMaxOrderSize]);
 
   useEffect(() => {
     if (isSDKConnected) {
