@@ -478,7 +478,7 @@ export const ActionBlock = memo(() => {
                     Trading fee:{' '}
                   </Typography>
                 }
-                rightSide={orderInfo.tradingFee ? formatToCurrency(orderInfo.tradingFee, 'bps', false, 1) : '-'}
+                rightSide={orderInfo.tradingFee ? formatToCurrency(orderInfo.tradingFee * 0.01, '%', false, 3) : '-'}
               />
               <SidesRow
                 leftSide={
