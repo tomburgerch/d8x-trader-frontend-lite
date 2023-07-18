@@ -221,46 +221,45 @@ export function getTradingFee(
 
 export function getMaxOrderSizeForTrader(
   chainId: number,
-  _traderAPI: TraderInterface | null,
+  traderAPI: TraderInterface | null,
   traderAddr: string,
   symbol: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
-  // TODO: VOV: To be changed! SDK API is not same as AJAX call
-  // if (traderAPI) {
-  //   return traderAPI
-  //     .maxOrderSizeForTrader(traderAddr, symbol)
-  //     .then(({ buy, sell }) => {
-  //       console.log('max buy/sell =', buy, sell);
-  //       return {
-  //         type: 'max-order-size-for-trader',
-  //         msg: '',
-  //         data: { buy: buy, sell: sell },
-  //       } as ValidatedResponseI<MaxOrderSizeResponseI>;
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       throw new Error(error);
-  //     });
-  // } else {
-  const params = new URLSearchParams({
-    symbol,
-    traderAddr,
-  });
-  if (timestamp) {
-    params.append('t', '' + timestamp);
-  }
-
-  return fetch(`${getApiUrlByChainId(chainId)}/max-order-size-for-trader?${params}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
+  if (traderAPI) {
+    return traderAPI
+      .maxOrderSizeForTrader(traderAddr, symbol)
+      .then(({ buy, sell }) => {
+        console.log('max buy/sell =', buy, sell);
+        return {
+          type: 'max-order-size-for-trader',
+          msg: '',
+          data: { buy: buy, sell: sell },
+        } as ValidatedResponseI<MaxOrderSizeResponseI>;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error(error);
+      });
+  } else {
+    const params = new URLSearchParams({
+      symbol,
+      traderAddr,
+    });
+    if (timestamp) {
+      params.append('t', '' + timestamp);
     }
-  );
-  // }
+
+    return fetch(`${getApiUrlByChainId(chainId)}/max-order-size-for-trader?${params}`, getRequestOptions()).then(
+      (data) => {
+        if (!data.ok) {
+          console.error({ data });
+          throw new Error(data.statusText);
+        }
+        return data.json();
+      }
+    );
+  }
 }
 
 // needs broker input
