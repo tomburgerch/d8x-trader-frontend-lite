@@ -11,7 +11,7 @@ import type {
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
 import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
-import { TraderInterface, BUY_SIDE, SELL_SIDE, floatToABK64x64 } from '@d8x/perpetuals-sdk';
+import { TraderInterface, floatToABK64x64 } from '@d8x/perpetuals-sdk';
 
 function getApiUrlByChainId(chainId: number) {
   return config.apiUrl[`${chainId}`] || config.apiUrl.default;
@@ -90,7 +90,7 @@ export function getPositionRisk(
   }
 
   if (traderAPI) {
-    // console.log(`positionRisk via SDK ${symbol}`);
+    console.log(`positionRisk via SDK ${symbol}`);
     return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI[]) => {
       return { type: 'position-risk', msg: '', data: data } as ValidatedResponseI<MarginAccountI[]>;
     });
@@ -108,36 +108,27 @@ export function getPositionRisk(
 
 export function positionRiskOnTrade(
   chainId: number,
-  traderAPI: TraderInterface | null,
+  traderAPI: TraderInterface,
   order: OrderI,
   traderAddr: string,
   curAccount?: MarginAccountI
-): Promise<ValidatedResponseI<{ newPositionRisk: MarginAccountI; orderCost: number }>> {
-  if (traderAPI) {
-    // console.log('positionRiskOnTrade via SDK');
-    return traderAPI.positionRiskOnTrade(traderAddr, order, curAccount).then((data) => {
-      return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
-        newPositionRisk: MarginAccountI;
-        orderCost: number;
-      }>;
-    });
-  } else {
-    // console.log('positionRiskOnTrade via BE');
-    const requestOptions = {
-      ...getRequestOptions(RequestMethodE.Post),
-      body: JSON.stringify({
-        order,
-        traderAddr,
-      }),
-    };
-    return fetch(`${getApiUrlByChainId(chainId)}/position-risk-on-trade`, requestOptions).then((data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
-    });
-  }
+): Promise<
+  ValidatedResponseI<{
+    newPositionRisk: MarginAccountI;
+    orderCost: number;
+    maxLongTrade: number;
+    maxShortTrade: number;
+  }>
+> {
+  console.log('positionRiskOnTrade via SDK');
+  return traderAPI.positionRiskOnTrade(traderAddr, order, curAccount).then((data) => {
+    return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
+      newPositionRisk: MarginAccountI;
+      orderCost: number;
+      maxLongTrade: number;
+      maxShortTrade: number;
+    }>;
+  });
 }
 
 export function positionRiskOnCollateralAction(
@@ -186,7 +177,7 @@ export function getOpenOrders(
   timestamp?: number
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI[]>> {
   if (traderAPI) {
-    // console.log(`openOrders via SDK ${symbol} `);
+    console.log(`openOrders via SDK ${symbol} `);
     return traderAPI.openOrders(traderAddr, symbol).then((data) => {
       return { type: 'open-orders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI[]>;
     });
@@ -231,32 +222,25 @@ export function getTradingFee(
 export function getMaxOrderSizeForTrader(
   chainId: number,
   traderAPI: TraderInterface | null,
-  order: OrderI,
   traderAddr: string,
+  symbol: string,
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
-  const symbol = order.symbol;
   if (traderAPI) {
-    return (
-      traderAPI
-        .positionRisk(traderAddr, symbol)
-        .then((positionRisk) => {
-          return traderAPI.maxOrderSizeForTrader(BUY_SIDE, positionRisk[0]).then((buy) => {
-            return traderAPI.maxOrderSizeForTrader(SELL_SIDE, positionRisk[0]).then((sell) => {
-              return {
-                type: 'max-order-size-for-trader',
-                msg: '',
-                data: { buy: buy, sell: sell },
-              } as ValidatedResponseI<MaxOrderSizeResponseI>;
-            });
-          });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((error: any) => {
-          console.log(error);
-          throw new Error(error);
-        })
-    );
+    return traderAPI
+      .maxOrderSizeForTrader(traderAddr, symbol)
+      .then(({ buy, sell }) => {
+        console.log('max buy/sell =', buy, sell);
+        return {
+          type: 'max-order-size-for-trader',
+          msg: '',
+          data: { buy: buy, sell: sell },
+        } as ValidatedResponseI<MaxOrderSizeResponseI>;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error(error);
+      });
   } else {
     const params = new URLSearchParams({
       symbol,

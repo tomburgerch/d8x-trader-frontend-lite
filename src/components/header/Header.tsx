@@ -19,6 +19,7 @@ import {
   perpetualsAtom,
   selectedPoolIdAtom,
   traderAPIAtom,
+  poolTokenDecimalsAtom,
 } from 'store/pools.store';
 import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
@@ -55,6 +56,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
+  const [, setPoolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
@@ -125,8 +127,9 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
       setPoolTokenBalance(Number(poolTokenBalance.formatted));
+      setPoolTokenDecimals(poolTokenBalance.decimals);
     }
-  }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance]);
+  }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance, setPoolTokenDecimals]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

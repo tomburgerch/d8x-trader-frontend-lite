@@ -7,6 +7,9 @@
 
 This package is configured entirely via environment variables. You must specify:
 
+- REACT_APP_PROJECT_ID: Head over to [WalletConnect Cloud](https://cloud.walletconnect.com/) to sign in or sign up. Create (or use an existing) project and copy its associated project id.
+  - Example:
+    `REACT_APP_PROJECT_ID=yourprojectid`
 - REACT_APP_API_URL: A semicolon separated list of endpoints served by your main REST API service.
   - For example, you could be hosting two main API services for two different chains, one at `https://api.mybackend.com` for Polygon zkEVM (chain ID 1101) and one at `https://api.test.mybackend.com` for Polygon zkEVM Testnet (chain ID 1442).
   - You must also define a default chain for your frontend, in this example it's mainnet (1101)

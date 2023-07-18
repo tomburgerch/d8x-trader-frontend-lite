@@ -8,6 +8,7 @@ import { Box } from '@mui/material';
 
 import { StaticBackground } from 'components/static-background/StaticBackground';
 import { ReferPage } from 'pages/refer-page/ReferPage';
+import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
 import { TraderPage } from 'pages/trader-page/TraderPage';
 import { VaultPage } from 'pages/vault-page/VaultPage';
 import { appDimensionsAtom } from 'store/app.store';
@@ -35,6 +36,7 @@ export const App = memo(() => {
           <Route key="refer-page" path={PageE.Refer} element={<ReferPage />} />
           <Route key="trader-page" path="*" element={<TraderPage />} />
         </Routes>
+        <WelcomeModal />
         <ToastContainer position="top-left" autoClose={10_000} />
       </Box>
     </Box>

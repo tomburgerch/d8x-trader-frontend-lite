@@ -11,7 +11,7 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { proxyAddrAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { poolTokenDecimalsAtom, proxyAddrAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { dCurrencyPriceAtom, loadStatsAtom, sdkConnectedAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -32,6 +32,7 @@ export const Add = memo(() => {
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [, setLoadStats] = useAtom(loadStatsAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
 
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -64,7 +65,7 @@ export const Add = memo(() => {
       return;
     }
 
-    if (!liqProvTool || !isSDKConnected || !selectedPool || !addAmount || addAmount < 0) {
+    if (!liqProvTool || !isSDKConnected || !selectedPool || !addAmount || addAmount < 0 || !poolTokenDecimals) {
       return;
     }
 
@@ -74,51 +75,53 @@ export const Add = memo(() => {
 
     requestSentRef.current = true;
     setRequestSent(true);
-    await approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addAmount)
+    await approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
       .then((res) => {
         if (res?.hash) {
           console.log(res.hash);
         }
-        liqProvTool.addLiquidity(signer, selectedPool.poolSymbol, addAmount).then(async (tx) => {
-          console.log(`addLiquidity tx hash: ${tx.hash}`);
-          setLoadStats(false);
-          tx.wait()
-            .then((receipt) => {
-              if (receipt.status === 1) {
+        liqProvTool
+          .addLiquidity(signer, selectedPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
+          .then(async (tx) => {
+            console.log(`addLiquidity tx hash: ${tx.hash}`);
+            setLoadStats(false);
+            tx.wait()
+              .then((receipt) => {
+                if (receipt.status === 1) {
+                  setLoadStats(true);
+                  setAddAmount(0);
+                  setInputValue('0');
+                  requestSentRef.current = false;
+                  setRequestSent(false);
+                  toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+                }
+              })
+              .catch(async (err) => {
+                console.log(err);
+                const response = await signer.call(
+                  {
+                    to: tx.to,
+                    from: tx.from,
+                    nonce: tx.nonce,
+                    gasLimit: tx.gasLimit,
+                    gasPrice: tx.gasPrice,
+                    data: tx.data,
+                    value: tx.value,
+                    chainId: tx.chainId,
+                    type: tx.type ?? undefined,
+                    accessList: tx.accessList,
+                  },
+                  tx.blockNumber
+                );
+                const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                 setLoadStats(true);
-                setAddAmount(0);
-                setInputValue('0');
                 requestSentRef.current = false;
                 setRequestSent(false);
-                toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
-              }
-            })
-            .catch(async (err) => {
-              console.log(err);
-              const response = await signer.call(
-                {
-                  to: tx.to,
-                  from: tx.from,
-                  nonce: tx.nonce,
-                  gasLimit: tx.gasLimit,
-                  gasPrice: tx.gasPrice,
-                  data: tx.data,
-                  value: tx.value,
-                  chainId: tx.chainId,
-                  type: tx.type ?? undefined,
-                  accessList: tx.accessList,
-                },
-                tx.blockNumber
-              );
-              const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-              setLoadStats(true);
-              requestSentRef.current = false;
-              setRequestSent(false);
-              toast.error(
-                <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
-              );
-            });
-        });
+                toast.error(
+                  <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+                );
+              });
+          });
       })
       .catch(async () => {
         setLoadStats(true);
@@ -126,7 +129,17 @@ export const Add = memo(() => {
         setRequestSent(false);
         toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
       });
-  }, [addAmount, liqProvTool, selectedPool, address, proxyAddr, signer, isSDKConnected, setLoadStats]);
+  }, [
+    addAmount,
+    liqProvTool,
+    selectedPool,
+    address,
+    proxyAddr,
+    signer,
+    isSDKConnected,
+    poolTokenDecimals,
+    setLoadStats,
+  ]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -134,6 +147,13 @@ export const Add = memo(() => {
     }
     return 0;
   }, [addAmount, dCurrencyPrice]);
+
+  const isButtonDisabled = useMemo(() => {
+    if (!addAmount || requestSent || !isSDKConnected || !selectedPool?.brokerCollateralLotSize) {
+      return true;
+    }
+    return addAmount < selectedPool.brokerCollateralLotSize;
+  }, [addAmount, requestSent, isSDKConnected, selectedPool]);
 
   return (
     <div className={styles.root}>
@@ -199,7 +219,7 @@ export const Add = memo(() => {
         <Box className={styles.buttonHolder}>
           <Button
             variant="primary"
-            disabled={!addAmount || requestSent || !isSDKConnected}
+            disabled={isButtonDisabled}
             onClick={handleAddLiquidity}
             className={styles.actionButton}
           >

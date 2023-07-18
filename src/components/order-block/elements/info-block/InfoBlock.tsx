@@ -24,6 +24,14 @@ export const InfoBlock = memo(() => {
     );
   }, [orderSize, orderInfo, selectedPerpetual]);
 
+  const feePct = useMemo(() => {
+    if (orderInfo?.tradingFee) {
+      return (
+        (orderInfo.tradingFee * 0.01) / (1 + (orderInfo.stopLossPrice ? 1 : 0) + (orderInfo.takeProfitPrice ? 1 : 0))
+      );
+    }
+  }, [orderInfo]);
+
   return (
     <Box className={styles.root}>
       <Box className={styles.row}>
@@ -34,7 +42,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmall">Fees</Typography>
         <Typography variant="bodySmallSB">
           {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
-          {formatToCurrency(orderInfo?.tradingFee, 'bps', false, 1)}
+          {formatToCurrency(feePct, '%', false, 3)}
           {')'}
         </Typography>
       </Box>

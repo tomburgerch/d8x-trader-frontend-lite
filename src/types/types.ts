@@ -158,7 +158,7 @@ export interface SmartContractOrderI {
   brokerFeeTbps: number;
   traderAddr: string;
   brokerAddr: string;
-  referrerAddr: string;
+  executorAddr: string;
   brokerSignature: BytesLike;
   fAmount: BigNumberish;
   fLimitPrice: BigNumberish;

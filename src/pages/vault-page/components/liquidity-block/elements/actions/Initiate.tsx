@@ -13,15 +13,13 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { dCurrencyPriceAtom, userAmountAtom, withdrawalsAtom, loadStatsAtom } from 'store/vault-pools.store';
-import { formatToCurrency } from 'utils/formatToCurrency';
+import { userAmountAtom, withdrawalsAtom, loadStatsAtom } from 'store/vault-pools.store';
 
 import styles from './Action.module.scss';
 
 export const Initiate = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
-  const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
   const [, setLoadStats] = useAtom(loadStatsAtom);
@@ -67,7 +65,7 @@ export const Initiate = memo(() => {
     setRequestSent(true);
 
     await liqProvTool
-      .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount)
+      .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
         setLoadStats(false);
@@ -113,16 +111,9 @@ export const Initiate = memo(() => {
         setLoadStats(true);
         requestSentRef.current = false;
         setRequestSent(false);
-        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
+        toast.error(<ToastContent title="Error intiating withdrawal" bodyLines={[]} />);
       });
   }, [initiateAmount, liqProvTool, signer, selectedPool, setLoadStats]);
-
-  const predictedAmount = useMemo(() => {
-    if (initiateAmount > 0 && dCurrencyPrice != null) {
-      return initiateAmount * dCurrencyPrice;
-    }
-    return 0;
-  }, [initiateAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
@@ -151,7 +142,7 @@ export const Initiate = memo(() => {
             <InfoBlock
               title={
                 <>
-                  Amount of <strong>{selectedPool?.poolSymbol}</strong>
+                  Amount of <strong>d{selectedPool?.poolSymbol}</strong>
                 </>
               }
               content={
@@ -180,10 +171,6 @@ export const Initiate = memo(() => {
         </Box>
 
         <Box className={styles.summaryBlock}>
-          <Box className={styles.row}>
-            <Typography variant="body2">Amount</Typography>
-            <Typography variant="body2">{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</Typography>
-          </Box>
           <Separator />
           <Box className={styles.row}>
             <Typography variant="body2">Can be withdrawn on:</Typography>

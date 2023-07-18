@@ -11,13 +11,15 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { getMaxOrderSizeForTrader, orderDigest, positionRiskOnTrade } from 'network/network';
+import { getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
 import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
+  openOrdersAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
+  poolTokenDecimalsAtom,
   positionsAtom,
   proxyAddrAtom,
   selectedPerpetualAtom,
@@ -25,7 +27,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { MaxOrderSizeResponseI, OrderI, OrderInfoI } from 'types/types';
+import { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -93,12 +95,14 @@ export const ActionBlock = memo(() => {
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
 
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
-  const [maxOrderSize, setMaxOrderSize] = useState<MaxOrderSizeResponseI>();
+  const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
 
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
@@ -109,13 +113,13 @@ export const ActionBlock = memo(() => {
   });
 
   const openReviewOrderModal = useCallback(async () => {
-    if (!orderInfo || !address) {
+    if (!orderInfo || !address || !traderAPIRef.current) {
       return;
     }
     validityCheckRef.current = true;
     setShowReviewOrderModal(true);
     setNewPositionRisk(null);
-
+    setMaxOrderSize(undefined);
     const mainOrder = createMainOrder(orderInfo);
     await positionRiskOnTrade(
       chainId,
@@ -126,13 +130,15 @@ export const ActionBlock = memo(() => {
     ).then((data) => {
       setNewPositionRisk(data.data.newPositionRisk);
       setCollateralDeposit(data.data.orderCost);
-    });
-
-    setMaxOrderSize(undefined);
-    await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
-      setMaxOrderSize(data.data);
+      setMaxOrderSize({ maxBuy: data.data.maxLongTrade, maxSell: data.data.maxShortTrade });
       validityCheckRef.current = false;
     });
+
+    // setMaxOrderSize(undefined);
+    // await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
+    //   setMaxOrderSize(data.data);
+    //   validityCheckRef.current = false;
+    // });
   }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
@@ -209,90 +215,114 @@ export const ActionBlock = memo(() => {
   }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
   const handleOrderConfirm = useCallback(async () => {
-    if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr) {
+    if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
       return;
     }
     setRequestSent(true);
     setIsValidityCheckDone(false);
     requestSentRef.current = true;
-    await orderDigest(chainId, parsedOrders, address)
-      .then((data) => {
-        if (data.data.digests.length > 0) {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit)
-            .then((res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
-              // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-              const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              postOrder(signer, signatures, data.data)
-                .then((tx) => {
-                  // success submitting to mempool
-                  console.log(`postOrder tx hash: ${tx.hash}`);
-                  setShowReviewOrderModal(false);
-                  toast.success(<ToastContent title="Order submit processed" bodyLines={[]} />);
-                  clearInputsData();
-                  // release lock
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  tx.wait()
-                    .then((receipt) => {
-                      // can't use this since backend will send a websocket message in case of success
-                      // if (receipt.status === 1) {
-                      //   toast.success(<ToastContent title="Order submitted" bodyLines={[]} />);
-                      // }
-                      if (receipt.status !== 1) {
-                        toast.error(<ToastContent title="Transaction failed" bodyLines={[]} />);
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.log(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+    await orderDigest(chainId, parsedOrders, address).then((data) => {
+      if (data.data.digests.length > 0) {
+        approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit, poolTokenDecimals).then(
+          (res) => {
+            if (res?.hash) {
+              console.log(res.hash);
+            }
+            // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+            const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
+            postOrder(signer, signatures, data.data)
+              .then(async (tx) => {
+                // success submitting to mempool
+                console.log(`postOrder tx hash: ${tx.hash}`);
+                setShowReviewOrderModal(false);
+                toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
+                clearInputsData();
+                // release lock
+                requestSentRef.current = false;
+                setRequestSent(false);
+                await tx
+                  .wait()
+                  .then((receipt) => {
+                    if (receipt.status === 1) {
                       requestSentRef.current = false;
                       setRequestSent(false);
-                      toast.error(
-                        <ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
+                        ({ data: d }) => {
+                          if (d) {
+                            d.map((o) => setOpenOrders(o));
+                          }
+                        }
                       );
-                    });
-                })
-                .catch(async (error) => {
-                  // user rejected posting
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  console.error(error);
-                });
-            })
-            .catch(async (error) => {
-              // user rejecting approving margin
-              requestSentRef.current = false;
-              setRequestSent(false);
-              console.error(error);
-            });
-        }
-      })
-      .catch(async (error) => {
-        toast.error(<ToastContent title="Error posting order" bodyLines={[{ label: 'Reason', value: error }]} />);
-        // release lock
-        requestSentRef.current = false;
-        setRequestSent(false);
-        console.error(error);
-      });
-  }, [parsedOrders, chainId, address, signer, selectedPool, proxyAddr, collateralDeposit, clearInputsData]);
+                      toast.success(
+                        <ToastContent
+                          title="Order Submitted"
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                    }
+                  })
+                  .catch(async (err) => {
+                    console.error(err);
+                    const response = await signer.call(
+                      {
+                        to: tx.to,
+                        from: tx.from,
+                        nonce: tx.nonce,
+                        gasLimit: tx.gasLimit,
+                        gasPrice: tx.gasPrice,
+                        data: tx.data,
+                        value: tx.value,
+                        chainId: tx.chainId,
+                        type: tx.type ?? undefined,
+                        accessList: tx.accessList,
+                      },
+                      tx.blockNumber
+                    );
+                    const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                    requestSentRef.current = false;
+                    setRequestSent(false);
+                    if (reason !== '') {
+                      toast.error(
+                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      );
+                    } else {
+                      // false positive, probably just metamask
+                      toast.success(
+                        <ToastContent
+                          title="Order Submitted"
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                    }
+                  });
+              })
+              .catch(async (error) => {
+                requestSentRef.current = false;
+                setRequestSent(false);
+                console.error(error);
+                let msg = (error?.message ?? error) as string;
+                msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+                toast.error(
+                  <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                );
+              });
+          }
+        );
+      }
+    });
+  }, [
+    parsedOrders,
+    chainId,
+    address,
+    signer,
+    selectedPool,
+    proxyAddr,
+    collateralDeposit,
+    poolTokenDecimals,
+    clearInputsData,
+    // getOpenOrders,
+    setOpenOrders,
+  ]);
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -336,9 +366,9 @@ export const ActionBlock = memo(() => {
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isTooLarge = orderInfo.size > maxOrderSize.buy;
+      isTooLarge = orderInfo.size > maxOrderSize.maxBuy;
     } else {
-      isTooLarge = orderInfo.size > maxOrderSize.sell;
+      isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
       return 'Order will fail: order size is too large';
@@ -358,7 +388,7 @@ export const ActionBlock = memo(() => {
     ) {
       return 'Warning: order size below minimal position size';
     }
-    if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
+    if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     return 'Good to go';
@@ -448,7 +478,7 @@ export const ActionBlock = memo(() => {
                     Trading fee:{' '}
                   </Typography>
                 }
-                rightSide={orderInfo.tradingFee ? formatToCurrency(orderInfo.tradingFee, 'bps', false, 1) : '-'}
+                rightSide={orderInfo.tradingFee ? formatToCurrency(orderInfo.tradingFee * 0.01, '%', false, 3) : '-'}
               />
               <SidesRow
                 leftSide={
