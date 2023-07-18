@@ -10,3 +10,14 @@
   border-right: 1px solid var(--d8x-color-black-100);
   margin: 10 * $d8x-spacing 0;
 }
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .root {
+    flex-direction: column;
+  }
+
+  .divider {
+    display: none;
+  }
+}

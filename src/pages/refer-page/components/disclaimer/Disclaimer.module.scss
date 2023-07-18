@@ -16,3 +16,19 @@
 .text {
   color: var(--d8x-color-black-400);
 }
+
+@media screen and (max-width: 1080px) {
+
+  .root {
+    display: none;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .root {
+    display: flex;
+    padding-top: 10 * $d8x-spacing;
+    padding-bottom: 0;
+  }
+}
