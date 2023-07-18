@@ -27,13 +27,17 @@ export const useRebateRate = (chainId: number, address: string | undefined, refe
   useEffect(() => {
     getBaseRebateAsync().then((percentageCut: number) => {
       setBaseRebate(percentageCut);
-      //   setKickbackRateInputValue(`${0.25 * percentageCut}`);
     });
   }, [getBaseRebateAsync, baseRebate]);
 
   return baseRebate;
 };
 
+/**
+ * @member DEFAULT
+ * @member CODE_TAKEN signifies that the code does already exist - can be redeemed
+ * @member CODE_AVAILABLE signifies that the code does not exist - cannot be redeemed
+ */
 export enum CodeStateE {
   DEFAULT,
   CODE_TAKEN,
@@ -44,32 +48,39 @@ export const useCodeInput = (chainId: number) => {
   const [codeInputValue, setCodeInputValue] = useState('');
   const [codeState, setCodeState] = useState(CodeStateE.DEFAULT);
 
-  const checkedCodesRef = useRef<string[]>([]);
+  const checkedCodesRef = useRef<Record<string, boolean>>({});
 
   const codeInputDisabled = codeState !== CodeStateE.CODE_AVAILABLE;
 
   const handleCodeChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
-      setCodeInputValue(value);
+
+      // clean up string and transform to uppercase
+      const filteredValue = value.replace(/[^a-zA-Z0-9\-_]/g, '').toUpperCase();
+
+      setCodeInputValue(filteredValue);
 
       // if user resets input reset code state to default
-      if (value === '') {
+      if (filteredValue === '') {
         setCodeState(CodeStateE.DEFAULT);
         return;
       }
 
       // if input is filled
 
-      let codeExists = false;
-
       // only check code on every keystroke if code has not been checked before (ref)
-      if (!checkedCodesRef.current.find((element) => element === value)) {
-        codeExists = await checkCodeExists(chainId, value);
-        checkedCodesRef.current.push(value);
+      if (!(filteredValue in checkedCodesRef.current)) {
+        const codeExists = await checkCodeExists(chainId, filteredValue);
+
+        if (codeExists) {
+          checkedCodesRef.current[filteredValue] = true;
+        } else {
+          checkedCodesRef.current[filteredValue] = false;
+        }
       }
 
-      if (!codeExists) {
+      if (!checkedCodesRef.current[filteredValue]) {
         setCodeState(CodeStateE.CODE_AVAILABLE);
         return;
       }

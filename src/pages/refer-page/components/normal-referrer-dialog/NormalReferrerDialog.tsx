@@ -12,6 +12,8 @@ import { postUpsertReferralCode } from 'network/referral';
 
 import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
+import { replaceSymbols } from 'utils/replaceInvalidSymbols';
+
 import { ReferralDialogActionE } from 'types/enums';
 
 import styles from './NormalReferrerDialog.module.scss';
@@ -39,7 +41,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.NORMAL);
 
   const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
-  useEffect(() => setKickbackRateInputValue((0.33 * baseRebate).toFixed(3)), [baseRebate]);
+  useEffect(() => setKickbackRateInputValue((0.25 * baseRebate).toFixed(3)), [baseRebate]);
 
   const sidesRowValues = useMemo(() => {
     const traderRate = +kickbackRateInputValue;
@@ -54,7 +56,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
       setKickbackRateInputValue(String(baseRebate));
       return;
     }
-    setKickbackRateInputValue(value);
+    setKickbackRateInputValue(replaceSymbols(value));
   };
 
   const handleUpsertCode = async () => {

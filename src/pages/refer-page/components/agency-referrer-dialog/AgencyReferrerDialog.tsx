@@ -90,10 +90,6 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   };
 
   const isAddressValid = useMemo(() => {
-    if (!referrerAddressInputValue || referrerAddressInputValue.length > 42) {
-      return false;
-    }
-
     if (isValidAddress(referrerAddressInputValue)) {
       return true;
     }
@@ -102,8 +98,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   }, [referrerAddressInputValue]);
 
   const handleUpsertCode = async () => {
-    const isValidAddressEntered = isValidAddress(referrerAddressInputValue);
-    if (!address || !signer || !isValidAddressEntered) {
+    if (!address || !signer) {
       return;
     }
     const { agencyRate, referrerRate, traderRate } = sidesRowValues;

@@ -19,7 +19,7 @@ import { RebateTypeE, RequestMethodE } from '../types/enums';
 import { config } from 'config';
 
 // TODO: MJO: temporary - change this
-const RPC = 'https://matic-mumbai.chainstacklabs.com';
+const RPC = 'https://gateway.tenderly.co/public/polygon-mumbai';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
