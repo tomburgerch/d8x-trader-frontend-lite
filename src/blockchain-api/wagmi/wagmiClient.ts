@@ -3,6 +3,7 @@ import { coinbaseWallet, injectedWallet, metaMaskWallet, walletConnectWallet } f
 import { configureChains, createClient } from 'wagmi';
 import { polygonMumbai, polygon, polygonZkEvm, polygonZkEvmTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 import polygonMainIcon from 'assets/networks/polygonMain.svg';
 import polygonTestIcon from 'assets/networks/polygonTest.svg';
@@ -17,10 +18,25 @@ const defaultChains: Chain[] = [
   { ...polygonZkEvmTestnet, iconUrl: zkTestIcon, iconBackground: 'transparent' },
 ];
 
-const { chains, provider } = configureChains(defaultChains, [publicProvider()], {
-  pollingInterval: 10_000,
-  stallTimeout: 5_000,
-});
+const { chains, provider } = configureChains(
+  defaultChains,
+  [
+    jsonRpcProvider({
+      rpc: (chain) => (chain.id === 80001 ? { http: 'https://gateway.tenderly.co/public/polygon-mumbai' } : null),
+    }),
+    jsonRpcProvider({
+      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc.ankr.com/polygon_mumbai' } : null),
+    }),
+    jsonRpcProvider({
+      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc-mumbai.maticvigil.com	' } : null),
+    }),
+    publicProvider(),
+  ],
+  {
+    pollingInterval: 10_000,
+    stallTimeout: 5_000,
+  }
+);
 
 const projectId = config.projectId;
 

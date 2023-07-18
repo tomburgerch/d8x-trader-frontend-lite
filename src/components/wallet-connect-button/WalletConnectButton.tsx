@@ -4,7 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useConnect, useProvider } from 'wagmi';
+import { useAccount, useChainId, useConnect, useSigner } from 'wagmi';
 
 import { Box, Button, useMediaQuery, useTheme } from '@mui/material';
 
@@ -38,10 +38,11 @@ export const WalletConnectButton = memo(() => {
 
   const loadingAPIRef = useRef(false);
 
-  const { address } = useAccount();
+  // const { address } = useAccount();
   const chainId = useChainId();
-  const provider = useProvider();
-  const { isConnected, isReconnecting, isDisconnected } = useAccount();
+  // const provider = useProvider();
+  const { data: signer } = useSigner();
+  const { address, isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
 
   const loadSDK = useCallback(
@@ -112,13 +113,14 @@ export const WalletConnectButton = memo(() => {
 
   // connect SDK on change of provider/chain/wallet
   useEffect(() => {
-    if (loadingAPIRef.current || !isConnected || !provider || !chainId) {
+    if (loadingAPIRef.current || !isConnected || !signer?.provider || !chainId) {
       return;
     }
-    loadSDK(provider, chainId)
+    unloadSDK();
+    loadSDK(signer.provider, chainId)
       .then(() => {})
       .catch((err) => console.log(err));
-  }, [isConnected, provider, chainId, loadSDK]);
+  }, [isConnected, signer, chainId, loadSDK, unloadSDK]);
 
   return (
     <ConnectButton.Custom>
