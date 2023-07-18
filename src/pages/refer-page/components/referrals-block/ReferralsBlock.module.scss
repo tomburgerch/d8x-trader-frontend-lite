@@ -25,3 +25,14 @@
 .dataValue {
   font-weight: 600;
 }
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .buttonContainer {
+    display: block;
+
+    .enterCodeButton {
+      width: 100%;
+    }
+  }
+}
