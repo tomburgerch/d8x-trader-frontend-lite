@@ -2,6 +2,10 @@
 
 .root {
 
+  :global(.MuiOutlinedInput-input) {
+    width: 100%;
+  }
+
   :global(.MuiButtonBase-root) {
     padding: 9px 15px;
     border-radius: $d8x-border-radius;

@@ -4,7 +4,7 @@ import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useSigner } from 'wagmi';
 
-import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
 import { ReactComponent as SwitchIcon } from 'assets/icons/switchSeparator.svg';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
@@ -13,7 +13,7 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import {
   dCurrencyPriceAtom,
-  loadStatsAtom,
+  triggerUserStatsUpdateAtom,
   sdkConnectedAtom,
   selectedLiquidityPoolAtom,
 } from 'store/vault-pools.store';
@@ -35,7 +35,7 @@ export const Add = memo(() => {
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
-  const [, setLoadStats] = useAtom(loadStatsAtom);
+  const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
@@ -98,13 +98,12 @@ export const Add = memo(() => {
           .addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
           .then(async (tx) => {
             console.log(`addLiquidity tx hash: ${tx.hash}`);
-            setLoadStats(false);
             toast.success(<ToastContent title="Adding Liquidity" bodyLines={[]} />);
             await tx
               .wait()
               .then((receipt) => {
                 if (receipt.status === 1) {
-                  setLoadStats(true);
+                  setTriggerUserStatsUpdate((prevValue) => !prevValue);
                   setAddAmount(0);
                   setInputValue('0');
                   requestSentRef.current = false;
@@ -130,7 +129,7 @@ export const Add = memo(() => {
                   tx.blockNumber
                 );
                 const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                setLoadStats(true);
+                setTriggerUserStatsUpdate((prevValue) => !prevValue);
                 requestSentRef.current = false;
                 setRequestSent(false);
                 toast.error(
@@ -140,7 +139,7 @@ export const Add = memo(() => {
           });
       })
       .catch(async () => {
-        setLoadStats(true);
+        setTriggerUserStatsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
         toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
@@ -154,8 +153,14 @@ export const Add = memo(() => {
     signer,
     isSDKConnected,
     poolTokenDecimals,
-    setLoadStats,
+    setTriggerUserStatsUpdate,
   ]);
+
+  const handleMaxAmount = useCallback(() => {
+    if (poolTokenBalance) {
+      handleInputCapture(`${poolTokenBalance}`);
+    }
+  }, [handleInputCapture, poolTokenBalance]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -217,8 +222,17 @@ export const Add = memo(() => {
             currency={selectedLiquidityPool?.poolSymbol}
             step="1"
             min={0}
+            max={poolTokenBalance || 999999}
           />
         </Box>
+        {poolTokenBalance && (
+          <Typography className={styles.helperText} variant="bodyTiny">
+            Max:{' '}
+            <Link onClick={handleMaxAmount}>
+              {formatToCurrency(poolTokenBalance, selectedLiquidityPool?.poolSymbol)}
+            </Link>
+          </Typography>
+        )}
         <Box className={styles.iconSeparator}>
           <SwitchIcon />
         </Box>

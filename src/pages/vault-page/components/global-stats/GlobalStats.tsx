@@ -10,7 +10,7 @@ import {
   dCurrencyPriceAtom,
   tvlAtom,
   selectedLiquidityPoolAtom,
-  loadStatsAtom,
+  triggerUserStatsUpdateAtom,
   sdkConnectedAtom,
 } from 'store/vault-pools.store';
 import { traderAPIAtom } from 'store/pools.store';
@@ -22,7 +22,7 @@ export const GlobalStats = () => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
-  const [loadStats] = useAtom(loadStatsAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
@@ -30,10 +30,6 @@ export const GlobalStats = () => {
   const weeklyApiRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
-
     if (!chainId || !selectedLiquidityPool) {
       setWeeklyAPI(undefined);
       return;
@@ -51,29 +47,23 @@ export const GlobalStats = () => {
       .finally(() => {
         weeklyApiRequestSentRef.current = false;
       });
-  }, [chainId, selectedLiquidityPool, loadStats]);
+  }, [chainId, selectedLiquidityPool, triggerUserStatsUpdate]);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
     setDCurrencyPrice(null);
     if (traderAPI && isSDKConnected && selectedLiquidityPool) {
       traderAPI.getShareTokenPrice(selectedLiquidityPool.poolSymbol).then((price) => setDCurrencyPrice(price));
     }
-  }, [traderAPI, selectedLiquidityPool, loadStats, isSDKConnected, setDCurrencyPrice]);
+  }, [traderAPI, selectedLiquidityPool, triggerUserStatsUpdate, isSDKConnected, setDCurrencyPrice]);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
     setTvl(null);
     if (traderAPI && isSDKConnected && selectedLiquidityPool) {
       traderAPI
         .getPoolState(selectedLiquidityPool.poolSymbol)
         .then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
     }
-  }, [traderAPI, selectedLiquidityPool, loadStats, isSDKConnected, setTvl]);
+  }, [traderAPI, selectedLiquidityPool, triggerUserStatsUpdate, isSDKConnected, setTvl]);
 
   const dSupply = useMemo(() => {
     if (selectedLiquidityPool && dCurrencyPrice && tvl) {

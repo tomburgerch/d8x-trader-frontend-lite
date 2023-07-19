@@ -9,7 +9,7 @@ import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { getEarnings } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import {
-  loadStatsAtom,
+  triggerUserStatsUpdateAtom,
   sdkConnectedAtom,
   selectedLiquidityPoolAtom,
   userAmountAtom,
@@ -27,7 +27,7 @@ export const PersonalStats = memo(() => {
   const [withdrawals] = useAtom(withdrawalsAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [loadStats] = useAtom(loadStatsAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [estimatedEarnings, setEstimatedEarnings] = useState<number>();
@@ -35,23 +35,15 @@ export const PersonalStats = memo(() => {
   const earningsRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
-
     setUserAmount(null);
     if (selectedLiquidityPool && traderAPI && isSDKConnected && address) {
       traderAPI.getPoolShareTokenBalance(address, selectedLiquidityPool.poolSymbol).then((amount) => {
         setUserAmount(amount);
       });
     }
-  }, [selectedLiquidityPool, traderAPI, isSDKConnected, address, loadStats, setUserAmount]);
+  }, [selectedLiquidityPool, traderAPI, isSDKConnected, address, triggerUserStatsUpdate, setUserAmount]);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
-
     if (!chainId || !selectedLiquidityPool || !address) {
       setEstimatedEarnings(undefined);
       return;
@@ -68,7 +60,7 @@ export const PersonalStats = memo(() => {
       .finally(() => {
         earningsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedLiquidityPool, loadStats]);
+  }, [chainId, address, selectedLiquidityPool, triggerUserStatsUpdate]);
 
   const withdrawnOn = useMemo(() => {
     if (!withdrawals || withdrawals.length === 0) {
@@ -107,7 +99,12 @@ export const PersonalStats = memo(() => {
         </Typography>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {estimatedEarnings !== undefined
-            ? formatToCurrency(estimatedEarnings, selectedLiquidityPool?.poolSymbol)
+            ? formatToCurrency(
+                estimatedEarnings < -0.0000000001 ? estimatedEarnings : Math.max(estimatedEarnings, 0),
+                selectedLiquidityPool?.poolSymbol,
+                false,
+                10
+              )
             : '--'}
         </Typography>
       </Box>

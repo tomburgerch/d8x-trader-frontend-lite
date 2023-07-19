@@ -17,6 +17,16 @@
   }
 }
 
+.helperText {
+  display: block;
+  text-align: right;
+  margin-top: $d8x-spacing / 2;
+
+  a {
+    cursor: pointer;
+  }
+}
+
 .contentBlock {
   width: 100%;
   max-width: 470px;
