@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -20,6 +20,9 @@ import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/Per
 import { TableTypeE } from 'types/enums';
 
 import styles from './TraderPage.module.scss';
+import { useNavigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
@@ -29,6 +32,17 @@ export const TraderPage = memo(() => {
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
+
+  const [selectedPool] = useAtom(selectedPoolAtom);
+  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (selectedPerpetual && selectedPool) {
+      navigate(`/${selectedPerpetual?.baseCurrency}-${selectedPerpetual?.quoteCurrency}-${selectedPool?.poolSymbol}`);
+    }
+  }, [selectedPerpetual, selectedPool, navigate]);
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [

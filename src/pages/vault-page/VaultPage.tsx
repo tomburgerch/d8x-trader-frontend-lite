@@ -25,6 +25,12 @@ export const VaultPage = memo(() => {
   const withdrawalsRequestSentRef = useRef(false);
 
   useEffect(() => {
+    if (selectedLiquidityPool) {
+      document.title = `${selectedLiquidityPool.poolSymbol} Vault | D8X`;
+    }
+  }, [selectedLiquidityPool]);
+
+  useEffect(() => {
     if (!chainId || !selectedLiquidityPool || !address) {
       setWithdrawals([]);
       return;

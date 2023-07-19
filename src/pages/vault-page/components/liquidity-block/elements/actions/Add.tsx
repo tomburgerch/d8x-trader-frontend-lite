@@ -88,16 +88,19 @@ export const Add = memo(() => {
     requestSentRef.current = true;
     setRequestSent(true);
     await approveMarginToken(signer, selectedLiquidityPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
-      .then((res) => {
+      .then(async (res) => {
         if (res?.hash) {
-          console.log(res.hash);
+          console.log(`token approval txn: ${res.hash}`);
+          await res.wait();
         }
         liqProvTool
           .addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
           .then(async (tx) => {
             console.log(`addLiquidity tx hash: ${tx.hash}`);
             setLoadStats(false);
-            tx.wait()
+            toast.success(<ToastContent title="Adding Liquidity" bodyLines={[]} />);
+            await tx
+              .wait()
               .then((receipt) => {
                 if (receipt.status === 1) {
                   setLoadStats(true);
@@ -105,7 +108,7 @@ export const Add = memo(() => {
                   setInputValue('0');
                   requestSentRef.current = false;
                   setRequestSent(false);
-                  toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+                  toast.success(<ToastContent title="Liquidity Added" bodyLines={[]} />);
                 }
               })
               .catch(async (err) => {
@@ -130,7 +133,7 @@ export const Add = memo(() => {
                 requestSentRef.current = false;
                 setRequestSent(false);
                 toast.error(
-                  <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+                  <ToastContent title="Error Adding Liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
                 );
               });
           });
