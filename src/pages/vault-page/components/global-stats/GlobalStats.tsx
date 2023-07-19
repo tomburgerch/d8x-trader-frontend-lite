@@ -2,7 +2,6 @@ import { useAtom } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useChainId } from 'wagmi';
 
-import { PERIOD_OF_7_DAYS } from 'app-constants';
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPI } from 'network/history';
@@ -44,11 +43,8 @@ export const GlobalStats = () => {
       return;
     }
 
-    const fromTimestamp = Math.floor((Date.now() - PERIOD_OF_7_DAYS) / 1000);
-    const toTimestamp = Math.floor(Date.now() / 1000);
-
     weeklyApiRequestSentRef.current = true;
-    getWeeklyAPI(chainId, fromTimestamp, toTimestamp, selectedLiquidityPool.poolSymbol)
+    getWeeklyAPI(chainId, selectedLiquidityPool.poolSymbol)
       .then((data) => {
         setWeeklyAPI(data.apy * 100);
       })
