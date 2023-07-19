@@ -53,11 +53,14 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
 
   const handleKickbackRateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    if (+value > baseRebate) {
+
+    const filteredValue = replaceSymbols(value);
+
+    if (+filteredValue > baseRebate) {
       setKickbackRateInputValue(baseRebate.toFixed(2));
       return;
     }
-    setKickbackRateInputValue(replaceSymbols(value));
+    setKickbackRateInputValue(filteredValue);
   };
 
   const handleUpsertCode = async () => {
@@ -123,7 +126,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
         <Box className={styles.kickbackRateInputContainer}>
           <Typography variant="bodySmall">Set Trader's Kickback Rate:</Typography>
           <OutlinedInput
-            type="number"
+            type="text"
             value={kickbackRateInputValue}
             inputProps={{ min: 0, max: baseRebate }}
             onChange={handleKickbackRateChange}

@@ -24,8 +24,6 @@ export const ReferralsBlock = () => {
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
-  // const isAgency = true;
-
   return (
     <Box className={styles.root}>
       <Box className={styles.buttonContainer}>

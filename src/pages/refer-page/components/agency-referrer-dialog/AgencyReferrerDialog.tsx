@@ -13,6 +13,7 @@ import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/re
 import { postUpsertReferralCode } from 'network/referral';
 
 import { isValidAddress } from 'utils/isValidAddress';
+import { replaceSymbols } from 'utils/replaceInvalidSymbols';
 
 import { ReferralDialogActionE } from 'types/enums';
 
@@ -78,24 +79,25 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     type: KickbackRateTypeE
   ) => {
     const { value } = event.target;
+    const filteredValue = replaceSymbols(value);
 
     if (type === KickbackRateTypeE.REFERRER) {
-      if (+value + Number(referrersKickbackRate) > baseRebate) {
+      if (+filteredValue + Number(tradersKickbackRate) > baseRebate) {
         setReferrersKickbackRate(baseRebate.toFixed(2));
         setTradersKickbackRate('0');
         return;
       }
-      setReferrersKickbackRate(value);
+      setReferrersKickbackRate(filteredValue);
       return;
     }
 
     if (type === KickbackRateTypeE.TRADER) {
-      if (+value + Number(referrersKickbackRate) > baseRebate) {
+      if (+filteredValue + Number(referrersKickbackRate) > baseRebate) {
         setTradersKickbackRate(baseRebate.toFixed(2));
         setReferrersKickbackRate('0');
         return;
       }
-      setTradersKickbackRate(value);
+      setTradersKickbackRate(filteredValue);
       return;
     }
   };
@@ -110,6 +112,9 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   };
 
   const isAddressValid = useMemo(() => {
+    if (referrerAddressInputValue.length > 42) {
+      return false;
+    }
     if (isValidAddress(referrerAddressInputValue)) {
       return true;
     }
@@ -188,7 +193,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
         <Box className={styles.referrerKickbackInputContainer}>
           <Typography variant="bodySmall">Set Referrer's Kickback Rate:</Typography>
           <OutlinedInput
-            type="number"
+            type="text"
             inputProps={{ min: 0, max: baseRebate }}
             value={referrersKickbackRate}
             onChange={(event) => handleKickbackRateChange(event, KickbackRateTypeE.REFERRER)}
@@ -199,7 +204,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
         <Box className={styles.traderKickbackInputContainer}>
           <Typography variant="bodySmall">Set Trader's Kickback Rate:</Typography>
           <OutlinedInput
-            type="number"
+            type="text"
             inputProps={{ min: 0, max: baseRebate }}
             value={tradersKickbackRate}
             onChange={(event) => handleKickbackRateChange(event, KickbackRateTypeE.TRADER)}
