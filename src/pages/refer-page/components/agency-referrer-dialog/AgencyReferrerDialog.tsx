@@ -42,15 +42,16 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const { codeInputValue, handleCodeChange, codeState, codeInputDisabled } = useCodeInput(chainId);
+  const { codeInputValue, handleCodeChange, codeState } = useCodeInput(chainId);
+  const codeInputDisabled = codeState !== CodeStateE.CODE_AVAILABLE;
 
   const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.AGENCY);
 
   const [referrersKickbackRate, setReferrersKickbackRate] = useState('0');
-  useEffect(() => setReferrersKickbackRate((0.33 * baseRebate).toFixed(3)), [baseRebate]);
+  useEffect(() => setReferrersKickbackRate((0.33 * baseRebate).toFixed(2)), [baseRebate]);
 
   const [tradersKickbackRate, setTradersKickbackRate] = useState('0');
-  useEffect(() => setTradersKickbackRate((0.33 * baseRebate).toFixed(3)), [baseRebate]);
+  useEffect(() => setTradersKickbackRate((0.33 * baseRebate).toFixed(2)), [baseRebate]);
 
   const [referrerAddressInputValue, setReferrerAddressInputValue] = useState(
     props.type === ReferralDialogActionE.CREATE ? '' : props.referrerAddr
@@ -66,9 +67,9 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     const traderRate = baseRebate - agencyRate - Number(referrersKickbackRate);
 
     return {
-      agencyRate: agencyRate.toFixed(3),
-      referrerRate: referrerRate.toFixed(3),
-      traderRate: traderRate.toFixed(3),
+      agencyRate: agencyRate.toFixed(2),
+      referrerRate: referrerRate.toFixed(2),
+      traderRate: traderRate.toFixed(2),
     };
   }, [baseRebate, referrersKickbackRate, tradersKickbackRate]);
 
@@ -77,7 +78,26 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     type: KickbackRateTypeE
   ) => {
     const { value } = event.target;
-    type === KickbackRateTypeE.REFERRER ? setReferrersKickbackRate(value) : setTradersKickbackRate(value);
+
+    if (type === KickbackRateTypeE.REFERRER) {
+      if (+value + Number(referrersKickbackRate) > baseRebate) {
+        setReferrersKickbackRate(baseRebate.toFixed(2));
+        setTradersKickbackRate('0');
+        return;
+      }
+      setReferrersKickbackRate(value);
+      return;
+    }
+
+    if (type === KickbackRateTypeE.TRADER) {
+      if (+value + Number(referrersKickbackRate) > baseRebate) {
+        setTradersKickbackRate(baseRebate.toFixed(2));
+        setReferrersKickbackRate('0');
+        return;
+      }
+      setTradersKickbackRate(value);
+      return;
+    }
   };
 
   const handleReferrerAddressChange = (event: ChangeEvent<HTMLInputElement>) => {

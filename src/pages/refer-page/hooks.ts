@@ -50,8 +50,6 @@ export const useCodeInput = (chainId: number) => {
 
   const checkedCodesRef = useRef<Record<string, boolean>>({});
 
-  const codeInputDisabled = codeState !== CodeStateE.CODE_AVAILABLE;
-
   const handleCodeChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
@@ -90,5 +88,5 @@ export const useCodeInput = (chainId: number) => {
     [chainId]
   );
 
-  return { codeInputValue, handleCodeChange, codeState, codeInputDisabled };
+  return { codeInputValue, handleCodeChange, codeState };
 };

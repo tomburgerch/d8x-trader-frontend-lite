@@ -17,14 +17,14 @@ import { ReferralDialogActionE } from 'types/enums';
 import styles from './ReferralsBlock.module.scss';
 
 export const ReferralsBlock = () => {
-  // const [isAgency] = useAtom(isAgencyAtom);
+  const [isAgency] = useAtom(isAgencyAtom);
   const [referralCode] = useAtom(referralCodeAtom);
 
   const { address } = useAccount();
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
-  const isAgency = true;
+  // const isAgency = true;
 
   return (
     <Box className={styles.root}>

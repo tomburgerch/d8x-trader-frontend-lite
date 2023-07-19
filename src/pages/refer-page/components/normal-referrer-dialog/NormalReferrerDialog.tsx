@@ -36,24 +36,25 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const { codeInputValue, handleCodeChange, codeState, codeInputDisabled } = useCodeInput(chainId);
+  const { codeInputValue, handleCodeChange, codeState } = useCodeInput(chainId);
+  const codeInputDisabled = codeState !== CodeStateE.CODE_AVAILABLE;
 
   const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.NORMAL);
 
   const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
-  useEffect(() => setKickbackRateInputValue((0.25 * baseRebate).toFixed(3)), [baseRebate]);
+  useEffect(() => setKickbackRateInputValue((0.25 * baseRebate).toFixed(2)), [baseRebate]);
 
   const sidesRowValues = useMemo(() => {
     const traderRate = +kickbackRateInputValue;
     const userRate = baseRebate - traderRate;
 
-    return { userRate: userRate.toFixed(3), traderRate: traderRate.toFixed(3) };
+    return { userRate: userRate.toFixed(2), traderRate: traderRate.toFixed(2) };
   }, [baseRebate, kickbackRateInputValue]);
 
   const handleKickbackRateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (+value > baseRebate) {
-      setKickbackRateInputValue(String(baseRebate));
+      setKickbackRateInputValue(baseRebate.toFixed(2));
       return;
     }
     setKickbackRateInputValue(replaceSymbols(value));
