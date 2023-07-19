@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
@@ -8,6 +8,16 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 
 export const PerpetualStats = () => {
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+
+  useEffect(() => {
+    if (perpetualStatistics) {
+      document.title = formatToCurrency(
+        perpetualStatistics.midPrice,
+        `${perpetualStatistics.baseCurrency}-${perpetualStatistics.quoteCurrency} | D8X`,
+        true
+      );
+    }
+  }, [perpetualStatistics]);
 
   const items: StatDataI[] = useMemo(
     () => [
