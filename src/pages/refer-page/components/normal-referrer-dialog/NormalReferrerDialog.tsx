@@ -146,6 +146,11 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
             <SidesRow leftSide="Your code" rightSide={props.code} rightSideStyles={styles.sidesRowValue} />
           </Box>
         )}
+        {props.type === ReferralDialogActionE.CREATE && (
+          <Typography variant="bodyTiny" component="p" className={styles.infoText}>
+            Only uppercase characters, numbers, underscores ( _ ) and hyphens (-) are allowed.
+          </Typography>
+        )}
         <Box className={styles.dialogActionsContainer}>
           <Button variant="secondary" onClick={props.onClose}>
             Cancel

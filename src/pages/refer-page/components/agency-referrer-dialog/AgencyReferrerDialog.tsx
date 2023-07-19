@@ -230,14 +230,19 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
         )}
         <div className={styles.divider} />
         {props.type === ReferralDialogActionE.CREATE && (
-          <Box className={styles.codeInputContainer}>
-            <OutlinedInput
-              placeholder="Enter a code"
-              value={codeInputValue}
-              onChange={handleCodeChange}
-              className={styles.codeInput}
-            />
-          </Box>
+          <>
+            <Box className={styles.codeInputContainer}>
+              <OutlinedInput
+                placeholder="Enter a code"
+                value={codeInputValue}
+                onChange={handleCodeChange}
+                className={styles.codeInput}
+              />
+            </Box>
+            <Typography variant="bodyTiny" component="p" className={styles.infoText}>
+              Only uppercase characters, numbers, underscores ( _ ) and hyphens (-) are allowed.
+            </Typography>
+          </>
         )}
         {props.type === ReferralDialogActionE.MODIFY && (
           <Box className={styles.paddedContainer}>

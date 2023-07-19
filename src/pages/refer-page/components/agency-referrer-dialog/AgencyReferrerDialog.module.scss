@@ -82,6 +82,12 @@
   }
 }
 
+.infoText {
+  padding: 0 8 * $d8x-spacing;
+  color: var(--d8x-color-black-400);
+  margin: -2 * $d8x-spacing 0 8 * $d8x-spacing;
+}
+
 .dialogActionsContainer {
   display: flex;
   justify-content: space-between;

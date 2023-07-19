@@ -45,6 +45,9 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
           onChange={handleCodeChange}
           className={styles.input}
         />
+        <Typography variant="bodyTiny" className={styles.infoText}>
+          Only uppercase characters, numbers, underscores ( _ ) and hyphens (-) are allowed.
+        </Typography>
         <Box className={styles.actionButtonsContainer}>
           <Button variant="secondary" className={styles.cancelButton} onClick={onClose}>
             Cancel
