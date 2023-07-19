@@ -31,26 +31,14 @@ export function getFundingRatePayments(chainId: number, traderAddr: string): Pro
   });
 }
 
-export function getWeeklyAPI(
-  chainId: number,
-  fromTimestamp: number,
-  toTimestamp: number,
-  poolSymbol: string
-): Promise<WeeklyApiI> {
-  const params = {
-    fromTimestamp: fromTimestamp + '',
-    toTimestamp: toTimestamp + '',
-    poolSymbol,
-  };
-  return fetch(`${getHistoryUrlByChainId(chainId)}/apy?${new URLSearchParams(params)}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
+export function getWeeklyAPI(chainId: number, poolSymbol: string): Promise<WeeklyApiI> {
+  return fetch(`${getHistoryUrlByChainId(chainId)}/apy?poolSymbol=${poolSymbol}`, getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
     }
-  );
+    return data.json();
+  });
 }
 
 export function getEarnings(chainId: number, address: string, poolSymbol: string): Promise<EarningsI> {
