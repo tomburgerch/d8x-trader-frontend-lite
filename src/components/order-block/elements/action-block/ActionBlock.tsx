@@ -392,7 +392,7 @@ export const ActionBlock = memo(() => {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
-      return `Order undefined: take profit price is incompatible with leverage`;
+      return `Order undefined: take profit is incompatible with leverage`;
     }
     return 'Good to go';
   }, [
@@ -548,7 +548,9 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  !orderInfo.stopLossPrice ? '-' : formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                  orderInfo.stopLossPrice && orderInfo.stopLossPrice > 0
+                    ? formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                    : '-'
                 }
               />
               <SidesRow
@@ -559,9 +561,9 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  !orderInfo.takeProfitPrice
-                    ? '-'
-                    : formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                  orderInfo.takeProfitPrice && orderInfo.takeProfitPrice > 0
+                    ? formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                    : '-'
                 }
               />
             </Box>
