@@ -1,18 +1,17 @@
-import { LiquidityProviderTool } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import { LiquidityTypeE } from 'types/enums';
 import type { OpenWithdrawalI, PoolI } from 'types/types';
 
-export const liqProvToolAtom = atom<LiquidityProviderTool | null>(null);
 export const liquidityPoolsAtom = atom<PoolI[]>([]);
 export const liquidityTypeAtom = atom(LiquidityTypeE.Add);
 export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 export const dCurrencyPriceAtom = atom<number | null>(null);
 export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
-export const loadStatsAtom = atom(true);
+export const triggerWithdrawalsUpdateAtom = atom(true);
+export const triggerUserStatsUpdateAtom = atom(true);
 export const sdkConnectedAtom = atom(false);
 
 const selectedLiquidityPoolNameLSAtom = atomWithStorage<string>('d8x_selectedLiquidityPoolName', '');

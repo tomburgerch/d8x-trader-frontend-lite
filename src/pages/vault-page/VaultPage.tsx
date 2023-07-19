@@ -11,7 +11,7 @@ import { Header } from 'components/header/Header';
 import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
-import { selectedLiquidityPoolAtom, withdrawalsAtom } from 'store/vault-pools.store';
+import { selectedLiquidityPoolAtom, triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
 
 import styles from './VaultPage.module.scss';
 
@@ -20,6 +20,7 @@ export const VaultPage = memo(() => {
   const { address } = useAccount();
 
   const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setWithdrawals] = useAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
@@ -47,7 +48,7 @@ export const VaultPage = memo(() => {
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedLiquidityPool, setWithdrawals]);
+  }, [chainId, address, selectedLiquidityPool, setWithdrawals, triggerUserStatsUpdate]);
 
   return (
     <Box className={styles.root}>
