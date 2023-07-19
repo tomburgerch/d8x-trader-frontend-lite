@@ -109,6 +109,7 @@ export const TradeHistoryTable = memo(() => {
             <TableBody className={styles.tableBody}>
               {address &&
                 tradesHistory
+                  .sort((a, b) => Number(b.timestamp) - Number(a.timestamp))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((tradeHistory) => (
                     <TradeHistoryRow
