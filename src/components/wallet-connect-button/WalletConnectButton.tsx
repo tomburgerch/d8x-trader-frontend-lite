@@ -37,6 +37,7 @@ export const WalletConnectButton = memo(() => {
   const [, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
   const loadingAPIRef = useRef(false);
+  const loadingTraderLoyaltyRef = useRef(false);
 
   // const { address } = useAccount();
   const chainId = useChainId();
@@ -85,10 +86,19 @@ export const WalletConnectButton = memo(() => {
   }, [setTraderAPI, setSDKConnected, setAPIBusy]);
 
   useEffect(() => {
+    if (loadingTraderLoyaltyRef.current) {
+      return;
+    }
+
     if (address) {
-      getTraderLoyalty(chainId, address).then((data) => {
-        setLoyaltyScore(data.data);
-      });
+      loadingTraderLoyaltyRef.current = true;
+      getTraderLoyalty(chainId, address)
+        .then((data) => {
+          setLoyaltyScore(data.data);
+        })
+        .finally(() => {
+          loadingTraderLoyaltyRef.current = false;
+        });
     } else {
       setLoyaltyScore(5);
     }

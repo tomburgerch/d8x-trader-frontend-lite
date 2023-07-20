@@ -13,8 +13,6 @@ import { VaultPage } from 'pages/vault-page/VaultPage';
 import { appDimensionsAtom } from 'store/app.store';
 import { PageE } from 'types/enums';
 
-import '@rainbow-me/rainbowkit/styles.css';
-
 import styles from './App.module.scss';
 
 export const App = memo(() => {
