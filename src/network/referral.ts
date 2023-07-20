@@ -18,9 +18,6 @@ import { RebateTypeE, RequestMethodE } from '../types/enums';
 
 import { config } from 'config';
 
-// TODO: MJO: temporary - change this
-const RPC = 'https://gateway.tenderly.co/public/polygon-mumbai';
-
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
 }
@@ -36,7 +33,7 @@ export async function postUpsertReferralCode(
   signer: Signer,
   onSignatureSuccess: () => void
 ) {
-  const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
+  const referralCodeSigner = new ReferralCodeSigner(signer, '');
   const payload: APIReferralCodePayload = {
     code,
     referrerAddr,
@@ -75,7 +72,7 @@ export async function postUseReferralCode(
   signer: Signer,
   onSignatureSuccess: () => void
 ) {
-  const referralCodeSigner = new ReferralCodeSigner(signer, RPC);
+  const referralCodeSigner = new ReferralCodeSigner(signer, '');
 
   const payload: APIReferralCodeSelectionPayload = {
     code,

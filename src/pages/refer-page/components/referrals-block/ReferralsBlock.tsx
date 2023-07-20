@@ -29,7 +29,7 @@ export const ReferralsBlock = () => {
       <Box className={styles.buttonContainer}>
         {address ? (
           <Button onClick={openDialog} variant="primary" className={styles.enterCodeButton}>
-            Enter code
+            Create code
           </Button>
         ) : (
           <WalletConnectButton />

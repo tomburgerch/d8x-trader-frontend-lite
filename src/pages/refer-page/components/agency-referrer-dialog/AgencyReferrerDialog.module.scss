@@ -104,6 +104,11 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
 
+  .referrerKickbackInputContainer,
+  .traderKickbackInputContainer {
+    gap: 5 * $d8x-spacing;
+  }
+
   .dialogActionsContainer {
     flex-direction: column;
     align-items: stretch;

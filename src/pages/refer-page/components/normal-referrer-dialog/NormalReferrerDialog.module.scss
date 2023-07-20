@@ -83,7 +83,16 @@
   width: 200px;
 }
 
+.modifyCodeButton {
+  width: 200px;
+  margin-left: 30 * $d8x-spacing;
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
+
+  .kickbackRateInputContainer {
+    gap: 5 * $d8x-spacing;
+  }
 
   .dialogActionsContainer {
     flex-direction: column;
@@ -95,7 +104,12 @@
     height: 50px;
   }
 
-  .enterCodeButton {
+  .enterCodeButton,
+  .modifyCodeButton {
     width: 100%;
+  }
+
+  .modifyCodeButton {
+    margin-left: 0;
   }
 }

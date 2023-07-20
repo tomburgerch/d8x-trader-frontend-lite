@@ -15,7 +15,7 @@ export const Disclaimer = ({ title, textBlocks }: DisclaimerPropsI) => {
       </Typography>
       {textBlocks.map((textBlock) => (
         <Typography key={textBlock} variant="bodySmall" className={styles.text}>
-          The discounts are airdropped weekly to your wallet.
+          {textBlock}
         </Typography>
       ))}
     </Box>

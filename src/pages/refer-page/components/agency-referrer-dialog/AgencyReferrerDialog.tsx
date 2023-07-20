@@ -162,7 +162,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     <Dialog open onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
-          Create Referral Code
+          {props.type === ReferralDialogActionE.CREATE ? 'Create' : 'Modify'} Referral Code
         </Typography>
         <Box className={styles.baseRebateContainer}>
           <Typography variant="bodyMedium" fontWeight={600}>

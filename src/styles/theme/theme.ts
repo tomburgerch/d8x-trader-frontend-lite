@@ -175,6 +175,7 @@ export const theme = createTheme({
           textTransform: 'none',
           color: 'var(--d8x-color-purple)',
           borderColor: 'var(--d8x-color-purple)',
+          paddingTop: '12px !important',
           '&:hover': {
             borderColor: 'var(--d8x-color-purple)',
             backgroundColor: 'var(--d8x-background-purple)',

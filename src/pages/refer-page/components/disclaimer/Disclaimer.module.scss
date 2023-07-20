@@ -17,7 +17,7 @@
   color: var(--d8x-color-black-400);
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and ($d8x-breakpoint-max-md) {
 
   .root {
     display: none;

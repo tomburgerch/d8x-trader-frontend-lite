@@ -27,14 +27,14 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
       <TableRow className={styles.root}>
         <TableCell className={classnames(styles.bodyCell, styles.codeCell)}>{data.code}</TableCell>
         <TableCell align="right" className={styles.bodyCell}>
-          {formatToCurrency(data.referrerRebatePerc, '%', false, 2)}
+          {formatToCurrency(data.referrerRebatePerc, '%', false, 2).replace(' ', '')}
         </TableCell>
         <TableCell align="right" className={styles.bodyCell}>
-          {formatToCurrency(data.traderRebatePerc, '%', false, 2)}
+          {formatToCurrency(data.traderRebatePerc, '%', false, 2).replace(' ', '')}
         </TableCell>
         {isAgency && (
           <TableCell align="right" className={styles.bodyCell}>
-            {formatToCurrency(data.agencyRebatePerc, '%', false, 2)}
+            {formatToCurrency(data.agencyRebatePerc, '%', false, 2).replace(' ', '')}
           </TableCell>
         )}
         <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>

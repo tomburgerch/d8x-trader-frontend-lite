@@ -100,7 +100,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
     <Dialog open onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
-          Create Referral Code
+          {props.type === ReferralDialogActionE.CREATE ? 'Create' : 'Modify'} Referral Code
         </Typography>
         <Box className={styles.baseRebateContainer}>
           <Typography variant="bodyMedium" fontWeight={600}>
@@ -172,7 +172,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
             </Button>
           )}
           {props.type === ReferralDialogActionE.MODIFY && (
-            <Button variant="primary" onClick={handleUpsertCode} className={styles.enterCodeButton}>
+            <Button variant="primary" onClick={handleUpsertCode} className={styles.modifyCodeButton}>
               Modify
             </Button>
           )}
