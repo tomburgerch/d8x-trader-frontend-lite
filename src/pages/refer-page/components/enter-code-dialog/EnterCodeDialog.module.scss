@@ -1,5 +1,9 @@
 @import 'styles/theme/theme';
 
+:global(.MuiDialog-paper) {
+  border-radius: $d8x-border-radius;
+}
+
 .dialogRoot {
   display: flex;
   flex-direction: column;
@@ -37,4 +41,22 @@
 
 .enterCodeButton {
   width: 220px;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .actionButtonsContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4 * $d8x-spacing;
+  }
+
+  button {
+    height: 50px;
+  }
+
+  .enterCodeButton,
+  .cancelButton {
+    width: 100%;
+  }
 }

@@ -1,7 +1,10 @@
 @import 'styles/theme/theme';
 
+:global(.MuiDialog-paper) {
+  border-radius: $d8x-border-radius;
+}
+
 .dialogRoot {
-  min-width: 465px;
   width: 100%;
   padding: 10 * $d8x-spacing 0 8 * $d8x-spacing 0;
 }
@@ -78,4 +81,21 @@
 
 .enterCodeButton {
   width: 200px;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .dialogActionsContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4 * $d8x-spacing;
+  }
+
+  button {
+    height: 50px;
+  }
+
+  .enterCodeButton {
+    width: 100%;
+  }
 }
