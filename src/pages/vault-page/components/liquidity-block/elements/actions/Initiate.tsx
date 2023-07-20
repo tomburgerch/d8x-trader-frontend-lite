@@ -192,12 +192,12 @@ export const Initiate = memo(() => {
             min={0}
           />
         </Box>
-        {userAmount && (
+        {userAmount ? (
           <Typography className={styles.helperText} variant="bodyTiny">
             Max:{' '}
             <Link onClick={handleMaxUserAmount}>{formatToCurrency(userAmount, selectedLiquidityPool?.poolSymbol)}</Link>
           </Typography>
-        )}
+        ) : null}
 
         <Box className={styles.summaryBlock}>
           <Separator />
