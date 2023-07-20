@@ -169,7 +169,7 @@ export const CollateralsSelect = memo(() => {
   };
 
   const selectItems: SelectItemI<PoolI>[] = useMemo(() => {
-    return pools.map((pool) => ({ value: pool.poolSymbol, item: pool }));
+    return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
   return (
