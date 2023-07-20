@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -26,12 +27,6 @@ export const VaultPage = memo(() => {
   const withdrawalsRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (selectedLiquidityPool) {
-      document.title = `${selectedLiquidityPool.poolSymbol} Vault | D8X`;
-    }
-  }, [selectedLiquidityPool]);
-
-  useEffect(() => {
     if (!chainId || !selectedLiquidityPool || !address) {
       setWithdrawals([]);
       return;
@@ -51,15 +46,20 @@ export const VaultPage = memo(() => {
   }, [chainId, address, selectedLiquidityPool, setWithdrawals, triggerUserStatsUpdate]);
 
   return (
-    <Box className={styles.root}>
-      <Header>
-        <LiquidityPoolsSelect />
-      </Header>
-      <Container className={styles.container}>
-        <GlobalStats />
-        <LiquidityBlock />
-      </Container>
-      <Footer />
-    </Box>
+    <>
+      <Helmet>
+        <title>{`${selectedLiquidityPool?.poolSymbol} Vault | D8X App`}</title>
+      </Helmet>
+      <Box className={styles.root}>
+        <Header>
+          <LiquidityPoolsSelect />
+        </Header>
+        <Container className={styles.container}>
+          <GlobalStats />
+          <LiquidityBlock />
+        </Container>
+        <Footer />
+      </Box>
+    </>
   );
 });
