@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { useAtom } from 'jotai';
 import { memo } from 'react';
 
-import { Box, Button, ButtonGroup, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { takeProfitAtom } from 'store/order-block.store';
@@ -36,18 +36,16 @@ export const TakeProfitSelector = memo(() => {
         />
       </Box>
       <Box className={styles.takeProfitOptions}>
-        <ButtonGroup variant="outlined" aria-label="button group">
-          {Object.values(TakeProfitE).map((key) => (
-            <Button
-              key={key}
-              variant="outlined"
-              className={classNames({ [styles.selected]: key === takeProfit })}
-              onClick={() => setTakeProfit(key)}
-            >
-              {key}
-            </Button>
-          ))}
-        </ButtonGroup>
+        {Object.values(TakeProfitE).map((key) => (
+          <Button
+            key={key}
+            variant="outlined"
+            className={classNames({ [styles.selected]: key === takeProfit })}
+            onClick={() => setTakeProfit(key)}
+          >
+            {key}
+          </Button>
+        ))}
       </Box>
     </Box>
   );

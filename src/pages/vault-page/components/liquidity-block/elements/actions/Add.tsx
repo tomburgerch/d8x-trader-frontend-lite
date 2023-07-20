@@ -225,14 +225,14 @@ export const Add = memo(() => {
             max={poolTokenBalance || 999999}
           />
         </Box>
-        {poolTokenBalance && (
+        {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
             Max:{' '}
             <Link onClick={handleMaxAmount}>
               {formatToCurrency(poolTokenBalance, selectedLiquidityPool?.poolSymbol)}
             </Link>
           </Typography>
-        )}
+        ) : null}
         <Box className={styles.iconSeparator}>
           <SwitchIcon />
         </Box>
