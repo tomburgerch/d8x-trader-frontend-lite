@@ -26,7 +26,7 @@ export const ReferralCodeBlock = ({ referralCode, traderRebatePercentage }: Refe
             Your rebate rate
           </Typography>
           <Typography variant="bodyLarge" className={styles.dataValue}>
-            {address && traderRebatePercentage ? `${traderRebatePercentage * 100}%` : 'N/A'}
+            {address && traderRebatePercentage ? `${traderRebatePercentage.toFixed(2)}%` : 'N/A'}
           </Typography>
         </Box>
         {address ? (

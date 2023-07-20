@@ -76,9 +76,9 @@ export const TraderTab = () => {
       const traderReferralDataExists = !!Object.keys(referralCodesResponse.data.trader).length;
 
       if (traderReferralDataExists) {
-        const { code, traderRebatePerc } = referralCodesResponse.data.trader;
+        const { code, traderRebatePercFinal } = referralCodesResponse.data.trader;
         setReferralCode(code);
-        setTraderRebatePercentage(traderRebatePerc ?? 0);
+        setTraderRebatePercentage(traderRebatePercFinal ?? 0);
       }
     }
   }, [address, chainId]);

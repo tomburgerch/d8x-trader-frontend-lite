@@ -280,7 +280,7 @@ export interface EarnedRebateI {
 export interface TraderDataI {
   code: string;
   activeSince: string;
-  traderRebatePerc?: number;
+  traderRebatePercFinal?: number;
 }
 
 export interface OpenTraderRebateI {
