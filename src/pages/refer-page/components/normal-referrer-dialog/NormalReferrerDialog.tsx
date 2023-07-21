@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAtom } from 'jotai';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
@@ -13,6 +14,8 @@ import { postUpsertReferralCode } from 'network/referral';
 import { CodeStateE, ReferrerRoleE, useCodeInput, useRebateRate } from 'pages/refer-page/hooks';
 
 import { replaceSymbols } from 'utils/replaceInvalidSymbols';
+
+import { referralCodesRefetchHandlerRefAtom } from 'store/refer.store';
 
 import { ReferralDialogActionE } from 'types/enums';
 
@@ -32,6 +35,8 @@ interface NormalReferrerDialogModifyPropsI {
 type UpdatedNormalReferrerDialogPropsT = NormalReferrerDialogCreatePropsI | NormalReferrerDialogModifyPropsI;
 
 export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) => {
+  const [referralCodesRefetchHandler] = useAtom(referralCodesRefetchHandlerRefAtom);
+
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
@@ -94,6 +99,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
         bodyLines={[]}
       />
     );
+    referralCodesRefetchHandler.handleRefresh();
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -9,7 +9,7 @@ import { Header } from 'components/header/Header';
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
 import { getIsAgency, getReferralCodes } from 'network/referral';
-import { isAgencyAtom, referralCodeAtom } from 'store/refer.store';
+import { isAgencyAtom, referralCodeAtom, referralCodesRefetchHandlerRefAtom } from 'store/refer.store';
 
 import { TabSelector } from './components/tab-selector/TabSelector';
 import { ReferrerTab } from './components/referrer-tab/ReferrerTab';
@@ -24,6 +24,8 @@ export const ReferPage = memo(() => {
   const [, setIsAgency] = useAtom(isAgencyAtom);
   const [, setReferralCode] = useAtom(referralCodeAtom);
 
+  const [, setReferralCodesRefetchHandler] = useAtom(referralCodesRefetchHandlerRefAtom);
+
   const chainId = useChainId();
   const { address } = useAccount();
 
@@ -32,7 +34,7 @@ export const ReferPage = memo(() => {
 
   const handleTabChange = (newIndex: number) => setActiveTabIndex(newIndex);
 
-  useEffect(() => {
+  const refreshReferralCodes = useCallback(() => {
     if (referralCodesRequestRef.current || !chainId || !address) {
       return;
     }
@@ -46,7 +48,15 @@ export const ReferPage = memo(() => {
       .finally(() => {
         referralCodesRequestRef.current = false;
       });
-  }, [chainId, address, setReferralCode]);
+  }, [address, chainId, setReferralCode]);
+
+  useEffect(() => {
+    setReferralCodesRefetchHandler({ handleRefresh: refreshReferralCodes });
+  }, [refreshReferralCodes, setReferralCodesRefetchHandler]);
+
+  useEffect(() => {
+    refreshReferralCodes();
+  }, [refreshReferralCodes]);
 
   useEffect(() => {
     if (isAgencyRequestRef.current || !chainId || !address) {
