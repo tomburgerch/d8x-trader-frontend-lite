@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -8,6 +8,7 @@ import { InfoBlock } from 'components/info-block/InfoBlock';
 import { orderInfoAtom, takeProfitAtom, takeProfitPriceAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, TakeProfitE } from 'types/enums';
+import { mapCurrencyToFractionDigits } from 'utils/formatToCurrency';
 
 import styles from './TakeProfitSelector.module.scss';
 
@@ -17,27 +18,28 @@ export const TakeProfitSelector = memo(() => {
   const [, setTakeProfitPrice] = useAtom(takeProfitPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
+  const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);
+
+  const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
+  const currentLeverageRef = useRef(orderInfo?.leverage);
+
   const handleTakeProfitPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const takeProfitPriceValue = event.target.value;
       if (takeProfitPriceValue !== '') {
-        setTakeProfitPrice(+takeProfitPriceValue);
+        setTakeProfitInputPrice(+takeProfitPriceValue);
         setTakeProfit(null);
       } else {
-        setTakeProfitPrice(null);
-        setTakeProfit(TakeProfitE.None);
+        setTakeProfitInputPrice(null);
       }
     },
-    [setTakeProfitPrice, setTakeProfit]
+    [setTakeProfit]
   );
-
-  useEffect(() => {
-    setTakeProfitPrice(null);
-  }, [orderInfo?.orderBlock, setTakeProfitPrice]);
 
   const handleTakeProfitChange = useCallback(
     (takeProfitValue: TakeProfitE) => {
       setTakeProfitPrice(null);
+      setTakeProfitInputPrice(null);
       setTakeProfit(takeProfitValue);
     },
     [setTakeProfitPrice, setTakeProfit]
@@ -57,16 +59,63 @@ export const TakeProfitSelector = memo(() => {
     return undefined;
   }, [orderInfo?.midPrice, orderInfo?.orderBlock]);
 
-  const takeProfitValue = useMemo(() => {
-    if (orderInfo?.takeProfitPrice != null) {
-      const minValue = Math.max(minTakeProfitPrice, orderInfo.takeProfitPrice);
-      if (maxTakeProfitPrice) {
-        return Math.min(maxTakeProfitPrice, minValue);
-      }
-      return minValue;
+  const fractionDigits = useMemo(() => {
+    if (selectedPerpetual?.quoteCurrency) {
+      const foundFractionDigits = mapCurrencyToFractionDigits[selectedPerpetual.quoteCurrency];
+      return foundFractionDigits !== undefined ? foundFractionDigits : 2;
     }
-    return '';
-  }, [orderInfo?.takeProfitPrice, minTakeProfitPrice, maxTakeProfitPrice]);
+    return 2;
+  }, [selectedPerpetual?.quoteCurrency]);
+
+  const validateTakeProfitPrice = useCallback(() => {
+    if (takeProfitInputPrice === null) {
+      setTakeProfitPrice(null);
+      setTakeProfit(TakeProfitE.None);
+      return;
+    }
+
+    if (maxTakeProfitPrice && takeProfitInputPrice > maxTakeProfitPrice) {
+      const maxTakeProfitPriceRounded = +maxTakeProfitPrice.toFixed(fractionDigits);
+      setTakeProfitPrice(maxTakeProfitPriceRounded);
+      setTakeProfitInputPrice(maxTakeProfitPriceRounded);
+      return;
+    }
+    if (takeProfitInputPrice < minTakeProfitPrice) {
+      const minTakeProfitPriceRounded = +minTakeProfitPrice.toFixed(fractionDigits);
+      setTakeProfitPrice(minTakeProfitPriceRounded);
+      setTakeProfitInputPrice(minTakeProfitPriceRounded);
+      return;
+    }
+
+    setTakeProfitPrice(takeProfitInputPrice);
+  }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfit, setTakeProfitPrice, fractionDigits]);
+
+  useEffect(() => {
+    if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
+      currentOrderBlockRef.current = orderInfo?.orderBlock;
+
+      setTakeProfitPrice(null);
+      setTakeProfitInputPrice(null);
+
+      if (orderInfo?.stopLoss === null) {
+        setTakeProfit(TakeProfitE.None);
+      }
+    }
+  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setTakeProfitPrice, setTakeProfit]);
+
+  useEffect(() => {
+    if (currentLeverageRef.current !== orderInfo?.leverage) {
+      currentLeverageRef.current = orderInfo?.leverage;
+
+      validateTakeProfitPrice();
+    }
+  }, [orderInfo?.leverage, validateTakeProfitPrice]);
+
+  useEffect(() => {
+    if (takeProfit && takeProfit !== TakeProfitE.None && orderInfo?.takeProfitPrice) {
+      setTakeProfitInputPrice(Math.max(0, +orderInfo.takeProfitPrice.toFixed(fractionDigits)));
+    }
+  }, [takeProfit, orderInfo?.takeProfitPrice, fractionDigits]);
 
   return (
     <Box className={styles.root}>
@@ -100,10 +149,11 @@ export const TakeProfitSelector = memo(() => {
             </InputAdornment>
           }
           type="number"
-          value={takeProfitValue}
+          value={takeProfitInputPrice || ''}
           placeholder="-"
           onChange={handleTakeProfitPriceChange}
-          inputProps={{ step: 0.01, min: minTakeProfitPrice, max: maxTakeProfitPrice }}
+          onBlur={validateTakeProfitPrice}
+          inputProps={{ step: 0.01 }}
         />
       </Box>
       <Box className={styles.takeProfitOptions}>
