@@ -46,16 +46,19 @@ export const StopLossSelector = memo(() => {
   const minStopLossPrice = useMemo(() => {
     if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Short) {
       return orderInfo.midPrice;
+    } else if (orderInfo?.midPrice && orderInfo?.leverage) {
+      return orderInfo.midPrice - orderInfo.midPrice / orderInfo.leverage;
     }
     return 0;
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock]);
+  }, [orderInfo?.midPrice, orderInfo?.orderBlock, orderInfo?.leverage]);
 
   const maxStopLossPrice = useMemo(() => {
     if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Long) {
       return orderInfo.midPrice;
+    } else if (orderInfo?.midPrice && orderInfo?.leverage) {
+      return orderInfo.midPrice + orderInfo.midPrice / orderInfo.leverage;
     }
-    return undefined;
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock]);
+  }, [orderInfo?.midPrice, orderInfo?.orderBlock, orderInfo?.leverage]);
 
   const stopLossValue = useMemo(() => {
     if (orderInfo?.stopLossPrice != null) {
