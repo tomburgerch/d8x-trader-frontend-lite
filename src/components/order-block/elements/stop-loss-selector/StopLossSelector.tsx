@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -8,6 +8,7 @@ import { InfoBlock } from 'components/info-block/InfoBlock';
 import { orderInfoAtom, stopLossAtom, stopLossPriceAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, StopLossE } from 'types/enums';
+import { mapCurrencyToFractionDigits } from 'utils/formatToCurrency';
 
 import styles from './StopLossSelector.module.scss';
 
@@ -17,27 +18,28 @@ export const StopLossSelector = memo(() => {
   const [, setStopLossPrice] = useAtom(stopLossPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
-  useEffect(() => {
-    setStopLossPrice(null);
-  }, [orderInfo?.orderBlock, setStopLossPrice]);
+  const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
+
+  const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
+  const currentLeverageRef = useRef(orderInfo?.leverage);
 
   const handleStopLossPriceChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const stopLossPriceValue = event.target.value;
       if (stopLossPriceValue !== '') {
-        setStopLossPrice(+stopLossPriceValue);
+        setStopLossInputPrice(+stopLossPriceValue);
         setStopLoss(null);
       } else {
-        setStopLossPrice(null);
-        setStopLoss(StopLossE.None);
+        setStopLossInputPrice(null);
       }
     },
-    [setStopLossPrice, setStopLoss]
+    [setStopLoss]
   );
 
   const handleStopLossChange = useCallback(
     (stopLossValue: StopLossE) => {
       setStopLossPrice(null);
+      setStopLossInputPrice(null);
       setStopLoss(stopLossValue);
     },
     [setStopLossPrice, setStopLoss]
@@ -60,16 +62,63 @@ export const StopLossSelector = memo(() => {
     }
   }, [orderInfo?.midPrice, orderInfo?.orderBlock, orderInfo?.leverage]);
 
-  const stopLossValue = useMemo(() => {
-    if (orderInfo?.stopLossPrice != null) {
-      const minValue = Math.max(minStopLossPrice, orderInfo.stopLossPrice);
-      if (maxStopLossPrice) {
-        return Math.min(maxStopLossPrice, minValue);
-      }
-      return minValue;
+  const fractionDigits = useMemo(() => {
+    if (selectedPerpetual?.quoteCurrency) {
+      const foundFractionDigits = mapCurrencyToFractionDigits[selectedPerpetual.quoteCurrency];
+      return foundFractionDigits !== undefined ? foundFractionDigits : 2;
     }
-    return '';
-  }, [orderInfo?.stopLossPrice, minStopLossPrice, maxStopLossPrice]);
+    return 2;
+  }, [selectedPerpetual?.quoteCurrency]);
+
+  const validateStopLossPrice = useCallback(() => {
+    if (stopLossInputPrice === null) {
+      setStopLossPrice(null);
+      setStopLoss(StopLossE.None);
+      return;
+    }
+
+    if (maxStopLossPrice && stopLossInputPrice > maxStopLossPrice) {
+      const maxStopLossPriceRounded = +maxStopLossPrice.toFixed(fractionDigits);
+      setStopLossPrice(maxStopLossPriceRounded);
+      setStopLossInputPrice(maxStopLossPriceRounded);
+      return;
+    }
+    if (stopLossInputPrice < minStopLossPrice) {
+      const minStopLossPriceRounded = +minStopLossPrice.toFixed(fractionDigits);
+      setStopLossPrice(minStopLossPriceRounded);
+      setStopLossInputPrice(minStopLossPriceRounded);
+      return;
+    }
+
+    setStopLossPrice(stopLossInputPrice);
+  }, [minStopLossPrice, maxStopLossPrice, stopLossInputPrice, setStopLoss, setStopLossPrice, fractionDigits]);
+
+  useEffect(() => {
+    if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
+      currentOrderBlockRef.current = orderInfo?.orderBlock;
+
+      setStopLossPrice(null);
+      setStopLossInputPrice(null);
+
+      if (orderInfo?.stopLoss === null) {
+        setStopLoss(StopLossE.None);
+      }
+    }
+  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setStopLossPrice, setStopLoss]);
+
+  useEffect(() => {
+    if (currentLeverageRef.current !== orderInfo?.leverage) {
+      currentLeverageRef.current = orderInfo?.leverage;
+
+      validateStopLossPrice();
+    }
+  }, [orderInfo?.leverage, validateStopLossPrice]);
+
+  useEffect(() => {
+    if (stopLoss && stopLoss !== StopLossE.None && orderInfo?.stopLossPrice) {
+      setStopLossInputPrice(+orderInfo.stopLossPrice.toFixed(fractionDigits));
+    }
+  }, [stopLoss, orderInfo?.stopLossPrice, fractionDigits]);
 
   return (
     <Box className={styles.root}>
@@ -103,10 +152,11 @@ export const StopLossSelector = memo(() => {
             </InputAdornment>
           }
           type="number"
-          value={stopLossValue}
+          value={stopLossInputPrice || ''}
           placeholder="-"
           onChange={handleStopLossPriceChange}
-          inputProps={{ step: 0.01, min: minStopLossPrice, max: maxStopLossPrice }}
+          onBlur={validateStopLossPrice}
+          inputProps={{ step: 0.01 }}
         />
       </Box>
       <Box className={styles.stopLossOptions}>
