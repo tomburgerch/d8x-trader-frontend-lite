@@ -97,11 +97,11 @@ export const TakeProfitSelector = memo(() => {
       setTakeProfitPrice(null);
       setTakeProfitInputPrice(null);
 
-      if (orderInfo?.stopLoss === null) {
+      if (orderInfo?.takeProfit === null) {
         setTakeProfit(TakeProfitE.None);
       }
     }
-  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setTakeProfitPrice, setTakeProfit]);
+  }, [orderInfo?.orderBlock, orderInfo?.takeProfit, setTakeProfitPrice, setTakeProfit]);
 
   useEffect(() => {
     if (currentLeverageRef.current !== orderInfo?.leverage) {
