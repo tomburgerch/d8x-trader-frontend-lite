@@ -25,6 +25,7 @@ const disclaimerTextBlocks = [
 export const TraderTab = () => {
   const [earnedRebates, setEarnedRebates] = useState(0);
   const [openRewards, setOpenRewards] = useState(0);
+
   const [referralCode, setReferralCode] = useState('');
   const [traderRebatePercentage, setTraderRebatePercentage] = useState(0);
 
@@ -101,7 +102,11 @@ export const TraderTab = () => {
       <Overview title="Your discounts" items={overviewItems} />
       <Disclaimer title="Trade & Earn" textBlocks={disclaimerTextBlocks} />
       <div className={styles.divider} />
-      <ReferralCodeBlock referralCode={referralCode} traderRebatePercentage={traderRebatePercentage} />
+      <ReferralCodeBlock
+        referralCode={referralCode}
+        traderRebatePercentage={traderRebatePercentage}
+        onCodeApplySuccess={getReferralCodesAsync}
+      />
     </Box>
   );
 };

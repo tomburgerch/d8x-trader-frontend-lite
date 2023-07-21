@@ -14,6 +14,15 @@ import { VaultPage } from 'pages/vault-page/VaultPage';
 import { appDimensionsAtom } from 'store/app.store';
 import { PageE } from 'types/enums';
 
+import 'core-js/es/promise';
+import 'core-js/es/array';
+import 'core-js/es/string';
+import 'core-js/es/map';
+import 'core-js/es/number';
+import 'core-js/es/math';
+import 'core-js/es/array';
+import 'core-js/es/object';
+
 import '@rainbow-me/rainbowkit/styles.css';
 
 import styles from './App.module.scss';

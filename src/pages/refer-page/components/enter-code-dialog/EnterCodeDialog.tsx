@@ -14,9 +14,10 @@ import styles from './EnterCodeDialog.module.scss';
 
 interface EnterCodeDialogPropsI {
   onClose: () => void;
+  onCodeApplySuccess: () => void;
 }
 
-export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
+export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialogPropsI) => {
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
@@ -31,6 +32,7 @@ export const EnterCodeDialog = ({ onClose }: EnterCodeDialogPropsI) => {
     }
     await postUseReferralCode(chainId, address, codeInputValue, signer, onClose);
     toast.success(<ToastContent title="Code applied successfully" bodyLines={[]} />);
+    onCodeApplySuccess();
   };
 
   return (

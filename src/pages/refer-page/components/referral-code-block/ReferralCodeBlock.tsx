@@ -12,9 +12,14 @@ import styles from './ReferralCodeBlock.module.scss';
 interface ReferralCodeBlockPropsI {
   referralCode: string;
   traderRebatePercentage: number;
+  onCodeApplySuccess: () => void;
 }
 
-export const ReferralCodeBlock = ({ referralCode, traderRebatePercentage }: ReferralCodeBlockPropsI) => {
+export const ReferralCodeBlock = ({
+  referralCode,
+  traderRebatePercentage,
+  onCodeApplySuccess,
+}: ReferralCodeBlockPropsI) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { address } = useAccount();
 
@@ -44,7 +49,7 @@ export const ReferralCodeBlock = ({ referralCode, traderRebatePercentage }: Refe
       <Typography variant="bodyLarge" className={styles.dataValue}>
         {address && referralCode ? referralCode : 'N/A'}
       </Typography>
-      {dialogOpen && <EnterCodeDialog onClose={() => setDialogOpen(false)} />}
+      {dialogOpen && <EnterCodeDialog onClose={() => setDialogOpen(false)} onCodeApplySuccess={onCodeApplySuccess} />}
     </Box>
   );
 };
