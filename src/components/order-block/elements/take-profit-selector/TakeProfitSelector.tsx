@@ -141,7 +141,7 @@ export const TakeProfitSelector = memo(() => {
           />
         </Box>
         <OutlinedInput
-          id="custom-stop-loss-price"
+          id="custom-take-profit-price"
           className={styles.customPriceInput}
           endAdornment={
             <InputAdornment position="end">
