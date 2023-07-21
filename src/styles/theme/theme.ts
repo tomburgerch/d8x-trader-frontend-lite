@@ -352,6 +352,7 @@ export const theme = createTheme({
         root: {
           borderRadius: '8px',
           border: 'none',
+          justifyContent: 'space-between',
           width: '180px',
           ':hover': {
             backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.2)',
@@ -370,6 +371,7 @@ export const theme = createTheme({
         input: {
           padding: '10px 10px 6px',
           width: 'auto',
+          flex: 1,
           lineHeight: '1.5',
           border: 'none',
           fontSize: '16px',
@@ -378,6 +380,13 @@ export const theme = createTheme({
         },
         notchedOutline: {
           borderColor: 'var(--d8x-color-black-opac)',
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          minWidth: '30px',
         },
       },
     },

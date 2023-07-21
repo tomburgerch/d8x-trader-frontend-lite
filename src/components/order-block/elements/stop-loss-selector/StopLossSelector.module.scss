@@ -7,18 +7,32 @@
   margin-bottom: 6 * $d8x-spacing;
 }
 
+.labelHolder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3 * $d8x-spacing;
+}
+
 .label {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 3 * $d8x-spacing;
+}
+
+.customPriceInput {
+
+  :global(.MuiOutlinedInput-input) {
+    padding: 8px 10px 6px;
+  }
 }
 
 .stopLossOptions {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: $d8x-spacing;
+  flex-wrap: wrap;
 
   :global(.MuiButtonGroup-root) {
     width: 100%;

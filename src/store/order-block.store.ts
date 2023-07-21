@@ -16,8 +16,10 @@ export const slippageSliderAtom = atom(4);
 export const keepPositionLeverageAtom = atom(false);
 export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(ExpiryE['60D']);
-export const stopLossAtom = atom(StopLossE.None);
-export const takeProfitAtom = atom(TakeProfitE.None);
+export const stopLossAtom = atom<StopLossE | null>(StopLossE.None);
+export const stopLossPriceAtom = atom<number | null>(null);
+export const takeProfitAtom = atom<TakeProfitE | null>(TakeProfitE.None);
+export const takeProfitPriceAtom = atom<number | null>(null);
 
 const limitPriceValueAtom = atom(-1);
 const triggerPriceValueAtom = atom(0);
@@ -102,7 +104,9 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const slippage = get(slippageSliderAtom);
   const expireDays = get(expireDaysAtom);
   const stopLoss = get(stopLossAtom);
+  const stopLossCustomPrice = get(stopLossPriceAtom);
   const takeProfit = get(takeProfitAtom);
+  const takeProfitCustomPrice = get(takeProfitPriceAtom);
 
   const symbol = createSymbol({
     baseCurrency: perpetualStatistics.baseCurrency,
@@ -137,7 +141,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   }
 
   let stopLossPrice = null;
-  if (stopLoss !== StopLossE.None) {
+  if (stopLoss !== StopLossE.None && stopLoss !== null) {
     const stopLossMultiplier =
       1 - ((orderBlock === OrderBlockE.Long ? 1 : -1) * Math.abs(mapStopLossToNumber(stopLoss))) / leverage;
 
@@ -152,10 +156,12 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
         stopLossPrice = triggerPrice * stopLossMultiplier;
       }
     }
+  } else if (stopLoss === null && stopLossCustomPrice !== null) {
+    stopLossPrice = stopLossCustomPrice;
   }
 
   let takeProfitPrice = null;
-  if (takeProfit !== TakeProfitE.None) {
+  if (takeProfit !== TakeProfitE.None && takeProfit !== null) {
     const takeProfitMultiplier =
       // (1 + mapTakeProfitToNumber(takeProfit) * (orderBlock === OrderBlockE.Long ? 1 : -1)) / leverage;
       1 + ((orderBlock === OrderBlockE.Long ? 1 : -1) * mapTakeProfitToNumber(takeProfit)) / leverage;
@@ -171,6 +177,8 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
         takeProfitPrice = triggerPrice * takeProfitMultiplier;
       }
     }
+  } else {
+    takeProfitPrice = takeProfitCustomPrice;
   }
 
   return {

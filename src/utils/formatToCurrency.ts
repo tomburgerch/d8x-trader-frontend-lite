@@ -1,4 +1,4 @@
-const mapCurrencyToFractionDigits: Record<string, number> = {
+export const mapCurrencyToFractionDigits: Record<string, number> = {
   USD: 2,
   USDC: 2,
   MATIC: 1,
