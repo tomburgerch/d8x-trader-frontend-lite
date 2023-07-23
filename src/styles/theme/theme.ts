@@ -21,8 +21,10 @@ declare module '@mui/material/styles' {
   interface TypographyVariants {
     bodyBig: CSSProperties;
     bodyLarge: CSSProperties;
+    bodyLargePopup: CSSProperties;
     bodyMedium: CSSProperties;
     bodySmall: CSSProperties;
+    bodySmallPopup: CSSProperties;
     bodySmallSB: CSSProperties;
     bodyTiny: CSSProperties;
     adornment: CSSProperties;
@@ -33,8 +35,10 @@ declare module '@mui/material/styles' {
   interface TypographyVariantsOptions {
     bodyBig?: CSSProperties;
     bodyLarge?: CSSProperties;
+    bodyLargePopup?: CSSProperties;
     bodyMedium?: CSSProperties;
     bodySmall?: CSSProperties;
+    bodySmallPopup?: CSSProperties;
     bodySmallSB?: CSSProperties;
     bodyTiny?: CSSProperties;
     adornment?: CSSProperties;
@@ -47,8 +51,10 @@ declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     bodyBig: true;
     bodyLarge: true;
+    bodyLargePopup: true;
     bodyMedium: true;
     bodySmall: true;
+    bodySmallPopup: true;
     bodySmallSB: true;
     bodyTiny: true;
     adornment: true;
@@ -594,6 +600,16 @@ theme.typography.bodyLarge = {
   },
 };
 
+theme.typography.bodyLargePopup = {
+  fontSize: 20,
+  fontWeight: 400,
+  lineHeight: '24px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: 14,
+    lineHeight: '16px',
+  },
+};
+
 theme.typography.bodyMedium = {
   fontSize: 16,
   fontWeight: 400,
@@ -608,6 +624,16 @@ theme.typography.bodySmall = {
   fontSize: 14,
   fontWeight: 400,
   lineHeight: '20px',
+};
+
+theme.typography.bodySmallPopup = {
+  fontSize: 14,
+  fontWeight: 400,
+  lineHeight: '20px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: 10,
+    lineHeight: '12px',
+  },
 };
 
 theme.typography.bodySmallSB = {
