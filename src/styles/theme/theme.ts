@@ -23,6 +23,7 @@ declare module '@mui/material/styles' {
     bodyLarge: CSSProperties;
     bodyLargePopup: CSSProperties;
     bodyMedium: CSSProperties;
+    bodyMediumPopup: CSSProperties;
     bodySmall: CSSProperties;
     bodySmallPopup: CSSProperties;
     bodySmallSB: CSSProperties;
@@ -37,6 +38,7 @@ declare module '@mui/material/styles' {
     bodyLarge?: CSSProperties;
     bodyLargePopup?: CSSProperties;
     bodyMedium?: CSSProperties;
+    bodyMediumPopup?: CSSProperties;
     bodySmall?: CSSProperties;
     bodySmallPopup?: CSSProperties;
     bodySmallSB?: CSSProperties;
@@ -53,6 +55,7 @@ declare module '@mui/material/Typography' {
     bodyLarge: true;
     bodyLargePopup: true;
     bodyMedium: true;
+    bodyMediumPopup: true;
     bodySmall: true;
     bodySmallPopup: true;
     bodySmallSB: true;
@@ -605,7 +608,7 @@ theme.typography.bodyLargePopup = {
   fontWeight: 400,
   lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: '16px',
   },
 };
@@ -615,7 +618,17 @@ theme.typography.bodyMedium = {
   fontWeight: 400,
   lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
-    fontSize: 16,
+    fontSize: 12,
+    lineHeight: '24px',
+  },
+};
+
+theme.typography.bodyMedium = {
+  fontSize: 16,
+  fontWeight: 400,
+  lineHeight: '24px',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: 12,
     lineHeight: '24px',
   },
 };
@@ -623,7 +636,7 @@ theme.typography.bodyMedium = {
 theme.typography.bodySmall = {
   fontSize: 14,
   fontWeight: 400,
-  lineHeight: '20px',
+  lineHeight: '14px',
 };
 
 theme.typography.bodySmallPopup = {
