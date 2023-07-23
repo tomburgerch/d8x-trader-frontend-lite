@@ -1,5 +1,6 @@
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useChainId, useNetwork } from 'wagmi';
 
 import { Box, MenuItem } from '@mui/material';
@@ -7,6 +8,7 @@ import { Box, MenuItem } from '@mui/material';
 import { ReactComponent as PerpetualIcon } from 'assets/icons/perpetualIcon.svg';
 import { useCandlesWebSocketContext } from 'context/websocket-context/candles/useCandlesWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
+import { parseSymbol } from 'helpers/parseSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import {
@@ -17,7 +19,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { candlesAtom, candlesDataReadyAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
-import { PerpetualI } from 'types/types';
+import type { PerpetualI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 import { SelectItemI } from '../header-select/types';
@@ -45,14 +47,41 @@ export const PerpetualsSelect = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { chain } = useNetwork();
   const chainId = useChainId();
 
   const traderAPIRef = useRef(traderAPI);
 
-  // const chainId = useChainId();
-
   const { isConnected, send } = useCandlesWebSocketContext();
+
+  useEffect(() => {
+    if (!location.hash || !selectedPool || !selectedPerpetual) {
+      return;
+    }
+
+    const symbolHash = location.hash.slice(1);
+    const result = parseSymbol(symbolHash);
+    if (!result) {
+      return;
+    }
+
+    if (
+      selectedPerpetual.quoteCurrency === result.quoteCurrency &&
+      selectedPerpetual.baseCurrency === result.baseCurrency
+    ) {
+      return;
+    }
+
+    const foundPerpetual = selectedPool.perpetuals.find(
+      (perpetual) => perpetual.quoteCurrency === result.quoteCurrency && perpetual.baseCurrency === result.baseCurrency
+    );
+    if (foundPerpetual) {
+      setSelectedPerpetual(foundPerpetual.id);
+    }
+  }, [location.hash, selectedPool, selectedPerpetual, setSelectedPerpetual]);
 
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
@@ -106,6 +135,7 @@ export const PerpetualsSelect = memo(() => {
 
   const handleChange = (newItem: PerpetualI) => {
     setSelectedPerpetual(newItem.id);
+    navigate(`${location.pathname}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${selectedPool?.poolSymbol}`);
     clearInputsData();
   };
 

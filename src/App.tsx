@@ -23,8 +23,6 @@ import 'core-js/es/math';
 import 'core-js/es/array';
 import 'core-js/es/object';
 
-import '@rainbow-me/rainbowkit/styles.css';
-
 import styles from './App.module.scss';
 
 export const App = memo(() => {

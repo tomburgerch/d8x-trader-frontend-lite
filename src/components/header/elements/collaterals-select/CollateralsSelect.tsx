@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, MenuItem } from '@mui/material';
@@ -7,6 +8,7 @@ import { Box, MenuItem } from '@mui/material';
 import { ReactComponent as CollateralIcon } from 'assets/icons/collateralIcon.svg';
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
+import { parseSymbol } from 'helpers/parseSymbol';
 import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import {
@@ -19,12 +21,12 @@ import {
   selectedPoolIdAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { PoolI } from 'types/types';
+import type { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
+import type { SelectItemI } from '../header-select/types';
 
 import styles from '../header-select/HeaderSelect.module.scss';
-import { SelectItemI } from '../header-select/types';
 
 const OptionsHeader = () => {
   return (
@@ -55,12 +57,36 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
+  const loadingTradingFeeRef = useRef(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
+    if (location.hash) {
+      const symbolHash = location.hash.slice(1);
+      const result = parseSymbol(symbolHash);
+      if (result && selectedPool?.poolSymbol !== result.poolSymbol) {
+        setSelectedPool(result.poolSymbol);
+      }
+    }
+  }, [location.hash, selectedPool, setSelectedPool]);
+
+  useEffect(() => {
+    if (loadingTradingFeeRef.current) {
+      return;
+    }
+
     if (selectedPool !== null && address) {
+      loadingTradingFeeRef.current = true;
       setPoolFee(undefined);
-      getTradingFee(chainId, selectedPool.poolSymbol, address).then(({ data }) => {
-        setPoolFee(data);
-      });
+      getTradingFee(chainId, selectedPool.poolSymbol, address)
+        .then(({ data }) => {
+          setPoolFee(data);
+        })
+        .finally(() => {
+          loadingTradingFeeRef.current = false;
+        });
     } else if (!address) {
       setPoolFee(undefined);
     }
@@ -129,15 +155,28 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
     }
   }, [selectedPool, chainId, address, fetchOpenOrders, fetchPositions]);
 
+  useEffect(() => {
+    if (location.hash || !selectedPool) {
+      return;
+    }
+
+    navigate(
+      `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
+    );
+  }, [selectedPool, location.hash, location.pathname, navigate]);
+
   const handleChange = (newItem: PoolI) => {
     setSelectedPool(newItem.poolSymbol);
     setSelectedPoolId(traderAPI?.getPoolIdFromSymbol(newItem.poolSymbol) ?? null);
     setSelectedPerpetual(newItem.perpetuals[0].id);
+    navigate(
+      `${location.pathname}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
+    );
     clearInputsData();
   };
 
   const selectItems: SelectItemI<PoolI>[] = useMemo(() => {
-    return pools.map((pool) => ({ value: pool.poolSymbol, item: pool }));
+    return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
   return (

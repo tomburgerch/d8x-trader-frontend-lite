@@ -1,4 +1,6 @@
+import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -16,8 +18,9 @@ import { SelectorItemI, TableSelector } from 'components/table-selector/TableSel
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
 import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/PerpetualStats';
-
+import { perpetualStatisticsAtom } from 'store/pools.store';
 import { TableTypeE } from 'types/enums';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
 
@@ -29,6 +32,8 @@ export const TraderPage = memo(() => {
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
+
+  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [
@@ -95,51 +100,66 @@ export const TraderPage = memo(() => {
   );
 
   return (
-    <Box className={styles.root}>
-      <Header>
-        <CollateralsSelect />
-        <PerpetualsSelect />
-      </Header>
-      {isBigScreen && (
-        <Container className={styles.sidesContainer}>
-          <Box className={styles.leftBlock}>
+    <>
+      <Helmet>
+        <title>
+          {`${
+            perpetualStatistics
+              ? formatToCurrency(
+                  perpetualStatistics.midPrice,
+                  `${perpetualStatistics.baseCurrency}-${perpetualStatistics.quoteCurrency}`,
+                  true
+                )
+              : ''
+          } | D8X App`}
+        </title>
+      </Helmet>
+      <Box className={styles.root}>
+        <Header>
+          <CollateralsSelect />
+          <PerpetualsSelect />
+        </Header>
+        {isBigScreen && (
+          <Container className={styles.sidesContainer}>
+            <Box className={styles.leftBlock}>
+              <PerpetualStats />
+              <TradingViewChart />
+              <TableSelector
+                selectorItems={selectorForAllItems}
+                activeIndex={activeAllIndex}
+                setActiveIndex={handleActiveAllIndex}
+              />
+            </Box>
+            <Box className={styles.rightBlock}>
+              <OrderBlock />
+            </Box>
+          </Container>
+        )}
+        {!isBigScreen && (
+          <Container className={styles.columnContainer}>
             <PerpetualStats />
             <TradingViewChart />
-            <TableSelector
-              selectorItems={selectorForAllItems}
-              activeIndex={activeAllIndex}
-              setActiveIndex={handleActiveAllIndex}
-            />
-          </Box>
-          <Box className={styles.rightBlock}>
             <OrderBlock />
-          </Box>
-        </Container>
-      )}
-      {!isBigScreen && (
-        <Container className={styles.columnContainer}>
-          <PerpetualStats />
-          <TradingViewChart />
-          <OrderBlock />
-          {isMobile ? (
-            <TableSelectorMobile selectorItems={selectorForAllItems} />
-          ) : (
-            <>
-              <TableSelector
-                selectorItems={positionItems}
-                activeIndex={activePositionIndex}
-                setActiveIndex={handlePositionsIndex}
-              />
-              <TableSelector
-                selectorItems={historyItems}
-                activeIndex={activeHistoryIndex}
-                setActiveIndex={handleHistoryIndex}
-              />
-            </>
-          )}
-        </Container>
-      )}
-      <Footer />
-    </Box>
+            {isMobile ? (
+              <TableSelectorMobile selectorItems={selectorForAllItems} />
+            ) : (
+              <>
+                <TableSelector
+                  selectorItems={positionItems}
+                  activeIndex={activePositionIndex}
+                  setActiveIndex={handlePositionsIndex}
+                />
+                <TableSelector
+                  selectorItems={historyItems}
+                  activeIndex={activeHistoryIndex}
+                  setActiveIndex={handleHistoryIndex}
+                />
+              </>
+            )}
+          </Container>
+        )}
+        <Footer />
+      </Box>
+    </>
   );
 });

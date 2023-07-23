@@ -21,10 +21,16 @@ const defaultChains: Chain[] = [
 const { chains, provider } = configureChains(
   defaultChains,
   [
-    publicProvider(),
     jsonRpcProvider({
       rpc: (chain) => (chain.id === 80001 ? { http: 'https://gateway.tenderly.co/public/polygon-mumbai' } : null),
     }),
+    jsonRpcProvider({
+      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc.ankr.com/polygon_mumbai' } : null),
+    }),
+    jsonRpcProvider({
+      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc-mumbai.maticvigil.com	' } : null),
+    }),
+    publicProvider(),
   ],
   {
     pollingInterval: 10_000,

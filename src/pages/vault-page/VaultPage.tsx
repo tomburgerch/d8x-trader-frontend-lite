@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -12,7 +13,7 @@ import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
 import { selectedPoolAtom } from 'store/pools.store';
-import { withdrawalsAtom } from 'store/vault-pools.store';
+import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
 
 import styles from './VaultPage.module.scss';
 
@@ -21,6 +22,7 @@ export const VaultPage = memo(() => {
   const { address } = useAccount();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setWithdrawals] = useAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
@@ -42,18 +44,23 @@ export const VaultPage = memo(() => {
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedPool, setWithdrawals]);
+  }, [chainId, address, selectedPool, setWithdrawals, triggerUserStatsUpdate]);
 
   return (
-    <Box className={styles.root}>
-      <Header>
-        <CollateralsSelect label="Liquidity pool" />
-      </Header>
-      <Container className={styles.container}>
-        <GlobalStats />
-        <LiquidityBlock />
-      </Container>
-      <Footer />
-    </Box>
+    <>
+      <Helmet>
+        <title>{`${selectedPool?.poolSymbol} Vault | D8X App`}</title>
+      </Helmet>
+      <Box className={styles.root}>
+        <Header>
+          <CollateralsSelect label="Liquidity pool" />
+        </Header>
+        <Container className={styles.container}>
+          <GlobalStats />
+          <LiquidityBlock />
+        </Container>
+        <Footer />
+      </Box>
+    </>
   );
 });

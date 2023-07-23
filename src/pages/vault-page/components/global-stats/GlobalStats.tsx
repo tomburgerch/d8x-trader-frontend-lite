@@ -2,13 +2,12 @@ import { useAtom } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useChainId } from 'wagmi';
 
-import { PERIOD_OF_7_DAYS } from 'app-constants';
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPI } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { dCurrencyPriceAtom, tvlAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { dCurrencyPriceAtom, tvlAtom, loadStatsAtom, sdkConnectedAtom } from 'store/vault-pools.store';
 
 export const GlobalStats = () => {
   const chainId = useChainId();
@@ -17,7 +16,7 @@ export const GlobalStats = () => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
-  const [loadStats] = useAtom(loadStatsAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
@@ -25,10 +24,6 @@ export const GlobalStats = () => {
   const weeklyApiRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
-
     if (!chainId || !selectedPool) {
       setWeeklyAPI(undefined);
       return;
@@ -38,38 +33,29 @@ export const GlobalStats = () => {
       return;
     }
 
-    const fromTimestamp = Math.floor((Date.now() - PERIOD_OF_7_DAYS) / 1000);
-    const toTimestamp = Math.floor(Date.now() / 1000);
-
     weeklyApiRequestSentRef.current = true;
-    getWeeklyAPI(chainId, fromTimestamp, toTimestamp, selectedPool.poolSymbol)
+    getWeeklyAPI(chainId, selectedPool.poolSymbol)
       .then((data) => {
-        setWeeklyAPI(data.apy * 100);
+        setWeeklyAPI(data.allTimeAPY * 100);
       })
       .finally(() => {
         weeklyApiRequestSentRef.current = false;
       });
-  }, [chainId, selectedPool, loadStats]);
+  }, [chainId, selectedPool, triggerUserStatsUpdate]);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
     setDCurrencyPrice(null);
     if (traderAPI && isSDKConnected && selectedPool) {
       traderAPI.getShareTokenPrice(selectedPool.poolSymbol).then((price) => setDCurrencyPrice(price));
     }
-  }, [traderAPI, selectedPool, loadStats, isSDKConnected, setDCurrencyPrice]);
+  }, [traderAPI, selectedPool, triggerUserStatsUpdate, isSDKConnected, setDCurrencyPrice]);
 
   useEffect(() => {
-    if (!loadStats) {
-      return;
-    }
     setTvl(null);
     if (traderAPI && isSDKConnected && selectedPool) {
       traderAPI.getPoolState(selectedPool.poolSymbol).then((PoolState) => setTvl(PoolState.pnlParticipantCashCC));
     }
-  }, [traderAPI, selectedPool, loadStats, isSDKConnected, setTvl]);
+  }, [traderAPI, selectedPool, triggerUserStatsUpdate, isSDKConnected, setTvl]);
 
   const dSupply = useMemo(() => {
     if (selectedPool && dCurrencyPrice && tvl) {
@@ -82,7 +68,7 @@ export const GlobalStats = () => {
     () => [
       {
         id: 'weeklyAPY',
-        label: 'Weekly APY',
+        label: 'All Time APY',
         value: weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '%', true, 2) : '--',
       },
       {

@@ -391,12 +391,16 @@ export const ActionBlock = memo(() => {
     if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
       return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
     }
+    if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
+      return `Order undefined: take profit is incompatible with leverage`;
+    }
     return 'Good to go';
   }, [
     maxOrderSize,
     orderInfo?.size,
     orderInfo?.orderBlock,
     orderInfo?.orderType,
+    orderInfo?.takeProfitPrice,
     selectedPerpetualStaticInfo,
     poolTokenBalance,
     isMarketClosed,
@@ -440,6 +444,14 @@ export const ActionBlock = memo(() => {
     return;
   }, [validityCheckText]);
 
+  const feePct = useMemo(() => {
+    if (orderInfo?.tradingFee) {
+      return (
+        (orderInfo.tradingFee * 0.01) / (1 + (orderInfo.stopLossPrice ? 1 : 0) + (orderInfo.takeProfitPrice ? 1 : 0))
+      );
+    }
+  }, [orderInfo]);
+
   return (
     <Box className={styles.root}>
       <Button
@@ -453,17 +465,17 @@ export const ActionBlock = memo(() => {
       </Button>
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
-          <DialogTitle>Review order</DialogTitle>
+          <DialogTitle className={styles.dialogTitle}> Review order</DialogTitle>
           <Box className={styles.emphasis}>
             <SidesRow
               leftSide={
-                <Typography variant="bodyLarge" className={styles.semibold}>
+                <Typography variant="bodyLargePopup" className={styles.semibold}>
                   {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''} {orderInfo.orderType}{' '}
                   {orderBlockMap[orderInfo.orderBlock]}
                 </Typography>
               }
               rightSide={
-                <Typography variant="bodyLarge" className={styles.semibold}>
+                <Typography variant="bodyLargePopup" className={styles.semibold}>
                   {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
                 </Typography>
               }
@@ -473,16 +485,7 @@ export const ActionBlock = memo(() => {
             <Box className={styles.orderDetails}>
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
-                    {' '}
-                    Trading fee:{' '}
-                  </Typography>
-                }
-                rightSide={orderInfo.tradingFee ? formatToCurrency(orderInfo.tradingFee * 0.01, '%', false, 3) : '-'}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
                     Deposit from wallet:{' '}
                   </Typography>
@@ -490,78 +493,113 @@ export const ActionBlock = memo(() => {
                 rightSide={
                   isOrderValid && collateralDeposit >= 0 ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
+              <SidesRow
+                leftSide={
+                  <Typography variant="bodySmallPopup" className={styles.left}>
+                    {' '}
+                    Wallet balance:{' '}
+                  </Typography>
+                }
+                rightSide={
+                  isOrderValid && poolTokenBalance && poolTokenBalance >= 0
+                    ? formatToCurrency(poolTokenBalance, orderInfo.poolName)
+                    : '-'
+                }
+                rightSideStyles={styles.rightSide}
+              />
+              <SidesRow
+                leftSide={
+                  <Typography variant="bodySmallPopup" className={styles.left}>
+                    {' '}
+                    Trading fee:{' '}
+                  </Typography>
+                }
+                rightSide={feePct ? formatToCurrency(feePct, '%', false, 3) : '-'}
+                rightSideStyles={styles.rightSide}
+              />
+
               {orderInfo.maxMinEntryPrice !== null && (
                 <SidesRow
                   leftSide={
-                    <Typography variant="bodySmall" className={styles.left}>
+                    <Typography variant="bodySmallPopup" className={styles.left}>
                       {orderInfo.orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:
                     </Typography>
                   }
                   rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
+                  rightSideStyles={styles.rightSide}
                 />
               )}
               {orderInfo.triggerPrice !== null && (
                 <SidesRow
                   leftSide={
-                    <Typography variant="bodySmall" className={styles.left}>
+                    <Typography variant="bodySmallPopup" className={styles.left}>
                       {' '}
                       Trigger price:{' '}
                     </Typography>
                   }
                   rightSide={formatToCurrency(orderInfo.triggerPrice, orderInfo.quoteCurrency)}
+                  rightSideStyles={styles.rightSide}
                 />
               )}
               {orderInfo.limitPrice !== null && (
                 <SidesRow
                   leftSide={
-                    <Typography variant="bodySmall" className={styles.left}>
+                    <Typography variant="bodySmallPopup" className={styles.left}>
                       {' '}
                       Limit price:{' '}
                     </Typography>
                   }
                   rightSide={
-                    orderInfo.limitPrice > -1 ? formatToCurrency(orderInfo.limitPrice, orderInfo.quoteCurrency) : '-'
+                    orderInfo.limitPrice > -1 && orderInfo.limitPrice < Infinity
+                      ? formatToCurrency(orderInfo.limitPrice, orderInfo.quoteCurrency)
+                      : '-'
                   }
+                  rightSideStyles={styles.rightSide}
                 />
               )}
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Stop-loss:{' '}
+                    Stop-loss price:{' '}
                   </Typography>
                 }
                 rightSide={
-                  !orderInfo.stopLossPrice ? '-' : formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                  orderInfo.stopLossPrice && orderInfo.stopLossPrice > 0
+                    ? formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                    : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Take-profit:{' '}
+                    Take-profit price:{' '}
                   </Typography>
                 }
                 rightSide={
-                  !orderInfo.takeProfitPrice
-                    ? '-'
-                    : formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                  orderInfo.takeProfitPrice && orderInfo.takeProfitPrice > 0
+                    ? formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                    : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
             </Box>
           </DialogContent>
           <Separator />
           <DialogContent>
             <Box className={styles.newPositionHeader}>
-              <Typography variant="bodyMedium" className={styles.bold}>
+              <Typography variant="bodyMediumPopup" className={styles.bold}>
                 New position details
               </Typography>
             </Box>
             <Box className={styles.newPositionDetails}>
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
                     Position size:{' '}
                   </Typography>
@@ -571,10 +609,11 @@ export const ActionBlock = memo(() => {
                     ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
                     : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
                     Margin:{' '}
                   </Typography>
@@ -584,39 +623,45 @@ export const ActionBlock = memo(() => {
                     ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
                     : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
                     Leverage:{' '}
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.positionNotionalBaseCCY !== 0
-                    ? `${formatNumber(newPositionRisk?.leverage)}x`
+                  isOrderValid && newPositionRisk && newPositionRisk.leverage > 0 && newPositionRisk.leverage < Infinity
+                    ? `${formatNumber(newPositionRisk.leverage)}x`
                     : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
               <SidesRow
                 leftSide={
-                  <Typography variant="bodySmall" className={styles.left}>
+                  <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
                     Liquidation price:{' '}
                   </Typography>
                 }
                 rightSide={
-                  !isOrderValid || !newPositionRisk || newPositionRisk.liquidationPrice[0] <= 0
-                    ? '-'
-                    : formatToCurrency(newPositionRisk?.liquidationPrice[0] ?? 0, orderInfo.quoteCurrency)
+                  isOrderValid &&
+                  newPositionRisk &&
+                  newPositionRisk.liquidationPrice[0] > 0 &&
+                  newPositionRisk.liquidationPrice[0] < Infinity
+                    ? formatToCurrency(newPositionRisk.liquidationPrice[0] ?? 0, orderInfo.quoteCurrency)
+                    : '-'
                 }
+                rightSideStyles={styles.rightSide}
               />
             </Box>
           </DialogContent>
           <Box className={styles.emphasis}>
             <SidesRow
               leftSide={
-                <Typography variant="bodyMedium" className={styles.semibold}>
+                <Typography variant="bodyMediumPopup" className={styles.semibold}>
                   Validity checks
                 </Typography>
               }
@@ -626,7 +671,7 @@ export const ActionBlock = memo(() => {
                     <CircularProgress color="primary" />
                   </Box>
                 ) : (
-                  <Typography variant="bodyMedium" className={styles.bold} style={{ color: validityColor }}>
+                  <Typography variant="bodyMediumPopup" className={styles.bold} style={{ color: validityColor }}>
                     {validityResult}
                   </Typography>
                 )
@@ -636,7 +681,7 @@ export const ActionBlock = memo(() => {
           <DialogContent>
             {isValidityCheckDone ? (
               <Box className={styles.goMessage}>
-                <Typography variant="bodySmall" className={styles.centered} style={{ color: validityColor }}>
+                <Typography variant="bodySmallPopup" className={styles.centered} style={{ color: validityColor }}>
                   {validityCheckText}
                 </Typography>
               </Box>
@@ -644,7 +689,7 @@ export const ActionBlock = memo(() => {
               ''
             )}
           </DialogContent>
-          <DialogActions>
+          <DialogActions className={styles.dialogActions}>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
               Cancel
             </Button>

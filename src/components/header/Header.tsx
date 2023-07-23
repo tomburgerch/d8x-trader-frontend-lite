@@ -10,6 +10,7 @@ import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTh
 import { createSymbol } from 'helpers/createSymbol';
 import { pages } from 'navigation/pages';
 import { getExchangeInfo } from 'network/network';
+import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import {
   oracleFactoryAddrAtom,
   poolTokenBalanceAtom,
@@ -57,6 +58,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
   const [, setPoolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
@@ -121,12 +123,20 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
     }
   }, [chainId, setExchangeInfo]);
 
-  const { data: poolTokenBalance, isError } = useBalance({
+  const {
+    data: poolTokenBalance,
+    isError,
+    refetch,
+  } = useBalance({
     address: address,
     token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
     chainId: chain?.id,
     enabled: !requestRef.current && address !== undefined && chainId === chain?.id,
   });
+
+  useEffect(() => {
+    refetch().then();
+  }, [refetch, triggerUserStatsUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {

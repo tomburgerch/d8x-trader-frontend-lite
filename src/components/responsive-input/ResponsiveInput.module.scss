@@ -2,6 +2,10 @@
 
 .root {
 
+  :global(.MuiOutlinedInput-input) {
+    width: 100%;
+  }
+
   :global(.MuiButtonBase-root) {
     padding: 9px 15px;
     border-radius: $d8x-border-radius;
@@ -53,7 +57,9 @@
       }
 
       :global(.MuiInputAdornment-root) {
+        margin-top: 4px;
         margin-left: 0;
+        margin-right: 4px;
       }
     }
 

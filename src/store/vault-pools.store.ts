@@ -10,5 +10,6 @@ export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 export const dCurrencyPriceAtom = atom<number | null>(null);
 export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
-export const loadStatsAtom = atom(true);
+export const triggerWithdrawalsUpdateAtom = atom(true);
+export const triggerUserStatsUpdateAtom = atom(true);
 export const sdkConnectedAtom = atom(false);

@@ -63,4 +63,26 @@
 
 .goMessage {
   color: var(--d8x-color-black-opac);
+  padding: 8px 0 0;
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .emphasis {
+    padding: $d8x-spacing * 3 $d8x-spacing * 8;
+  }
+
+  .dialogTitle {
+    font-size: 16px;
+    line-height: 20px;
+    padding: 24px 16px 16px;
+  }
+
+  .dialogActions {
+    padding: 16px 16px 24px;
+  }
+
+  .rightSide {
+    font-size: 10px;
+  }
 }

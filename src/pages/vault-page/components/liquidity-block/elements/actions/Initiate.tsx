@@ -5,7 +5,7 @@ import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useSigner } from 'wagmi';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 
 import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
@@ -13,7 +13,13 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { Separator } from 'components/separator/Separator';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { userAmountAtom, withdrawalsAtom, loadStatsAtom } from 'store/vault-pools.store';
+import {
+  userAmountAtom,
+  withdrawalsAtom,
+  triggerUserStatsUpdateAtom,
+  triggerWithdrawalsUpdateAtom,
+} from 'store/vault-pools.store';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
 
@@ -22,7 +28,8 @@ export const Initiate = memo(() => {
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
-  const [, setLoadStats] = useAtom(loadStatsAtom);
+  const [, setTriggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
+  const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
 
   const { data: signer } = useSigner();
 
@@ -68,12 +75,12 @@ export const Initiate = memo(() => {
       .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
-        setLoadStats(false);
         toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
             if (receipt.status === 1) {
-              setLoadStats(true);
+              setTriggerUserStatsUpdate((prevValue) => !prevValue);
+              setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
               setInitiateAmount(0);
               setInputValue('0');
               requestSentRef.current = false;
@@ -99,21 +106,29 @@ export const Initiate = memo(() => {
               tx.blockNumber
             );
             const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-            setLoadStats(true);
+            setTriggerUserStatsUpdate((prevValue) => !prevValue);
+            setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
             requestSentRef.current = false;
             setRequestSent(false);
-            toast.success(
+            toast.error(
               <ToastContent title="Error initiating withdrawal" bodyLines={[{ label: 'Reason', value: reason }]} />
             );
           });
       })
       .catch(async () => {
-        setLoadStats(true);
+        setTriggerUserStatsUpdate((prevValue) => !prevValue);
+        setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
         toast.error(<ToastContent title="Error intiating withdrawal" bodyLines={[]} />);
       });
-  }, [initiateAmount, liqProvTool, signer, selectedPool, setLoadStats]);
+  }, [initiateAmount, liqProvTool, signer, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
+
+  const handleMaxUserAmount = useCallback(() => {
+    if (userAmount) {
+      handleInputCapture(`${userAmount}`);
+    }
+  }, [handleInputCapture, userAmount]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
@@ -169,6 +184,11 @@ export const Initiate = memo(() => {
             min={0}
           />
         </Box>
+        {userAmount ? (
+          <Typography className={styles.helperText} variant="bodyTiny">
+            Max: <Link onClick={handleMaxUserAmount}>{formatToCurrency(userAmount, selectedPool?.poolSymbol)}</Link>
+          </Typography>
+        ) : null}
 
         <Box className={styles.summaryBlock}>
           <Separator />

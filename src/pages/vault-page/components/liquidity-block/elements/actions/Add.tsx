@@ -4,15 +4,21 @@ import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useSigner } from 'wagmi';
 
-import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
 import { ReactComponent as SwitchIcon } from 'assets/icons/switchSeparator.svg';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { poolTokenDecimalsAtom, proxyAddrAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { dCurrencyPriceAtom, loadStatsAtom, sdkConnectedAtom } from 'store/vault-pools.store';
+import {
+  poolTokenBalanceAtom,
+  poolTokenDecimalsAtom,
+  proxyAddrAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+} from 'store/pools.store';
+import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
@@ -30,9 +36,10 @@ export const Add = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
-  const [, setLoadStats] = useAtom(loadStatsAtom);
+  const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
 
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
@@ -76,24 +83,26 @@ export const Add = memo(() => {
     requestSentRef.current = true;
     setRequestSent(true);
     await approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
-      .then((res) => {
+      .then(async (res) => {
         if (res?.hash) {
-          console.log(res.hash);
+          console.log(`token approval txn: ${res.hash}`);
+          await res.wait();
         }
         liqProvTool
           .addLiquidity(signer, selectedPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
           .then(async (tx) => {
             console.log(`addLiquidity tx hash: ${tx.hash}`);
-            setLoadStats(false);
-            tx.wait()
+            toast.success(<ToastContent title="Adding Liquidity" bodyLines={[]} />);
+            await tx
+              .wait()
               .then((receipt) => {
                 if (receipt.status === 1) {
-                  setLoadStats(true);
+                  setTriggerUserStatsUpdate((prevValue) => !prevValue);
                   setAddAmount(0);
                   setInputValue('0');
                   requestSentRef.current = false;
                   setRequestSent(false);
-                  toast.success(<ToastContent title="Liquidity added" bodyLines={[]} />);
+                  toast.success(<ToastContent title="Liquidity Added" bodyLines={[]} />);
                 }
               })
               .catch(async (err) => {
@@ -114,17 +123,17 @@ export const Add = memo(() => {
                   tx.blockNumber
                 );
                 const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                setLoadStats(true);
+                setTriggerUserStatsUpdate((prevValue) => !prevValue);
                 requestSentRef.current = false;
                 setRequestSent(false);
                 toast.error(
-                  <ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+                  <ToastContent title="Error Adding Liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
                 );
               });
           });
       })
       .catch(async () => {
-        setLoadStats(true);
+        setTriggerUserStatsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
         toast.error(<ToastContent title="Error adding liquidity" bodyLines={[]} />);
@@ -138,8 +147,14 @@ export const Add = memo(() => {
     signer,
     isSDKConnected,
     poolTokenDecimals,
-    setLoadStats,
+    setTriggerUserStatsUpdate,
   ]);
+
+  const handleMaxAmount = useCallback(() => {
+    if (poolTokenBalance) {
+      handleInputCapture(`${poolTokenBalance}`);
+    }
+  }, [handleInputCapture, poolTokenBalance]);
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -149,11 +164,11 @@ export const Add = memo(() => {
   }, [addAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
-    if (!addAmount || requestSent || !isSDKConnected || !selectedPool?.brokerCollateralLotSize) {
+    if (!addAmount || requestSent || !isSDKConnected || !selectedPool?.brokerCollateralLotSize || !poolTokenBalance) {
       return true;
     }
-    return addAmount < selectedPool.brokerCollateralLotSize;
-  }, [addAmount, requestSent, isSDKConnected, selectedPool]);
+    return addAmount > poolTokenBalance || addAmount < selectedPool.brokerCollateralLotSize;
+  }, [addAmount, requestSent, isSDKConnected, selectedPool, poolTokenBalance]);
 
   return (
     <div className={styles.root}>
@@ -193,8 +208,14 @@ export const Add = memo(() => {
             currency={selectedPool?.poolSymbol}
             step="1"
             min={0}
+            max={poolTokenBalance || 999999}
           />
         </Box>
+        {poolTokenBalance ? (
+          <Typography className={styles.helperText} variant="bodyTiny">
+            Max: <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
+          </Typography>
+        ) : null}
         <Box className={styles.iconSeparator}>
           <SwitchIcon />
         </Box>

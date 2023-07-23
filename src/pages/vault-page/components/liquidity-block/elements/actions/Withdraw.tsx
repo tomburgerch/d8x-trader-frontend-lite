@@ -11,7 +11,13 @@ import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
-import { dCurrencyPriceAtom, loadStatsAtom, userAmountAtom, withdrawalsAtom } from 'store/vault-pools.store';
+import {
+  dCurrencyPriceAtom,
+  triggerUserStatsUpdateAtom,
+  triggerWithdrawalsUpdateAtom,
+  userAmountAtom,
+  withdrawalsAtom,
+} from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
@@ -22,7 +28,8 @@ export const Withdraw = memo(() => {
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [userAmount] = useAtom(userAmountAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
-  const [, setLoadStats] = useAtom(loadStatsAtom);
+  const [, setTriggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
+  const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
 
   const { data: signer } = useSigner();
 
@@ -46,12 +53,12 @@ export const Withdraw = memo(() => {
       .executeLiquidityWithdrawal(signer, selectedPool.poolSymbol)
       .then(async (tx) => {
         console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
-        setLoadStats(false);
         toast.success(<ToastContent title="Withdrawing liquidity" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
             if (receipt.status === 1) {
-              setLoadStats(true);
+              setTriggerUserStatsUpdate((prevValue) => !prevValue);
+              setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
               requestSentRef.current = false;
               setRequestSent(false);
               toast.success(<ToastContent title="Liquidity withdrawn" bodyLines={[]} />);
@@ -75,23 +82,25 @@ export const Withdraw = memo(() => {
               tx.blockNumber
             );
             const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-            setLoadStats(true);
+            setTriggerUserStatsUpdate((prevValue) => !prevValue);
+            setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
             requestSentRef.current = false;
             setRequestSent(false);
-            toast.success(
+            toast.error(
               <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
             );
           });
       })
       .catch(async (err) => {
-        setLoadStats(true);
+        setTriggerUserStatsUpdate((prevValue) => !prevValue);
+        setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
         toast.error(
           <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: err as string }]} />
         );
       });
-  }, [liqProvTool, selectedPool, signer, setLoadStats]);
+  }, [liqProvTool, selectedPool, signer, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
 
   const shareAmount = useMemo(() => {
     if (!withdrawals) {
@@ -158,7 +167,7 @@ export const Withdraw = memo(() => {
         <Box className={styles.inputLine}>
           <Box className={styles.label}>
             <InfoBlock
-              title="dMATIC price"
+              title={`d${selectedPool?.poolSymbol}`}
               content={
                 <>
                   <Typography>
