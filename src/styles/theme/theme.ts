@@ -619,24 +619,14 @@ theme.typography.bodyMedium = {
   lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
     fontSize: 12,
-    lineHeight: '24px',
-  },
-};
-
-theme.typography.bodyMedium = {
-  fontSize: 16,
-  fontWeight: 400,
-  lineHeight: '24px',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: 12,
-    lineHeight: '24px',
+    lineHeight: '20px',
   },
 };
 
 theme.typography.bodySmall = {
   fontSize: 14,
   fontWeight: 400,
-  lineHeight: '14px',
+  lineHeight: '20px',
 };
 
 theme.typography.bodySmallPopup = {
