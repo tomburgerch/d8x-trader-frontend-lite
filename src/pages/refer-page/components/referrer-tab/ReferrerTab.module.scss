@@ -1,0 +1,23 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  background-color: var(--d8x-color-white);
+  border-radius: $d8x-border-radius;
+}
+
+.divider {
+  border-right: 1px solid var(--d8x-color-black-100);
+  margin: 10 * $d8x-spacing 0;
+}
+
+@media screen and (max-width: 1080px) {
+
+  .root {
+    flex-direction: column;
+  }
+
+  .divider {
+    display: none;
+  }
+}

@@ -18,6 +18,7 @@ import {
   positionsAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
+  selectedPoolIdAtom,
   traderAPIAtom,
 } from 'store/pools.store';
 import type { PoolI } from 'types/types';
@@ -36,7 +37,11 @@ const OptionsHeader = () => {
   );
 };
 
-export const CollateralsSelect = memo(() => {
+interface CollateralsSelectPropsI {
+  label?: string;
+}
+
+export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
   const { address } = useAccount();
   const chainId = useChainId();
 
@@ -47,6 +52,7 @@ export const CollateralsSelect = memo(() => {
   const [, setPositions] = useAtom(positionsAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
+  const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
   const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
@@ -161,6 +167,7 @@ export const CollateralsSelect = memo(() => {
 
   const handleChange = (newItem: PoolI) => {
     setSelectedPool(newItem.poolSymbol);
+    setSelectedPoolId(traderAPI?.getPoolIdFromSymbol(newItem.poolSymbol) ?? null);
     setSelectedPerpetual(newItem.perpetuals[0].id);
     navigate(
       `${location.pathname}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
@@ -179,7 +186,7 @@ export const CollateralsSelect = memo(() => {
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
-        label="Collateral"
+        label={label ? label : 'Collateral'}
         items={selectItems}
         width="100%"
         value={selectedPool?.poolSymbol}

@@ -1,0 +1,38 @@
+@import 'styles/theme/theme';
+
+.root {
+  padding: 10 * $d8x-spacing 8 * $d8x-spacing;
+  flex: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+
+  .enterCodeButton {
+    width: 170px;
+  }
+}
+
+.divider {
+  margin: 6 * $d8x-spacing 0;
+}
+
+.dataTitle {
+  margin-bottom: $d8x-spacing;
+}
+
+.dataValue {
+  font-weight: 600;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .buttonContainer {
+    display: block;
+
+    .enterCodeButton {
+      width: 100%;
+    }
+  }
+}

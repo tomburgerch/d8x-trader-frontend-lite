@@ -1,0 +1,34 @@
+@import 'styles/theme/theme';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6 * $d8x-spacing;
+  box-sizing: content-box;
+  max-width: 250px;
+  padding: 10 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.text {
+  color: var(--d8x-color-black-400);
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .root {
+    display: none;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .root {
+    display: flex;
+    padding-top: 10 * $d8x-spacing;
+    padding-bottom: 0;
+  }
+}

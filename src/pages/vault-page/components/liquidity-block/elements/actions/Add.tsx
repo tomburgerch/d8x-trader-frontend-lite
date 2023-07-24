@@ -12,13 +12,14 @@ import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import {
-  dCurrencyPriceAtom,
-  triggerUserStatsUpdateAtom,
-  sdkConnectedAtom,
-  selectedLiquidityPoolAtom,
-} from 'store/vault-pools.store';
+  poolTokenBalanceAtom,
+  poolTokenDecimalsAtom,
+  proxyAddrAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+} from 'store/pools.store';
+import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { poolTokenBalanceAtom, poolTokenDecimalsAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 
 import styles from './Action.module.scss';
 
@@ -32,7 +33,7 @@ export const Add = memo(() => {
   });
 
   const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
@@ -71,14 +72,7 @@ export const Add = memo(() => {
       return;
     }
 
-    if (
-      !liqProvTool ||
-      !isSDKConnected ||
-      !selectedLiquidityPool ||
-      !addAmount ||
-      addAmount < 0 ||
-      !poolTokenDecimals
-    ) {
+    if (!liqProvTool || !isSDKConnected || !selectedPool || !addAmount || addAmount < 0 || !poolTokenDecimals) {
       return;
     }
 
@@ -88,14 +82,14 @@ export const Add = memo(() => {
 
     requestSentRef.current = true;
     setRequestSent(true);
-    await approveMarginToken(signer, selectedLiquidityPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
+    await approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
       .then(async (res) => {
         if (res?.hash) {
           console.log(`token approval txn: ${res.hash}`);
           await res.wait();
         }
         liqProvTool
-          .addLiquidity(signer, selectedLiquidityPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
+          .addLiquidity(signer, selectedPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
           .then(async (tx) => {
             console.log(`addLiquidity tx hash: ${tx.hash}`);
             toast.success(<ToastContent title="Adding Liquidity" bodyLines={[]} />);
@@ -147,7 +141,7 @@ export const Add = memo(() => {
   }, [
     addAmount,
     liqProvTool,
-    selectedLiquidityPool,
+    selectedPool,
     address,
     proxyAddr,
     signer,
@@ -170,30 +164,24 @@ export const Add = memo(() => {
   }, [addAmount, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
-    if (
-      !addAmount ||
-      requestSent ||
-      !isSDKConnected ||
-      !selectedLiquidityPool?.brokerCollateralLotSize ||
-      !poolTokenBalance
-    ) {
+    if (!addAmount || requestSent || !isSDKConnected || !selectedPool?.brokerCollateralLotSize || !poolTokenBalance) {
       return true;
     }
-    return addAmount > poolTokenBalance || addAmount < selectedLiquidityPool.brokerCollateralLotSize;
-  }, [addAmount, requestSent, isSDKConnected, selectedLiquidityPool, poolTokenBalance]);
+    return addAmount > poolTokenBalance || addAmount < selectedPool.brokerCollateralLotSize;
+  }, [addAmount, requestSent, isSDKConnected, selectedPool, poolTokenBalance]);
 
   return (
     <div className={styles.root}>
       <Box className={styles.infoBlock}>
         <Typography variant="h5">Add Liquidity</Typography>
         <Typography variant="body2" className={styles.text}>
-          Add liquidity to the {selectedLiquidityPool?.poolSymbol} pool and receive d{selectedLiquidityPool?.poolSymbol}
-          , an ERC-20 token that represents your ownership in the liquidity pool.
+          Add liquidity to the {selectedPool?.poolSymbol} pool and receive d{selectedPool?.poolSymbol}, an ERC-20 token
+          that represents your ownership in the liquidity pool.
         </Typography>
         <Typography variant="body2" className={styles.text}>
           As a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized in{' '}
-          {selectedLiquidityPool?.poolSymbol}. You'll also participate in the PnL of the pool. d
-          {selectedLiquidityPool?.poolSymbol} accumulates fees, funding rate payments and PnL in real-time.
+          {selectedPool?.poolSymbol}. You'll also participate in the PnL of the pool. d{selectedPool?.poolSymbol}{' '}
+          accumulates fees, funding rate payments and PnL in real-time.
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
@@ -202,14 +190,12 @@ export const Add = memo(() => {
             <InfoBlock
               title={
                 <>
-                  Amount of <strong>{selectedLiquidityPool?.poolSymbol}</strong>
+                  Amount of <strong>{selectedPool?.poolSymbol}</strong>
                 </>
               }
               content={
                 <>
-                  <Typography>
-                    Specify the amount of {selectedLiquidityPool?.poolSymbol} you want to add to the pool.
-                  </Typography>
+                  <Typography>Specify the amount of {selectedPool?.poolSymbol} you want to add to the pool.</Typography>
                 </>
               }
             />
@@ -219,7 +205,7 @@ export const Add = memo(() => {
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={selectedLiquidityPool?.poolSymbol}
+            currency={selectedPool?.poolSymbol}
             step="1"
             min={0}
             max={poolTokenBalance || 999999}
@@ -227,10 +213,7 @@ export const Add = memo(() => {
         </Box>
         {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
-            Max:{' '}
-            <Link onClick={handleMaxAmount}>
-              {formatToCurrency(poolTokenBalance, selectedLiquidityPool?.poolSymbol)}
-            </Link>
+            Max: <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
           </Typography>
         ) : null}
         <Box className={styles.iconSeparator}>
@@ -238,14 +221,14 @@ export const Add = memo(() => {
         </Box>
         <Box className={styles.inputLine}>
           <Box className={styles.label}>
-            You receive <strong>d{selectedLiquidityPool?.poolSymbol}</strong>
+            You receive <strong>d{selectedPool?.poolSymbol}</strong>
           </Box>
           <Box className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"
               endAdornment={
                 <InputAdornment position="end">
-                  <Typography variant="adornment">d{selectedLiquidityPool?.poolSymbol}</Typography>
+                  <Typography variant="adornment">d{selectedPool?.poolSymbol}</Typography>
                 </InputAdornment>
               }
               type="text"

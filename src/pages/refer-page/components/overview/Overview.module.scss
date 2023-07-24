@@ -1,0 +1,35 @@
+@import 'styles/theme/theme';
+
+.root {
+  background-color: var(--d8x-color-black-50);
+  padding: 10 * $d8x-spacing;
+  border-radius: $d8x-border-radius 0 0 $d8x-border-radius;
+  box-sizing: content-box;
+  min-width: 195px;
+}
+
+.title {
+  margin-bottom: 10 * $d8x-spacing;
+}
+
+.dataBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8 * $d8x-spacing;
+
+  .dataTitle {
+    color: var(--d8x-color-black-500);
+    margin-bottom: $d8x-spacing;
+  }
+
+  .dataValue {
+    font-weight: 600;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+
+  .root {
+    border-radius: $d8x-border-radius $d8x-border-radius 0 0;
+  }
+}

@@ -1,0 +1,125 @@
+@import 'styles/theme/theme';
+
+:global(.MuiDialog-paper) {
+  border-radius: $d8x-border-radius;
+}
+
+.dialogRoot {
+  width: 100%;
+  padding: 10 * $d8x-spacing 0 8 * $d8x-spacing 0;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 8 * $d8x-spacing;
+}
+
+.baseRebateContainer {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--d8x-color-black-50);
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.paddedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5 * $d8x-spacing;
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.sidesRowValue {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.divider {
+  border-bottom: 1px solid var(--d8x-color-black-150);
+}
+
+.referrerKickbackInputContainer,
+.traderKickbackInputContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.traderKickbackInputContainer {
+  padding-top: 0;
+}
+
+.kickbackInput {
+  background-color: var(--d8x-color-black-100);
+  max-width: 120px;
+  color: var(--d8x-color-black-400);
+
+  input {
+    width: 100%;
+  }
+}
+
+.referrerChangeContainer {
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.referrerChangeFlexWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.codeInputContainer {
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.codeInputLabel {
+  margin-bottom: 3 * $d8x-spacing;
+}
+
+.codeInput {
+  background-color: var(--d8x-color-black-100);
+  width: 100%;
+
+  input {
+    width: 100%;
+  }
+}
+
+.infoText {
+  padding: 0 8 * $d8x-spacing;
+  color: var(--d8x-color-black-400);
+  margin: -2 * $d8x-spacing 0 8 * $d8x-spacing;
+}
+
+.dialogActionsContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8 * $d8x-spacing;
+}
+
+.enterCodeButton {
+  width: 200px;
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+
+  .referrerKickbackInputContainer,
+  .traderKickbackInputContainer {
+    gap: 5 * $d8x-spacing;
+  }
+
+  .dialogActionsContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4 * $d8x-spacing;
+  }
+
+  button {
+    height: 50px;
+  }
+
+  .enterCodeButton {
+    width: 100%;
+  }
+}

@@ -186,6 +186,7 @@ export const theme = createTheme({
           lineHeight: '1.5',
           padding: '9px 8px 7px',
           borderColor: 'var(--d8x-color-purple)',
+          paddingTop: '12px !important',
           '&:hover': {
             borderColor: 'var(--d8x-color-purple)',
             backgroundColor: 'var(--d8x-background-purple)',
@@ -386,6 +387,9 @@ export const theme = createTheme({
           fontSize: '16px',
           fontWeight: '500',
           color: 'var(--d8x-color-black-maintext)',
+          '::placeholder': {
+            paddingTop: '1px',
+          },
         },
         notchedOutline: {
           borderColor: 'var(--d8x-color-black-opac)',

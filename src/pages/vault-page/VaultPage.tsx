@@ -7,12 +7,13 @@ import { Box } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
-import { LiquidityPoolsSelect } from 'components/header/elements/liquidity-pools-select/LiquidityPoolsSelect';
+import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
 import { Header } from 'components/header/Header';
 import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
-import { selectedLiquidityPoolAtom, triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
+import { selectedPoolAtom } from 'store/pools.store';
+import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
 
 import styles from './VaultPage.module.scss';
 
@@ -20,14 +21,14 @@ export const VaultPage = memo(() => {
   const chainId = useChainId();
   const { address } = useAccount();
 
-  const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
   const [triggerUserStatsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setWithdrawals] = useAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (!chainId || !selectedLiquidityPool || !address) {
+    if (!chainId || !selectedPool || !address) {
       setWithdrawals([]);
       return;
     }
@@ -38,21 +39,21 @@ export const VaultPage = memo(() => {
 
     withdrawalsRequestSentRef.current = true;
 
-    getOpenWithdrawals(chainId, address, selectedLiquidityPool.poolSymbol)
+    getOpenWithdrawals(chainId, address, selectedPool.poolSymbol)
       .then(({ withdrawals }) => setWithdrawals(withdrawals))
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedLiquidityPool, setWithdrawals, triggerUserStatsUpdate]);
+  }, [chainId, address, selectedPool, setWithdrawals, triggerUserStatsUpdate]);
 
   return (
     <>
       <Helmet>
-        <title>{`${selectedLiquidityPool?.poolSymbol} Vault | D8X App`}</title>
+        <title>{`${selectedPool?.poolSymbol} Vault | D8X App`}</title>
       </Helmet>
       <Box className={styles.root}>
         <Header>
-          <LiquidityPoolsSelect />
+          <CollateralsSelect label="Liquidity pool" />
         </Header>
         <Container className={styles.container}>
           <GlobalStats />

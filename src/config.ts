@@ -2,6 +2,7 @@ const {
   REACT_APP_PROJECT_ID: projectId = '',
   REACT_APP_API_URL: apiUrls = '',
   REACT_APP_HISTORY_URL: historyUrls = '',
+  REACT_APP_REFERRAL_URL: referralUrls = '',
   REACT_APP_WEBSOCKET_URL: wsUrls = '',
   REACT_APP_CANDLES_WEBSOCKET_URL: candlesWsUrls = '',
 } = process.env;
@@ -25,6 +26,7 @@ export const config = {
   projectId: projectId,
   apiUrl: parseUrls(apiUrls),
   historyUrl: parseUrls(historyUrls),
+  referralUrl: parseUrls(referralUrls),
   wsUrl: parseUrls(wsUrls),
   candlesWsUrl: parseUrls(candlesWsUrls),
 };

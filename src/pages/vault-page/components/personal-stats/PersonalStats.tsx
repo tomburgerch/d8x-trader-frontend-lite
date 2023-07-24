@@ -8,14 +8,8 @@ import { Box, Typography } from '@mui/material';
 import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { getEarnings } from 'network/history';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import {
-  triggerUserStatsUpdateAtom,
-  sdkConnectedAtom,
-  selectedLiquidityPoolAtom,
-  userAmountAtom,
-  withdrawalsAtom,
-} from 'store/vault-pools.store';
-import { traderAPIAtom } from 'store/pools.store';
+import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { triggerUserStatsUpdateAtom, sdkConnectedAtom, userAmountAtom, withdrawalsAtom } from 'store/vault-pools.store';
 
 import styles from './PersonalStats.module.scss';
 
@@ -23,7 +17,7 @@ export const PersonalStats = memo(() => {
   const chainId = useChainId();
   const { address } = useAccount();
 
-  const [selectedLiquidityPool] = useAtom(selectedLiquidityPoolAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
@@ -36,15 +30,15 @@ export const PersonalStats = memo(() => {
 
   useEffect(() => {
     setUserAmount(null);
-    if (selectedLiquidityPool && traderAPI && isSDKConnected && address) {
-      traderAPI.getPoolShareTokenBalance(address, selectedLiquidityPool.poolSymbol).then((amount) => {
+    if (selectedPool && traderAPI && isSDKConnected && address) {
+      traderAPI.getPoolShareTokenBalance(address, selectedPool.poolSymbol).then((amount) => {
         setUserAmount(amount);
       });
     }
-  }, [selectedLiquidityPool, traderAPI, isSDKConnected, address, triggerUserStatsUpdate, setUserAmount]);
+  }, [selectedPool, traderAPI, isSDKConnected, address, triggerUserStatsUpdate, setUserAmount]);
 
   useEffect(() => {
-    if (!chainId || !selectedLiquidityPool || !address) {
+    if (!chainId || !selectedPool || !address) {
       setEstimatedEarnings(undefined);
       return;
     }
@@ -55,12 +49,12 @@ export const PersonalStats = memo(() => {
 
     earningsRequestSentRef.current = true;
 
-    getEarnings(chainId, address, selectedLiquidityPool.poolSymbol)
+    getEarnings(chainId, address, selectedPool.poolSymbol)
       .then(({ earnings }) => setEstimatedEarnings(earnings))
       .finally(() => {
         earningsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedLiquidityPool, triggerUserStatsUpdate]);
+  }, [chainId, address, selectedPool, triggerUserStatsUpdate]);
 
   const withdrawnOn = useMemo(() => {
     if (!withdrawals || withdrawals.length === 0) {
@@ -90,7 +84,7 @@ export const PersonalStats = memo(() => {
           Amount
         </Typography>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {userAmount !== undefined ? formatToCurrency(userAmount, `d${selectedLiquidityPool?.poolSymbol}`) : '--'}
+          {userAmount !== undefined ? formatToCurrency(userAmount, `d${selectedPool?.poolSymbol}`) : '--'}
         </Typography>
       </Box>
       <Box key="midPrice" className={styles.statContainer}>
@@ -101,7 +95,7 @@ export const PersonalStats = memo(() => {
           {estimatedEarnings !== undefined
             ? formatToCurrency(
                 estimatedEarnings < -0.0000000001 ? estimatedEarnings : Math.max(estimatedEarnings, 0),
-                selectedLiquidityPool?.poolSymbol,
+                selectedPool?.poolSymbol,
                 false,
                 10
               )
@@ -122,7 +116,7 @@ export const PersonalStats = memo(() => {
         </Typography>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {withdrawals && withdrawals.length > 0
-            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedLiquidityPool?.poolSymbol}`)
+            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.poolSymbol}`)
             : 'na'}
         </Typography>
       </Box>

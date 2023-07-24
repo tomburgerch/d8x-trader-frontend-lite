@@ -10,7 +10,7 @@ import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTh
 import { createSymbol } from 'helpers/createSymbol';
 import { pages } from 'navigation/pages';
 import { getExchangeInfo } from 'network/network';
-import { liquidityPoolsAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
+import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import {
   oracleFactoryAddrAtom,
   poolTokenBalanceAtom,
@@ -18,7 +18,8 @@ import {
   proxyAddrAtom,
   selectedPoolAtom,
   perpetualsAtom,
-  chainIdAtom,
+  selectedPoolIdAtom,
+  traderAPIAtom,
   poolTokenDecimalsAtom,
 } from 'store/pools.store';
 import { ExchangeInfoI, PerpetualDataI } from 'types/types';
@@ -50,16 +51,16 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const { chain } = useNetwork();
   const { address } = useAccount();
 
-  const [, setPools] = useAtom(poolsAtom);
-  const [, setLiquidityPools] = useAtom(liquidityPoolsAtom);
+  const [pools, setPools] = useAtom(poolsAtom);
   const [, setPerpetuals] = useAtom(perpetualsAtom);
   const [, setOracleFactoryAddr] = useAtom(oracleFactoryAddrAtom);
   const [, setProxyAddr] = useAtom(proxyAddrAtom);
   const [, setPoolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
   const [, setPoolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
-  const [, setChainId] = useAtom(chainIdAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const requestRef = useRef(false);
@@ -71,7 +72,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
         return;
       }
       setPools(data.pools);
-      setLiquidityPools(data.pools);
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
         perpetuals.push(
@@ -92,8 +92,20 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },
-    [setPools, setLiquidityPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]
+    [setPools, setPerpetuals, setOracleFactoryAddr, setProxyAddr]
   );
+
+  useEffect(() => {
+    let poolId = null;
+    if (traderAPI && pools.length > 0) {
+      try {
+        poolId = traderAPI.getPoolIdFromSymbol(pools[0].poolSymbol);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    setSelectedPoolId(poolId);
+  }, [pools, traderAPI, setSelectedPoolId]);
 
   useEffect(() => {
     if (!requestRef.current && chainId) {
@@ -102,7 +114,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
       getExchangeInfo(chainId, null)
         .then(({ data }) => {
           setExchangeInfo(data);
-          setChainId(chainId);
           requestRef.current = false;
         })
         .catch((err) => {
@@ -110,7 +121,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
           requestRef.current = false;
         });
     }
-  }, [chainId, setExchangeInfo, setChainId]);
+  }, [chainId, setExchangeInfo]);
 
   const {
     data: poolTokenBalance,

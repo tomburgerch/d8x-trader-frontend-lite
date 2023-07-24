@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useNetwork } from 'wagmi';
+import { useChainId, useNetwork } from 'wagmi';
 
 import { Box, MenuItem } from '@mui/material';
 
@@ -12,7 +12,6 @@ import { parseSymbol } from 'helpers/parseSymbol';
 import { getPerpetualStaticInfo } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import {
-  chainIdAtom,
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   selectedPerpetualAtom,
@@ -47,15 +46,14 @@ export const PerpetualsSelect = memo(() => {
   const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
-  const [chainId] = useAtom(chainIdAtom);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const traderAPIRef = useRef(traderAPI);
   const { chain } = useNetwork();
+  const chainId = useChainId();
 
-  // const chainId = useChainId();
+  const traderAPIRef = useRef(traderAPI);
 
   const { isConnected, send } = useCandlesWebSocketContext();
 

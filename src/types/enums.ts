@@ -90,3 +90,14 @@ export enum PageE {
   Refer = '/refer',
   Vault = '/vault',
 }
+
+export enum RebateTypeE {
+  Agency = 'agency',
+  Trader = 'trader',
+  Referrer = 'referrer',
+}
+
+export enum ReferralDialogActionE {
+  CREATE,
+  MODIFY,
+}
