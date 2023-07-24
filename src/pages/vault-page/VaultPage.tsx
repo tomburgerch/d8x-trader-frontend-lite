@@ -41,6 +41,7 @@ export const VaultPage = memo(() => {
 
     getOpenWithdrawals(chainId, address, selectedPool.poolSymbol)
       .then(({ withdrawals }) => setWithdrawals(withdrawals))
+      .catch(console.error)
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });
