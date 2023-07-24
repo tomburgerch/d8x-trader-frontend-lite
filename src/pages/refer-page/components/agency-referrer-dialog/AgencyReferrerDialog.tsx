@@ -37,6 +37,9 @@ interface NormalReferrerDialogModifyPropsI {
   code: string;
   referrerAddr: string;
   onClose: () => void;
+  referrerRebatePercent: number;
+  traderRebatePercent: number;
+  agencyRebatePercent: number;
 }
 
 type UpdatedAgencyReferrerDialogPropsT = NormalReferrerDialogCreatePropsI | NormalReferrerDialogModifyPropsI;
@@ -54,10 +57,20 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.AGENCY);
 
   const [referrersKickbackRate, setReferrersKickbackRate] = useState('0');
-  useEffect(() => setReferrersKickbackRate((0.33 * baseRebate).toFixed(2)), [baseRebate]);
-
   const [tradersKickbackRate, setTradersKickbackRate] = useState('0');
-  useEffect(() => setTradersKickbackRate((0.33 * baseRebate).toFixed(2)), [baseRebate]);
+
+  useEffect(() => {
+    let traderKickbackRate, referrerKickbackRate;
+    if (props.type === ReferralDialogActionE.MODIFY) {
+      referrerKickbackRate = props.referrerRebatePercent;
+      traderKickbackRate = props.traderRebatePercent;
+    } else {
+      referrerKickbackRate = 0.33 * baseRebate;
+      traderKickbackRate = 0.33 * baseRebate;
+    }
+    setReferrersKickbackRate(referrerKickbackRate.toFixed(2));
+    setTradersKickbackRate(traderKickbackRate.toFixed(2));
+  }, [baseRebate, props]);
 
   const [referrerAddressInputValue, setReferrerAddressInputValue] = useState(
     props.type === ReferralDialogActionE.CREATE ? '' : props.referrerAddr
@@ -120,11 +133,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
     if (referrerAddressInputValue.length > 42) {
       return false;
     }
-    if (isValidAddress(referrerAddressInputValue)) {
-      return true;
-    }
-
-    return false;
+    return isValidAddress(referrerAddressInputValue);
   }, [referrerAddressInputValue]);
 
   const handleUpsertCode = async () => {
@@ -135,11 +144,11 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
 
     const rateSum = Number(agencyRate) + Number(referrerRate) + Number(traderRate);
 
-    const traderRebatePerc = (100 * Number(traderRate)) / rateSum;
+    const traderRebatePercent = (100 * Number(traderRate)) / rateSum;
 
-    const agencyRebatePerc = (100 * Number(agencyRate)) / rateSum;
+    const agencyRebatePercent = (100 * Number(agencyRate)) / rateSum;
 
-    const referrerRebatePerc = (100 * Number(referrerRate)) / rateSum;
+    const referrerRebatePercent = (100 * Number(referrerRate)) / rateSum;
 
     const code = props.type === ReferralDialogActionE.MODIFY ? props.code : codeInputValue;
 
@@ -149,9 +158,9 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
       referrerAddressInputValue,
       address,
       code,
-      traderRebatePerc,
-      agencyRebatePerc,
-      referrerRebatePerc,
+      traderRebatePercent,
+      agencyRebatePercent,
+      referrerRebatePercent,
       signer,
       props.onClose
     );
@@ -165,7 +174,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
   };
 
   return (
-    <Dialog open onClose={props.onClose}>
+    <Dialog open={true} onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           {props.type === ReferralDialogActionE.CREATE ? 'Create' : 'Modify'} Referral Code

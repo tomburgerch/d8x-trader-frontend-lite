@@ -66,10 +66,19 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
           referrerAddr={data.referrerAddr}
           type={ReferralDialogActionE.MODIFY}
           onClose={closeDialog}
+          referrerRebatePercent={absolutePercentages.referrerRebatePerc}
+          traderRebatePercent={absolutePercentages.traderRebatePerc}
+          agencyRebatePercent={absolutePercentages.agencyRebatePerc}
         />
       )}
       {dialogOpen && !isAgency && (
-        <NormalReferrerDialog code={data.code} type={ReferralDialogActionE.MODIFY} onClose={closeDialog} />
+        <NormalReferrerDialog
+          code={data.code}
+          type={ReferralDialogActionE.MODIFY}
+          onClose={closeDialog}
+          referrerRebatePercent={absolutePercentages.referrerRebatePerc}
+          traderRebatePercent={absolutePercentages.traderRebatePerc}
+        />
       )}
     </>
   );

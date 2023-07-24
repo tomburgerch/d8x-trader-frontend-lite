@@ -387,6 +387,9 @@ export const theme = createTheme({
           fontSize: '16px',
           fontWeight: '500',
           color: 'var(--d8x-color-black-maintext)',
+          '::placeholder': {
+            paddingTop: '1px',
+          },
         },
         notchedOutline: {
           borderColor: 'var(--d8x-color-black-opac)',

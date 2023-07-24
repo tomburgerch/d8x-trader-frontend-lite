@@ -30,6 +30,8 @@ interface NormalReferrerDialogModifyPropsI {
   type: ReferralDialogActionE.MODIFY;
   code: string;
   onClose: () => void;
+  referrerRebatePercent: number;
+  traderRebatePercent: number;
 }
 
 type UpdatedNormalReferrerDialogPropsT = NormalReferrerDialogCreatePropsI | NormalReferrerDialogModifyPropsI;
@@ -47,11 +49,20 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   const baseRebate = useRebateRate(chainId, address, ReferrerRoleE.NORMAL);
 
   const [kickbackRateInputValue, setKickbackRateInputValue] = useState('0');
-  useEffect(() => setKickbackRateInputValue((0.25 * baseRebate).toFixed(2)), [baseRebate]);
+
+  useEffect(() => {
+    let kickbackRate;
+    if (props.type === ReferralDialogActionE.MODIFY) {
+      kickbackRate = props.traderRebatePercent;
+    } else {
+      kickbackRate = 0.25 * baseRebate;
+    }
+    setKickbackRateInputValue(kickbackRate.toFixed(2));
+  }, [baseRebate, props]);
 
   const sidesRowValues = useMemo(() => {
     const traderRate = +kickbackRateInputValue;
-    const userRate = baseRebate - traderRate;
+    const userRate = baseRebate > 0 ? baseRebate - traderRate : 0;
 
     return { userRate: userRate.toFixed(2), traderRate: traderRate.toFixed(2) };
   }, [baseRebate, kickbackRateInputValue]);
@@ -103,7 +114,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   };
 
   return (
-    <Dialog open onClose={props.onClose}>
+    <Dialog open={true} onClose={props.onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           {props.type === ReferralDialogActionE.CREATE ? 'Create' : 'Modify'} Referral Code
