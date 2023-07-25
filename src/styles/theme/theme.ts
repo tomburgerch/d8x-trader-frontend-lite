@@ -186,7 +186,6 @@ export const theme = createTheme({
           lineHeight: '1.5',
           padding: '9px 8px 7px',
           borderColor: 'var(--d8x-color-purple)',
-          paddingTop: '12px !important',
           '&:hover': {
             borderColor: 'var(--d8x-color-purple)',
             backgroundColor: 'var(--d8x-background-purple)',
@@ -337,7 +336,7 @@ export const theme = createTheme({
           props: { size: 'tableSmall' },
           style: {
             ...MuiButtonSharedStyle,
-            padding: '0 8px',
+            padding: '2px 8px 0',
             fontSize: '12px',
             fontWeight: 'normal',
             minWidth: '40px',
