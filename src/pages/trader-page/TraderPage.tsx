@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
@@ -18,11 +18,21 @@ import { SelectorItemI, TableSelector } from 'components/table-selector/TableSel
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
 import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/PerpetualStats';
-import { perpetualStatisticsAtom } from 'store/pools.store';
+import {
+  openOrdersAtom,
+  perpetualStatisticsAtom,
+  poolFeeAtom,
+  positionsAtom,
+  selectedPoolAtom,
+  traderAPIAtom,
+} from 'store/pools.store';
 import { TableTypeE } from 'types/enums';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
+import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
+import { useAccount, useChainId } from 'wagmi';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
@@ -33,7 +43,97 @@ export const TraderPage = memo(() => {
   const [activePositionIndex, setActivePositionIndex] = useState(0);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
 
+  const fetchPositionsRef = useRef(false);
+  const fetchOrdersRef = useRef(false);
+  const fetchFeeRef = useRef(false);
+
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [selectedPool] = useAtom(selectedPoolAtom);
+  const [traderAPI] = useAtom(traderAPIAtom);
+  const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [, setPositions] = useAtom(positionsAtom);
+  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  const [, setPoolFee] = useAtom(poolFeeAtom);
+
+  const chainId = useChainId();
+  const { address } = useAccount();
+
+  const fetchPositions = useCallback(
+    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+      if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchPositionsRef.current) {
+        return;
+      }
+      fetchPositionsRef.current = true;
+      await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            data.map((p) => setPositions(p));
+          }
+          fetchFeeRef.current = false;
+        })
+        .catch((err) => {
+          console.error(err);
+          fetchPositionsRef.current = false;
+        });
+    },
+    [traderAPI, isSDKConnected, setPositions]
+  );
+
+  const fetchOrders = useCallback(
+    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+      if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchOrdersRef.current) {
+        return;
+      }
+      fetchOrdersRef.current = true;
+      await getOpenOrders(_chainId, traderAPI, _poolSymbol, _address)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            data.map((orders) => setOpenOrders(orders));
+          }
+          fetchFeeRef.current = false;
+        })
+        .catch((err) => {
+          console.error(err);
+          fetchOrdersRef.current = false;
+        });
+    },
+    [traderAPI, isSDKConnected, setOpenOrders]
+  );
+
+  const fetchFee = useCallback(
+    async (_chainId: number, _poolSymbol: string, _address: string) => {
+      if (fetchFeeRef.current) {
+        return;
+      }
+      fetchFeeRef.current = true;
+      setPoolFee(undefined);
+      getTradingFee(_chainId, _poolSymbol, _address)
+        .then(({ data }) => {
+          setPoolFee(data);
+          fetchFeeRef.current = false;
+        })
+        .catch((error) => {
+          console.error(error);
+          fetchFeeRef.current = false;
+        });
+    },
+    [setPoolFee]
+  );
+
+  useEffect(() => {
+    if (!chainId || !selectedPool?.poolSymbol || !address) {
+      return;
+    }
+    fetchPositions(chainId, selectedPool.poolSymbol, address);
+    fetchOrders(chainId, selectedPool?.poolSymbol, address);
+    fetchFee(chainId, selectedPool.poolSymbol, address);
+  }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
+
+  useEffect(() => {
+    fetchOrdersRef.current = selectedPool?.poolSymbol === undefined;
+    fetchPositionsRef.current = selectedPool?.poolSymbol === undefined;
+    fetchFeeRef.current = selectedPool?.poolSymbol === undefined;
+  });
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [

@@ -70,7 +70,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     leverage: orderInfo.leverage,
     reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
     keepPositionLvg: orderInfo.keepPositionLeverage,
-    executionTimestamp: 0,
+    executionTimestamp: Math.floor(Date.now() / 1000 - 10),
     deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
 }
@@ -127,18 +127,17 @@ export const ActionBlock = memo(() => {
       mainOrder,
       address,
       positions?.find((pos) => pos.symbol === orderInfo.symbol)
-    ).then((data) => {
-      setNewPositionRisk(data.data.newPositionRisk);
-      setCollateralDeposit(data.data.orderCost);
-      setMaxOrderSize({ maxBuy: data.data.maxLongTrade, maxSell: data.data.maxShortTrade });
-      validityCheckRef.current = false;
-    });
-
-    // setMaxOrderSize(undefined);
-    // await getMaxOrderSizeForTrader(chainId, traderAPIRef.current, mainOrder, address, Date.now()).then((data) => {
-    //   setMaxOrderSize(data.data);
-    //   validityCheckRef.current = false;
-    // });
+    )
+      .then((data) => {
+        setNewPositionRisk(data.data.newPositionRisk);
+        setCollateralDeposit(data.data.orderCost);
+        setMaxOrderSize({ maxBuy: data.data.maxLongTrade, maxSell: data.data.maxShortTrade });
+        validityCheckRef.current = false;
+      })
+      .catch((error) => {
+        console.error(error);
+        validityCheckRef.current = false;
+      });
   }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
 
   const closeReviewOrderModal = useCallback(() => {
@@ -190,7 +189,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: 0,
+        executionTimestamp: Math.floor(Date.now() / 1000 - 10),
       });
     }
 
@@ -208,7 +207,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: 0,
+        executionTimestamp: Math.floor(Date.now() / 1000 - 10),
       });
     }
     return orders;
@@ -221,10 +220,16 @@ export const ActionBlock = memo(() => {
     setRequestSent(true);
     setIsValidityCheckDone(false);
     requestSentRef.current = true;
-    await orderDigest(chainId, parsedOrders, address).then((data) => {
-      if (data.data.digests.length > 0) {
-        approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, collateralDeposit, poolTokenDecimals).then(
-          (res) => {
+    await orderDigest(chainId, parsedOrders, address)
+      .then((data) => {
+        if (data.data.digests.length > 0) {
+          approveMarginToken(
+            signer,
+            selectedPool.marginTokenAddr,
+            proxyAddr,
+            collateralDeposit,
+            poolTokenDecimals
+          ).then((res) => {
             if (res?.hash) {
               console.log(res.hash);
             }
@@ -244,8 +249,6 @@ export const ActionBlock = memo(() => {
                   .wait()
                   .then((receipt) => {
                     if (receipt.status === 1) {
-                      requestSentRef.current = false;
-                      setRequestSent(false);
                       getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
                         ({ data: d }) => {
                           if (d) {
@@ -253,6 +256,8 @@ export const ActionBlock = memo(() => {
                           }
                         }
                       );
+                      requestSentRef.current = false;
+                      setRequestSent(false);
                       toast.success(
                         <ToastContent
                           title="Order Submitted"
@@ -286,6 +291,13 @@ export const ActionBlock = memo(() => {
                         <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                       );
                     } else {
+                      getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
+                        ({ data: d }) => {
+                          if (d) {
+                            d.map((o) => setOpenOrders(o));
+                          }
+                        }
+                      );
                       // false positive, probably just metamask
                       toast.success(
                         <ToastContent
@@ -306,10 +318,16 @@ export const ActionBlock = memo(() => {
                   <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
                 );
               });
+          });
+        }
+      })
+      .then(() => {
+        getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(({ data: d }) => {
+          if (d) {
+            d.map((o) => setOpenOrders(o));
           }
-        );
-      }
-    });
+        });
+      });
   }, [
     parsedOrders,
     chainId,

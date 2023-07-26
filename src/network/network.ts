@@ -230,7 +230,6 @@ export function getMaxOrderSizeForTrader(
     return traderAPI
       .maxOrderSizeForTrader(traderAddr, symbol)
       .then(({ buy, sell }) => {
-        console.log('max buy/sell =', buy, sell);
         return {
           type: 'max-order-size-for-trader',
           msg: '',
@@ -437,7 +436,6 @@ export function getMarketClosedStatus(
   symbol: string
 ): Promise<ValidatedResponseI<{ isMarketClosed: boolean }>> {
   if (traderAPI) {
-    console.log('calling isMarketClosed');
     return traderAPI.isMarketClosed(symbol).then((isClosed) => {
       return {
         type: 'isMarketClosed',
