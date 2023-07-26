@@ -35,9 +35,10 @@ const OptionsHeader = () => {
 
 interface CollateralsSelectPropsI {
   label?: string;
+  withNavigate?: boolean;
 }
 
-export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
+export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelectPropsI) => {
   const { address } = useAccount();
 
   const theme = useTheme();
@@ -84,16 +85,6 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
     }
   }, [selectedPool, isConnected, send, address]);
 
-  useEffect(() => {
-    if (location.hash || !selectedPool) {
-      return;
-    }
-
-    navigate(
-      `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
-    );
-  }, [selectedPool, location.hash, location.pathname, navigate]);
-
   const handleChange = (newItem: PoolI) => {
     let poolId: number | undefined = undefined;
     try {
@@ -104,9 +95,12 @@ export const CollateralsSelect = memo(({ label }: CollateralsSelectPropsI) => {
     setSelectedPool(newItem.poolSymbol);
     setSelectedPoolId(poolId ?? null);
     setSelectedPerpetual(newItem.perpetuals[0].id);
-    navigate(
-      `${location.pathname}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
-    );
+
+    if (withNavigate) {
+      navigate(
+        `${location.pathname}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
+      );
+    }
     clearInputsData();
   };
 

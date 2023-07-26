@@ -33,6 +33,7 @@ import styles from './TraderPage.module.scss';
 import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
 import { useAccount, useChainId } from 'wagmi';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
@@ -57,6 +58,8 @@ export const TraderPage = memo(() => {
 
   const chainId = useChainId();
   const { address } = useAccount();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchPositions = useCallback(
     async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
@@ -121,12 +124,22 @@ export const TraderPage = memo(() => {
   );
 
   useEffect(() => {
+    if (location.hash || !selectedPool) {
+      return;
+    }
+
+    navigate(
+      `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
+    );
+  }, [selectedPool, location.hash, location.pathname, navigate]);
+
+  useEffect(() => {
     if (!chainId || !selectedPool?.poolSymbol || !address) {
       return;
     }
-    fetchPositions(chainId, selectedPool.poolSymbol, address);
-    fetchOrders(chainId, selectedPool?.poolSymbol, address);
-    fetchFee(chainId, selectedPool.poolSymbol, address);
+    fetchPositions(chainId, selectedPool.poolSymbol, address).then();
+    fetchOrders(chainId, selectedPool?.poolSymbol, address).then();
+    fetchFee(chainId, selectedPool.poolSymbol, address).then();
   }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
 
   useEffect(() => {
@@ -216,8 +229,8 @@ export const TraderPage = memo(() => {
       </Helmet>
       <Box className={styles.root}>
         <Header>
-          <CollateralsSelect />
-          <PerpetualsSelect />
+          <CollateralsSelect withNavigate={true} />
+          <PerpetualsSelect withNavigate={true} />
         </Header>
         {isBigScreen && (
           <Container className={styles.sidesContainer}>
