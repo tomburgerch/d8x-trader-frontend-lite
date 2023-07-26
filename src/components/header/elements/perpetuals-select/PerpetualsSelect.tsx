@@ -35,7 +35,11 @@ const OptionsHeader = () => {
   );
 };
 
-export const PerpetualsSelect = memo(() => {
+interface PerpetualsSelectPropsI {
+  withNavigate?: boolean;
+}
+
+export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) => {
   const { chain } = useNetwork();
   const chainId = useChainId();
 
@@ -138,7 +142,9 @@ export const PerpetualsSelect = memo(() => {
 
   const handleChange = (newItem: PerpetualI) => {
     setSelectedPerpetual(newItem.id);
-    navigate(`${location.pathname}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${selectedPool?.poolSymbol}`);
+    if (withNavigate) {
+      navigate(`${location.pathname}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${selectedPool?.poolSymbol}`);
+    }
     clearInputsData();
   };
 

@@ -45,4 +45,39 @@
   .statContainer {
     padding: $d8x-spacing * 3 $d8x-spacing * 4;
   }
+
+  .rootMobile {
+    display: flex;
+    gap: $d8x-spacing * 3;
+
+    .statContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $d8x-spacing * 2 $d8x-spacing * 4;
+      gap: $d8x-spacing * 2;
+    }
+
+    .groupedStat {
+
+      & + .groupedStat {
+        margin-top: $d8x-spacing * 2;
+      }
+
+      .statLabel {
+        font-size: 10px;
+        line-height: 14px;
+        min-width: 50px;
+      }
+
+      .statValue {
+        font-size: 10px;
+        line-height: 14px;
+      }
+    }
+
+    .statValue {
+      white-space: normal;
+    }
+  }
 }

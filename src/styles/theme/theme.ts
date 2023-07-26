@@ -87,7 +87,7 @@ const MuiButtonSharedStyle = {
   minWidth: '140px',
   transition: 'ease-in-out 250ms',
   borderRadius: '26px',
-  padding: '12px 20px 8px',
+  padding: '10px 20px 8px',
   fontSize: '18px',
   fontWeight: 700,
 };
