@@ -14,6 +14,9 @@ import type {
   FundingI,
 } from 'types/types';
 
+const SELECTED_POOL_NAME_LS_KEY = 'd8x_selectedPoolName';
+const SHOW_CHART_FOR_MOBILE_LS_KEY = 'd8x_showChartForMobile';
+
 export const traderAPIAtom = atom<TraderInterface | null>(null);
 export const traderAPIBusyAtom = atom(false);
 export const poolsAtom = atom<PoolI[]>([]);
@@ -37,7 +40,21 @@ export const fundingListAtom = atom<FundingI[]>([]);
 const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
 const ordersAtom = atom<Record<string, OrderI>>({});
 
-const selectedPoolNameLSAtom = atomWithStorage<string>('d8x_selectedPoolName', '');
+const selectedPoolNameLSAtom = atomWithStorage<string>(SELECTED_POOL_NAME_LS_KEY, '');
+const showChartForMobileLSAtom = atomWithStorage(SHOW_CHART_FOR_MOBILE_LS_KEY, false);
+
+export const showChartForMobileAtom = atom(
+  (get) => {
+    const isShown = get(showChartForMobileLSAtom);
+    if (!isShown) {
+      return false;
+    }
+    return isShown;
+  },
+  (get, set, isShown: boolean) => {
+    set(showChartForMobileLSAtom, isShown);
+  }
+);
 
 export const selectedPoolAtom = atom(
   (get) => {

@@ -8,8 +8,6 @@ import { StatsLine } from 'components/stats-line/StatsLine';
 import { StatsLineMobile } from 'components/stats-line/StatsLineMobile';
 import { perpetualStatisticsAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { StatsLineMobile } from '../../../../components/stats-line/StatsLineMobile';
 
 export const PerpetualStats = () => {
   const theme = useTheme();

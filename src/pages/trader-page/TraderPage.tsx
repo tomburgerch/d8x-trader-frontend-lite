@@ -1,6 +1,8 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -16,7 +18,8 @@ import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
-import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
+import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
+import { ChartHolder } from 'pages/trader-page/components/chart-holder/ChartHolder';
 import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/PerpetualStats';
 import {
   openOrdersAtom,
@@ -26,14 +29,11 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { TableTypeE } from 'types/enums';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
-import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
-import { useAccount, useChainId } from 'wagmi';
-import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 export const TraderPage = memo(() => {
   const theme = useTheme();
@@ -236,7 +236,7 @@ export const TraderPage = memo(() => {
           <Container className={styles.sidesContainer}>
             <Box className={styles.leftBlock}>
               <PerpetualStats />
-              <TradingViewChart />
+              <ChartHolder />
               <TableSelector
                 selectorItems={selectorForAllItems}
                 activeIndex={activeAllIndex}
@@ -251,7 +251,7 @@ export const TraderPage = memo(() => {
         {!isBigScreen && (
           <Container className={styles.columnContainer}>
             <PerpetualStats />
-            <TradingViewChart />
+            <ChartHolder />
             <OrderBlock />
             {isMobile ? (
               <TableSelectorMobile selectorItems={selectorForAllItems} />

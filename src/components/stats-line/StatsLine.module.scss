@@ -58,6 +58,22 @@
       gap: $d8x-spacing * 2;
     }
 
+    .chartIcon {
+      display: flex;
+      width: 32px;
+      height: 28px;
+      padding: $d8x-spacing;
+      border-radius: 5px;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &.active {
+        background-color: var(--d8x-color-purple-50, #EFF0FE);
+      }
+    }
+
     .groupedStat {
 
       & + .groupedStat {
