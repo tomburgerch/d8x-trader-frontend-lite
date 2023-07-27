@@ -66,3 +66,10 @@
     display: none;
   }
 }
+
+@media screen and ($d8x-breakpoint-height-max-md) {
+
+  .sliderHolder {
+    margin-bottom: 4px;
+  }
+}
