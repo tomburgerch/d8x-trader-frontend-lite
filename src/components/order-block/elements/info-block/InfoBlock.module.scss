@@ -14,3 +14,11 @@
   margin-top: $d8x-spacing / 2;
   color: var(--d8x-color-black-maintext);
 }
+
+@media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
+  screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) and ($d8x-breakpoint-max-lg) {
+
+  .infoText {
+    font-size: 10px;
+  }
+}
