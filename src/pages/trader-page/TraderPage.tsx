@@ -47,6 +47,7 @@ export const TraderPage = memo(() => {
   const fetchPositionsRef = useRef(false);
   const fetchOrdersRef = useRef(false);
   const fetchFeeRef = useRef(false);
+  const isPageUrlAppliedRef = useRef(false);
 
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -124,10 +125,11 @@ export const TraderPage = memo(() => {
   );
 
   useEffect(() => {
-    if (location.hash || !selectedPool) {
+    if (location.hash || !selectedPool || isPageUrlAppliedRef.current) {
       return;
     }
 
+    isPageUrlAppliedRef.current = true;
     navigate(
       `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
     );
