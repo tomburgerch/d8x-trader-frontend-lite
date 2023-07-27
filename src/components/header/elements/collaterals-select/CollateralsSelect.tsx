@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
@@ -56,13 +56,18 @@ export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelec
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
+  const urlChangesAppliedRed = useRef(false);
+
   useEffect(() => {
-    if (location.hash) {
-      const symbolHash = location.hash.slice(1);
-      const result = parseSymbol(symbolHash);
-      if (result && selectedPool?.poolSymbol !== result.poolSymbol) {
-        setSelectedPool(result.poolSymbol);
-      }
+    if (!location.hash || urlChangesAppliedRed.current) {
+      return;
+    }
+
+    const symbolHash = location.hash.slice(1);
+    const result = parseSymbol(symbolHash);
+    urlChangesAppliedRed.current = true;
+    if (result && selectedPool?.poolSymbol !== result.poolSymbol) {
+      setSelectedPool(result.poolSymbol);
     }
   }, [location.hash, selectedPool, setSelectedPool]);
 
