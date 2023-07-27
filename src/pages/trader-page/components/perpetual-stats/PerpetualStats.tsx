@@ -23,12 +23,19 @@ export const PerpetualStats = () => {
         value: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
+        numberOnly: perpetualStatistics
+          ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
+          : '--',
+        currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
       },
       {
         id: 'markPrice',
         label: 'Mark Price',
         value: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true)
+          : '--',
+        numberOnly: perpetualStatistics
+          ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
           : '--',
         grouped: true,
         columnNr: 1,
@@ -38,6 +45,9 @@ export const PerpetualStats = () => {
         label: 'Index Price',
         value: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true)
+          : '--',
+        numberOnly: perpetualStatistics
+          ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
           : '--',
         grouped: true,
         columnNr: 1,

@@ -26,3 +26,10 @@
     margin-bottom: 3 * $d8x-spacing;
   }
 }
+
+@media screen and ($d8x-breakpoint-height-max-md) {
+
+  .root {
+    margin-top: 2 * $d8x-spacing;
+  }
+}

@@ -31,7 +31,10 @@ export const StatsLineMobile = memo(({ items }: StatsLinePropsI) => {
             {items[0].label}
           </Typography>
           <Typography variant="bodyLarge" className={styles.statValue}>
-            {items[0].value}
+            {items[0].numberOnly}
+          </Typography>
+          <Typography variant="bodyTiny" className={styles.statCurrency}>
+            {items[0].currencyOnly}
           </Typography>
         </Box>
         <Box>
@@ -51,8 +54,8 @@ export const StatsLineMobile = memo(({ items }: StatsLinePropsI) => {
                 <Typography variant="bodyTiny" className={styles.statLabel}>
                   {item.label}
                 </Typography>
-                <Typography variant="bodyLarge" className={styles.statValue}>
-                  {item.value}
+                <Typography variant="bodyTiny" className={styles.statValue}>
+                  {item.numberOnly}
                 </Typography>
               </Box>
             ))}
