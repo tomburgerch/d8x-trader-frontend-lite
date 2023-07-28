@@ -1,19 +1,23 @@
-import { format } from 'date-fns';
 import { useAtom } from 'jotai';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
-import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { getEarnings } from 'network/history';
-import { formatToCurrency } from 'utils/formatToCurrency';
+
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { triggerUserStatsUpdateAtom, sdkConnectedAtom, userAmountAtom, withdrawalsAtom } from 'store/vault-pools.store';
 
+import { formatToCurrency } from 'utils/formatToCurrency';
+
 import styles from './PersonalStats.module.scss';
 
-export const PersonalStats = memo(() => {
+interface PersonalStatsPropsI {
+  withdrawOn: string;
+}
+
+export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const chainId = useChainId();
   const { address } = useAccount();
 
@@ -56,24 +60,6 @@ export const PersonalStats = memo(() => {
         earningsRequestSentRef.current = false;
       });
   }, [chainId, address, selectedPool, triggerUserStatsUpdate]);
-
-  const withdrawnOn = useMemo(() => {
-    if (!withdrawals || withdrawals.length === 0) {
-      return 'N/A';
-    }
-    const currentTime = Date.now();
-    const latestWithdrawalTimeElapsed = withdrawals[withdrawals.length - 1].timeElapsedSec * 1000;
-
-    const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
-    if (currentTime < withdrawalTime) {
-      return format(new Date(withdrawalTime), 'MMMM d yyyy HH:mm');
-    } else if (currentTime >= withdrawalTime + PERIOD_OF_4_DAYS) {
-      return 'Overdue';
-    } else {
-      // (currentTime >= withdrawalTime)
-      return 'Now';
-    }
-  }, [withdrawals]);
 
   return (
     <Box className={styles.root}>
@@ -126,7 +112,7 @@ export const PersonalStats = memo(() => {
           Can be withdrawn on
         </Typography>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {withdrawnOn}
+          {withdrawOn}
         </Typography>
       </Box>
     </Box>

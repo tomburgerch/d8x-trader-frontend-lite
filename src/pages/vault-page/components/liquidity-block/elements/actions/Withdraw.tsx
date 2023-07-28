@@ -26,7 +26,11 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
 
-export const Withdraw = memo(() => {
+interface WithdrawPropsI {
+  withdrawOn: string;
+}
+
+export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
@@ -34,7 +38,7 @@ export const Withdraw = memo(() => {
   const [withdrawals] = useAtom(withdrawalsAtom);
   const [, setTriggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
-
+  console.log(dCurrencyPrice);
   const { data: signer } = useSigner();
 
   const [requestSent, setRequestSent] = useState(false);
@@ -127,11 +131,19 @@ export const Withdraw = memo(() => {
   }, [withdrawals]);
 
   const predictedAmount = useMemo(() => {
-    if (shareAmount && shareAmount > 0 && dCurrencyPrice != null) {
-      return shareAmount * dCurrencyPrice;
+    if (!withdrawals) {
+      return;
+    }
+    if (withdrawals.length === 0) {
+      return 0;
+    }
+    const latestWithdrawal = withdrawals[withdrawals.length - 1];
+
+    if (dCurrencyPrice) {
+      return latestWithdrawal.shareAmount * dCurrencyPrice;
     }
     return 0;
-  }, [shareAmount, dCurrencyPrice]);
+  }, [dCurrencyPrice, withdrawals]);
 
   const isButtonDisabled = useMemo(() => {
     return !userAmount || !shareAmount || requestSent;
@@ -177,7 +189,7 @@ export const Withdraw = memo(() => {
           <Box className={styles.row}>
             <Typography variant="body2">Can be withdrawn on:</Typography>
             <Typography variant="body2">
-              <strong>{format(new Date(Date.now() + PERIOD_OF_2_DAYS), 'MMMM d yyyy HH:mm')}</strong>
+              <strong>{withdrawOn}</strong>
             </Typography>
           </Box>
           <Box className={styles.row}>
