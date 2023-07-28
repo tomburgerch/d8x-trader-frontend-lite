@@ -36,10 +36,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: frontend
           IMAGE_TAG: d8x-frontend-stage-${{ github.sha }}
-          REACT_APP_API_URL: 80001::https://api.quantena.tech;1442::https://api.zktest.quantena.tech;default::https://api.zktest.quantena.tech
-          REACT_APP_HISTORY_URL: default::https://history.zktest.quantena.tech;80001::https://history.api.quantena.tech
+          REACT_APP_API_URL: 80001::https://api.quantena.tech;1442::https://api.zktest.quantena.tech;default::https://api.quantena.tech
+          REACT_APP_HISTORY_URL: default::https://history.api.quantena.tech;80001::https://history.api.quantena.tech
           REACT_APP_REFERRAL_URL: default::https://referral.zktest.quantena.tech;80001::https://referral.api.quantena.tech
-          REACT_APP_WEBSOCKET_URL: 80001::wss://ws.quantena.tech/;1442::wss://ws.zktest.quantena.tech/;default::wss://ws.zktest.quantena.tech/
+          REACT_APP_WEBSOCKET_URL: 80001::wss://ws.quantena.tech/;1442::wss://ws.zktest.quantena.tech/;default::wss://ws.quantena.tech/
           REACT_APP_CANDLES_WEBSOCKET_URL: default::wss://candles.testnet.quantena.tech/
         run: |
           docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_API_URL=$REACT_APP_API_URL --build-arg REACT_APP_HISTORY_URL=$REACT_APP_HISTORY_URL --build-arg REACT_APP_REFERRAL_URL=$REACT_APP_REFERRAL_URL --build-arg REACT_APP_CANDLES_WEBSOCKET_URL=$REACT_APP_CANDLES_WEBSOCKET_URL --build-arg REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL .
