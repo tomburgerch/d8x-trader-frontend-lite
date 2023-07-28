@@ -59,7 +59,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     liqProvTool
       .executeLiquidityWithdrawal(signer, selectedPool.poolSymbol)
       .then(async (tx) => {
-        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        console.log(`executeLiquidityWithdrawal tx hash: ${tx.hash}`);
         toast.success(<ToastContent title="Withdrawing liquidity" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
@@ -181,7 +181,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
                 </Typography>
               </>
             }
-            actionIconClassName={styles.actionIcon}
+            classname={styles.actionIcon}
           />
         </Box>
         <Box className={styles.summaryBlock}>

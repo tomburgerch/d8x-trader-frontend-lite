@@ -198,7 +198,7 @@ export const Add = memo(() => {
                   <Typography>Specify the amount of {selectedPool?.poolSymbol} you want to add to the pool.</Typography>
                 </>
               }
-              actionIconClassName={styles.actionIcon}
+              classname={styles.actionIcon}
             />
           </Box>
           <ResponsiveInput

@@ -4,17 +4,15 @@ import { memo, useMemo } from 'react';
 
 import { Box } from '@mui/material';
 
+import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
 import { Separator } from 'components/separator/Separator';
+import { liquidityTypeAtom, withdrawalsAtom } from 'store/vault-pools.store';
+import { LiquidityTypeE } from 'types/enums';
+
+import { PersonalStats } from '../personal-stats/PersonalStats';
 import { Add } from './elements/actions/Add';
 import { Withdraw } from './elements/actions/Withdraw';
 import { LiquidityTypeSelector } from './elements/liquidity-type-selector/LiquidityTypeSelector';
-import { PersonalStats } from '../personal-stats/PersonalStats';
-
-import { liquidityTypeAtom, withdrawalsAtom } from 'store/vault-pools.store';
-
-import { PERIOD_OF_2_DAYS, PERIOD_OF_4_DAYS } from 'app-constants';
-
-import { LiquidityTypeE } from 'types/enums';
 
 import styles from './LiquidityBlock.module.scss';
 

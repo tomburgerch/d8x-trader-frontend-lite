@@ -70,7 +70,7 @@ export const Initiate = memo(() => {
     await liqProvTool
       .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
-        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        console.log(`initiateLiquidityWithdrawal tx hash: ${tx.hash}`);
         toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
@@ -116,7 +116,7 @@ export const Initiate = memo(() => {
         setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
-        toast.error(<ToastContent title="Error intiating withdrawal" bodyLines={[]} />);
+        toast.error(<ToastContent title="Error initiating withdrawal" bodyLines={[]} />);
       });
   }, [initiateAmount, liqProvTool, signer, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
 
@@ -148,7 +148,7 @@ export const Initiate = memo(() => {
               </Typography>
             </>
           }
-          actionIconClassName={styles.actionIcon}
+          classname={styles.actionIcon}
         />
       </Box>
       <ResponsiveInput
