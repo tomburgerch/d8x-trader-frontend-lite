@@ -57,19 +57,17 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
       <Table>
         <TableHead>
           <TableRow>
-            {referralCodesHeaders
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map(({ label, align }) => (
-                <TableCell key={label.toString()} align={align}>
-                  <Typography variant="bodyTiny" className={styles.headerLabel}>
-                    {label}
-                  </Typography>
-                </TableCell>
-              ))}
+            {referralCodesHeaders.map(({ label, align }) => (
+              <TableCell key={label.toString()} align={align}>
+                <Typography variant="bodyTiny" className={styles.headerLabel}>
+                  {label}
+                </Typography>
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {codes.map((data) => (
+          {codes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data) => (
             <ReferralCodesRow key={data.code} data={data} isAgency={isAgency} />
           ))}
           {codes.length === 0 && <EmptyTableRow colSpan={referralCodesHeaders.length} text={'No rebate codes'} />}

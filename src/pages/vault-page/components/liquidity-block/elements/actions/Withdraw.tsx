@@ -10,6 +10,8 @@ import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { Initiate } from './Initiate';
+
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
@@ -18,11 +20,16 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
+
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
 
-export const Withdraw = memo(() => {
+interface WithdrawPropsI {
+  withdrawOn: string;
+}
+
+export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
@@ -52,7 +59,7 @@ export const Withdraw = memo(() => {
     liqProvTool
       .executeLiquidityWithdrawal(signer, selectedPool.poolSymbol)
       .then(async (tx) => {
-        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        console.log(`executeLiquidityWithdrawal tx hash: ${tx.hash}`);
         toast.success(<ToastContent title="Withdrawing liquidity" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
@@ -117,17 +124,24 @@ export const Withdraw = memo(() => {
     if (currentTime < withdrawalTime) {
       return 0;
     } else {
-      // (currentTime >= withdrawalTime)
       return latestWithdrawal.shareAmount;
     }
   }, [withdrawals]);
 
   const predictedAmount = useMemo(() => {
-    if (shareAmount && shareAmount > 0 && dCurrencyPrice != null) {
-      return shareAmount * dCurrencyPrice;
+    if (!withdrawals) {
+      return;
+    }
+    if (withdrawals.length === 0) {
+      return 0;
+    }
+    const latestWithdrawal = withdrawals[withdrawals.length - 1];
+
+    if (dCurrencyPrice) {
+      return latestWithdrawal.shareAmount * dCurrencyPrice;
     }
     return 0;
-  }, [shareAmount, dCurrencyPrice]);
+  }, [dCurrencyPrice, withdrawals]);
 
   const isButtonDisabled = useMemo(() => {
     return !userAmount || !shareAmount || requestSent;
@@ -138,55 +152,50 @@ export const Withdraw = memo(() => {
       <Box className={styles.infoBlock}>
         <Typography variant="h5">Withdraw liquidity</Typography>
         <Typography variant="body2" className={styles.text}>
-          Withdraw {selectedPool?.poolSymbol} from the pool.
+          To withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 48 hours to process your
+          request and you can only have one withdrawal request at a time.
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          Keep in mind that you need to initiate a withdrawal request before you can withdraw your funds. Once done, a
-          withdrawable amount of d{selectedPool?.poolSymbol} can be exchanged for {selectedPool?.poolSymbol} at d
-          {selectedPool?.poolSymbol} price.
+          After 48 hours, a withdrawable amount of d{selectedPool?.poolSymbol} can be exchanged for{' '}
+          {selectedPool?.poolSymbol} at d{selectedPool?.poolSymbol} price.
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
-        <Box className={styles.inputLine}>
-          <Box className={styles.label}>
-            <InfoBlock
-              title="Withdrawable amount"
-              content={
-                <>
-                  <Typography>
-                    This amount can be converted to {selectedPool?.poolSymbol}, which can be withdrawn from the pool.
-                  </Typography>
-                </>
-              }
-            />
-          </Box>
-          <Typography variant="body1" className={styles.value}>
-            {formatToCurrency(shareAmount, `d${selectedPool?.poolSymbol}`)}
-          </Typography>
+        {!withdrawals.length && (
+          <>
+            <Initiate />
+            <Separator className={styles.separator} />
+          </>
+        )}
+        <Box className={styles.withdrawLabel}>
+          <InfoBlock
+            title={
+              <>
+                {!withdrawals.length && '2.'} Withdraw <strong>{selectedPool?.poolSymbol}</strong>
+              </>
+            }
+            content={
+              <>
+                <Typography>
+                  This amount can be converted to {selectedPool?.poolSymbol}, which can be withdrawn from the pool.
+                </Typography>
+              </>
+            }
+            classname={styles.actionIcon}
+          />
         </Box>
-        <Box className={styles.inputLine}>
-          <Box className={styles.label}>
-            <InfoBlock
-              title={`d${selectedPool?.poolSymbol}`}
-              content={
-                <>
-                  <Typography>
-                    This is the price at which you can convert d{selectedPool?.poolSymbol} to {selectedPool?.poolSymbol}
-                    .
-                  </Typography>
-                </>
-              }
-            />
-          </Box>
-          <Typography variant="body1" className={styles.value}>
-            {formatToCurrency(dCurrencyPrice, selectedPool?.poolSymbol)}
-          </Typography>
-        </Box>
-        <Separator />
         <Box className={styles.summaryBlock}>
           <Box className={styles.row}>
+            <Typography variant="body2">Can be withdrawn on:</Typography>
+            <Typography variant="body2">
+              <strong>{withdrawOn}</strong>
+            </Typography>
+          </Box>
+          <Box className={styles.row}>
             <Typography variant="body2">You receive:</Typography>
-            <Typography variant="body2">{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</Typography>
+            <Typography variant="body2">
+              <strong>{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</strong>
+            </Typography>
           </Box>
         </Box>
         <Box className={styles.buttonHolder}>

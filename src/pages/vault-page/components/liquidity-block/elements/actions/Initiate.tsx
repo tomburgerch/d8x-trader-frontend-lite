@@ -1,17 +1,14 @@
 import { toUtf8String } from '@ethersproject/strings';
-import { format } from 'date-fns';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useSigner } from 'wagmi';
 
-import { Box, Button, Link, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
-import { PERIOD_OF_2_DAYS } from 'app-constants';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { Separator } from 'components/separator/Separator';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   userAmountAtom,
@@ -19,7 +16,6 @@ import {
   triggerUserStatsUpdateAtom,
   triggerWithdrawalsUpdateAtom,
 } from 'store/vault-pools.store';
-import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
 
@@ -74,7 +70,7 @@ export const Initiate = memo(() => {
     await liqProvTool
       .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
-        console.log(`initiateWithdrawal tx hash: ${tx.hash}`);
+        console.log(`initiateLiquidityWithdrawal tx hash: ${tx.hash}`);
         toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
@@ -120,15 +116,9 @@ export const Initiate = memo(() => {
         setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
-        toast.error(<ToastContent title="Error intiating withdrawal" bodyLines={[]} />);
+        toast.error(<ToastContent title="Error initiating withdrawal" bodyLines={[]} />);
       });
   }, [initiateAmount, liqProvTool, signer, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
-
-  const handleMaxUserAmount = useCallback(() => {
-    if (userAmount) {
-      handleInputCapture(`${userAmount}`);
-    }
-  }, [handleInputCapture, userAmount]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
@@ -139,77 +129,47 @@ export const Initiate = memo(() => {
   }, [withdrawals, userAmount, initiateAmount, requestSent]);
 
   return (
-    <div className={styles.root}>
-      <Box className={styles.infoBlock}>
-        <Typography variant="h5">Initiate withdrawal</Typography>
-        <Typography variant="body2" className={styles.text}>
-          Are you looking to withdraw your {selectedPool?.poolSymbol} from the liquidity pool? If so, you can initiate a
-          withdrawal request.
-        </Typography>
-        <Typography variant="body2" className={styles.text}>
-          Keep in mind that it takes 48 hours to process your request and you can only have one withdrawal request at a
-          time.
-        </Typography>
+    <>
+      <Box className={styles.withdrawLabel}>
+        <InfoBlock
+          title={
+            <>
+              1. Initiate withdrawal of <strong>{selectedPool?.poolSymbol}</strong>
+            </>
+          }
+          content={
+            <>
+              <Typography>
+                Specify the amount of d{selectedPool?.poolSymbol} you want to exchange for {selectedPool?.poolSymbol}.
+              </Typography>
+              <Typography>
+                After 48 hours, this amount can be converted to {selectedPool?.poolSymbol} and can be withdrawn from the
+                pool.
+              </Typography>
+            </>
+          }
+          classname={styles.actionIcon}
+        />
       </Box>
-      <Box className={styles.contentBlock}>
-        <Box className={styles.inputLine}>
-          <Box className={styles.label}>
-            <InfoBlock
-              title={
-                <>
-                  Amount of <strong>d{selectedPool?.poolSymbol}</strong>
-                </>
-              }
-              content={
-                <>
-                  <Typography>
-                    Specify the amount of d{selectedPool?.poolSymbol} you want to exchange for{' '}
-                    {selectedPool?.poolSymbol}.
-                  </Typography>
-                  <Typography>
-                    After 48 hours, this amount can be converted to {selectedPool?.poolSymbol} and can be withdrawn from
-                    the pool.
-                  </Typography>
-                </>
-              }
-            />
-          </Box>
-          <ResponsiveInput
-            id="initiate-amount-size"
-            className={styles.inputHolder}
-            inputValue={inputValue}
-            setInputValue={handleInputCapture}
-            currency={`d${selectedPool?.poolSymbol}`}
-            step="1"
-            min={0}
-          />
-        </Box>
-        {userAmount ? (
-          <Typography className={styles.helperText} variant="bodyTiny">
-            Max: <Link onClick={handleMaxUserAmount}>{formatToCurrency(userAmount, selectedPool?.poolSymbol)}</Link>
-          </Typography>
-        ) : null}
-
-        <Box className={styles.summaryBlock}>
-          <Separator />
-          <Box className={styles.row}>
-            <Typography variant="body2">Can be withdrawn on:</Typography>
-            <Typography variant="body2">
-              {format(new Date(Date.now() + PERIOD_OF_2_DAYS), 'MMMM d yyyy HH:mm')}
-            </Typography>
-          </Box>
-        </Box>
-        <Box className={styles.buttonHolder}>
-          <Button
-            variant="primary"
-            disabled={isButtonDisabled}
-            onClick={handleInitiateLiquidity}
-            className={styles.actionButton}
-          >
-            Initiate withdrawal
-          </Button>
-        </Box>
+      <ResponsiveInput
+        id="initiate-amount-size"
+        className={styles.initiateInputHolder}
+        inputValue={inputValue}
+        setInputValue={handleInputCapture}
+        currency={`d${selectedPool?.poolSymbol ?? '--'}`}
+        step="1"
+        min={0}
+      />
+      <Box className={styles.buttonHolder}>
+        <Button
+          variant="primary"
+          disabled={isButtonDisabled}
+          onClick={handleInitiateLiquidity}
+          className={styles.actionButton}
+        >
+          Initiate withdrawal
+        </Button>
       </Box>
-    </div>
+    </>
   );
 });
