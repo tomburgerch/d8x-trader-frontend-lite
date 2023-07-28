@@ -71,7 +71,6 @@ export enum TvChartPeriodE {
 
 export enum LiquidityTypeE {
   Add = 'Add',
-  Initiate = 'Initiate',
   Withdraw = 'Withdraw',
 }
 

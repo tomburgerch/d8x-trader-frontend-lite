@@ -59,7 +59,7 @@ export const PersonalStats = memo(() => {
 
   const withdrawnOn = useMemo(() => {
     if (!withdrawals || withdrawals.length === 0) {
-      return 'na';
+      return 'N/A';
     }
     const currentTime = Date.now();
     const latestWithdrawalTimeElapsed = withdrawals[withdrawals.length - 1].timeElapsedSec * 1000;
@@ -118,7 +118,7 @@ export const PersonalStats = memo(() => {
         <Typography variant="bodyMedium" className={styles.statValue}>
           {withdrawals && withdrawals.length > 0
             ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.poolSymbol}`)
-            : 'na'}
+            : 'N/A'}
         </Typography>
       </Box>
       <Box key="fundingRate" className={styles.statContainer}>

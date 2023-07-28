@@ -5,7 +5,7 @@ import { LiquidityTypeE } from 'types/enums';
 import type { OpenWithdrawalI } from 'types/types';
 
 export const liqProvToolAtom = atom<LiquidityProviderTool | null>(null);
-export const liquidityTypeAtom = atom(LiquidityTypeE.Add);
+export const liquidityTypeAtom = atom(LiquidityTypeE.Withdraw);
 export const withdrawalsAtom = atom<OpenWithdrawalI[]>([]);
 export const dCurrencyPriceAtom = atom<number | null>(null);
 export const tvlAtom = atom<number | null>(null);
