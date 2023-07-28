@@ -1,6 +1,5 @@
 import { toUtf8String } from '@ethersproject/strings';
 import { useAtom } from 'jotai';
-import { format } from 'date-fns';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useSigner } from 'wagmi';
@@ -38,7 +37,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [withdrawals] = useAtom(withdrawalsAtom);
   const [, setTriggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
-  console.log(dCurrencyPrice);
+
   const { data: signer } = useSigner();
 
   const [requestSent, setRequestSent] = useState(false);
@@ -125,7 +124,6 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     if (currentTime < withdrawalTime) {
       return 0;
     } else {
-      // (currentTime >= withdrawalTime)
       return latestWithdrawal.shareAmount;
     }
   }, [withdrawals]);
