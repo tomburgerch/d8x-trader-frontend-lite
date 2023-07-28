@@ -22,7 +22,7 @@ export const VaultPage = memo(() => {
   const { address } = useAccount();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
-  const [triggerUserStatsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
+  const [triggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setWithdrawals] = useAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
@@ -45,7 +45,7 @@ export const VaultPage = memo(() => {
       .finally(() => {
         withdrawalsRequestSentRef.current = false;
       });
-  }, [chainId, address, selectedPool, setWithdrawals, triggerUserStatsUpdate]);
+  }, [chainId, address, selectedPool, setWithdrawals, triggerWithdrawalsUpdate]);
 
   return (
     <>
