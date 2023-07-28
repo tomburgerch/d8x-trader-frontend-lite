@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classnames from 'classnames';
 
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
@@ -10,14 +11,16 @@ import styles from './InfoBlock.module.scss';
 interface InfoBlockPropsI {
   title: string | JSX.Element;
   content: string | JSX.Element;
+  actionIconClassName?: string;
 }
 
-export const InfoBlock = ({ title, content }: InfoBlockPropsI) => {
+export const InfoBlock = ({ title, content, actionIconClassName }: InfoBlockPropsI) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
     <>
-      <InfoIcon onClick={() => setModalOpen(true)} className={styles.actionIcon} /> {title}
+      <InfoIcon onClick={() => setModalOpen(true)} className={classnames(styles.actionIcon, actionIconClassName)} />
+      {title}
       <Dialog open={isModalOpen} className={styles.dialog}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent className={styles.dialogContent}>{content}</DialogContent>

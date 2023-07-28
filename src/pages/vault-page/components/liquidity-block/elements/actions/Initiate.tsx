@@ -148,6 +148,7 @@ export const Initiate = memo(() => {
               </Typography>
             </>
           }
+          actionIconClassName={styles.actionIcon}
         />
       </Box>
       <ResponsiveInput

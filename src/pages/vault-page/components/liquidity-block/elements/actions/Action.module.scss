@@ -92,6 +92,11 @@
   margin-top: $d8x-spacing * 6;
 }
 
+.actionIcon {
+  position: relative;
+  bottom: 2px;
+}
+
 @media screen and ($d8x-breakpoint-max-md) {
 
   .root {

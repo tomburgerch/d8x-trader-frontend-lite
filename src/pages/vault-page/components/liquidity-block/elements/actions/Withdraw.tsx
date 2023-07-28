@@ -181,6 +181,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
                 </Typography>
               </>
             }
+            actionIconClassName={styles.actionIcon}
           />
         </Box>
         <Box className={styles.summaryBlock}>
