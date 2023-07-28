@@ -14,6 +14,10 @@
   line-height: 24px;
 }
 
+.dialogContent > :not(:first-of-type) {
+  margin-top: 16px;
+}
+
 .dialogAction {
   justify-content: center;
 }
@@ -26,4 +30,5 @@
 
 .actionIcon {
   cursor: pointer;
+  position: relative;
 }

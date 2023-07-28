@@ -22,13 +22,28 @@
 }
 
 .statValue {
-  display: block;
+  display: inline-block;
   color: var(--d8x-color-purple);
   white-space: nowrap;
   font-weight: 600;
 }
 
+.statCurrency {
+  display: inline-block;
+  color: var(--d8x-color-purple);
+  white-space: nowrap;
+  font-size: 8px;
+  margin-left: 4px;
+}
+
 @media screen and ($d8x-breakpoint-max-lg) {
+
+  .root {
+    margin-top: 12px;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
 
   .root {
     overflow-x: auto;
@@ -42,19 +57,25 @@
     overflow-x: auto;
   }
 
+  .statValue {
+    font-size: 16px;
+  }
+
   .statContainer {
-    padding: $d8x-spacing * 3 $d8x-spacing * 4;
+    padding: $d8x-spacing * 2 $d8x-spacing * 2;
   }
 
   .rootMobile {
     display: flex;
     gap: $d8x-spacing * 3;
+    margin-bottom: $d8x-spacing * 1;
+    margin-top: $d8x-spacing * 3;
 
     .statContainer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: $d8x-spacing * 2 $d8x-spacing * 4;
+      padding: $d8x-spacing * 2 $d8x-spacing * 2;
       gap: $d8x-spacing * 2;
     }
 
@@ -77,18 +98,20 @@
     .groupedStat {
 
       & + .groupedStat {
-        margin-top: $d8x-spacing * 2;
+        margin-top: $d8x-spacing * 0;
       }
 
       .statLabel {
+        margin-top: $d8x-spacing * 2.5;
         font-size: 10px;
-        line-height: 14px;
+        line-height: 2px;
         min-width: 50px;
+        margin-bottom: 0;
       }
 
       .statValue {
         font-size: 10px;
-        line-height: 14px;
+        line-height: 12px;
       }
     }
 

@@ -4,7 +4,7 @@ import { memo, useMemo } from 'react';
 import { Box, Typography } from '@mui/material';
 
 import { orderInfoAtom, orderSizeAtom } from 'store/order-block.store';
-import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { poolTokenBalanceAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './InfoBlock.module.scss';
@@ -14,6 +14,7 @@ export const InfoBlock = memo(() => {
   const [orderSize] = useAtom(orderSizeAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
 
   const feeInCC = useMemo(() => {
     if (!orderInfo?.tradingFee || !selectedPerpetual?.collToQuoteIndexPrice || !selectedPerpetual?.indexPrice) {
@@ -35,12 +36,26 @@ export const InfoBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <Box className={styles.row}>
-        <Typography variant="bodySmallPopup">Order size</Typography>
-        <Typography variant="bodySmallSB">{formatToCurrency(orderSize, selectedPerpetual?.baseCurrency)}</Typography>
+        <Typography variant="bodySmallPopup" className={styles.infoText}>
+          Wallet balance
+        </Typography>
+        <Typography variant="bodySmallSB" className={styles.infoText}>
+          {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
+        </Typography>
       </Box>
       <Box className={styles.row}>
-        <Typography variant="bodySmallPopup">Fees</Typography>
-        <Typography variant="bodySmallSB">
+        <Typography variant="bodySmallPopup" className={styles.infoText}>
+          Order size
+        </Typography>
+        <Typography variant="bodySmallSB" className={styles.infoText}>
+          {formatToCurrency(orderSize, selectedPerpetual?.baseCurrency)}
+        </Typography>
+      </Box>
+      <Box className={styles.row}>
+        <Typography variant="bodySmallPopup" className={styles.infoText}>
+          Fees
+        </Typography>
+        <Typography variant="bodySmallSB" className={styles.infoText}>
           {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
           {formatToCurrency(feePct, '%', false, 3)}
           {')'}

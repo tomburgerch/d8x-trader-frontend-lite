@@ -100,13 +100,10 @@
     gap: 4 * $d8x-spacing;
   }
 
-  button {
-    height: 50px;
-  }
-
   .enterCodeButton,
   .modifyCodeButton {
     width: 100%;
+    height: 50px;
   }
 
   .modifyCodeButton {

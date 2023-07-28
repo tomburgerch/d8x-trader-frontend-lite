@@ -115,11 +115,12 @@
     gap: 4 * $d8x-spacing;
   }
 
-  button {
+  .cancelButton {
     height: 50px;
   }
 
   .enterCodeButton {
     width: 100%;
+    height: 50px;
   }
 }

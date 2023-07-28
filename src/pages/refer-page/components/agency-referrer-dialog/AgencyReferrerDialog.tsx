@@ -290,7 +290,7 @@ export const AgencyReferrerDialog = (props: UpdatedAgencyReferrerDialogPropsT) =
           </Box>
         )}
         <Box className={styles.dialogActionsContainer}>
-          <Button variant="secondary" onClick={props.onClose}>
+          <Button variant="secondary" onClick={props.onClose} className={styles.cancelButton}>
             Cancel
           </Button>
           {props.type === ReferralDialogActionE.CREATE && (

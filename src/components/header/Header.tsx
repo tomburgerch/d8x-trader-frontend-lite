@@ -26,7 +26,6 @@ import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
-import { Separator } from '../separator/Separator';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { PageAppBar } from './Header.styles';
@@ -214,7 +213,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
             </Button>
           </Toolbar>
           {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
-          {isSmallScreen && <Separator className={styles.mobileSeparator} />}
         </PageAppBar>
         <Box component="nav">
           <Drawer

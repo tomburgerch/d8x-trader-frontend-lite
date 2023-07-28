@@ -13,10 +13,18 @@ export function formatToCurrency(
   value: number | undefined | null,
   currency = '',
   keepZeros = false,
-  fractionDigits?: number
+  fractionDigits?: number,
+  justNumber?: boolean
 ) {
   if (value == null) {
     return '-';
+  }
+
+  if (justNumber) {
+    return `${new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: fractionDigits || mapCurrencyToFractionDigits[currency],
+      minimumFractionDigits: keepZeros ? fractionDigits || mapCurrencyToFractionDigits[currency] : undefined,
+    }).format(value)}`;
   }
   return `${new Intl.NumberFormat('en-US', {
     maximumFractionDigits: fractionDigits || mapCurrencyToFractionDigits[currency],

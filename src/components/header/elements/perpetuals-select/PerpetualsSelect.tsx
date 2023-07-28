@@ -63,9 +63,10 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
 
   const traderAPIRef = useRef(traderAPI);
+  const urlChangesAppliedRed = useRef(false);
 
   useEffect(() => {
-    if (!location.hash || !selectedPool || !selectedPerpetual) {
+    if (!location.hash || !selectedPool || !selectedPerpetual || urlChangesAppliedRed.current) {
       return;
     }
 
@@ -82,6 +83,7 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
       return;
     }
 
+    urlChangesAppliedRed.current = true;
     const foundPerpetual = selectedPool.perpetuals.find(
       (perpetual) => perpetual.quoteCurrency === result.quoteCurrency && perpetual.baseCurrency === result.baseCurrency
     );

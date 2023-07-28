@@ -47,13 +47,14 @@ export const TraderPage = memo(() => {
   const fetchPositionsRef = useRef(false);
   const fetchOrdersRef = useRef(false);
   const fetchFeeRef = useRef(false);
+  const isPageUrlAppliedRef = useRef(false);
 
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
-  const [, setPositions] = useAtom(positionsAtom);
-  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  const [positions, setPositions] = useAtom(positionsAtom);
+  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
   const [, setPoolFee] = useAtom(poolFeeAtom);
 
   const chainId = useChainId();
@@ -124,10 +125,11 @@ export const TraderPage = memo(() => {
   );
 
   useEffect(() => {
-    if (location.hash || !selectedPool) {
+    if (location.hash || !selectedPool || isPageUrlAppliedRef.current) {
       return;
     }
 
+    isPageUrlAppliedRef.current = true;
     navigate(
       `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
     );
@@ -151,17 +153,17 @@ export const TraderPage = memo(() => {
   const positionItems: SelectorItemI[] = useMemo(
     () => [
       {
-        label: 'Positions',
+        label: 'Positions (' + positions.length + ')',
         item: <PositionsTable />,
         tableType: TableTypeE.POSITIONS,
       },
       {
-        label: 'Open Orders',
+        label: 'Open Orders (' + openOrders.length + ')',
         item: <OpenOrdersTable />,
         tableType: TableTypeE.OPEN_ORDERS,
       },
     ],
-    []
+    [positions, openOrders]
   );
 
   const historyItems: SelectorItemI[] = useMemo(

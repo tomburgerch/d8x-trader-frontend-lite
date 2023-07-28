@@ -2,6 +2,8 @@ import { Box, Typography } from '@mui/material';
 
 import { type PoolI } from 'types/types';
 
+import { formatToCurrency } from 'utils/formatToCurrency';
+
 import styles from './Overview.module.scss';
 
 export interface OverviewItemI {
@@ -28,7 +30,7 @@ export const Overview = ({ title, items }: OverviewPropsI) => {
               {itemTitle}
             </Typography>
             <Typography variant="bodyMedium" className={styles.dataValue}>
-              {value} {poolSymbol}
+              {typeof value === 'string' ? value : formatToCurrency(value, poolSymbol, true)}
             </Typography>
           </Box>
         ))}
