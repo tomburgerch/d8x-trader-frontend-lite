@@ -98,8 +98,8 @@ export const ActionBlock = memo(() => {
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [, clearInputsData] = useAtom(clearInputsDataAtom);
   const [, setOpenOrders] = useAtom(openOrdersAtom);
-  const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
 
+  const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
@@ -248,22 +248,18 @@ export const ActionBlock = memo(() => {
                 await tx
                   .wait()
                   .then((receipt) => {
+                    requestSentRef.current = false;
+                    setRequestSent(false);
                     if (receipt.status === 1) {
-                      getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address)
-                        .then(({ data: d }) => {
-                          if (d) {
-                            d.map((o) => setOpenOrders(o));
-                          }
-                        })
-                        .catch(console.error);
-                      requestSentRef.current = false;
-                      setRequestSent(false);
+                      const toastTile = parsedOrders.length > 1 ? 'Orders Submitted' : 'Order Submitted';
                       toast.success(
                         <ToastContent
-                          title="Order Submitted"
+                          title={toastTile}
                           bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
                         />
                       );
+                    } else {
+                      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
                     }
                   })
                   .catch(async (err) => {
@@ -290,33 +286,27 @@ export const ActionBlock = memo(() => {
                       toast.error(
                         <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
                       );
-                    } else {
-                      getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address).then(
-                        ({ data: d }) => {
-                          if (d) {
-                            d.map((o) => setOpenOrders(o));
-                          }
-                        }
-                      );
-                      // false positive, probably just metamask
-                      toast.success(
-                        <ToastContent
-                          title="Order Submitted"
-                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
-                        />
-                      );
                     }
+                  })
+                  .finally(() => {
+                    getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address)
+                      .then(({ data: d }) => {
+                        if (d && d.length > 0) {
+                          d.map((o) => setOpenOrders(o));
+                        }
+                      })
+                      .catch(console.error);
                   });
               })
               .catch(async (error) => {
                 requestSentRef.current = false;
                 setRequestSent(false);
                 console.error(error);
-                let msg = (error?.message ?? error) as string;
-                msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-                toast.error(
-                  <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
-                );
+                // let msg = (error?.message ?? error) as string;
+                // msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+                // toast.error(
+                //   <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                // );
               });
           });
         }
@@ -339,7 +329,6 @@ export const ActionBlock = memo(() => {
     collateralDeposit,
     poolTokenDecimals,
     clearInputsData,
-    // getOpenOrders,
     setOpenOrders,
   ]);
 
