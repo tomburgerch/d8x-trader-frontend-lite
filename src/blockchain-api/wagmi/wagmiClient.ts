@@ -17,25 +17,34 @@ const defaultChains: Chain[] = [
   { ...polygonZkEvmTestnet, iconUrl: zkTestIcon, iconBackground: 'transparent' },
 ];
 
-const { chains, provider } = configureChains(
-  defaultChains,
-  [
+const providers = [
+  jsonRpcProvider({
+    rpc: (chain) => (chain.id === 80001 ? { http: 'https://gateway.tenderly.co/public/polygon-mumbai' } : null),
+    priority: 1,
+  }),
+  jsonRpcProvider({
+    rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc.ankr.com/polygon_mumbai' } : null),
+    priority: 2,
+  }),
+  jsonRpcProvider({
+    rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc-mumbai.maticvigil.com' } : null),
+    priority: 3,
+  }),
+  publicProvider({ priority: 4 }),
+].concat(
+  defaultChains.map(({ id: chainId }: Chain) =>
     jsonRpcProvider({
-      rpc: (chain) => (chain.id === 80001 ? { http: 'https://gateway.tenderly.co/public/polygon-mumbai' } : null),
-    }),
-    jsonRpcProvider({
-      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc.ankr.com/polygon_mumbai' } : null),
-    }),
-    jsonRpcProvider({
-      rpc: (chain) => (chain.id === 80001 ? { http: 'https://rpc-mumbai.maticvigil.com	' } : null),
-    }),
-    publicProvider(),
-  ],
-  {
-    pollingInterval: 10_000,
-    stallTimeout: 5_000,
-  }
+      rpc: (chain) =>
+        chain.id === chainId && config.httpRPC[chainId] && config.httpRPC[chainId] !== ''
+          ? { http: config.httpRPC[chainId] }
+          : null,
+      static: true,
+      priority: 4,
+    })
+  )
 );
+
+const { chains, provider } = configureChains(defaultChains, providers, { stallTimeout: 5_000 });
 
 const projectId = config.projectId;
 
