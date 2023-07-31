@@ -481,6 +481,13 @@ export const theme = createTheme({
         },
       },
     },
+    MuiTablePagination: {
+      styleOverrides: {
+        selectIcon: {
+          top: 0,
+        },
+      },
+    },
     MuiDialogTitle: {
       styleOverrides: {
         root: {
