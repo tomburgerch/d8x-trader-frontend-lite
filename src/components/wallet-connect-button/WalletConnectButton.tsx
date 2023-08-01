@@ -3,6 +3,7 @@ import { Provider } from '@ethersproject/abstract-provider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useConnect, useSigner } from 'wagmi';
 
@@ -12,13 +13,13 @@ import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
 import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ReactComponent as WalletIcon } from 'assets/icons/walletIcon.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { config } from 'config';
 import { getTraderLoyalty } from 'network/network';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { loyaltyScoreAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
 import styles from './WalletConnectButton.module.scss';
-import { config } from 'config';
 
 const loyaltyMap: Record<number, string> = {
   1: 'Diamond',
@@ -29,6 +30,8 @@ const loyaltyMap: Record<number, string> = {
 };
 
 export const WalletConnectButton = memo(() => {
+  const { t } = useTranslation();
+
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -154,7 +157,7 @@ export const WalletConnectButton = memo(() => {
               if (!connected) {
                 return (
                   <Button onClick={openConnectModal} variant="primary" className={styles.connectWalletButton}>
-                    Connect
+                    {t('common.wallet-connect')}
                   </Button>
                 );
               }
@@ -162,7 +165,7 @@ export const WalletConnectButton = memo(() => {
               if (chain.unsupported) {
                 return (
                   <Button onClick={openChainModal} variant="warning">
-                    Wrong network
+                    {t('error.wrong-network')}
                   </Button>
                 );
               }

@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "trade": "Trade",
+    "refer": "Refer",
+    "vault": "Vault"
+  },
+  "pages": {
+    "trade": {
+      "stats": {
+        "mid-price": "Mid Price",
+        "mark-price": "Mark Price",
+        "index-price": "Index Price",
+        "funding-rate": "Funding Rate",
+        "open-interest": "Open Interest"
+      }
+    },
+    "refer": {},
+    "vault": {}
+  },
+  "common": {
+    "change-language": "Change Language",
+    "wallet-connect": "Connect",
+    "select": {
+      "collateral": {
+        "label": "Collateral:",
+        "label2": "Liquidity pool:",
+        "headers": {
+          "collateral": "Collateral",
+          "num-of-perps": "No. of perps"
+        }
+      },
+      "perpetual": {
+        "label": "Perpetual:",
+        "headers": {
+          "pair": "Pair",
+          "status": "Status"
+        }
+      }
+    }
+  },
+  "error": {
+    "wrong-network": "Wrong network"
+  }
+}

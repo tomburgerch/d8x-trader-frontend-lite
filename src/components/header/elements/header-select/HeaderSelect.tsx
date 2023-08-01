@@ -71,7 +71,7 @@ function HeaderSelectComponent<T>(props: HeaderSelectI<T>) {
   return (
     <Box className={styles.root}>
       <FormControl fullWidth variant="filled" className={styles.autocomplete}>
-        <InputLabel id={`${id}-label`}>{label}:</InputLabel>
+        <InputLabel id={`${id}-label`}>{label}</InputLabel>
         <Select
           id={id}
           sx={{ width: width ?? 300 }}

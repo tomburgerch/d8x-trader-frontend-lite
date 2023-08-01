@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "trade": "贸易",
+    "refer": "请参阅",
+    "vault": "金库"
+  },
+  "pages": {
+    "trade": {
+      "stats": {
+        "mid-price": "中等价格",
+        "mark-price": "马克普莱斯",
+        "index-price": "指数价格",
+        "funding-rate": "资助比率",
+        "open-interest": "公开兴趣"
+      }
+    },
+    "refer": {},
+    "vault": {}
+  },
+  "common": {
+    "change-language": "改變語言",
+    "wallet-connect": "連接",
+    "select": {
+      "collateral": {
+        "label": "抵押品:",
+        "label2": "流动性池:",
+        "headers": {
+          "collateral": "抵押品",
+          "num-of-perps": "永续人数"
+        }
+      },
+      "perpetual": {
+        "label": "永久的:",
+        "headers": {
+          "pair": "对的对子",
+          "status": "状"
+        }
+      }
+    }
+  },
+  "error": {
+    "wrong-network": "错误的网络"
+  }
+}

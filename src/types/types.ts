@@ -4,7 +4,14 @@ import { BytesLike } from '@ethersproject/bytes';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
-import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, PageE, StopLossE, TakeProfitE } from './enums';
+import { AlignE, ExpiryE, LanguageE, OrderBlockE, OrderTypeE, PageE, StopLossE, TakeProfitE } from './enums';
+
+export interface LanguageMetaI {
+  id: LanguageE;
+  lang: string;
+  flag: string;
+  name: string;
+}
 
 export interface AppDimensionsI {
   width?: number;
@@ -265,6 +272,7 @@ export interface PageI {
   id: string;
   path: PageE | string;
   title: string;
+  translationKey: string;
 }
 
 export interface ReferralVolumeI {

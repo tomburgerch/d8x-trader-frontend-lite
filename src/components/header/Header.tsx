@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
 
@@ -26,6 +27,7 @@ import { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
+import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 import { PageAppBar } from './Header.styles';
@@ -46,6 +48,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+  const { t } = useTranslation();
   const chainId = useChainId();
   const { chain } = useNetwork();
   const { address } = useAccount();
@@ -161,7 +164,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
             to={page.path}
             className={({ isActive }) => `${styles.navMobileItem} ${isActive ? styles.active : styles.inactive}`}
           >
-            {page.title}
+            {t(page.translationKey)}
           </NavLink>
         ))}
       </nav>
@@ -189,7 +192,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
                       to={page.path}
                       className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : styles.inactive}`}
                     >
-                      {page.title}
+                      {t(page.translationKey)}
                     </NavLink>
                   ))}
                 </nav>
@@ -211,6 +214,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
             >
               <MenuIcon />
             </Button>
+            <LanguageSwitcher />
           </Toolbar>
           {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
         </PageAppBar>
