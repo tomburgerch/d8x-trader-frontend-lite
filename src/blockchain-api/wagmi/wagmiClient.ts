@@ -44,7 +44,7 @@ const providers = [
   )
 );
 
-const { chains, provider } = configureChains(defaultChains, providers, { stallTimeout: 5_000 });
+const { chains, provider, webSocketProvider } = configureChains(defaultChains, providers, { stallTimeout: 5_000 });
 
 const projectId = config.projectId;
 
@@ -64,6 +64,7 @@ const wagmiClient = createClient({
   autoConnect: true,
   connectors,
   provider,
+  webSocketProvider,
 });
 
 export { chains, wagmiClient };
