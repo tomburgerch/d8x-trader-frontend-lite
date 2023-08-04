@@ -62,16 +62,17 @@ export const WalletConnectButton = memo(() => {
         configSDK.priceFeedEndpoints = [{ type: 'pyth', endpoint: config.priceFeedEndpoint[_chainId] }];
       }
       const newTraderAPI = new TraderInterface(configSDK);
-      await newTraderAPI
-        .createProxyInstance(_provider)
+      newTraderAPI
+        .createProxyInstance()
         .then(() => {
           loadingAPIRef.current = false;
           setAPIBusy(false);
           setSDKConnected(true);
           console.log(`SDK loaded on chain id ${_chainId}`);
+          setTraderAPI(newTraderAPI);
         })
         .catch((err) => {
-          console.log(`error loading SDK `);
+          console.log('error loading SDK');
           loadingAPIRef.current = false;
           setAPIBusy(false);
           console.error(err);
@@ -79,7 +80,6 @@ export const WalletConnectButton = memo(() => {
             console.log('error code', err.code);
           }
         });
-      setTraderAPI(newTraderAPI);
     },
     [setTraderAPI, setSDKConnected, setAPIBusy]
   );

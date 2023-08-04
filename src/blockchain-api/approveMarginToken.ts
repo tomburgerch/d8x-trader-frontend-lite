@@ -1,30 +1,38 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { MaxUint256 } from '@ethersproject/constants';
 
 import { erc20ABI } from 'wagmi';
+import { prepareWriteContract, writeContract } from '@wagmi/core';
 import { decNToFloat } from '@d8x/perpetuals-sdk';
+
+import type { AddressT } from 'types/types';
 
 export function approveMarginToken(
   signer: Signer,
   marginTokenAddr: string,
   proxyAddr: string,
   minAmount: number,
-  decimals: number
+  decimals: number,
+  allowance?: BigNumber
 ) {
-  const marginToken = new Contract(marginTokenAddr, erc20ABI, signer);
-  const amount = MaxUint256;
-  const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
-  return signer.getAddress().then((addr: string) => {
-    return marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
-      console.log('allowance =', decNToFloat(allowance, decimals), 'minAmount =', minAmount);
-      if (allowance.gt(minAmountBN)) {
-        return Promise.resolve(null);
-      } else {
-        return marginToken.approve(proxyAddr, amount, { gasLimit: BigNumber.from(1_000_000) });
-      }
-    });
-  });
+  if (allowance) {
+    const amount = MaxUint256;
+    const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
+    console.log('allowance =', decNToFloat(allowance, decimals), 'minAmount =', minAmount);
+    if (allowance.gt(minAmountBN)) {
+      return Promise.resolve(null);
+    } else {
+      return prepareWriteContract({
+        address: marginTokenAddr as AddressT,
+        abi: erc20ABI,
+        functionName: 'approve',
+        args: [proxyAddr as AddressT, amount],
+        signer,
+      }).then((config) => writeContract(config));
+    }
+  } else {
+    return Promise.resolve(null);
+  }
 }

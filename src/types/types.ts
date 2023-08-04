@@ -6,6 +6,8 @@ import type { ReactNode } from 'react';
 
 import { AlignE, ExpiryE, OrderBlockE, OrderTypeE, PageE, StopLossE, TakeProfitE } from './enums';
 
+export type AddressT = `0x${string}`;
+
 export interface AppDimensionsI {
   width?: number;
   height?: number;

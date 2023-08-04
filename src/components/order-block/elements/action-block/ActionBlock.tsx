@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useSigner } from 'wagmi';
+import { erc20ABI, useAccount, useChainId, useContractRead, useSigner } from 'wagmi';
 import { Separator } from 'components/separator/Separator';
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -27,7 +27,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import { OrderI, OrderInfoI } from 'types/types';
+import { AddressT, OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -110,7 +110,7 @@ export const ActionBlock = memo(() => {
 
   useEffect(() => {
     traderAPIRef.current = traderAPI;
-  });
+  }, [traderAPI]);
 
   const openReviewOrderModal = useCallback(async () => {
     if (!orderInfo || !address || !traderAPIRef.current) {
@@ -212,6 +212,14 @@ export const ActionBlock = memo(() => {
     return orders;
   }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
+  const { data: allowance } = useContractRead({
+    address: (selectedPool?.marginTokenAddr ? selectedPool.marginTokenAddr : '') as AddressT,
+    abi: erc20ABI,
+    functionName: 'allowance',
+    args: [address as AddressT, proxyAddr as AddressT],
+    enabled: !!selectedPool && !!selectedPool.marginTokenAddr,
+  });
+
   const handleOrderConfirm = useCallback(() => {
     if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
       return;
@@ -220,94 +228,110 @@ export const ActionBlock = memo(() => {
     setIsValidityCheckDone(false);
     requestSentRef.current = true;
     orderDigest(chainId, parsedOrders, address)
-      .then(async (data) => {
+      .then((data) => {
         if (data.data.digests.length > 0) {
           // hide modal now that metamask popup shows up
           setShowReviewOrderModal(false);
-          await approveMarginToken(
+          approveMarginToken(
             signer,
             selectedPool.marginTokenAddr,
             proxyAddr,
             collateralDeposit,
-            poolTokenDecimals
-          ).then(async (res) => {
-            if (res?.hash) {
-              console.log(res.hash);
-            }
-            setTimeout(() => setShowReviewOrderModal(false), 5_000);
-            // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-            const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-            await postOrder(signer, signatures, data.data).then(async (tx) => {
-              // success submitting order to the node
-              console.log(`postOrder tx hash: ${tx.hash}`);
-              setShowReviewOrderModal(false);
-              // order was sent, release lock and clear - no need to wait for the blockchain
+            poolTokenDecimals,
+            allowance
+          )
+            .then(async (res) => {
+              if (res?.hash) {
+                console.log(res.hash);
+              }
+              // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+              const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
+              await postOrder(signer, signatures, data.data).then(async (tx) => {
+                // success submitting order to the node
+                console.log(`postOrder tx hash: ${tx.hash}`);
+                // order was sent, release lock and clear - no need to wait for the blockchain
+                requestSentRef.current = false;
+                setRequestSent(false);
+                clearInputsData();
+                toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
+                await tx
+                  .wait()
+                  .then((receipt) => {
+                    // txn went through
+                    if (receipt.status === 1) {
+                      const toastTile = parsedOrders.length > 1 ? 'Orders Submitted' : 'Order Submitted';
+                      toast.success(
+                        <ToastContent
+                          title={toastTile}
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                    } else {
+                      // typically unreachable
+                      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+                    }
+                  })
+                  .catch(async (err) => {
+                    // txn failed - get the revert reason
+                    console.error(err);
+                    const response = await signer.call(
+                      {
+                        to: tx.to,
+                        from: tx.from,
+                        nonce: tx.nonce,
+                        gasLimit: tx.gasLimit,
+                        gasPrice: tx.gasPrice,
+                        data: tx.data,
+                        value: tx.value,
+                        chainId: tx.chainId,
+                        type: tx.type ?? undefined,
+                        accessList: tx.accessList,
+                      },
+                      tx.blockNumber
+                    );
+                    const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
+                    if (reason !== '') {
+                      toast.error(
+                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      );
+                    }
+                  })
+                  .finally(() => {
+                    // we go the receipt or failed trying - refresh orders
+                    getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address)
+                      .then(({ data: d }) => {
+                        if (d && d.length > 0) {
+                          console.log('fetched open orders');
+                          d.map((o) => setOpenOrders(o));
+                        }
+                      })
+                      .catch(console.error);
+                  });
+              });
+
+              // ensure we can trade again
               requestSentRef.current = false;
               setRequestSent(false);
-              clearInputsData();
-              toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
-              await tx
-                .wait()
-                .then((receipt) => {
-                  // txn went through
-                  if (receipt.status === 1) {
-                    const toastTile = parsedOrders.length > 1 ? 'Orders Submitted' : 'Order Submitted';
-                    toast.success(
-                      <ToastContent
-                        title={toastTile}
-                        bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
-                      />
-                    );
-                  } else {
-                    // typically unreachable
-                    toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
-                  }
-                })
-                .catch(async (err) => {
-                  // txn failed - get the revert reason
-                  console.error(err);
-                  const response = await signer.call(
-                    {
-                      to: tx.to,
-                      from: tx.from,
-                      nonce: tx.nonce,
-                      gasLimit: tx.gasLimit,
-                      gasPrice: tx.gasPrice,
-                      data: tx.data,
-                      value: tx.value,
-                      chainId: tx.chainId,
-                      type: tx.type ?? undefined,
-                      accessList: tx.accessList,
-                    },
-                    tx.blockNumber
-                  );
-                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                  if (reason !== '') {
-                    toast.error(
-                      <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                    );
-                  }
-                })
-                .finally(() => {
-                  // we go the receipt or failed trying - refresh orders
-                  getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address)
-                    .then(({ data: d }) => {
-                      if (d && d.length > 0) {
-                        console.log('fetched open orders');
-                        d.map((o) => setOpenOrders(o));
-                      }
-                    })
-                    .catch(console.error);
-                });
+              setShowReviewOrderModal(false);
+            })
+            .catch((error) => {
+              // not a transaction error, but probably metamask or network -> no toast
+              console.error(error);
+              // ensure we can trade again
+              requestSentRef.current = false;
+              setRequestSent(false);
+              setShowReviewOrderModal(false);
             });
-          });
+        } else {
+          // ensure we can trade again
+          requestSentRef.current = false;
+          setRequestSent(false);
+          setShowReviewOrderModal(false);
         }
       })
       .catch((error) => {
         // not a transaction error, but probably metamask or network -> no toast
         console.error(error);
-      })
-      .finally(() => {
         // ensure we can trade again
         requestSentRef.current = false;
         setRequestSent(false);
@@ -324,6 +348,7 @@ export const ActionBlock = memo(() => {
     poolTokenDecimals,
     clearInputsData,
     setOpenOrders,
+    allowance,
   ]);
 
   const atPrice = useMemo(() => {
