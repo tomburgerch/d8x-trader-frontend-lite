@@ -173,6 +173,77 @@
         "funding-block-mobile": {
           "symbol": "Symbol"
         }
+      },
+      "order-block": {
+        "selector": {
+          "long": "Long",
+          "short": "Short"
+        },
+        "order-type": {
+          "market": "Market",
+          "limit": "Limit",
+          "stop": "Stop"
+        }, 
+        "order-size": {
+          "title": "Order size",
+          "body1": "Sets the size of your order.",
+          "body2": "Your maximal order size, based on your open positions and the state of the exchange, is:",
+          "body3": "The minimal position size for this perpetual is:",
+          "body4": "The step size is:"
+        },
+        "limit-price": {
+          "title": "Limit price",
+          "body1": "If you specify a limit price your order will be executed at the predetermined limit price or a better price.",
+          "body2": "For a stop order, setting a limit price is optional. A stop order with specified limit price is a stop-limit order, a stop order without specified limit price is a stop-market order."
+        },
+        "trigger-price": {
+          "title": "Trigger price",
+          "body1": "The trigger price is the mark price at which your stop order is triggered.",
+          "body2": "If you do not select a limit price in addition to your trigger price, you would be placing a stop-market order. Your order will be executed at the best available price once triggered.",
+          "body3": "If you specify a limit price in addition to your trigger price, you would be placing a stop-limit order. Your order will be executed at the predetermined limit price or a better price."
+        },
+        "leverage": {
+          "title": "Leverage",
+          "body1": "Specifies the leverage of your order.",
+          "body2": "If your order is reducing an existing position ('partial closure'), the leverage you select has no impact."
+        },
+        "slippage": {
+          "title": "Slippage settings",
+          "body": "Choose slippage tolerance",
+          "max": "Max entry price:",
+          "min": "Min entry price:",
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        },
+        "reduce-only": "Reduce only",
+        "expiry": {
+          "title": "Expiry settings",
+          "body": "Set the number of days after, which your main order will expire (this setting does not affect your take-profit and stop-loss orders).",
+          "close": "Close"
+        },
+        "stop-loss": {
+          "title": "Stop loss",
+          "body1": "You can specify a stop loss order to go along with your main order.",
+          "body2": "If you select e.g. -50%, you create a second order, that will be triggered if your loss on your main order reaches -50%.",
+          "body3": "Technically, you are specifying a stop-market order, of the opposing side (if your main order is a BUY order, you are specifying a stop-market SELL order). The trigger price is automatically calculated such that your overall loss is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NONE"
+        },
+        "take-profit": {
+          "title": "Take profit",
+          "body1": "You can specify a take profit order to go along with your main order.",
+          "body2": "If you select e.g., 100%, you create a second order, that will be triggered if your profit on your main order reaches 100%.",
+          "body3": "Technically, you are specifying a limit order of the opposing side (if your main order is a BUY order, you are specifying a limit SELL order). The limit price is automatically calculated such that your overall profit is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NONE"
+        },
+        "info": {
+          "balance": "Wallet balance",
+          "order-size": "Order size",
+          "fees": "Fees"
+        }, 
+        "review": {
+          "title": "Review order"
+        }
+
       }
     },
     "refer": {},

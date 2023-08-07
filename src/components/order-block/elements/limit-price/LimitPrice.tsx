@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
@@ -13,6 +14,7 @@ import commonStyles from '../../OrderBlock.module.scss';
 import styles from './LimitPrice.module.scss';
 
 export const LimitPrice = memo(() => {
+  const { t } = useTranslation();
   const [orderType] = useAtom(orderTypeAtom);
   const [limitPrice, setLimitPrice] = useAtom(limitPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
@@ -60,17 +62,11 @@ export const LimitPrice = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.label}>
         <InfoBlock
-          title="Limit price"
+          title={t('pages.trade.order-block.limit-price.title')}
           content={
             <>
-              <Typography>
-                If you specify a limit price your order will be executed at the predetermined limit price or a better
-                price.
-              </Typography>
-              <Typography>
-                For a stop order, setting a limit price is optional. A stop order with specified limit price is a
-                stop-limit order, a stop order without specified limit price is a stop-market order.
-              </Typography>
+              <Typography>{t('pages.trade.order-block.limit-price.body1')}</Typography>
+              <Typography>{t('pages.trade.order-block.limit-price.body2')}</Typography>
             </>
           }
           classname={commonStyles.actionIcon}

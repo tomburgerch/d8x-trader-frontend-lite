@@ -14,103 +14,103 @@
         "open-interest": "公开兴趣"
       },
       "positions-table": {
-        "table-title": "待完成",
+        "table-title": "待完成1",
         "table-header": {
           "symbol": "待完成",
-          "size": "待完成",
-          "side": "待完成",
-          "entry-price": "待完成",
-          "liq-price": "待完成",
-          "margin": "待完成",
-          "pnl": "待完成"
+          "size": "待完成3",
+          "side": "待完成4",
+          "entry-price": "待完成5",
+          "liq-price": "待完成6",
+          "margin": "待完成7",
+          "pnl": "待完成8"
         },
         "table-content": {
-          "buy": "待完成",
-          "sell": "待完成",
-          "modify": "待完成",
-          "connect": "待完成",
-          "no-open": "待完成"
+          "buy": "待完成9",
+          "sell": "待完成10",
+          "modify": "待完成11",
+          "connect": "待完成12",
+          "no-open": "待完成13"
         },
         "position-block-mobile": {
-          "symbol": "待完成",
-          "modify": "待完成"
+          "symbol": "待完成14",
+          "modify": "待完成15"
         },
         "modify-modal": {
-          "title": "待完成",
+          "title": "待完成15",
           "selector": {
-            "close": "待完成",
-            "add": "待完成",
-            "remove": "待完成"
+            "close": "待完成16",
+            "add": "待完成17",
+            "remove": "待完成18"
           },
-          "close": "待完成",
-          "add": "待完成",
-          "remove": "待完成",
+          "close": "待完成19",
+          "add": "待完成21",
+          "remove": "待完成22",
           "pos-details": {
-            "title": "待完成",
-            "size": "待完成:",
-            "margin": "待完成:",
-            "leverage": "待完成:",
-            "liq-price": "待完成:"
+            "title": "待完成23",
+            "size": "待完成24:",
+            "margin": "待完成25:",
+            "leverage": "待完成26:",
+            "liq-price": "待完成27:"
           },
-          "cancel": "待完成",
-          "confirm": "待完成"
+          "cancel": "待完成28",
+          "confirm": "待完成29"
         },
         "toasts": {
           "submit-close": {
-            "title": "待完成"
+            "title": "待完成31"
           },
           "submitted": {
-            "title": "待完成",
-            "body": "待完成"
+            "title": "待完成32",
+            "body": "待完成33"
           },
           "tx-failed": {
-            "title": "待完成",
-            "body": "待完成"
+            "title": "待完成34",
+            "body": "待完成35"
           },
           "error-processing": {
-            "title": "待完成",
-            "body": "待完成"
+            "title": "待完成36",
+            "body": "待完成37"
           },
           "adding-collateral": {
-            "title": "待完成"
+            "title": "待完成38"
           },
           "collateral-added": {
-            "title": "待完成",
-            "body1": "待完成",
-            "body2": "待完成"
+            "title": "待完成39",
+            "body1": "待完成41",
+            "body2": "待完成42"
           },
           "removing-collateral": {
-            "title": "待完成"
+            "title": "待完成43"
           },
           "collateral-removed": {
-            "title": "待完成",
-            "body1": "待完成",
-            "body2": "待完成"
+            "title": "待完成44",
+            "body1": "待完成45",
+            "body2": "待完成46"
           }
         }
       },
       "orders-table": {
         "table-title": "待完成",
         "table-header": {
-          "symbol": "待完成",
-          "side": "待完成",
-          "type": "待完成",
-          "order-size": "待完成",
-          "limit-price": "待完成",
-          "stop-price": "待完成",
-          "leverage": "待完成",
-          "good-until": "待完成"
+          "symbol": "待完成48",
+          "side": "待完成49",
+          "type": "待完成51",
+          "order-size": "待完成52",
+          "limit-price": "待完成53",
+          "stop-price": "待完成54",
+          "leverage": "待完成55",
+          "good-until": "待完成56"
         },
         "table-content": {
-          "buy": "待完成",
-          "sell": "待完成",
-          "connect": "待完成",
-          "no-open": "待完成",
-          "na": "待完成",
-          "cancel": "待完成",
-          "limit": "待完成",
-          "market": "待完成",
-          "stop": "待完成"
+          "buy": "待完成57",
+          "sell": "待完成58",
+          "connect": "待完成59",
+          "no-open": "待完成61",
+          "na": "待完成62",
+          "cancel": "待完成63",
+          "limit": "待完成64",
+          "market": "待完成65",
+          "stop": "待完成66"
         },
         "cancel-modal": {
           "title": "待完成",
@@ -160,7 +160,7 @@
         }
       },
       "funding-table": {
-        "table-title": "待完成",
+        "table-title": "待完成2",
         "table-header": {
           "time": "待完成",
           "perpetual": "待完成",
@@ -173,6 +173,77 @@
         "funding-block-mobile": {
           "symbol": "待完成"
         }
+      },
+      "order-block": {
+        "selector": {
+          "long": "f待f",
+          "short": "dd待d"
+        },
+        "order-type": {
+          "market": "Mar待ket",
+          "limit": "L待imit",
+          "stop": "Sto待p"
+        }, 
+        "order-size": {
+          "title": "Ord待er size",
+          "body1": "Sets待 the size of your order.",
+          "body2": "Y待our maximal order size, based on your open positions and the state of the exchange, is:",
+          "body3": "Th待e minimal position size for this perpetual is:",
+          "body4": "Th待e step size is:"
+        },
+        "limit-price": {
+          "title": "Lim待it price",
+          "body1": "If待 you specify a limit price your order will be executed at the predetermined limit price or a better price.",
+          "body2": "Fo待r a stop order, setting a limit price is optional. A stop order with specified limit price is a stop-limit order, a stop order without specified limit price is a stop-market order."
+        },
+        "trigger-price": {
+          "title": "Tr待igger price",
+          "body1": "Th待e trigger price is the mark price at which your stop order is triggered.",
+          "body2": "If待 you do not select a limit price in addition to your trigger price, you would be placing a stop-market order. Your order will be executed at the best available price once triggered.",
+          "body3": "If 待you specify a limit price in addition to your trigger price, you would be placing a stop-limit order. Your order will be executed at the predetermined limit price or a better price."
+        },
+        "leverage": {
+          "title": "Levera待ge",
+          "body1": "Speci待fies the leverage of your order.",
+          "body2": "If 待your order is reducing an existing position ('partial closure'), the leverage you select has no impact."
+        },
+        "slippage": {
+          "title": "Slip待page settings",
+          "body": "Choos待e slippage tolerance",
+          "max": "Max e待ntry price:",
+          "min": "Min e待ntry price:",
+          "cancel": "Ca待ncel",
+          "confirm": "Co待nfirm"
+        },
+        "reduce-only": "R待educe only",
+        "expiry": {
+          "title": "Exp待iry settings",
+          "body": "Set the待 number of days after, which your main order will expire (this setting does not affect your take-profit and stop-loss orders).",
+          "close": "Clo待se"
+        },
+        "stop-loss": {
+          "title": "S待top loss",
+          "body1": "Yo待u can specify a stop loss order to go along with your main order.",
+          "body2": "If待 you select e.g. -50%, you create a second order, that will be triggered if your loss on your main order reaches -50%.",
+          "body3": "Te待chnically, you are specifying a stop-market order, of the opposing side (if your main order is a BUY order, you are specifying a stop-market SELL order). The trigger price is automatically calculated such that your overall loss is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NO待NE"
+        },
+        "take-profit": {
+          "title": "Take待 profit",
+          "body1": "You 待can specify a take profit order to go along with your main order.",
+          "body2": "If yo待u select e.g., 100%, you create a second order, that will be triggered if your profit on your main order reaches 100%.",
+          "body3": "Techni待cally, you are specifying a limit order of the opposing side (if your main order is a BUY order, you are specifying a limit SELL order). The limit price is automatically calculated such that your overall profit is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NO待NE"
+        },
+        "info": {
+          "balance": "Wal待let balance",
+          "order-size": "O待rder size",
+          "fees": "Fe待es"
+        }, 
+        "review": {
+          "title": "Revi待ew order"
+        }
+
       }
     },
     "refer": {},

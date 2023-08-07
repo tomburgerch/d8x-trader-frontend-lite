@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Slider, Typography } from '@mui/material';
 
@@ -20,6 +21,7 @@ function valueLabelFormat(value: number) {
 }
 
 export const LeverageSelector = memo(() => {
+  const { t } = useTranslation();
   const [leverage, setLeverage] = useAtom(leverageAtom);
   const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
 
@@ -65,14 +67,11 @@ export const LeverageSelector = memo(() => {
       <Box className={styles.rowOne}>
         <Box className={styles.label}>
           <InfoBlock
-            title="Leverage"
+            title={t('pages.trade.order-block.leverage.title')}
             content={
               <>
-                <Typography>Specifies the leverage of your order.</Typography>
-                <Typography>
-                  If your order is reducing an existing position ("partial closure"), the leverage you select has no
-                  impact.
-                </Typography>
+                <Typography>{t('pages.trade.order-block.leverage.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.leverage.body2')}</Typography>
               </>
             }
             classname={commonStyles.actionIcon}

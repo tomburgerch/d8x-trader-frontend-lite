@@ -1,6 +1,7 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
@@ -17,6 +18,7 @@ import commonStyles from '../../OrderBlock.module.scss';
 import styles from './OrderSize.module.scss';
 
 export const OrderSize = memo(() => {
+  const { t } = useTranslation();
   const [orderSize, setOrderSize] = useAtom(orderSizeAtom);
   const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
@@ -123,15 +125,14 @@ export const OrderSize = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.label}>
         <InfoBlock
-          title={'Order size'}
+          title={t('pages.trade.order-block.order-size.title')}
           content={
             <>
-              <Typography> Sets the size of your order. </Typography>
+              <Typography> {t('pages.trade.order-block.order-size.body1')} </Typography>
               <Typography>
-                Your maximal order size, based on your open positions and the state of the exchange, is {maxOrderSize}{' '}
-                {selectedPerpetual?.baseCurrency}. The minimal position size for this perpetual is {minPositionString}{' '}
-                {selectedPerpetual?.baseCurrency}, with a step size of {orderSizeStep} {selectedPerpetual?.baseCurrency}
-                .
+                {t('pages.trade.order-block.order-size.body2')} {maxOrderSize} {selectedPerpetual?.baseCurrency}.{' '}
+                {t('pages.trade.order-block.order-size.body3')} {minPositionString} {selectedPerpetual?.baseCurrency}.{' '}
+                {t('pages.trade.order-block.order-size.body4')} {orderSizeStep} {selectedPerpetual?.baseCurrency}.
               </Typography>
             </>
           }
