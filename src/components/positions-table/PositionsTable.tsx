@@ -2,6 +2,7 @@ import { HashZero } from '@ethersproject/constants';
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
@@ -78,6 +79,7 @@ import { toUtf8String } from '@ethersproject/strings';
 const MIN_WIDTH_FOR_TABLE = 900;
 
 export const PositionsTable = memo(() => {
+  const { t } = useTranslation();
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
@@ -158,7 +160,9 @@ export const PositionsTable = memo(() => {
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
                   console.log(`closePosition tx hash: ${tx.hash}`);
-                  toast.success(<ToastContent title="Submitting Closing Order" bodyLines={[]} />);
+                  toast.success(
+                    <ToastContent title={t('pages.trade.positions-table.toasts.submit-close.title')} bodyLines={[]} />
+                  );
                   await tx
                     .wait()
                     .then((receipt) => {
@@ -166,8 +170,13 @@ export const PositionsTable = memo(() => {
                       if (receipt.status === 1) {
                         toast.success(
                           <ToastContent
-                            title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: closeOrder.symbol }]} //.concat(
+                            title={t('pages.trade.positions-table.toasts.submitted.title')}
+                            bodyLines={[
+                              {
+                                label: t('pages.trade.positions-table.toasts.submitted.body'),
+                                value: closeOrder.symbol,
+                              },
+                            ]} //.concat(
                           />
                         );
                       }
@@ -192,14 +201,24 @@ export const PositionsTable = memo(() => {
                       const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
                       if (reason !== '') {
                         toast.error(
-                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                          <ToastContent
+                            title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+                            bodyLines={[
+                              { label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason },
+                            ]}
+                          />
                         );
                       } else {
                         // false positive, probably just Metamask/RPC
                         toast.success(
                           <ToastContent
-                            title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: closeOrder.symbol }]}
+                            title={t('pages.trade.positions-table.toasts.submitted.title')}
+                            bodyLines={[
+                              {
+                                label: t('pages.trade.positions-table.toasts.submitted.body'),
+                                value: closeOrder.symbol,
+                              },
+                            ]}
                           />
                         );
                       }
@@ -211,7 +230,10 @@ export const PositionsTable = memo(() => {
                   let msg = (error?.message ?? error) as string;
                   msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
                   toast.error(
-                    <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                    <ToastContent
+                      title={t('pages.trade.positions-table.toasts.error-processing.title')}
+                      bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
+                    />
                   );
                 });
             });
@@ -236,17 +258,28 @@ export const PositionsTable = memo(() => {
                   setModifyModalOpen(false);
                   setSelectedPosition(null);
                   console.log(`addCollateral tx hash: ${tx.hash}`);
-                  toast.success(<ToastContent title="Adding Collateral" bodyLines={[]} />);
+                  toast.success(
+                    <ToastContent
+                      title={t('pages.trade.positions-table.toasts.adding-collateral.title')}
+                      bodyLines={[]}
+                    />
+                  );
                   await tx
                     .wait()
                     .then((receipt) => {
                       if (receipt.status === 1) {
                         toast.success(
                           <ToastContent
-                            title="Collateral Added"
+                            title={t('pages.trade.positions-table.toasts.collateral-added.title')}
                             bodyLines={[
-                              { label: 'Symbol', value: selectedPosition.symbol },
-                              { label: 'Amount', value: formatToCurrency(addCollateral, selectedPool.poolSymbol) },
+                              {
+                                label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
+                                value: selectedPosition.symbol,
+                              },
+                              {
+                                label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
+                                value: formatToCurrency(addCollateral, selectedPool.poolSymbol),
+                              },
                             ]}
                           />
                         );
@@ -273,16 +306,27 @@ export const PositionsTable = memo(() => {
                       setRequestSent(false);
                       if (reason !== '') {
                         toast.error(
-                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                          <ToastContent
+                            title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+                            bodyLines={[
+                              { label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason },
+                            ]}
+                          />
                         );
                       } else {
                         // false positive, probably just metamask
                         toast.success(
                           <ToastContent
-                            title="Collateral Added"
+                            title={t('pages.trade.positions-table.toasts.collateral-added.title')}
                             bodyLines={[
-                              { label: 'Symbol', value: selectedPosition.symbol },
-                              { label: 'Amount', value: formatToCurrency(addCollateral, selectedPool.poolSymbol) },
+                              {
+                                label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
+                                value: selectedPosition.symbol,
+                              },
+                              {
+                                label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
+                                value: formatToCurrency(addCollateral, selectedPool.poolSymbol),
+                              },
                             ]}
                           />
                         );
@@ -293,7 +337,10 @@ export const PositionsTable = memo(() => {
                   let msg = (error?.message ?? error) as string;
                   msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
                   toast.error(
-                    <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                    <ToastContent
+                      title={t('pages.trade.positions-table.toasts.error-processing.title')}
+                      bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
+                    />
                   );
                   console.error(error);
                   setRequestSent(false);
@@ -318,18 +365,29 @@ export const PositionsTable = memo(() => {
               setRequestSent(false);
               setModifyModalOpen(false);
               setSelectedPosition(null);
-              console.log(`removeCollaeral tx hash: ${tx.hash}`);
-              toast.success(<ToastContent title="Removing Collateral" bodyLines={[]} />);
+              console.log(`removeCollateral tx hash: ${tx.hash}`);
+              toast.success(
+                <ToastContent
+                  title={t('pages.trade.positions-table.toasts.removing-collateral.title')}
+                  bodyLines={[]}
+                />
+              );
               await tx
                 .wait()
                 .then((receipt) => {
                   if (receipt.status === 1) {
                     toast.success(
                       <ToastContent
-                        title="Collateral Removed"
+                        title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
                         bodyLines={[
-                          { label: 'Symbol', value: selectedPosition.symbol },
-                          { label: 'Amount', value: formatToCurrency(removeCollateral, selectedPool.poolSymbol) },
+                          {
+                            label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
+                            value: selectedPosition.symbol,
+                          },
+                          {
+                            label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
+                            value: formatToCurrency(removeCollateral, selectedPool.poolSymbol),
+                          },
                         ]}
                       />
                     );
@@ -356,16 +414,25 @@ export const PositionsTable = memo(() => {
                   setRequestSent(false);
                   if (reason !== '') {
                     toast.error(
-                      <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                      <ToastContent
+                        title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+                        bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason }]}
+                      />
                     );
                   } else {
                     // false positive, probably just metamask
                     toast.success(
                       <ToastContent
-                        title="Collateral Removed"
+                        title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
                         bodyLines={[
-                          { label: 'Symbol', value: selectedPosition.symbol },
-                          { label: 'Amount', value: formatToCurrency(removeCollateral, selectedPool.poolSymbol) },
+                          {
+                            label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
+                            value: selectedPosition.symbol,
+                          },
+                          {
+                            label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
+                            value: formatToCurrency(removeCollateral, selectedPool.poolSymbol),
+                          },
                         ]}
                       />
                     );
@@ -378,7 +445,10 @@ export const PositionsTable = memo(() => {
               let msg = (error?.message ?? error) as string;
               msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
               toast.error(
-                <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                <ToastContent
+                  title={t('pages.trade.positions-table.toasts.error-processing.title')}
+                  bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
+                />
               );
             });
         })
@@ -400,6 +470,7 @@ export const PositionsTable = memo(() => {
     maxCollateral,
     signer,
     poolTokenDecimals,
+    t,
   ]);
 
   const clearPositions = useCallback(() => {
@@ -544,15 +615,18 @@ export const PositionsTable = memo(() => {
 
   const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
-      { label: 'Symbol', align: AlignE.Left },
-      { label: 'Pos. Size', align: AlignE.Right },
-      { label: 'Side', align: AlignE.Left },
-      { label: 'Entry Price', align: AlignE.Right },
-      { label: 'Liq. Price', align: AlignE.Right },
-      { label: `Margin (${selectedPool?.poolSymbol})`, align: AlignE.Right },
-      { label: 'Unr. PnL', align: AlignE.Right },
+      { label: t('pages.trade.positions-table.table-header.symbol'), align: AlignE.Left },
+      { label: t('pages.trade.positions-table.table-header.size'), align: AlignE.Right },
+      { label: t('pages.trade.positions-table.table-header.side'), align: AlignE.Left },
+      { label: t('pages.trade.positions-table.table-header.entry-price'), align: AlignE.Right },
+      { label: t('pages.trade.positions-table.table-header.liq-price'), align: AlignE.Right },
+      {
+        label: `${t('pages.trade.positions-table.table-header.margin')} (${selectedPool?.poolSymbol})`,
+        align: AlignE.Right,
+      },
+      { label: t('pages.trade.positions-table.table-header.pnl'), align: AlignE.Right },
     ],
-    [selectedPool]
+    [selectedPool, t]
   );
 
   const isConfirmButtonDisabled = useMemo(() => {
@@ -690,7 +764,11 @@ export const PositionsTable = memo(() => {
               {(!address || positions.length === 0) && (
                 <EmptyTableRow
                   colSpan={positionsHeaders.length}
-                  text={!address ? 'Please connect your wallet' : 'No open positions'}
+                  text={
+                    !address
+                      ? t('pages.trade.positions-table.table-content.connect')
+                      : t('pages.trade.positions-table.table-content.no-open')
+                  }
                 />
               )}
             </TableBody>
@@ -711,7 +789,11 @@ export const PositionsTable = memo(() => {
                 />
               ))}
           {(!address || positions.length === 0) && (
-            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open positions'}</Box>
+            <Box className={styles.noData}>
+              {!address
+                ? t('pages.trade.positions-table.table-content.connect')
+                : t('pages.trade.positions-table.table-content.no-open')}
+            </Box>
           )}
         </Box>
       )}
@@ -741,14 +823,14 @@ export const PositionsTable = memo(() => {
                 defaultChecked={closePositionChecked}
                 onChange={(_event, checked) => setClosePositionChecked(checked)}
                 control={closePositionChecked ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
-                label="Close position"
+                label={t('pages.trade.positions-table.modify-modal.close')}
                 labelPlacement="end"
                 className={styles.formControlLabel}
               />
             )}
             {modifyType === ModifyTypeE.Add && (
               <SidesRow
-                leftSide="Add collateral"
+                leftSide={t('pages.trade.positions-table.modify-modal.add')}
                 rightSide={
                   <OutlinedInput
                     id="add-collateral"
@@ -768,7 +850,7 @@ export const PositionsTable = memo(() => {
             {modifyType === ModifyTypeE.Remove && (
               <Box>
                 <SidesRow
-                  leftSide={'Remove collateral'}
+                  leftSide={t('pages.trade.positions-table.modify-modal.remove')}
                   rightSide={
                     <FormControl variant="outlined">
                       <OutlinedInput
@@ -804,20 +886,32 @@ export const PositionsTable = memo(() => {
         <DialogContent>
           <Box className={styles.newPositionHeader}>
             <Typography variant="bodyMedium" className={styles.centered}>
-              New position details
+              {t('pages.trade.positions-table.modify-modal.pos-details.title')}
             </Typography>
           </Box>
           <Box className={styles.newPositionDetails}>
-            <SidesRow leftSide="Position size:" rightSide={calculatedPositionSize} />
-            <SidesRow leftSide="Margin:" rightSide={calculatedMargin} />
-            <SidesRow leftSide="Leverage:" rightSide={calculatedLeverage} />
-            <SidesRow leftSide="Liquidation price:" rightSide={calculatedLiqPrice} />
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.pos-details.size')}
+              rightSide={calculatedPositionSize}
+            />
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
+              rightSide={calculatedMargin}
+            />
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.pos-details.leverage')}
+              rightSide={calculatedLeverage}
+            />
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.pos-details.liq-price')}
+              rightSide={calculatedLiqPrice}
+            />
           </Box>
         </DialogContent>
         <Separator />
         <DialogActions>
           <Button onClick={closeModifyModal} variant="secondary" size="small">
-            Cancel
+            {t('pages.trade.positions-table.modify-modal.cancel')}
           </Button>
           <Button
             onClick={handleModifyPositionConfirm}
@@ -825,7 +919,7 @@ export const PositionsTable = memo(() => {
             size="small"
             disabled={isConfirmButtonDisabled}
           >
-            Confirm
+            {t('pages.trade.positions-table.modify-modal.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

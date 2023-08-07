@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
@@ -36,6 +37,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -153,7 +155,7 @@ export const TraderPage = memo(() => {
   const positionItems: SelectorItemI[] = useMemo(
     () => [
       {
-        label: 'Positions (' + positions.length + ')',
+        label: `${t('pages.trade.positions-table.table-title')} (` + positions.length + `)`,
         item: <PositionsTable />,
         tableType: TableTypeE.POSITIONS,
       },
@@ -163,7 +165,7 @@ export const TraderPage = memo(() => {
         tableType: TableTypeE.OPEN_ORDERS,
       },
     ],
-    [positions, openOrders]
+    [positions, openOrders, t]
   );
 
   const historyItems: SelectorItemI[] = useMemo(

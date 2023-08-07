@@ -12,6 +12,82 @@
         "index-price": "Index Price",
         "funding-rate": "Funding Rate",
         "open-interest": "Open Interest"
+      },
+      "positions-table": {
+        "table-title": "Positions",
+        "table-header": {
+          "symbol": "Symbol",
+          "size": "Pos. Size",
+          "side": "Side",
+          "entry-price": "Entry Price",
+          "liq-price": "Liq. Price",
+          "margin": "Margin",
+          "pnl": "Unr. PnL"
+        }, 
+        "table-content": {
+          "buy": "BUY",
+          "sell": "SELL",
+          "modify": "Modify",
+          "connect": "Please connect your wallet",
+          "no-open": "No open positions"
+        },
+        "position-block-mobile": {
+          "symbol": "Symbol",
+          "modify": "Modify"
+        },
+        "modify-modal": {
+          "selector": {
+            "close": "Close",
+            "add": "Add",
+            "remove": "Remove"
+          },
+          "close": "Close position",
+          "add": "Add collateral",
+          "remove": "Remove collateral",
+          "pos-details": {
+            "title": "New position details",
+            "size": "Position size:",
+            "margin": "Margin:",
+            "leverage": "Leverage:",
+            "liq-price": "Liquidation price:"
+          },
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        },
+        "toasts": {
+          "submit-close": {
+            "title": "Submitting Closing Order" 
+          },
+          "submitted": {
+            "title": "Order Submitted",
+            "body": "Symbol"    
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"    
+          },
+          "error-processing": {
+            "title": "Error Processing Transaction",
+            "body": "Reason"    
+          },
+          "adding-collateral": {
+            "title": "Adding Collateral" 
+          },
+          "collateral-added": {
+            "title": "Collateral Added", 
+            "body1": "Symbol",
+            "body2": "Amount"
+          },
+          "removing-collateral": {
+            "title": "Removing Collateral" 
+          },
+          "collateral-removed": {
+            "title": "Collateral Removed", 
+            "body1": "Symbol",
+            "body2": "Amount"
+          }
+
+        }
       }
     },
     "refer": {},
