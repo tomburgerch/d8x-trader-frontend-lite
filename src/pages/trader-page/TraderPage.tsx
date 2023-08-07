@@ -176,7 +176,7 @@ export const TraderPage = memo(() => {
         tableType: TableTypeE.TRADE_HISTORY,
       },
       {
-        label: 'Funding',
+        label: `${t('pages.trade.funding-table.table-title')}`,
         item: <FundingTable />,
         tableType: TableTypeE.FUNDING,
       },

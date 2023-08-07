@@ -153,9 +153,24 @@
         },
         "table-content": {
           "connect": "Please connect your wallet",
-          "no-open": "No open orders"
+          "no-open": "No trade history"
         },
         "history-block-mobile": {
+          "symbol": "Symbol"
+        }
+      },
+      "funding-table": {
+        "table-title": "Funding Payments",
+        "table-header": {
+          "time": "Time",
+          "perpetual": "Perpetual",
+          "funding-payment": "Funding Payment"
+        },
+        "table-content": {
+          "connect": "Please connect your wallet",
+          "no-open": "No funding payment data"
+        },
+        "funding-block-mobile": {
           "symbol": "Symbol"
         }
       }

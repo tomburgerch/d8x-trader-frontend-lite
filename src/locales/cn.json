@@ -158,6 +158,21 @@
         "history-block-mobile": {
           "symbol": "待完成"
         }
+      },
+      "funding-table": {
+        "table-title": "待完成",
+        "table-header": {
+          "time": "待完成",
+          "perpetual": "待完成",
+          "funding-payment": "待完成"
+        },
+        "table-content": {
+          "connect": "待完成",
+          "no-open": "待完成"
+        },
+        "funding-block-mobile": {
+          "symbol": "待完成"
+        }
       }
     },
     "refer": {},
