@@ -1,7 +1,7 @@
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { useTranslation } from 'react-i18next';
 import type { MarginAccountI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 

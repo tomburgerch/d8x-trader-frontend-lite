@@ -812,7 +812,7 @@ export const PositionsTable = memo(() => {
         </Box>
       )}
       <Dialog open={isModifyModalOpen} className={styles.dialog}>
-        <DialogTitle>Modify Position</DialogTitle>
+        <DialogTitle>{t('pages.trade.positions-table.modify-modal.title')}</DialogTitle>
         <DialogContent>
           <ModifyTypeSelector modifyType={modifyType} setModifyType={setModifyType} />
           <Box className={styles.inputBlock}>

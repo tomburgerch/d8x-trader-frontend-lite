@@ -23,7 +23,7 @@
           "liq-price": "Liq. Price",
           "margin": "Margin",
           "pnl": "Unr. PnL"
-        }, 
+        },
         "table-content": {
           "buy": "BUY",
           "sell": "SELL",
@@ -36,6 +36,7 @@
           "modify": "Modify"
         },
         "modify-modal": {
+          "title": "Modify Position",
           "selector": {
             "close": "Close",
             "add": "Add",
@@ -56,37 +57,87 @@
         },
         "toasts": {
           "submit-close": {
-            "title": "Submitting Closing Order" 
+            "title": "Submitting Closing Order"
           },
           "submitted": {
             "title": "Order Submitted",
-            "body": "Symbol"    
+            "body": "Symbol"
           },
           "tx-failed": {
             "title": "Transaction Failed",
-            "body": "Reason"    
+            "body": "Reason"
           },
           "error-processing": {
             "title": "Error Processing Transaction",
-            "body": "Reason"    
+            "body": "Reason"
           },
           "adding-collateral": {
-            "title": "Adding Collateral" 
+            "title": "Adding Collateral"
           },
           "collateral-added": {
-            "title": "Collateral Added", 
+            "title": "Collateral Added",
             "body1": "Symbol",
             "body2": "Amount"
           },
           "removing-collateral": {
-            "title": "Removing Collateral" 
+            "title": "Removing Collateral"
           },
           "collateral-removed": {
-            "title": "Collateral Removed", 
+            "title": "Collateral Removed",
             "body1": "Symbol",
             "body2": "Amount"
           }
-
+        }
+      },
+      "orders-table": {
+        "table-title": "Open Orders",
+        "table-header": {
+          "symbol": "Symbol",
+          "side": "Side",
+          "type": "Type",
+          "order-size": "Order Size",
+          "limit-price": "Limit Price",
+          "stop-price": "Stop Price",
+          "leverage": "Leverage",
+          "good-until": "Good Until"
+        },
+        "table-content": {
+          "buy": "BUY",
+          "sell": "SELL",
+          "connect": "Please connect your wallet",
+          "no-open": "No open orders",
+          "na": "N/A",
+          "cancel": "Cancel",
+          "limit": "Limit",
+          "market": "Market",
+          "stop": "Stop"
+        },
+        "cancel-modal": {
+          "title": "Cancel Open Order",
+          "content": "Are you sure you want to cancel this order?",
+          "back": "Back",
+          "confirm": "Cancel order"
+        },
+        "order-block-mobile": {
+          "symbol": "Symbol",
+          "cancel": "Cancel"
+        },
+        "toasts": {
+          "cancel-order": {
+            "title": "Cancelling Order"
+          },
+          "order-cancelled": {
+            "title": "Order Cancelled",
+            "body": "Symbol"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          },          
+          "error-processing": {
+            "title": "Error Processing Transaction",
+            "body": "Reason"
+          }
         }
       }
     },

@@ -160,7 +160,7 @@ export const TraderPage = memo(() => {
         tableType: TableTypeE.POSITIONS,
       },
       {
-        label: 'Open Orders (' + openOrders.length + ')',
+        label: `${t('pages.trade.orders-table.table-title')} (` + openOrders.length + `)`,
         item: <OpenOrdersTable />,
         tableType: TableTypeE.OPEN_ORDERS,
       },

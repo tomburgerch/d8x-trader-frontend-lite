@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 
 import { Box, Button, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -18,6 +19,7 @@ interface OpenOrderBlockPropsI {
 }
 
 export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderBlockPropsI) => {
+  const { t } = useTranslation();
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
@@ -27,14 +29,14 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
       <Box className={styles.headerWrapper}>
         <Box className={styles.leftSection}>
           <Typography variant="bodySmall" component="p">
-            Symbol
+            {t('pages.trade.orders-table.order-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
             {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
           </Typography>
         </Box>
         <Button variant="primary" size="tableSmall" onClick={() => handleOrderCancel(order)}>
-          Cancel
+          {t('pages.trade.orders-table.order-block-mobile.cancel')}
         </Button>
       </Box>
       <Box className={styles.dataWrapper}>

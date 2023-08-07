@@ -12,6 +12,133 @@
         "index-price": "指数价格",
         "funding-rate": "资助比率",
         "open-interest": "公开兴趣"
+      },
+      "positions-table": {
+        "table-title": "待完成",
+        "table-header": {
+          "symbol": "待完成",
+          "size": "待完成",
+          "side": "待完成",
+          "entry-price": "待完成",
+          "liq-price": "待完成",
+          "margin": "待完成",
+          "pnl": "待完成"
+        },
+        "table-content": {
+          "buy": "待完成",
+          "sell": "待完成",
+          "modify": "待完成",
+          "connect": "待完成",
+          "no-open": "待完成"
+        },
+        "position-block-mobile": {
+          "symbol": "待完成",
+          "modify": "待完成"
+        },
+        "modify-modal": {
+          "title": "待完成",
+          "selector": {
+            "close": "待完成",
+            "add": "待完成",
+            "remove": "待完成"
+          },
+          "close": "待完成",
+          "add": "待完成",
+          "remove": "待完成",
+          "pos-details": {
+            "title": "待完成",
+            "size": "待完成:",
+            "margin": "待完成:",
+            "leverage": "待完成:",
+            "liq-price": "待完成:"
+          },
+          "cancel": "待完成",
+          "confirm": "待完成"
+        },
+        "toasts": {
+          "submit-close": {
+            "title": "待完成"
+          },
+          "submitted": {
+            "title": "待完成",
+            "body": "待完成"
+          },
+          "tx-failed": {
+            "title": "待完成",
+            "body": "待完成"
+          },
+          "error-processing": {
+            "title": "待完成",
+            "body": "待完成"
+          },
+          "adding-collateral": {
+            "title": "待完成"
+          },
+          "collateral-added": {
+            "title": "待完成",
+            "body1": "待完成",
+            "body2": "待完成"
+          },
+          "removing-collateral": {
+            "title": "待完成"
+          },
+          "collateral-removed": {
+            "title": "待完成",
+            "body1": "待完成",
+            "body2": "待完成"
+          }
+        }
+      },
+      "orders-table": {
+        "table-title": "待完成",
+        "table-header": {
+          "symbol": "待完成",
+          "side": "待完成",
+          "type": "待完成",
+          "order-size": "待完成",
+          "limit-price": "待完成",
+          "stop-price": "待完成",
+          "leverage": "待完成",
+          "good-until": "待完成"
+        },
+        "table-content": {
+          "buy": "待完成",
+          "sell": "待完成",
+          "connect": "待完成",
+          "no-open": "待完成",
+          "na": "待完成",
+          "cancel": "待完成",
+          "limit": "待完成",
+          "market": "待完成",
+          "stop":"待完成"
+        },
+        "cancel-modal": {
+          "title": "待完成",
+          "content": "待完成",
+          "back": "待完成",
+          "confirm": "待完成"
+        },
+        "order-block-mobile": {
+          "symbol": "待完成",
+          "cancel": "待完成"
+        },
+        "toasts": {
+          "cancel-order": {
+            "title": "待完成"
+          },
+          "order-cancelled": {
+            "title": "待完成",
+            "body": "待完成"
+          },
+          "tx-failed": {
+            "title": "待完成",
+            "body": "待完成"
+          },          
+          "error-processing": {
+            "title": "待完成",
+            "body": "待完成"
+          }
+        }
       }
     },
     "refer": {},
