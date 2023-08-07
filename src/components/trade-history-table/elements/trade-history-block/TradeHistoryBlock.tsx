@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { Box, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import type { PerpetualDataI, TradeHistoryI, TableHeaderI } from 'types/types';
@@ -14,6 +15,7 @@ interface TradeHistoryRowPropsI {
 }
 
 export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHistoryRowPropsI) => {
+  const { t } = useTranslation();
   const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
   const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
@@ -22,7 +24,7 @@ export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHi
       <Box className={styles.headerWrapper}>
         <Box className={styles.leftSection}>
           <Typography variant="bodySmall" component="p">
-            Symbol
+            {t('pages.trade.history-table.history-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
             {perpetual?.symbol}

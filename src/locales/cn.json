@@ -110,7 +110,7 @@
           "cancel": "待完成",
           "limit": "待完成",
           "market": "待完成",
-          "stop":"待完成"
+          "stop": "待完成"
         },
         "cancel-modal": {
           "title": "待完成",
@@ -133,11 +133,30 @@
           "tx-failed": {
             "title": "待完成",
             "body": "待完成"
-          },          
+          },
           "error-processing": {
             "title": "待完成",
             "body": "待完成"
           }
+        }
+      },
+      "history-table": {
+        "table-title": "待完成",
+        "table-header": {
+          "time": "待完成",
+          "perpetual": "待完成",
+          "side": "待完成",
+          "price": "待完成",
+          "quantity": "待完成",
+          "fee": "待完成",
+          "realized-profit": "待完成"
+        },
+        "table-content": {
+          "connect": "待完成",
+          "no-open": "待完成"
+        },
+        "history-block-mobile": {
+          "symbol": "待完成"
         }
       }
     },

@@ -133,11 +133,30 @@
           "tx-failed": {
             "title": "Transaction Failed",
             "body": "Reason"
-          },          
+          },
           "error-processing": {
             "title": "Error Processing Transaction",
             "body": "Reason"
           }
+        }
+      },
+      "history-table": {
+        "table-title": "Trade History",
+        "table-header": {
+          "time": "Time",
+          "perpetual": "Perpetual",
+          "side": "Side",
+          "price": "Price",
+          "quantity": "Quantity",
+          "fee": "Fee",
+          "realized-profit": "Realized Profit"
+        },
+        "table-content": {
+          "connect": "Please connect your wallet",
+          "no-open": "No open orders"
+        },
+        "history-block-mobile": {
+          "symbol": "Symbol"
         }
       }
     },

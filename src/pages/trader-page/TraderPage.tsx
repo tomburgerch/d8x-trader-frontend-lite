@@ -171,7 +171,7 @@ export const TraderPage = memo(() => {
   const historyItems: SelectorItemI[] = useMemo(
     () => [
       {
-        label: 'Trade History',
+        label: `${t('pages.trade.history-table.table-title')}`,
         item: <TradeHistoryTable />,
         tableType: TableTypeE.TRADE_HISTORY,
       },
@@ -181,7 +181,7 @@ export const TraderPage = memo(() => {
         tableType: TableTypeE.FUNDING,
       },
     ],
-    []
+    [t]
   );
 
   const selectorForAllItems: SelectorItemI[] = useMemo(
