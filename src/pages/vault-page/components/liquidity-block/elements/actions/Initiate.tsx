@@ -2,6 +2,7 @@ import { toUtf8String } from '@ethersproject/strings';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { useSigner } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
@@ -20,6 +21,7 @@ import {
 import styles from './Action.module.scss';
 
 export const Initiate = memo(() => {
+  const { t } = useTranslation();
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [userAmount] = useAtom(userAmountAtom);
@@ -71,7 +73,7 @@ export const Initiate = memo(() => {
       .initiateLiquidityWithdrawal(signer, selectedPool.poolSymbol, initiateAmount, { gasLimit: 5_000_000 })
       .then(async (tx) => {
         console.log(`initiateLiquidityWithdrawal tx hash: ${tx.hash}`);
-        toast.success(<ToastContent title="Initiating liquidity withdrawal" bodyLines={[]} />);
+        toast.success(<ToastContent title={t('pages.vault.toast.initiating')} bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
             if (receipt.status === 1) {
@@ -81,7 +83,7 @@ export const Initiate = memo(() => {
               setInputValue('0');
               requestSentRef.current = false;
               setRequestSent(false);
-              toast.success(<ToastContent title="Liquidity withdrawal initiated" bodyLines={[]} />);
+              toast.success(<ToastContent title={t('pages.vault.toast.initiated')} bodyLines={[]} />);
             }
           })
           .catch(async (err) => {
@@ -107,7 +109,10 @@ export const Initiate = memo(() => {
             requestSentRef.current = false;
             setRequestSent(false);
             toast.error(
-              <ToastContent title="Error initiating withdrawal" bodyLines={[{ label: 'Reason', value: reason }]} />
+              <ToastContent
+                title={t('pages.vault.toast.error-initiating.title')}
+                bodyLines={[{ label: t('pages.vault.toast.error-initiating.body'), value: reason }]}
+              />
             );
           });
       })
@@ -118,7 +123,7 @@ export const Initiate = memo(() => {
         setRequestSent(false);
         toast.error(<ToastContent title="Error initiating withdrawal" bodyLines={[]} />);
       });
-  }, [initiateAmount, liqProvTool, signer, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
+  }, [initiateAmount, liqProvTool, signer, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
@@ -132,19 +137,14 @@ export const Initiate = memo(() => {
     <>
       <Box className={styles.withdrawLabel}>
         <InfoBlock
-          title={
-            <>
-              1. Initiate withdrawal of <strong>{selectedPool?.poolSymbol}</strong>
-            </>
-          }
+          title={<>{t('pages.vault.withdraw.initiate.title', { poolSymbol: selectedPool?.poolSymbol })}</>}
           content={
             <>
               <Typography>
-                Specify the amount of d{selectedPool?.poolSymbol} you want to exchange for {selectedPool?.poolSymbol}.
+                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
               <Typography>
-                After 48 hours, this amount can be converted to {selectedPool?.poolSymbol} and can be withdrawn from the
-                pool.
+                {t('pages.vault.withdraw.initiate.info2', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
             </>
           }
@@ -167,7 +167,7 @@ export const Initiate = memo(() => {
           onClick={handleInitiateLiquidity}
           className={styles.actionButton}
         >
-          Initiate withdrawal
+          {t('pages.vault.withdraw.initiate.button')}
         </Button>
       </Box>
     </>

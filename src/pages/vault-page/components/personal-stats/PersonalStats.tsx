@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
@@ -17,6 +18,7 @@ interface PersonalStatsPropsI {
 }
 
 export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
+  const { t } = useTranslation();
   const chainId = useChainId();
   const { address } = useAccount();
 
@@ -63,15 +65,18 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   return (
     <Box className={styles.root}>
       <Typography variant="h5" className={styles.heading}>
-        Your stats
+        {t('pages.vault.personal-stats.title')}
       </Typography>
       <Box key="amount" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoBlock
-            title={'Amount'}
+            title={t('pages.vault.personal-stats.amount.title')}
             content={
               <>
-                <Typography> Amount of pool tokens you own. </Typography>
+                <Typography>
+                  {' '}
+                  {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.poolSymbol })}{' '}
+                </Typography>
               </>
             }
             classname={styles.actionIcon}
@@ -84,13 +89,12 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
       <Box key="estimatedEarnings" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoBlock
-            title={'Estimated earnings'}
+            title={t('pages.vault.personal-stats.earnings.title')}
             content={
               <>
-                <Typography> Estimated earnings are an approximation of how much you've earned. </Typography>
+                <Typography> {t('pages.vault.personal-stats.earnings.info1')} </Typography>
                 <Typography>
-                  Estimated earnings = d{selectedPool?.poolSymbol} balance at market value + total{' '}
-                  {selectedPool?.poolSymbol} withdrawn - total {selectedPool?.poolSymbol} deposited
+                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.poolSymbol })}
                 </Typography>
               </>
             }
@@ -111,12 +115,12 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
       <Box key="withdrawalInitiated" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoBlock
-            title={'Withdrawal initiated?'}
+            title={t('pages.vault.personal-stats.initiated.title')}
             content={
               <>
                 <Typography>
                   {' '}
-                  Indicates if you have initated a withdrawal request for the {selectedPool?.poolSymbol} pool.
+                  {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.poolSymbol })}
                 </Typography>
               </>
             }
@@ -130,12 +134,17 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
       <Box key="withdrawalAmount" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoBlock
-            title={'Withdrawal amount'}
+            title={t('pages.vault.personal-stats.withdrawal-amount.title')}
             content={
               <>
-                <Typography> The amount of d{selectedPool?.poolSymbol} you initiated to withdraw. </Typography>
                 <Typography>
-                  Your liquidity continues to participate in the PnL and fee revenue of the pool until you withdraw.
+                  {' '}
+                  {t('pages.vault.personal-stats.withdrawal-amount.info1', {
+                    poolSymbol: selectedPool?.poolSymbol,
+                  })}{' '}
+                </Typography>
+                <Typography>
+                  {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.poolSymbol })}
                 </Typography>
               </>
             }
@@ -151,15 +160,11 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
       <Box key="withdrawalDate" className={styles.statContainer}>
         <Box className={styles.statLabel}>
           <InfoBlock
-            title={'Can be withdrawn on'}
+            title={t('pages.vault.personal-stats.date.title')}
             content={
               <>
-                <Typography> You can withdraw your liquidity two days after initializing withdrawal. </Typography>
-                <Typography>
-                  If you do not withdraw your funds within four days after they are ready to be withdrawn, anyone can
-                  execute the withdrawal on your behalf. In this case the funds are sent to your address, and the
-                  executor will earn a small fee paid out of your funds.
-                </Typography>
+                <Typography> {t('pages.vault.personal-stats.date.info1')} </Typography>
+                <Typography>{t('pages.vault.personal-stats.date.info2')}</Typography>
               </>
             }
             classname={styles.actionIcon}

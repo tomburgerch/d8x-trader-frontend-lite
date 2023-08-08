@@ -368,14 +368,100 @@
         "enter-new-code": "En贸ter new code",
         "title3": "En贸ter Referral Code",
         "enter-a-code": "E贸nter a code",
-        "instructions":"On贸ly UPPERCASE characters, numbers, underscores (_) and hyphens (-) are allowed.",
+        "instructions": "On贸ly UPPERCASE characters, numbers, underscores (_) and hyphens (-) are allowed.",
         "cancel": "Can贸el",
         "enter-code": "E贸nter a code",
         "code-not-found": "C贸ode not found",
         "use-code": "Us贸e code"
       }
     },
-    "vault": {}
+    "vault": {
+      "personal-stats": {
+        "title": "Yo贸ur stats",
+        "amount": {
+          "title": "A贸mount",
+          "info": "Am贸ount of d{{poolSymbol}} you own."
+        },
+        "earnings": {
+          "title": "E贸stimated earnings",
+          "info1": "E贸stimated earnings are an approximation of how much you've earned.",
+          "info2": "E贸stimated earnings = d{{poolSymbol}} balance at market value + total {{poolSymbol}} withdrawn - total {{poolSymbol}} deposited"
+        },
+        "initiated": {
+          "title": "W贸ithdrawal initiated?",
+          "info1": "In贸dicates if you have initated a withdrawal request for the {{poolSymbol}} pool."
+        },
+        "withdrawal-amount": {
+          "title": "Wi贸thdrawal amount",
+          "info1": "Th贸e amount of d{{poolSymbol}} you initiated to withdraw.",
+          "info2": "Yo贸ur liquidity continues to participate in the PnL and fee revenue of the pool until you withdraw." 
+        },
+        "date": {
+          "title": "C贸an be withdrawn on",
+          "info1": "Yo贸u can withdraw your liquidity two days after initializing withdrawal.",
+          "info2": "If贸 you do not withdraw your funds within four days after they are ready to be withdrawn, anyone can execute the withdrawal on your behalf. In this case the funds are sent to your address, and the executor will earn a small fee paid out of your funds."
+        }
+      },
+      "global-stats": {
+        "apy": "Al贸l Time APY",
+        "tvl": "T贸VL",
+        "price": "贸d{{poolSymbol}} Price",
+        "supply": "贸d{{poolSymbol}} Supply"
+      },
+      "add": {
+        "title": "A贸dd Liquidity",
+        "info1": "A贸dd {{poolSymbol}} liquidity to the pool and receive d{{poolSymbol}}, an ERC-20 token that represents your ownership in the liquidity pool.",
+        "info2": "A贸s a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized in the collateral currency. You'll also participate in the PnL of the pool. d{{poolSymbol}} accumulates fees, funding rate payments and PnL in real-time.",
+        "amount": {
+          "title": "贸Amount of {{poolSymbol}}",
+          "info1": "贸Specify the amount of {{poolSymbol}} you want to add to the pool."
+        },
+        "receive": "Y贸ou receive d{{poolSymbol}}",
+        "max": "贸Max:",
+        "button": "A贸贸dd"
+      },
+      "withdraw": {
+        "title": "W贸ithdraw Liquidity",
+        "info1": "T贸 withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 48 hours to process your request and you can only have one withdrawal request at a time.",
+        "info2": "A贸fter 48 hours, a withdrawable amount of d{{poolSymbol}} can be exchanged for {{poolSymbol}} at the d{{poolSymbol}} Price.",
+        "initiate": {
+          "title": "1.贸 Initiate withdrawal of {{poolSymbol}}",
+          "info1": "Sp贸ecify the amount of d{{poolSymbol}} you want to exchange for {{poolSymbol}}.",
+          "info2": "Af贸ter 48 hours, this amount can be converted to MATIC and can be withdrawn from the pool.",
+          "button": "I贸nitiate withdrawal"
+        },
+        "action": {
+          "title": "W贸ithdraw {{poolSymbol}}",
+          "info1": "T贸his amount can be converted to {{poolSymbol}}, which can be withdrawn from the pool.",
+          "date": "C贸an be withdrawn on:",
+          "receive": "Yo贸u receive:",
+          "button": "W贸ithdraw"
+        }
+      },
+      "na": "N/A贸",
+      "overdue": "O贸verdue",
+      "now": "No贸w",
+      "toast": {
+        "adding": "Ad贸ding Liquidity",
+        "added": "Liq贸uidity Added",
+        "error": {
+          "title": "Er贸ror Adding Liquidity",
+          "body": "Re贸ason"
+        },
+        "withdrawing": "Wi贸thdrawing liquidity",
+        "withdrawn": "Li贸quidity withdrawn",
+        "error-withdrawing": {
+          "title": "E贸rror Withdrawing Liquidity",
+          "body": "R贸eason"
+        },
+        "initiating": "Ini贸tiating liquidity withdrawal",
+        "initiated": "Li贸quidity withdrawal initiated",
+        "error-initiating": {
+          "title": "Er贸ror initiating withdrawal",
+          "body": "R贸eason"
+        }    
+      }
+    }
   },
   "common": {
     "change-language": "改變語言",

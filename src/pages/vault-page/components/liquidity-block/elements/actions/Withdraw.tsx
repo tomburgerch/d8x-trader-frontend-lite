@@ -1,6 +1,7 @@
 import { toUtf8String } from '@ethersproject/strings';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useSigner } from 'wagmi';
 
@@ -30,6 +31,7 @@ interface WithdrawPropsI {
 }
 
 export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
+  const { t } = useTranslation();
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
@@ -60,7 +62,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
       .executeLiquidityWithdrawal(signer, selectedPool.poolSymbol)
       .then(async (tx) => {
         console.log(`executeLiquidityWithdrawal tx hash: ${tx.hash}`);
-        toast.success(<ToastContent title="Withdrawing liquidity" bodyLines={[]} />);
+        toast.success(<ToastContent title={t('pages.vault.toast.withdrawing')} bodyLines={[]} />);
         tx.wait()
           .then((receipt) => {
             if (receipt.status === 1) {
@@ -68,7 +70,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
               setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
               requestSentRef.current = false;
               setRequestSent(false);
-              toast.success(<ToastContent title="Liquidity withdrawn" bodyLines={[]} />);
+              toast.success(<ToastContent title={t('pages.vault.toast.withdrawn')} bodyLines={[]} />);
             }
           })
           .catch(async (err) => {
@@ -94,7 +96,10 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             requestSentRef.current = false;
             setRequestSent(false);
             toast.error(
-              <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: reason }]} />
+              <ToastContent
+                title={t('pages.vault.toast.error.title')}
+                bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason }]}
+              />
             );
           });
       })
@@ -104,10 +109,13 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
         requestSentRef.current = false;
         setRequestSent(false);
         toast.error(
-          <ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: err as string }]} />
+          <ToastContent
+            title={t('pages.vault.toast.error.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error.body'), value: err as string }]}
+          />
         );
       });
-  }, [liqProvTool, selectedPool, signer, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
+  }, [liqProvTool, selectedPool, signer, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
 
   const shareAmount = useMemo(() => {
     if (!withdrawals) {
@@ -150,14 +158,12 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   return (
     <div className={styles.root}>
       <Box className={styles.infoBlock}>
-        <Typography variant="h5">Withdraw liquidity</Typography>
+        <Typography variant="h5">{t('pages.vault.withdraw.title')}</Typography>
         <Typography variant="body2" className={styles.text}>
-          To withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 48 hours to process your
-          request and you can only have one withdrawal request at a time.
+          {t('pages.vault.withdraw.info1')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          After 48 hours, a withdrawable amount of d{selectedPool?.poolSymbol} can be exchanged for{' '}
-          {selectedPool?.poolSymbol} at d{selectedPool?.poolSymbol} price.
+          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.poolSymbol })}
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
@@ -171,13 +177,14 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           <InfoBlock
             title={
               <>
-                {!withdrawals.length && '2.'} Withdraw <strong>{selectedPool?.poolSymbol}</strong>
+                {!withdrawals.length && '2.'}{' '}
+                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.poolSymbol })}
               </>
             }
             content={
               <>
                 <Typography>
-                  This amount can be converted to {selectedPool?.poolSymbol}, which can be withdrawn from the pool.
+                  {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.poolSymbol })}
                 </Typography>
               </>
             }
@@ -186,13 +193,13 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
         </Box>
         <Box className={styles.summaryBlock}>
           <Box className={styles.row}>
-            <Typography variant="body2">Can be withdrawn on:</Typography>
+            <Typography variant="body2">{t('pages.vault.withdraw.action.date')}</Typography>
             <Typography variant="body2">
               <strong>{withdrawOn}</strong>
             </Typography>
           </Box>
           <Box className={styles.row}>
-            <Typography variant="body2">You receive:</Typography>
+            <Typography variant="body2">{t('pages.vault.withdraw.action.receive')}</Typography>
             <Typography variant="body2">
               <strong>{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</strong>
             </Typography>
@@ -205,7 +212,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             className={styles.actionButton}
             disabled={isButtonDisabled}
           >
-            Withdraw
+            {t('pages.vault.withdraw.action.button')}
           </Button>
         </Box>
       </Box>
