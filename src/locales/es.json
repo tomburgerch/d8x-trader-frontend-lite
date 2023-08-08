@@ -1,0 +1,275 @@
+{
+  "navigation": {
+    "trade": "Comercio",
+    "refer": "Remitir",
+    "vault": "Depositar"
+  },
+  "pages": {
+    "trade": {
+      "stats": {
+        "mid-price": "Precio Medio",
+        "mark-price": "Precio Marcado",
+        "index-price": "Precio Índice",
+        "funding-rate": "Tasa de Financiamiento",
+        "open-interest": "Interés Abierto"
+      },
+      "positions-table": {
+        "table-title": "Posiciones",
+        "table-header": {
+          "symbol": "Símbolo",
+          "size": "Tamaño",
+          "side": "Lado",
+          "entry-price": "Precio de Entrada",
+          "liq-price": "Precio de Liquidacion",
+          "margin": "Margen",
+          "pnl": "Ganancias sin Realizar"
+        },
+        "table-content": {
+          "buy": "COMPRAR",
+          "sell": "VENDER",
+          "modify": "Modificar",
+          "connect": "Por favor conecte su cartera",
+          "no-open": "No hay posiciones abiertas"
+        },
+        "position-block-mobile": {
+          "symbol": "Símbolo",
+          "modify": "Modificar"
+        },
+        "modify-modal": {
+          "title": "Modificar Posición",
+          "selector": {
+            "close": "Cerrar",
+            "add": "Anadir",
+            "remove": "Remover"
+          },
+          "close": "Cerrar posición",
+          "add": "Anadir colateral",
+          "remove": "Remover colateral",
+          "pos-details": {
+            "title": "Detalles de su nueva posición",
+            "size": "Tamaño",
+            "margin": "Margen:",
+            "leverage": "Leverage:",
+            "liq-price": "Precio de Liquidacion"
+          },
+          "cancel": "Cancelar",
+          "confirm": "Confirmar"
+        },
+        "toasts": {
+          "submit-close": {
+            "title": "Cerrando Posición"
+          },
+          "submitted": {
+            "title": "Order Confirmada",
+            "body": "Símbolo"
+          },
+          "tx-failed": {
+            "title": "Transaccion Faillida",
+            "body": "Razon"
+          },
+          "error-processing": {
+            "title": "Error Procesando Transaccion",
+            "body": "Razon"
+          },
+          "adding-collateral": {
+            "title": "Anadiendo Colateral"
+          },
+          "collateral-added": {
+            "title": "Colateral Anadido",
+            "body1": "Símbolo",
+            "body2": "Cantidad"
+          },
+          "removing-collateral": {
+            "title": "Removiendo Colateral"
+          },
+          "collateral-removed": {
+            "title": "Colateral Removido",
+            "body1": "Símbolo",
+            "body2": "Cantidad"
+          }
+        }
+      },
+      "orders-table": {
+        "table-title": "Ordenes Abiertas",
+        "table-header": {
+          "symbol": "Símbolo",
+          "side": "Lado",
+          "type": "Tipo",
+          "order-size": "Tamano",
+          "limit-price": "Precio Limite",
+          "stop-price": "Precio de Parada",
+          "leverage": "Leverage",
+          "good-until": "Expira"
+        },
+        "table-content": {
+          "buy": "COMPRAR",
+          "sell": "VENDER",
+          "connect": "Por favor conectar su cartera",
+          "no-open": "No hay ordenes abiertas",
+          "na": "N/A",
+          "cancel": "Cancelar",
+          "limit": "Limite",
+          "market": "Mercado",
+          "stop": "Parada"
+        },
+        "cancel-modal": {
+          "title": "Cancelar Orden",
+          "content": "Seguro/a que quieres cancelar tu orden?",
+          "back": "Atras",
+          "confirm": "Cancelar orden"
+        },
+        "order-block-mobile": {
+          "symbol": "Símbolo",
+          "cancel": "Cancelar"
+        },
+        "toasts": {
+          "cancel-order": {
+            "title": "Cancelling Order"
+          },
+          "order-cancelled": {
+            "title": "Orden Cancelada",
+            "body": "Símbolo"
+          },
+          "tx-failed": {
+            "title": "Transaccion Fallida",
+            "body": "Razon"
+          },
+          "error-processing": {
+            "title": "Error Procesando Transaccion",
+            "body": "Razon"
+          }
+        }
+      },
+      "history-table": {
+        "table-title": "Historial de Órdenes",
+        "table-header": {
+          "time": "Fecha",
+          "perpetual": "Perpetuo",
+          "side": "Lado",
+          "price": "Precio",
+          "quantity": "Cantidad",
+          "fee": "Fee",
+          "realized-profit": "Ganancias Realizadas"
+        },
+        "table-content": {
+          "connect": "Por favor conecte su cartera",
+          "no-open": "No hay Órdenes"
+        },
+        "history-block-mobile": {
+          "symbol": "Símbolo"
+        }
+      },
+      "funding-table": {
+        "table-title": "Financiamientos",
+        "table-header": {
+          "time": "Fecha",
+          "perpetual": "Perpetuo",
+          "funding-payment": "Financiamiento"
+        },
+        "table-content": {
+          "connect": "Por favor conecte su cartera",
+          "no-open": "No hay financiamientos"
+        },
+        "funding-block-mobile": {
+          "symbol": "Símbolo"
+        }
+      },
+      "order-block": {
+        "selector": {
+          "long": "Long",
+          "short": "Short"
+        },
+        "order-type": {
+          "market": "Market",
+          "limit": "Limit",
+          "stop": "Stop"
+        },
+        "order-size": {
+          "title": "Order size",
+          "body1": "Sets the size of your order.",
+          "body2": "Your maximal order size, based on your open positions and the state of the exchange, is:",
+          "body3": "The minimal position size for this perpetual is:",
+          "body4": "The step size is:"
+        },
+        "limit-price": {
+          "title": "Limit price",
+          "body1": "If you specify a limit price your order will be executed at the predetermined limit price or a better price.",
+          "body2": "For a stop order, setting a limit price is optional. A stop order with specified limit price is a stop-limit order, a stop order without specified limit price is a stop-market order."
+        },
+        "trigger-price": {
+          "title": "Trigger price",
+          "body1": "The trigger price is the mark price at which your stop order is triggered.",
+          "body2": "If you do not select a limit price in addition to your trigger price, you would be placing a stop-market order. Your order will be executed at the best available price once triggered.",
+          "body3": "If you specify a limit price in addition to your trigger price, you would be placing a stop-limit order. Your order will be executed at the predetermined limit price or a better price."
+        },
+        "leverage": {
+          "title": "Leverage",
+          "body1": "Specifies the leverage of your order.",
+          "body2": "If your order is reducing an existing position ('partial closure'), the leverage you select has no impact."
+        },
+        "slippage": {
+          "title": "Slippage settings",
+          "body": "Choose slippage tolerance",
+          "max": "Max entry price:",
+          "min": "Min entry price:",
+          "cancel": "Cancel",
+          "confirm": "Confirm"
+        },
+        "reduce-only": "Reduce only",
+        "expiry": {
+          "title": "Expiry settings",
+          "body": "Set the number of days after, which your main order will expire (this setting does not affect your take-profit and stop-loss orders).",
+          "close": "Close"
+        },
+        "stop-loss": {
+          "title": "Stop loss",
+          "body1": "You can specify a stop loss order to go along with your main order.",
+          "body2": "If you select e.g. -50%, you create a second order, that will be triggered if your loss on your main order reaches -50%.",
+          "body3": "Technically, you are specifying a stop-market order, of the opposing side (if your main order is a BUY order, you are specifying a stop-market SELL order). The trigger price is automatically calculated such that your overall loss is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NONE"
+        },
+        "take-profit": {
+          "title": "Take profit",
+          "body1": "You can specify a take profit order to go along with your main order.",
+          "body2": "If you select e.g., 100%, you create a second order, that will be triggered if your profit on your main order reaches 100%.",
+          "body3": "Technically, you are specifying a limit order of the opposing side (if your main order is a BUY order, you are specifying a limit SELL order). The limit price is automatically calculated such that your overall profit is as per your selection, assuming you entered at the worst price your slippage settings allow.",
+          "none": "NONE"
+        },
+        "info": {
+          "balance": "Wallet balance",
+          "order-size": "Tamano",
+          "fees": "Comision"
+        },
+        "review": {
+          "title": "Review order"
+        }
+      }
+    },
+    "refer": {},
+    "vault": {}
+  },
+  "common": {
+    "change-language": "Cambiar Idioma",
+    "wallet-connect": "Conectar",
+    "select": {
+      "collateral": {
+        "label": "Colateral:",
+        "label2": "Liquidity pool:",
+        "headers": {
+          "collateral": "Colateral",
+          "num-of-perps": "No. de Perpetuos"
+        }
+      },
+      "perpetual": {
+        "label": "Perpetuos:",
+        "headers": {
+          "pair": "Par",
+          "status": "Estado"
+        }
+      }
+    }
+  },
+  "error": {
+    "wrong-network": "Red Incorrecta"
+  }
+}
