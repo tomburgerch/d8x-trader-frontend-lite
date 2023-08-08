@@ -1,6 +1,8 @@
 import classnames from 'classnames';
 
 import { Box, Typography } from '@mui/material';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './TabSelector.module.scss';
 
@@ -9,9 +11,11 @@ interface TabSelectorPropsI {
   onTabChange: (newIndex: number) => void;
 }
 
-const tabItems = ['As Referrer', 'As Trader'];
-
 export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
+  const { t } = useTranslation();
+
+  const tabItems = useMemo(() => [t('pages.refer.tab-selector.referrer'), t('pages.refer.tab-selector.trader')], [t]);
+
   return (
     <Box className={styles.root}>
       {tabItems.map((tab, index) => (

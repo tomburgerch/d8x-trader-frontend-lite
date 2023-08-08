@@ -307,7 +307,74 @@
         }
       }
     },
-    "refer": {},
+    "refer": {
+      "tab-selector": {
+        "referrer": "贸As Referrer",
+        "trader": "贸As Trader"
+      },
+      "referrer-tab": {
+        "disclaimer-text-block1": "E贸arn rebates by inviting traders to trade on D8X. Rebates are airdropped to your wallet weekly.",
+        "disclaimer-text-block2": "Ch贸eck out details on the D8X referral program.",
+        "volume": "Total referre贸d trading volume",
+        "rebates": "Total earne贸d rebates",
+        "title1": "Your r贸eferrals",
+        "title2": "Ref贸er & Earn",
+        "codes": "You贸r codes",
+        "create": "Cr贸eate code",
+        "na": "贸N/A",
+        "referrer-rebate-rate": "Ref贸errer rebate rate",
+        "trader-rebate-rate": "Trad贸er rebate rate",
+        "agency-rebate-rate": "Age贸ncy rebate rate",
+        "modify": "Mo贸ify",
+        "no-codes": "No贸 rebate codes"
+      },
+      "manage-code": {
+        "title-create": "贸Create Referral Code",
+        "base": "贸Your Base Rebate Rate:",
+        "you-receive": "Y贸ou receive",
+        "trader-receives": "T贸rader receives",
+        "agency": "A贸gency",
+        "referrer": "Re贸ferrer",
+        "trader": "Tr贸ader",
+        "trader-kickback": "S贸et Trader's Kickback Rate:",
+        "referrer-kickback": "S贸et Referrer's Kickback Rate:",
+        "referrer-addr": "E贸nter Referrer Address:",
+        "enter-code": "En贸ter a code",
+        "code-taken": "Co贸de already taken",
+        "create-code": "Cre贸ate code",
+        "instructions": "O贸nly UPPERCASE characters, numbers, underscores (_) and hyphens (-) are allowed.",
+        "cancel": "Can贸cel",
+        "enter-addr": "En贸ter an address",
+        "error": "Pl贸ease enter a valid address",
+        "title-modify": "M贸odify Referral Code",
+        "change-addr": "C贸hange Referrer Address?",
+        "your-code": "Yo贸ur code",
+        "modify": "M贸odify"
+      },
+      "toast": {
+        "success-create": "贸ode created successfully",
+        "success-modify": "C贸ode modified successfully",
+        "success-apply": "C贸ode applied successfully"
+      },
+      "trader-tab": {
+        "title1": "Y贸our discounts",
+        "earned-rebates": "T贸otal earned rebates",
+        "open-rewards": "O贸pen rewards",
+        "title2": "Tr贸ade & Earn",
+        "disclaimer-text-block1": "En贸ter a referral code to receive discounts on trading fees.",
+        "disclaimer-text-block2": "T贸he discounts are airdropped weekly to your wallet.",
+        "your-rebate-rate": "Yo贸ur rebate rate",
+        "your-active-code": "Yo贸ur active code",
+        "enter-new-code": "En贸ter new code",
+        "title3": "En贸ter Referral Code",
+        "enter-a-code": "E贸nter a code",
+        "instructions":"On贸ly UPPERCASE characters, numbers, underscores (_) and hyphens (-) are allowed.",
+        "cancel": "Can贸el",
+        "enter-code": "E贸nter a code",
+        "code-not-found": "C贸ode not found",
+        "use-code": "Us贸e code"
+      }
+    },
     "vault": {}
   },
   "common": {

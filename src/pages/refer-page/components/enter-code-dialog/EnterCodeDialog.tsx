@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
@@ -18,6 +19,7 @@ interface EnterCodeDialogPropsI {
 }
 
 export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialogPropsI) => {
+  const { t } = useTranslation();
   const { data: signer } = useSigner();
   const { address } = useAccount();
   const chainId = useChainId();
@@ -32,7 +34,7 @@ export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialog
     }
     try {
       await postUseReferralCode(chainId, address, codeInputValue, signer, onClose);
-      toast.success(<ToastContent title="Code applied successfully" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.refer.toast.success-apply')} bodyLines={[]} />);
       onCodeApplySuccess();
     } catch (err) {
       console.error(err);
@@ -43,25 +45,25 @@ export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialog
     <Dialog open onClose={onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
-          Enter Referral Code
+          {t('pages.refer.trader-tab.title3')}
         </Typography>
         <OutlinedInput
-          placeholder="Enter a code"
+          placeholder={t('pages.refer.trader-tab.enter-code')}
           value={codeInputValue}
           onChange={handleCodeChange}
           className={styles.input}
         />
         <Typography variant="bodyTiny" className={styles.infoText}>
-          Only uppercase characters, numbers, underscores ( _ ) and hyphens (-) are allowed.
+          {t('pages.refer.trader-tab.instructions')}
         </Typography>
         <Box className={styles.actionButtonsContainer}>
           <Button variant="secondary" className={styles.cancelButton} onClick={onClose}>
-            Cancel
+            {t('pages.refer.trader-tab.cancel')}
           </Button>
           <Button variant="primary" disabled={inputDisabled} onClick={handleUseCode} className={styles.enterCodeButton}>
-            {codeState === CodeStateE.DEFAULT && 'Enter code'}
-            {codeState === CodeStateE.CODE_AVAILABLE && 'Code not found'}
-            {codeState === CodeStateE.CODE_TAKEN && 'Use code'}
+            {codeState === CodeStateE.DEFAULT && t('pages.refer.trader-tab.enter-a-code')}
+            {codeState === CodeStateE.CODE_AVAILABLE && t('pages.refer.trader-tab.code-not-found')}
+            {codeState === CodeStateE.CODE_TAKEN && t('pages.refer.trader-tab.use-code')}
           </Button>
         </Box>
       </Box>

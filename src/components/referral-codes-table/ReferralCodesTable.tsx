@@ -1,5 +1,6 @@
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Box,
@@ -27,21 +28,22 @@ interface ReferralCodesTablePropsI {
 }
 
 export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTablePropsI) => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const referralCodesHeaders: TableHeaderI[] = useMemo(() => {
     const headers = [
-      { label: 'Your code', align: AlignE.Left },
-      { label: 'Referrer rebate rate', align: AlignE.Right },
-      { label: 'Trader rebate rate', align: AlignE.Right },
+      { label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
+      { label: t('pages.refer.referrer-tab.referrer-rebate-rate'), align: AlignE.Right },
+      { label: t('pages.refer.referrer-tab.trader-rebate-rate'), align: AlignE.Right },
     ];
     if (isAgency) {
-      headers.push({ label: 'Agency rebate rate', align: AlignE.Right });
+      headers.push({ label: t('pages.refer.referrer-tab.agency-rebate-rate'), align: AlignE.Right });
     }
-    headers.push({ label: 'Modify', align: AlignE.Center });
+    headers.push({ label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });
     return headers;
-  }, [isAgency]);
+  }, [isAgency, t]);
 
   const handleChangePage = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -70,7 +72,9 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
           {codes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data) => (
             <ReferralCodesRow key={data.code} data={data} isAgency={isAgency} />
           ))}
-          {codes.length === 0 && <EmptyTableRow colSpan={referralCodesHeaders.length} text={'No rebate codes'} />}
+          {codes.length === 0 && (
+            <EmptyTableRow colSpan={referralCodesHeaders.length} text={t('pages.refer.referrer-tab.no-codes')} />
+          )}
         </TableBody>
       </Table>
       {codes.length > 5 && (
