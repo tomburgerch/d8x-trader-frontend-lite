@@ -17,7 +17,7 @@ interface OpenOrderRowPropsI {
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
   const { t } = useTranslation();
   const parsedSymbol = parseSymbol(order.symbol);
-  const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : '';
+  const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
 
   return (

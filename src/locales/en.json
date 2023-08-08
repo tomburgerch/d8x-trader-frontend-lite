@@ -183,7 +183,7 @@
           "market": "Market",
           "limit": "Limit",
           "stop": "Stop"
-        }, 
+        },
         "order-size": {
           "title": "Order size",
           "body1": "Sets the size of your order.",
@@ -239,11 +239,72 @@
           "balance": "Wallet balance",
           "order-size": "Order size",
           "fees": "Fees"
-        }, 
+        },
         "review": {
           "title": "Review order"
         }
-
+      },
+      "action-block": {
+        "toasts": {
+          "processed": {
+            "title": "Order Submission Processed"
+          },
+          "orders-submitted": {
+            "title": "Orders Submitted",
+            "body": "Symbol"
+          },
+          "order-submitted": {
+            "title": "Order Submitted"
+          },
+          "error": {
+            "title": "Error Processing Transaction"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        },
+        "validity": {
+          "closed": "Warning: Market is closed",
+          "order-too-large": "Order will fail: order size is too large",
+          "order-too-small": "Order will fail: order size is too small",
+          "position-too-small": "Order will fail: resulting position too small",
+          "below-min-position": "Warning: order size below minimal position size",
+          "insufficient-balance": "Order will fail: insufficient wallet balance",
+          "undefined": "Order undefined: take profit is incompatible with leverage",
+          "good-to-go": "Good to go",
+          "pass": "Passed",
+          "fail": "Failed"
+        }, 
+        "order-types": {
+          "market": "market",
+          "limit": "limit",
+          "stop": "stop"
+        },
+        "order-action": {
+          "long": "Buy",
+          "short": "Sell"
+        },
+        "review": {
+          "title": "Review order",
+          "deposit": "Deposit from wallet:",
+          "balance": "Wallet balance:",
+          "fee": "Trading fee:",
+          "max": "Max entry price:",
+          "min": "Min entry price:",
+          "trigger-price": "Trigger price",
+          "limit-price": "Limit price",
+          "stop-loss": "Stop-loss price",
+          "take-profit": "Take-profit price",
+          "details": "New position details",
+          "size": "Position size",
+          "margin": "Margin",
+          "leverage": "Leverage",
+          "liq-price": "Liquidation price",
+          "validity-checks": "Validity checks",
+          "cancel": "cancel",
+          "confirm": "confirm"
+        }
       }
     },
     "refer": {},
@@ -268,7 +329,11 @@
           "status": "Status"
         }
       }
-    }
+    },
+    "info-modal": {
+      "close": "Close"
+    },
+    "refresh": "Refresh"
   },
   "error": {
     "wrong-network": "Wrong network"

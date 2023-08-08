@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
@@ -15,6 +16,7 @@ interface InfoBlockPropsI {
 }
 
 export const InfoBlock = ({ title, content, classname }: InfoBlockPropsI) => {
+  const { t } = useTranslation();
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
@@ -25,7 +27,7 @@ export const InfoBlock = ({ title, content, classname }: InfoBlockPropsI) => {
         <DialogContent className={styles.dialogContent}>{content}</DialogContent>
         <DialogActions className={styles.dialogAction}>
           <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
-            Close
+            {t('common.info-modal.close')}
           </Button>
         </DialogActions>
       </Dialog>

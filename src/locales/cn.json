@@ -141,37 +141,37 @@
         }
       },
       "history-table": {
-        "table-title": "待完成",
+        "table-title": "待完1成",
         "table-header": {
-          "time": "待完成",
-          "perpetual": "待完成",
-          "side": "待完成",
-          "price": "待完成",
-          "quantity": "待完成",
-          "fee": "待完成",
-          "realized-profit": "待完成"
+          "time": "待完成2",
+          "perpetual": "待完成3",
+          "side": "待完成4",
+          "price": "待完成5",
+          "quantity": "待完成6",
+          "fee": "待完成7",
+          "realized-profit": "待完成8"
         },
         "table-content": {
-          "connect": "待完成",
-          "no-open": "待完成"
+          "connect": "待完成9",
+          "no-open": "待完成10"
         },
         "history-block-mobile": {
-          "symbol": "待完成"
+          "symbol": "待完成11"
         }
       },
       "funding-table": {
         "table-title": "待完成2",
         "table-header": {
-          "time": "待完成",
-          "perpetual": "待完成",
-          "funding-payment": "待完成"
+          "time": "待2完成",
+          "perpetual": "3待完成",
+          "funding-payment": "4待完成"
         },
         "table-content": {
-          "connect": "待完成",
-          "no-open": "待完成"
+          "connect": "5待完成",
+          "no-open": "6待完成"
         },
         "funding-block-mobile": {
-          "symbol": "待完成"
+          "symbol": "7待完成"
         }
       },
       "order-block": {
@@ -183,7 +183,7 @@
           "market": "Mar待ket",
           "limit": "L待imit",
           "stop": "Sto待p"
-        }, 
+        },
         "order-size": {
           "title": "Ord待er size",
           "body1": "Sets待 the size of your order.",
@@ -239,11 +239,72 @@
           "balance": "Wal待let balance",
           "order-size": "O待rder size",
           "fees": "Fe待es"
-        }, 
+        },
         "review": {
           "title": "Revi待ew order"
         }
-
+      },
+      "action-block": {
+        "toasts": {
+          "processed": {
+            "title": "待Order Submission Processed"
+          },
+          "orders-submitted": {
+            "title": "O待rders Submitted",
+            "body": "S待ymbol"
+          },
+          "order-submitted": {
+            "title": "Or待der Submitted"
+          },
+          "error": {
+            "title": "Er待ror Processing Transaction"
+          },
+          "tx-failed": {
+            "title": "Tr待ansaction Failed",
+            "body": "Rea待son"
+          }
+        },
+        "validity": {
+          "closed": "W待arning: Market is closed",
+          "order-too-large": "Order 待will fail: order size is too large",
+          "order-too-small": "Ord待er will fail: order size is too small",
+          "position-too-small": "Or待der will fail: resulting position too small",
+          "below-min-position": "War待ning: order size below minimal position size",
+          "insufficient-balance": "Or待der will fail: insufficient wallet balance",
+          "undefined": "Order undef待ined: take profit is incompatible with leverage",
+          "good-to-go": "Good待 to go",
+          "pass": "Pass待ed",
+          "fail": "Fai待led"
+        }, 
+        "order-types": {
+          "market": "ma待rket",
+          "limit": "li待mit",
+          "stop": "st待op"
+        },
+        "order-action": {
+          "long": "B待y",
+          "short": "Se待ll"
+        },
+        "review": {
+          "title": "Re待view order",
+          "deposit": "De待posit from wallet:",
+          "balance": "W待allet balance:",
+          "fee": "Tra待ding fee:",
+          "max": "M待ax entry price:",
+          "min": "M待in entry price:",
+          "trigger-price": "T待rigger price",
+          "limit-price": "L待imit price",
+          "stop-loss": "St待op-loss price",
+          "take-profit": "待Take-profit price",
+          "details": "待New position details",
+          "size": "Pos待ition size",
+          "margin": "Ma待rgin",
+          "leverage": "Le待verage",
+          "liq-price": "Liq待uidation price",
+          "validity-checks": "Vali待dity checks",
+          "cancel": "canc待el",
+          "confirm": "conf待irm"
+        }
       }
     },
     "refer": {},
@@ -268,7 +329,11 @@
           "status": "状"
         }
       }
-    }
+    },
+    "info-modal": {
+      "close": "Close状"
+    },
+    "refresh": "状Refresh状"
   },
   "error": {
     "wrong-network": "错误的网络"

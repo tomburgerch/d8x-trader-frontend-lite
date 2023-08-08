@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useSigner } from 'wagmi';
 import { Separator } from 'components/separator/Separator';
@@ -37,11 +38,6 @@ import { useDebounce } from 'helpers/useDebounce';
 import { toUtf8String } from '@ethersproject/strings';
 import { HashZero } from '@ethersproject/constants';
 
-const orderBlockMap: Record<OrderBlockE, string> = {
-  [OrderBlockE.Long]: 'Buy',
-  [OrderBlockE.Short]: 'Sell',
-};
-
 const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
 function createMainOrder(orderInfo: OrderInfoI) {
@@ -76,6 +72,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 }
 
 export const ActionBlock = memo(() => {
+  const { t } = useTranslation();
   const { address } = useAccount();
   const chainId = useChainId();
 
@@ -107,6 +104,17 @@ export const ActionBlock = memo(() => {
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
   const validityCheckRef = useRef(false);
+
+  const orderBlockMap: Record<OrderBlockE, string> = {
+    [OrderBlockE.Long]: t('pages.trade.action-block.order-action.long'),
+    [OrderBlockE.Short]: t('pages.trade.action-block.order-action.short'),
+  };
+
+  const orderTypeMap: Record<OrderTypeE, string> = {
+    [OrderTypeE.Market]: t('pages.trade.action-block.order-types.market'),
+    [OrderTypeE.Limit]: t('pages.trade.action-block.order-types.limit'),
+    [OrderTypeE.Stop]: t('pages.trade.action-block.order-types.stop'),
+  };
 
   useEffect(() => {
     traderAPIRef.current = traderAPI;
@@ -239,7 +247,9 @@ export const ActionBlock = memo(() => {
                 // success submitting to mempool
                 console.log(`postOrder tx hash: ${tx.hash}`);
                 setShowReviewOrderModal(false);
-                toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
+                toast.success(
+                  <ToastContent title={t('pages.trade.action-block.toasts.processed.title')} bodyLines={[]} />
+                );
                 clearInputsData();
                 // release lock
                 requestSentRef.current = false;
@@ -250,15 +260,25 @@ export const ActionBlock = memo(() => {
                     requestSentRef.current = false;
                     setRequestSent(false);
                     if (receipt.status === 1) {
-                      const toastTile = parsedOrders.length > 1 ? 'Orders Submitted' : 'Order Submitted';
+                      const toastTile =
+                        parsedOrders.length > 1
+                          ? t('pages.trade.action-block.toasts.orders-submitted.title')
+                          : t('pages.trade.action-block.toasts.order-submitted.title');
                       toast.success(
                         <ToastContent
                           title={toastTile}
-                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                          bodyLines={[
+                            {
+                              label: t('pages.trade.action-block.toasts.orders-submitted.body'),
+                              value: parsedOrders[0].symbol,
+                            },
+                          ]}
                         />
                       );
                     } else {
-                      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+                      toast.error(
+                        <ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />
+                      );
                     }
                   })
                   .catch(async (err) => {
@@ -283,7 +303,10 @@ export const ActionBlock = memo(() => {
                     setRequestSent(false);
                     if (reason !== '') {
                       toast.error(
-                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
+                        <ToastContent
+                          title={t('pages.trade.action-block.toasts.tx-failed.title')}
+                          bodyLines={[{ label: t('pages.trade.action-block.toasts.tx-failed.body'), value: reason }]}
+                        />
                       );
                     }
                   })
@@ -326,6 +349,7 @@ export const ActionBlock = memo(() => {
     poolTokenDecimals,
     clearInputsData,
     setOpenOrders,
+    t,
   ]);
 
   const atPrice = useMemo(() => {
@@ -366,7 +390,7 @@ export const ActionBlock = memo(() => {
       return '-';
     }
     if (isMarketClosed) {
-      return 'Warning: Market is closed';
+      return t('pages.trade.action-block.validity.closed');
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
@@ -375,30 +399,30 @@ export const ActionBlock = memo(() => {
       isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
-      return 'Order will fail: order size is too large';
+      return t('pages.trade.action-block.validity.order-too-large');
     }
     const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
     if (isOrderTooSmall) {
-      return 'Order will fail: order size is too small';
+      return t('pages.trade.action-block.validity.order-too-small');
     }
     const isPositionTooSmall =
       (!positionToModify || positionToModify.positionNotionalBaseCCY === 0) &&
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
     if (isPositionTooSmall && orderInfo.orderType === OrderTypeE.Market) {
-      return 'Order will fail: resulting position too small';
+      return t('pages.trade.action-block.validity.position-too-small');
     } else if (
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC &&
       orderInfo.orderType !== OrderTypeE.Market
     ) {
-      return 'Warning: order size below minimal position size';
+      return t('pages.trade.action-block.validity.below-min-position');
     }
     if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
-      return `Order will fail: insufficient wallet balance ${poolTokenBalance}`;
+      return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
     }
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
-      return `Order undefined: take profit is incompatible with leverage`;
+      return t('pages.trade.action-block.validity.undefined');
     }
-    return 'Good to go';
+    return t('pages.trade.action-block.validity.good-to-go');
   }, [
     maxOrderSize,
     orderInfo?.size,
@@ -411,33 +435,37 @@ export const ActionBlock = memo(() => {
     collateralDeposit,
     positionToModify,
     showReviewOrderModal,
+    t,
   ]);
 
   const isOrderValid = useMemo(() => {
     return (
-      validityCheckText === 'Good to go' ||
-      validityCheckText === 'Market is closed' ||
-      /Warning/.test(validityCheckText)
+      validityCheckText === t('pages.trade.action-block.validity.good-to-go') ||
+      validityCheckText === t('pages.trade.action-block.validity.closed') ||
+      validityCheckText === t('pages.trade.action-block.validity.below-min-position')
     );
-  }, [validityCheckText]);
+  }, [validityCheckText, t]);
 
   const isConfirmButtonDisabled = useMemo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
   }, [isOrderValid, requestSent]);
 
-  const validityColor = useMemo(() => (validityCheckText === 'Good to go' ? 'green' : 'red'), [validityCheckText]);
+  const validityColor = useMemo(
+    () => (validityCheckText === t('pages.trade.action-block.validity.good-to-go') ? 'green' : 'red'),
+    [validityCheckText, t]
+  );
 
   const validityResult = useMemo(() => {
-    if (validityCheckText === 'Good to go') {
-      return 'Passed';
+    if (validityCheckText === t('pages.trade.action-block.validity.good-to-go')) {
+      return t('pages.trade.action-block.validity.pass');
     } else if (validityCheckText === '-') {
       return ' ';
     }
-    return 'Failed';
-  }, [validityCheckText]);
+    return t('pages.trade.action-block.validity.fail');
+  }, [validityCheckText, t]);
 
   useEffect(() => {
-    if (validityCheckText === 'Good to go') {
+    if (validityCheckText === t('pages.trade.action-block.validity.good-to-go')) {
       setIsValidityCheckDone(true);
       return;
     } else if (validityCheckText === '-') {
@@ -446,7 +474,7 @@ export const ActionBlock = memo(() => {
     }
     setIsValidityCheckDone(true);
     return;
-  }, [validityCheckText]);
+  }, [validityCheckText, t]);
 
   const feePct = useMemo(() => {
     if (orderInfo?.tradingFee) {
@@ -465,17 +493,17 @@ export const ActionBlock = memo(() => {
         className={styles.buyButton}
       >
         {orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long]}{' '}
-        {(orderInfo?.orderType ?? OrderTypeE.Market).toLowerCase()}
+        {orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market]}
       </Button>
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
-          <DialogTitle className={styles.dialogTitle}> Review order</DialogTitle>
+          <DialogTitle className={styles.dialogTitle}> {t('pages.trade.action-block.review.title')} </DialogTitle>
           <Box className={styles.emphasis}>
             <SidesRow
               leftSide={
                 <Typography variant="bodyLargePopup" className={styles.semibold}>
-                  {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''} {orderInfo.orderType}{' '}
-                  {orderBlockMap[orderInfo.orderBlock]}
+                  {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''}{' '}
+                  {orderTypeMap[orderInfo.orderType]} {orderBlockMap[orderInfo.orderBlock]}
                 </Typography>
               }
               rightSide={
@@ -491,7 +519,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Deposit from wallet:{' '}
+                    {t('pages.trade.action-block.review.deposit')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -503,7 +531,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Wallet balance:{' '}
+                    {t('pages.trade.action-block.review.balance')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -517,7 +545,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Trading fee:{' '}
+                    {t('pages.trade.action-block.review.fee')}{' '}
                   </Typography>
                 }
                 rightSide={feePct ? formatToCurrency(feePct, '%', false, 3) : '-'}
@@ -528,7 +556,9 @@ export const ActionBlock = memo(() => {
                 <SidesRow
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
-                      {orderInfo.orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:
+                      {orderInfo.orderBlock === OrderBlockE.Long
+                        ? t('pages.trade.action-block.review.max')
+                        : t('pages.trade.action-block.review.min')}
                     </Typography>
                   }
                   rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
@@ -540,7 +570,7 @@ export const ActionBlock = memo(() => {
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
                       {' '}
-                      Trigger price:{' '}
+                      {t('pages.trade.action-block.review.trigger-price')}{' '}
                     </Typography>
                   }
                   rightSide={formatToCurrency(orderInfo.triggerPrice, orderInfo.quoteCurrency)}
@@ -552,7 +582,7 @@ export const ActionBlock = memo(() => {
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
                       {' '}
-                      Limit price:{' '}
+                      {t('pages.trade.action-block.review.limit-price')}{' '}
                     </Typography>
                   }
                   rightSide={
@@ -567,7 +597,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Stop-loss price:{' '}
+                    {t('pages.trade.action-block.review.stop-loss')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -581,7 +611,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Take-profit price:{' '}
+                    {t('pages.trade.action-block.review.take-profit')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -597,7 +627,7 @@ export const ActionBlock = memo(() => {
           <DialogContent>
             <Box className={styles.newPositionHeader}>
               <Typography variant="bodyMediumPopup" className={styles.bold}>
-                New position details
+                {t('pages.trade.action-block.review.details')}
               </Typography>
             </Box>
             <Box className={styles.newPositionDetails}>
@@ -605,7 +635,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Position size:{' '}
+                    {t('pages.trade.action-block.review.size')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -619,7 +649,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Margin:{' '}
+                    {t('pages.trade.action-block.review.margin')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -633,7 +663,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Leverage:{' '}
+                    {t('pages.trade.action-block.review.leverage')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -647,7 +677,7 @@ export const ActionBlock = memo(() => {
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    Liquidation price:{' '}
+                    {t('pages.trade.action-block.review.liq-price')}{' '}
                   </Typography>
                 }
                 rightSide={
@@ -666,7 +696,7 @@ export const ActionBlock = memo(() => {
             <SidesRow
               leftSide={
                 <Typography variant="bodyMediumPopup" className={styles.semibold}>
-                  Validity checks
+                  {t('pages.trade.action-block.review.validity-checks')}
                 </Typography>
               }
               rightSide={
@@ -695,10 +725,10 @@ export const ActionBlock = memo(() => {
           </DialogContent>
           <DialogActions className={styles.dialogActions}>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
-              Cancel
+              {t('pages.trade.action-block.review.cancel')}
             </Button>
             <Button onClick={handleOrderConfirm} variant="primary" size="small" disabled={isConfirmButtonDisabled}>
-              Confirm
+              {t('pages.trade.action-block.review.confirm')}
             </Button>
           </DialogActions>
         </Dialog>
