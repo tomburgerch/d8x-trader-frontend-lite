@@ -1,7 +1,7 @@
+import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
-import { useAtom } from 'jotai';
 
 import { Box } from '@mui/material';
 

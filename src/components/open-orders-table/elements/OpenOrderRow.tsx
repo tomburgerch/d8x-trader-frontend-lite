@@ -29,9 +29,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
       </TableCell>
       <TableCell align="left">
         <Typography variant="cellSmall">
-          {order.side === 'BUY'
-            ? t('pages.trade.orders-table.table-content.buy')
-            : t('pages.trade.orders-table.table-content.sell')}
+          {t(`pages.trade.orders-table.table-content.${order.side.toLowerCase()}`)}
         </Typography>
       </TableCell>
       <TableCell align="left">

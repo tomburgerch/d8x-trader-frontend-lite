@@ -1,5 +1,6 @@
-import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+
+import { Box, Button, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';

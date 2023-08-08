@@ -1,8 +1,8 @@
 import classnames from 'classnames';
-
-import { Box, Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { Box, Typography } from '@mui/material';
 
 import styles from './TabSelector.module.scss';
 

@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
-import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+
+import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import type { PerpetualDataI, TradeHistoryI, TableHeaderI } from 'types/types';

@@ -71,6 +71,29 @@ function createMainOrder(orderInfo: OrderInfoI) {
   };
 }
 
+const orderBlockMap: Record<OrderBlockE, string> = {
+  [OrderBlockE.Long]: 'pages.trade.action-block.order-action.long',
+  [OrderBlockE.Short]: 'pages.trade.action-block.order-action.short',
+};
+
+const orderTypeMap: Record<OrderTypeE, string> = {
+  [OrderTypeE.Market]: 'pages.trade.action-block.order-types.market',
+  [OrderTypeE.Limit]: 'pages.trade.action-block.order-types.limit',
+  [OrderTypeE.Stop]: 'pages.trade.action-block.order-types.stop',
+};
+
+enum ValidityCheckE {
+  Empty = '-',
+  Closed = 'closed',
+  OrderTooLarge = 'order-too-large',
+  OrderTooSmall = 'order-too-small',
+  PositionTooSmall = 'position-too-small',
+  BelowMinPosition = 'below-min-position',
+  InsufficientBalance = 'insufficient-balance',
+  Undefined = 'undefined',
+  GoodToGo = 'good-to-go',
+}
+
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
   const { address } = useAccount();
@@ -104,17 +127,6 @@ export const ActionBlock = memo(() => {
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
   const validityCheckRef = useRef(false);
-
-  const orderBlockMap: Record<OrderBlockE, string> = {
-    [OrderBlockE.Long]: t('pages.trade.action-block.order-action.long'),
-    [OrderBlockE.Short]: t('pages.trade.action-block.order-action.short'),
-  };
-
-  const orderTypeMap: Record<OrderTypeE, string> = {
-    [OrderTypeE.Market]: t('pages.trade.action-block.order-types.market'),
-    [OrderTypeE.Limit]: t('pages.trade.action-block.order-types.limit'),
-    [OrderTypeE.Stop]: t('pages.trade.action-block.order-types.stop'),
-  };
 
   useEffect(() => {
     traderAPIRef.current = traderAPI;
@@ -379,7 +391,7 @@ export const ActionBlock = memo(() => {
     1_000
   );
 
-  const validityCheckText = useMemo(() => {
+  const validityCheckType = useMemo(() => {
     if (
       !showReviewOrderModal ||
       validityCheckRef.current ||
@@ -387,10 +399,10 @@ export const ActionBlock = memo(() => {
       !orderInfo?.orderBlock ||
       !selectedPerpetualStaticInfo
     ) {
-      return '-';
+      return ValidityCheckE.Empty;
     }
     if (isMarketClosed) {
-      return t('pages.trade.action-block.validity.closed');
+      return ValidityCheckE.Closed;
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
@@ -399,30 +411,31 @@ export const ActionBlock = memo(() => {
       isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
-      return t('pages.trade.action-block.validity.order-too-large');
+      return ValidityCheckE.OrderTooLarge;
     }
     const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
     if (isOrderTooSmall) {
-      return t('pages.trade.action-block.validity.order-too-small');
+      return ValidityCheckE.OrderTooSmall;
     }
     const isPositionTooSmall =
       (!positionToModify || positionToModify.positionNotionalBaseCCY === 0) &&
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
     if (isPositionTooSmall && orderInfo.orderType === OrderTypeE.Market) {
-      return t('pages.trade.action-block.validity.position-too-small');
+      return ValidityCheckE.PositionTooSmall;
     } else if (
       orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC &&
       orderInfo.orderType !== OrderTypeE.Market
     ) {
-      return t('pages.trade.action-block.validity.below-min-position');
+      return ValidityCheckE.BelowMinPosition;
     }
     if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
-      return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
+      return ValidityCheckE.InsufficientBalance;
+      // return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
     }
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
-      return t('pages.trade.action-block.validity.undefined');
+      return ValidityCheckE.Undefined;
     }
-    return t('pages.trade.action-block.validity.good-to-go');
+    return ValidityCheckE.GoodToGo;
   }, [
     maxOrderSize,
     orderInfo?.size,
@@ -435,46 +448,39 @@ export const ActionBlock = memo(() => {
     collateralDeposit,
     positionToModify,
     showReviewOrderModal,
-    t,
   ]);
 
-  const isOrderValid = useMemo(() => {
-    return (
-      validityCheckText === t('pages.trade.action-block.validity.good-to-go') ||
-      validityCheckText === t('pages.trade.action-block.validity.closed') ||
-      validityCheckText === t('pages.trade.action-block.validity.below-min-position')
-    );
-  }, [validityCheckText, t]);
+  const validityCheckText = useMemo(() => {
+    if (validityCheckType === ValidityCheckE.Empty) {
+      return '-';
+    } else if (validityCheckType === ValidityCheckE.InsufficientBalance) {
+      return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
+    }
+    return t(`pages.trade.action-block.validity.${validityCheckType}`);
+  }, [t, validityCheckType, poolTokenBalance]);
+
+  const isOrderValid =
+    validityCheckType === ValidityCheckE.GoodToGo ||
+    validityCheckType === ValidityCheckE.Closed ||
+    validityCheckType === ValidityCheckE.BelowMinPosition;
 
   const isConfirmButtonDisabled = useMemo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
   }, [isOrderValid, requestSent]);
 
-  const validityColor = useMemo(
-    () => (validityCheckText === t('pages.trade.action-block.validity.good-to-go') ? 'green' : 'red'),
-    [validityCheckText, t]
-  );
-
-  const validityResult = useMemo(() => {
-    if (validityCheckText === t('pages.trade.action-block.validity.good-to-go')) {
-      return t('pages.trade.action-block.validity.pass');
-    } else if (validityCheckText === '-') {
-      return ' ';
-    }
-    return t('pages.trade.action-block.validity.fail');
-  }, [validityCheckText, t]);
+  const validityColor = validityCheckType === ValidityCheckE.GoodToGo ? 'green' : 'red';
 
   useEffect(() => {
-    if (validityCheckText === t('pages.trade.action-block.validity.good-to-go')) {
+    if (validityCheckType === ValidityCheckE.GoodToGo) {
       setIsValidityCheckDone(true);
       return;
-    } else if (validityCheckText === '-') {
+    } else if (validityCheckType === ValidityCheckE.Empty) {
       setIsValidityCheckDone(false);
       return;
     }
     setIsValidityCheckDone(true);
     return;
-  }, [validityCheckText, t]);
+  }, [validityCheckType]);
 
   const feePct = useMemo(() => {
     if (orderInfo?.tradingFee) {
@@ -492,8 +498,8 @@ export const ActionBlock = memo(() => {
         onClick={openReviewOrderModal}
         className={styles.buyButton}
       >
-        {orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long]}{' '}
-        {orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market]}
+        {t(orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long])}{' '}
+        {t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}
       </Button>
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
@@ -503,7 +509,7 @@ export const ActionBlock = memo(() => {
               leftSide={
                 <Typography variant="bodyLargePopup" className={styles.semibold}>
                   {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''}{' '}
-                  {orderTypeMap[orderInfo.orderType]} {orderBlockMap[orderInfo.orderBlock]}
+                  {t(orderTypeMap[orderInfo.orderType])} {t(orderBlockMap[orderInfo.orderBlock])}
                 </Typography>
               }
               rightSide={
@@ -706,7 +712,13 @@ export const ActionBlock = memo(() => {
                   </Box>
                 ) : (
                   <Typography variant="bodyMediumPopup" className={styles.bold} style={{ color: validityColor }}>
-                    {validityResult}
+                    {validityCheckType !== ValidityCheckE.Empty
+                      ? t(
+                          `pages.trade.action-block.validity.${
+                            validityCheckType === ValidityCheckE.GoodToGo ? 'pass' : 'fail'
+                          }`
+                        )
+                      : ' '}
                   </Typography>
                 )
               }
