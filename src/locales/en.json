@@ -275,7 +275,7 @@
           "good-to-go": "Good to go",
           "pass": "Passed",
           "fail": "Failed"
-        }, 
+        },
         "order-types": {
           "market": "market",
           "limit": "limit",
