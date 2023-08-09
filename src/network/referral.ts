@@ -1,22 +1,19 @@
-import {
-  type APIReferralCodeSelectionPayload,
-  ReferralCodeSigner,
-  type APIReferralCodePayload,
-} from '@d8x/perpetuals-sdk';
-import { Signer } from '@ethersproject/abstract-signer';
-
-import { getRequestOptions } from 'helpers/getRequestOptions';
-
-import {
-  type EarnedRebateI,
-  type OpenTraderRebateI,
-  type ReferralCodeI,
-  type ReferralVolumeI,
-  type ValidatedResponseI,
-} from '../types/types';
-import { RebateTypeE, RequestMethodE } from '../types/enums';
+import { ReferralCodeSigner } from '@d8x/perpetuals-sdk';
+import type { APIReferralCodeSelectionPayload, APIReferralCodePayload } from '@d8x/perpetuals-sdk';
+import type { Account, Transport } from 'viem';
+import type { Chain, WalletClient } from 'wagmi';
 
 import { config } from 'config';
+import { getRequestOptions } from 'helpers/getRequestOptions';
+import type {
+  AddressT,
+  EarnedRebateI,
+  OpenTraderRebateI,
+  ReferralCodeI,
+  ReferralVolumeI,
+  ValidatedResponseI,
+} from 'types/types';
+import { RebateTypeE, RequestMethodE } from 'types/enums';
 
 function getReferralUrlByChainId(chainId: number) {
   return config.referralUrl[`${chainId}`] || config.referralUrl.default;
@@ -30,10 +27,12 @@ export async function postUpsertReferralCode(
   traderRebatePerc: number,
   agencyRebatePerc: number,
   referrerRebatePerc: number,
-  signer: Signer,
+  walletClient: WalletClient<Transport, Chain, Account>,
   onSignatureSuccess: () => void
 ) {
-  const referralCodeSigner = new ReferralCodeSigner(signer, '');
+  const signingFun = (x: string | Uint8Array) =>
+    walletClient.signMessage({ message: { raw: x as AddressT | Uint8Array } }) as Promise<string>;
+  const referralCodeSigner = new ReferralCodeSigner(signingFun, walletClient.account.address, '');
   const payload: APIReferralCodePayload = {
     code,
     referrerAddr,
@@ -69,11 +68,12 @@ export async function postUseReferralCode(
   chainId: number,
   address: string,
   code: string,
-  signer: Signer,
+  walletClient: WalletClient,
   onSignatureSuccess: () => void
 ) {
-  const referralCodeSigner = new ReferralCodeSigner(signer, '');
-
+  const signingFun = (x: string | Uint8Array) =>
+    walletClient.signMessage({ message: { raw: x as AddressT | Uint8Array } }) as Promise<string>;
+  const referralCodeSigner = new ReferralCodeSigner(signingFun, walletClient.account.address, '');
   const payload: APIReferralCodeSelectionPayload = {
     code,
     traderAddr: address,

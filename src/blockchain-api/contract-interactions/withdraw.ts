@@ -1,16 +1,27 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { Contract, ContractTransaction } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber';
+import { PROXY_ABI } from '@d8x/perpetuals-sdk';
+import type { Account, Transport, WalletClient } from 'viem';
+import type { Chain } from 'wagmi';
 
-import { CollateralChangeResponseI } from 'types/types';
+import type { CollateralChangeResponseI, AddressT } from 'types/types';
 
-export function withdraw(signer: Signer, data: CollateralChangeResponseI): Promise<ContractTransaction> {
-  const contract = new Contract(data.proxyAddr, [data.abi], signer);
-  return contract.withdraw(
-    data.perpId,
-    BigNumber.from(data.amountHex),
-    data.priceUpdate.updateData,
-    data.priceUpdate.publishTimes,
-    { gasLimit: 1_000_000, value: data.priceUpdate.updateFee }
-  );
+export function withdraw(
+  walletClient: WalletClient<Transport, Chain, Account>,
+  data: CollateralChangeResponseI
+): Promise<{ hash: AddressT }> {
+  const account = walletClient.account?.address;
+  if (!account) {
+    throw new Error('account not connected');
+  }
+  return walletClient
+    .writeContract({
+      chain: walletClient.chain,
+      address: data.proxyAddr as AddressT,
+      abi: PROXY_ABI,
+      functionName: 'withdraw',
+      args: [data.perpId, +data.amountHex, data.priceUpdate.updateData, data.priceUpdate.publishTimes],
+      gas: BigInt(1_000_000),
+      value: BigInt(data.priceUpdate.updateFee),
+      account: account,
+    })
+    .then((tx) => ({ hash: tx }));
 }

@@ -4,7 +4,7 @@ import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useSigner } from 'wagmi';
+import { erc20ABI, useAccount, useChainId, useContractRead, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import {
   Box,
@@ -17,8 +17,8 @@ import {
   FormControlLabel,
   InputAdornment,
   Link,
-  OutlinedInput,
   Table as MuiTable,
+  OutlinedInput,
   TableBody,
   TableCell,
   TableContainer,
@@ -64,16 +64,14 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
-import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
-import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
-import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
+import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
+import type { AddressT, MarginAccountI, OrderI, TableHeaderI } from 'types/types';
 
 import styles from './PositionsTable.module.scss';
 
 import { Separator } from 'components/separator/Separator';
-
-import { toUtf8String } from '@ethersproject/strings';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -93,7 +91,7 @@ export const PositionsTable = memo(() => {
 
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient({ chainId: chainId });
   const { width, ref } = useResizeDetector();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
@@ -107,6 +105,7 @@ export const PositionsTable = memo(() => {
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -122,8 +121,36 @@ export const PositionsTable = memo(() => {
     setSelectedPosition(null);
   }, []);
 
+  const { data: allowance } = useContractRead({
+    address: (selectedPool?.marginTokenAddr ? selectedPool.marginTokenAddr : '') as AddressT,
+    abi: erc20ABI,
+    functionName: 'allowance',
+    args: [address as AddressT, proxyAddr as AddressT],
+    enabled: !!selectedPool && !!selectedPool.marginTokenAddr && !!address && !!proxyAddr,
+  });
+
+  useWaitForTransaction({
+    hash: txHash,
+    onSuccess() {
+      if (modifyType === ModifyTypeE.Add) {
+        toast.success(<ToastContent title="Collateral Added" bodyLines={[]} />);
+      } else if (modifyType === ModifyTypeE.Remove) {
+        toast.success(<ToastContent title="Collateral Removed" bodyLines={[]} />);
+      } else if (modifyType === ModifyTypeE.Close) {
+        toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
+      }
+    },
+    onError() {
+      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    },
+    onSettled() {
+      setTxHash(undefined);
+    },
+    enabled: !!address,
+  });
+
   const handleModifyPositionConfirm = useCallback(async () => {
-    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !signer || !poolTokenDecimals) {
+    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !walletClient || !poolTokenDecimals) {
       return;
     }
 
@@ -144,75 +171,36 @@ export const PositionsTable = memo(() => {
         leverage: selectedPosition.leverage,
       };
 
-      await orderDigest(chainId, [closeOrder], address)
+      orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
-            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then((res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
+            approveMarginToken(
+              walletClient,
+              selectedPool.marginTokenAddr,
+              proxyAddr,
+              0,
+              poolTokenDecimals,
+              allowance
+            ).then(() => {
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              postOrder(signer, signatures, data.data)
-                .then(async (tx) => {
-                  setRequestSent(false);
-                  setModifyModalOpen(false);
-                  setSelectedPosition(null);
+              postOrder(walletClient, signatures, data.data)
+                .then((tx) => {
+                  setTxHash(tx.hash);
                   console.log(`closePosition tx hash: ${tx.hash}`);
                   toast.success(<ToastContent title="Submitting Closing Order" bodyLines={[]} />);
-                  await tx
-                    .wait()
-                    .then((receipt) => {
-                      setRequestSent(false);
-                      if (receipt.status === 1) {
-                        toast.success(
-                          <ToastContent
-                            title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: closeOrder.symbol }]} //.concat(
-                          />
-                        );
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.error(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                      if (reason !== '') {
-                        toast.error(
-                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                        );
-                      } else {
-                        // false positive, probably just Metamask/RPC
-                        toast.success(
-                          <ToastContent
-                            title="Order Submitted"
-                            bodyLines={[{ label: 'Symbol', value: closeOrder.symbol }]}
-                          />
-                        );
-                      }
-                    });
                 })
                 .catch((error) => {
                   console.error(error);
-                  setRequestSent(false);
                   let msg = (error?.message ?? error) as string;
                   msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
                   toast.error(
                     <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
                   );
+                })
+                .finally(() => {
+                  setRequestSent(false);
+                  setModifyModalOpen(false);
+                  setSelectedPosition(null);
                 });
             });
           }
@@ -223,83 +211,35 @@ export const PositionsTable = memo(() => {
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
-      await getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
+      getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral, poolTokenDecimals).then(
-            (res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
-              deposit(signer, data)
-                .then(async (tx) => {
-                  setRequestSent(false);
-                  setModifyModalOpen(false);
-                  setSelectedPosition(null);
-                  console.log(`addCollateral tx hash: ${tx.hash}`);
-                  toast.success(<ToastContent title="Adding Collateral" bodyLines={[]} />);
-                  await tx
-                    .wait()
-                    .then((receipt) => {
-                      if (receipt.status === 1) {
-                        toast.success(
-                          <ToastContent
-                            title="Collateral Added"
-                            bodyLines={[
-                              { label: 'Symbol', value: selectedPosition.symbol },
-                              { label: 'Amount', value: formatToCurrency(addCollateral, selectedPool.poolSymbol) },
-                            ]}
-                          />
-                        );
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.error(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                      setRequestSent(false);
-                      if (reason !== '') {
-                        toast.error(
-                          <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                        );
-                      } else {
-                        // false positive, probably just metamask
-                        toast.success(
-                          <ToastContent
-                            title="Collateral Added"
-                            bodyLines={[
-                              { label: 'Symbol', value: selectedPosition.symbol },
-                              { label: 'Amount', value: formatToCurrency(addCollateral, selectedPool.poolSymbol) },
-                            ]}
-                          />
-                        );
-                      }
-                    });
-                })
-                .catch((error) => {
-                  let msg = (error?.message ?? error) as string;
-                  msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-                  toast.error(
-                    <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
-                  );
-                  console.error(error);
-                  setRequestSent(false);
-                });
-            }
-          );
+          approveMarginToken(
+            walletClient,
+            selectedPool.marginTokenAddr,
+            proxyAddr,
+            addCollateral,
+            poolTokenDecimals
+          ).then(() => {
+            deposit(walletClient, data)
+              .then((tx) => {
+                console.log(`addCollateral tx hash: ${tx.hash}`);
+                setTxHash(tx.hash);
+                toast.success(<ToastContent title="Adding Collateral" bodyLines={[]} />);
+              })
+              .catch((error) => {
+                let msg = (error?.message ?? error) as string;
+                msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+                toast.error(
+                  <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                );
+                console.error(error);
+              })
+              .finally(() => {
+                setRequestSent(false);
+                setModifyModalOpen(false);
+                setSelectedPosition(null);
+              });
+          });
         })
         .catch((error) => {
           console.error(error);
@@ -311,75 +251,26 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      await getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
+      getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
-          withdraw(signer, data)
-            .then(async (tx) => {
-              setRequestSent(false);
-              setModifyModalOpen(false);
-              setSelectedPosition(null);
+          withdraw(walletClient, data)
+            .then((tx) => {
               console.log(`removeCollaeral tx hash: ${tx.hash}`);
+              setTxHash(tx.hash);
               toast.success(<ToastContent title="Removing Collateral" bodyLines={[]} />);
-              await tx
-                .wait()
-                .then((receipt) => {
-                  if (receipt.status === 1) {
-                    toast.success(
-                      <ToastContent
-                        title="Collateral Removed"
-                        bodyLines={[
-                          { label: 'Symbol', value: selectedPosition.symbol },
-                          { label: 'Amount', value: formatToCurrency(removeCollateral, selectedPool.poolSymbol) },
-                        ]}
-                      />
-                    );
-                  }
-                })
-                .catch(async (err) => {
-                  console.error(err);
-                  const response = await signer.call(
-                    {
-                      to: tx.to,
-                      from: tx.from,
-                      nonce: tx.nonce,
-                      gasLimit: tx.gasLimit,
-                      gasPrice: tx.gasPrice,
-                      data: tx.data,
-                      value: tx.value,
-                      chainId: tx.chainId,
-                      type: tx.type ?? undefined,
-                      accessList: tx.accessList,
-                    },
-                    tx.blockNumber
-                  );
-                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                  setRequestSent(false);
-                  if (reason !== '') {
-                    toast.error(
-                      <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                    );
-                  } else {
-                    // false positive, probably just metamask
-                    toast.success(
-                      <ToastContent
-                        title="Collateral Removed"
-                        bodyLines={[
-                          { label: 'Symbol', value: selectedPosition.symbol },
-                          { label: 'Amount', value: formatToCurrency(removeCollateral, selectedPool.poolSymbol) },
-                        ]}
-                      />
-                    );
-                  }
-                });
             })
             .catch((error) => {
               console.error(error);
-              setRequestSent(false);
               let msg = (error?.message ?? error) as string;
               msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
               toast.error(
                 <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
               );
+            })
+            .finally(() => {
+              setRequestSent(false);
+              setModifyModalOpen(false);
+              setSelectedPosition(null);
             });
         })
         .catch((error) => {
@@ -398,8 +289,9 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
-    signer,
+    walletClient,
     poolTokenDecimals,
+    allowance,
   ]);
 
   const clearPositions = useCallback(() => {
@@ -653,7 +545,7 @@ export const PositionsTable = memo(() => {
     return formatToCurrency(selectedPosition.liquidationPrice[0], parsedSymbol?.quoteCurrency);
   }, [selectedPosition, newPositionRisk, modifyType, closePositionChecked, parsedSymbol]);
 
-  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 

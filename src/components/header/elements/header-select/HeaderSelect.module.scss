@@ -1,5 +1,5 @@
-@import 'styles/theme/theme';
-@import 'styles/theme/utils';
+@import '~styles/theme/_theme.scss';
+@import '~styles/theme/_utils.scss';
 
 .root {
   width: 100%;
@@ -18,6 +18,11 @@
   min-width: 45px;
   border-radius: 50%;
   background-color: var(--d8x-color-white);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .autocomplete {

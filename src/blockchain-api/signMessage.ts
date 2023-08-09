@@ -1,11 +1,12 @@
-import { Buffer } from 'buffer';
-import { Signer } from '@ethersproject/abstract-signer';
+import type { Account, Transport } from 'viem';
+import type { Chain, WalletClient } from 'wagmi';
 
-export function signMessages(signer: Signer, digests: string[]) {
+import type { AddressT } from 'types/types';
+
+export function signMessages(walletClient: WalletClient<Transport, Chain, Account>, digests: string[]) {
   const promises = [];
   for (const digest of digests) {
-    const digestBuffer = Buffer.from(digest.slice(2), 'hex');
-    promises.push(signer.signMessage(digestBuffer));
+    promises.push(walletClient.signMessage({ message: { raw: digest as AddressT } }));
   }
   return Promise.all(promises);
 }

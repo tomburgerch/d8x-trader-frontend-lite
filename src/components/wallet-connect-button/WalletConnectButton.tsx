@@ -1,10 +1,9 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
-import { Provider } from '@ethersproject/abstract-provider';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useConnect, useSigner } from 'wagmi';
+import { type PublicClient, useAccount, useChainId, useConnect, usePublicClient } from 'wagmi';
 
 import { Box, Button, useMediaQuery, useTheme } from '@mui/material';
 
@@ -12,13 +11,13 @@ import { ReactComponent as FilledStar } from 'assets/starFilled.svg';
 import { ReactComponent as EmptyStar } from 'assets/starEmpty.svg';
 import { ReactComponent as WalletIcon } from 'assets/icons/walletIcon.svg';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { config } from 'config';
 import { getTraderLoyalty } from 'network/network';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { loyaltyScoreAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { cutAddressName } from 'utils/cutAddressName';
 
 import styles from './WalletConnectButton.module.scss';
-import { config } from 'config';
 
 const loyaltyMap: Record<number, string> = {
   1: 'Diamond',
@@ -40,15 +39,13 @@ export const WalletConnectButton = memo(() => {
   const loadingAPIRef = useRef(false);
   const loadingTraderLoyaltyRef = useRef(false);
 
-  // const { address } = useAccount();
   const chainId = useChainId();
-  // const provider = useProvider();
-  const { data: signer } = useSigner();
+  const publicClient = usePublicClient();
   const { address, isConnected, isReconnecting, isDisconnected } = useAccount();
   const { error: errorMessage } = useConnect();
 
   const loadSDK = useCallback(
-    async (_provider: Provider, _chainId: number) => {
+    async (_publicClient: PublicClient, _chainId: number) => {
       if (loadingAPIRef.current) {
         return;
       }
@@ -129,14 +126,14 @@ export const WalletConnectButton = memo(() => {
 
   // connect SDK on change of provider/chain/wallet
   useEffect(() => {
-    if (loadingAPIRef.current || !isConnected || !signer?.provider || !chainId) {
+    if (loadingAPIRef.current || !isConnected || !publicClient || !chainId) {
       return;
     }
     unloadSDK();
-    loadSDK(signer.provider, chainId)
+    loadSDK(publicClient, chainId)
       .then(() => {})
       .catch((err) => console.log(err));
-  }, [isConnected, signer, chainId, loadSDK, unloadSDK]);
+  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK]);
 
   return (
     <ConnectButton.Custom>
@@ -175,10 +172,26 @@ export const WalletConnectButton = memo(() => {
                   <Button onClick={openAccountModal} variant="primary" className={styles.addressButton}>
                     {!isMobileScreen && (
                       <Box className={styles.starsHolder} title={loyaltyMap[loyaltyScore]}>
-                        {loyaltyScore < 5 ? <FilledStar /> : <EmptyStar />}
-                        {loyaltyScore < 4 ? <FilledStar /> : <EmptyStar />}
-                        {loyaltyScore < 3 ? <FilledStar /> : <EmptyStar />}
-                        {loyaltyScore < 2 ? <FilledStar /> : <EmptyStar />}
+                        {loyaltyScore < 5 ? (
+                          <FilledStar width={12} height={12} />
+                        ) : (
+                          <EmptyStar width={12} height={12} />
+                        )}
+                        {loyaltyScore < 4 ? (
+                          <FilledStar width={12} height={12} />
+                        ) : (
+                          <EmptyStar width={12} height={12} />
+                        )}
+                        {loyaltyScore < 3 ? (
+                          <FilledStar width={12} height={12} />
+                        ) : (
+                          <EmptyStar width={12} height={12} />
+                        )}
+                        {loyaltyScore < 2 ? (
+                          <FilledStar width={12} height={12} />
+                        ) : (
+                          <EmptyStar width={12} height={12} />
+                        )}
                       </Box>
                     )}
                     {!isMobileScreen && cutAddressName(account.address)}

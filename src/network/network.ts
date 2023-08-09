@@ -23,7 +23,7 @@ export function getExchangeInfo(
 ): Promise<ValidatedResponseI<ExchangeInfoI>> {
   if (traderAPI) {
     // console.log('exchangeInfo via SDK');
-    return traderAPI.exchangeInfo().then((info) => {
+    return traderAPI.exchangeInfo().then((info: ExchangeInfoI) => {
       return { type: 'exchange-info', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
     });
   } else {
@@ -107,7 +107,7 @@ export function getPositionRisk(
 }
 
 export function positionRiskOnTrade(
-  chainId: number,
+  _chainId: number,
   traderAPI: TraderInterface,
   order: OrderI,
   traderAddr: string,
@@ -342,7 +342,7 @@ export function getAddCollateral(
           perpId: perpId,
           proxyAddr: proxyAddr,
           abi: proxyABI,
-          amountHex: amountHex.toString(),
+          amountHex: amountHex.toHexString(),
           priceUpdate: {
             updateData: submission.priceFeedVaas,
             publishTimes: submission.timestamps,

@@ -1,8 +1,8 @@
+import { Separator } from 'components/separator/Separator';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { erc20ABI, useAccount, useChainId, useContractRead, useSigner } from 'wagmi';
-import { Separator } from 'components/separator/Separator';
+import { erc20ABI, useAccount, useChainId, useContractRead, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -32,10 +32,9 @@ import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
-import styles from './ActionBlock.module.scss';
-import { useDebounce } from 'helpers/useDebounce';
-import { toUtf8String } from '@ethersproject/strings';
 import { HashZero } from '@ethersproject/constants';
+import { useDebounce } from 'helpers/useDebounce';
+import styles from './ActionBlock.module.scss';
 
 const orderBlockMap: Record<OrderBlockE, string> = {
   [OrderBlockE.Long]: 'Buy',
@@ -79,7 +78,8 @@ export const ActionBlock = memo(() => {
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const { data: signer } = useSigner({
+  const { data: walletClient } = useWalletClient({
+    chainId: chainId,
     onError(error) {
       console.log(error);
     },
@@ -103,6 +103,7 @@ export const ActionBlock = memo(() => {
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
+  const [postOrderTx, setPostOrderTx] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
@@ -217,11 +218,32 @@ export const ActionBlock = memo(() => {
     abi: erc20ABI,
     functionName: 'allowance',
     args: [address as AddressT, proxyAddr as AddressT],
-    enabled: !!selectedPool && !!selectedPool.marginTokenAddr,
+    enabled: !!selectedPool && !!selectedPool.marginTokenAddr && !!address && !!proxyAddr,
+  });
+
+  useWaitForTransaction({
+    hash: postOrderTx,
+    onSuccess() {
+      toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
+    },
+    onError() {
+      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    },
+    onSettled() {
+      setPostOrderTx(undefined);
+      getOpenOrders(chainId, traderAPIRef.current, orderInfo?.symbol as string, address as AddressT)
+        .then(({ data: d }) => {
+          if (d && d.length > 0) {
+            d.map((o) => setOpenOrders(o));
+          }
+        })
+        .catch(console.error);
+    },
+    enabled: !!address && !!orderInfo && !!postOrderTx,
   });
 
   const handleOrderConfirm = useCallback(() => {
-    if (!address || !signer || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
+    if (!address || !walletClient || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
       return;
     }
     setRequestSent(true);
@@ -233,7 +255,7 @@ export const ActionBlock = memo(() => {
           // hide modal now that metamask popup shows up
           setShowReviewOrderModal(false);
           approveMarginToken(
-            signer,
+            walletClient,
             selectedPool.marginTokenAddr,
             proxyAddr,
             collateralDeposit,
@@ -246,67 +268,20 @@ export const ActionBlock = memo(() => {
               }
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              await postOrder(signer, signatures, data.data).then(async (tx) => {
+              await postOrder(walletClient, signatures, data.data).then(async (tx) => {
                 // success submitting order to the node
                 console.log(`postOrder tx hash: ${tx.hash}`);
                 // order was sent, release lock and clear - no need to wait for the blockchain
                 requestSentRef.current = false;
                 setRequestSent(false);
                 clearInputsData();
-                toast.success(<ToastContent title="Order Submission Processed" bodyLines={[]} />);
-                await tx
-                  .wait()
-                  .then((receipt) => {
-                    // txn went through
-                    if (receipt.status === 1) {
-                      const toastTile = parsedOrders.length > 1 ? 'Orders Submitted' : 'Order Submitted';
-                      toast.success(
-                        <ToastContent
-                          title={toastTile}
-                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
-                        />
-                      );
-                    } else {
-                      // typically unreachable
-                      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
-                    }
-                  })
-                  .catch(async (err) => {
-                    // txn failed - get the revert reason
-                    console.error(err);
-                    const response = await signer.call(
-                      {
-                        to: tx.to,
-                        from: tx.from,
-                        nonce: tx.nonce,
-                        gasLimit: tx.gasLimit,
-                        gasPrice: tx.gasPrice,
-                        data: tx.data,
-                        value: tx.value,
-                        chainId: tx.chainId,
-                        type: tx.type ?? undefined,
-                        accessList: tx.accessList,
-                      },
-                      tx.blockNumber
-                    );
-                    const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                    if (reason !== '') {
-                      toast.error(
-                        <ToastContent title="Transaction Failed" bodyLines={[{ label: 'Reason', value: reason }]} />
-                      );
-                    }
-                  })
-                  .finally(() => {
-                    // we go the receipt or failed trying - refresh orders
-                    getOpenOrders(chainId, traderAPIRef.current, parsedOrders[0].symbol, address)
-                      .then(({ data: d }) => {
-                        if (d && d.length > 0) {
-                          console.log('fetched open orders');
-                          d.map((o) => setOpenOrders(o));
-                        }
-                      })
-                      .catch(console.error);
-                  });
+                toast.success(
+                  <ToastContent
+                    title="Order Submission Processed"
+                    bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                  />
+                );
+                setPostOrderTx(tx.hash);
               });
 
               // ensure we can trade again
@@ -341,13 +316,12 @@ export const ActionBlock = memo(() => {
     parsedOrders,
     chainId,
     address,
-    signer,
+    walletClient,
     selectedPool,
     proxyAddr,
     collateralDeposit,
     poolTokenDecimals,
     clearInputsData,
-    setOpenOrders,
     allowance,
   ]);
 
