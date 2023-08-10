@@ -130,7 +130,7 @@ export const PositionsTable = memo(() => {
           bodyLines={[
             {
               label: t('pages.trade.positions-table.toasts.submitted.body'),
-              value: selectedPosition.symbol,
+              value: selectedPosition?.symbol,
             },
           ]}
         />
@@ -159,7 +159,7 @@ export const PositionsTable = memo(() => {
           bodyLines={[
             {
               label: t('pages.trade.positions-table.toasts.collateral-added.body'),
-              value: selectedPosition.symbol,
+              value: selectedPosition?.symbol,
             },
           ]}
         />
@@ -188,7 +188,7 @@ export const PositionsTable = memo(() => {
           bodyLines={[
             {
               label: t('pages.trade.positions-table.toasts.collateral-removed.body'),
-              value: selectedPosition.symbol,
+              value: selectedPosition?.symbol,
             },
           ]}
         />

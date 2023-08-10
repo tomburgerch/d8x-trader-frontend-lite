@@ -67,7 +67,7 @@ export const OpenOrdersTable = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [modifyTx, setModifyTx] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const traderAPIRef = useRef(traderAPI);
   const isAPIBusyRef = useRef(isAPIBusy);
@@ -110,7 +110,7 @@ export const OpenOrdersTable = memo(() => {
   }, [chainId, address, selectedPool, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders]);
 
   useWaitForTransaction({
-    hash: modifyTx,
+    hash: txHash,
     onSuccess() {
       toast.success(
         <ToastContent
@@ -118,7 +118,7 @@ export const OpenOrdersTable = memo(() => {
           bodyLines={[
             {
               label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
-              value: selectedOrder.symbol,
+              value: selectedOrder?.symbol,
             },
           ]}
         />
@@ -128,12 +128,12 @@ export const OpenOrdersTable = memo(() => {
       toast.error(
         <ToastContent
           title={t('pages.trade.orders-table.toasts.tx-failed.title')}
-          bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: reason }]}
+          bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: reason.message }]}
         />
       );
     },
     onSettled() {
-      setModifyTx(undefined);
+      setTxHash(undefined);
       getOpenOrders(chainId, traderAPIRef.current, selectedOrder?.symbol as string, address as AddressT)
         .then(({ data: d }) => {
           if (d && d.length > 0) {
@@ -142,7 +142,7 @@ export const OpenOrdersTable = memo(() => {
         })
         .catch(console.error);
     },
-    enabled: !!address && !!selectedOrder && !!modifyTx,
+    enabled: !!address && !!selectedOrder && !!txHash,
   });
 
   const handleCancelOrderConfirm = useCallback(async () => {
@@ -171,7 +171,7 @@ export const OpenOrdersTable = memo(() => {
               toast.success(
                 <ToastContent title={t('pages.trade.orders-table.toasts.cancel-order.title')} bodyLines={[]} />
               );
-              setModifyTx(tx.hash);
+              setTxHash(tx.hash);
             })
             .catch((error) => {
               console.error(error);

@@ -20,7 +20,7 @@
     "lint:format:fix": "prettier --write './{src,cypress}/**/*.{ts,tsx}'",
     "lint:ts:fix": "npm run lint:ts -- --fix",
     "lint:css": "npm run stylelint",
-    "lint": "npm run lint:ts && npm run lint:css",
+    "lint": "tsc && npm run lint:ts && npm run lint:css",
     "prepare": "husky install"
   },
   "eslintConfig": {
@@ -39,6 +39,7 @@
       "npm run stylelint"
     ],
     "src/**/*.{js,jsx,ts,tsx}": [
+      "npm run tsc",
       "npm run prettify",
       "npm run eslint"
     ]

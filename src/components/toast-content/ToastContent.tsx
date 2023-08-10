@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -6,7 +8,7 @@ import styles from './ToastContent.module.scss';
 
 interface ToastContentPropsI {
   title: string;
-  bodyLines: { label: string; value: string }[];
+  bodyLines: { label: ReactNode; value: ReactNode }[];
 }
 
 export const ToastContent = ({ title, bodyLines }: ToastContentPropsI) => {
