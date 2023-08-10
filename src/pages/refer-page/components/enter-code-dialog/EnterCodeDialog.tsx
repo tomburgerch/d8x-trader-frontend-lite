@@ -6,9 +6,7 @@ import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { ToastContent } from 'components/toast-content/ToastContent';
-
 import { postUseReferralCode } from 'network/referral';
-
 import { CodeStateE, useCodeInput } from 'pages/refer-page/hooks';
 
 import styles from './EnterCodeDialog.module.scss';
@@ -43,7 +41,7 @@ export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialog
   };
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open={true} onClose={onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           {t('pages.refer.trader-tab.title3')}

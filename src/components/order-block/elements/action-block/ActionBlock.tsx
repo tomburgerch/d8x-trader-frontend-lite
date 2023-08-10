@@ -1,4 +1,4 @@
-import { Separator } from 'components/separator/Separator';
+import { HashZero } from '@ethersproject/constants';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,8 +10,10 @@ import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitl
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useDebounce } from 'helpers/useDebounce';
 import { getOpenOrders, orderDigest, positionRiskOnTrade } from 'network/network';
 import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
 import {
@@ -33,8 +35,6 @@ import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
-import { HashZero } from '@ethersproject/constants';
-import { useDebounce } from 'helpers/useDebounce';
 import styles from './ActionBlock.module.scss';
 
 const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
@@ -123,7 +123,7 @@ export const ActionBlock = memo(() => {
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
-  const [postOrderTx, setPostOrderTx] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
@@ -234,15 +234,25 @@ export const ActionBlock = memo(() => {
   }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
   useWaitForTransaction({
-    hash: postOrderTx,
+    hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
+      toast.success(
+        <ToastContent
+          title={toastTile}
+          bodyLines={[
+            {
+              label: t('pages.trade.action-block.toasts.orders-submitted.body'),
+              value: parsedOrders[0].symbol,
+            },
+          ]}
+        />
+      );
     },
     onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+      toast.error(<ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />);
     },
     onSettled() {
-      setPostOrderTx(undefined);
+      setTxHash(undefined);
       getOpenOrders(chainId, traderAPIRef.current, orderInfo?.symbol as string, address as AddressT)
         .then(({ data: d }) => {
           if (d && d.length > 0) {
@@ -251,7 +261,7 @@ export const ActionBlock = memo(() => {
         })
         .catch(console.error);
     },
-    enabled: !!address && !!orderInfo && !!postOrderTx,
+    enabled: !!address && !!orderInfo && !!txHash,
   });
 
   const handleOrderConfirm = useCallback(() => {
@@ -289,7 +299,7 @@ export const ActionBlock = memo(() => {
                     bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
                   />
                 );
-                setPostOrderTx(tx.hash);
+                setTxHash(tx.hash);
               });
 
               // ensure we can trade again
@@ -437,9 +447,10 @@ export const ActionBlock = memo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
   }, [isOrderValid, requestSent]);
 
-  const validityColor = validityCheckType === ValidityCheckE.GoodToGo
-    ? 'rgba(var(--d8x-background-buy-rgb), 1)'
-    : 'rgba(var(--d8x-background-sell-rgb), 1)';
+  const validityColor =
+    validityCheckType === ValidityCheckE.GoodToGo
+      ? 'rgba(var(--d8x-background-buy-rgb), 1)'
+      : 'rgba(var(--d8x-background-sell-rgb), 1)';
 
   useEffect(() => {
     if (validityCheckType === ValidityCheckE.GoodToGo) {

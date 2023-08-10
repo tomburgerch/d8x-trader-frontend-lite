@@ -1,9 +1,9 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
-import { useResizeDetector } from 'react-resize-detector';
 
 import {
   Box,
@@ -34,14 +34,13 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
+import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { AlignE, TableTypeE } from 'types/enums';
 import type { AddressT, OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
-
-import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './OpenOrdersTable.module.scss';
 
@@ -113,10 +112,25 @@ export const OpenOrdersTable = memo(() => {
   useWaitForTransaction({
     hash: modifyTx,
     onSuccess() {
-      toast.success(<ToastContent title="Order Cancelled" bodyLines={[]} />);
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
+              value: selectedOrder.symbol,
+            },
+          ]}
+        />
+      );
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.trade.orders-table.toasts.tx-failed.title')}
+          bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: reason }]}
+        />
+      );
     },
     onSettled() {
       setModifyTx(undefined);

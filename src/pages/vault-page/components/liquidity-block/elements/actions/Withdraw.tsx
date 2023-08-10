@@ -11,7 +11,6 @@ import { executeLiquidityWithdrawal } from 'blockchain-api/contract-interactions
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
-
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
@@ -51,10 +50,15 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   useWaitForTransaction({
     hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Liquidity Withdrawn" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.vault.toast.withdrawn')} bodyLines={[]} />);
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.vault.toast.error.title')}
+          bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
       setTxHash(undefined);
@@ -85,8 +89,12 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
         console.error(err);
         let msg = (err?.message ?? err) as string;
         msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-        // TODO: VOV: Replace texts with translations
-        toast.error(<ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: msg }]} />);
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error-withdrawing.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error-withdrawing.body'), value: msg }]}
+          />
+        );
       })
       .finally(() => {
         setTriggerUserStatsUpdate((prevValue) => !prevValue);

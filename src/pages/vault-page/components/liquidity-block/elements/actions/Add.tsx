@@ -20,10 +20,10 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
+import type { AddressT } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
-import { AddressT } from 'types/types';
 
 export const Add = memo(() => {
   const { t } = useTranslation();
@@ -47,7 +47,7 @@ export const Add = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
 
   const [inputValue, setInputValue] = useState(`${addAmount}`);
-  const [addTxn, setAddTxn] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
@@ -71,18 +71,23 @@ export const Add = memo(() => {
   }, [addAmount]);
 
   useWaitForTransaction({
-    hash: addTxn,
+    hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Liquidity Added" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.vault.toast.added')} bodyLines={[]} />);
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.vault.toast.error.title')}
+          bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
-      setAddTxn(undefined);
+      setTxHash(undefined);
       setTriggerUserStatsUpdate((prevValue) => !prevValue);
     },
-    enabled: !!addTxn,
+    enabled: !!txHash,
   });
 
   const handleAddLiquidity = useCallback(() => {
@@ -104,7 +109,7 @@ export const Add = memo(() => {
       .then(() => {
         addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount).then((tx) => {
           console.log(`addLiquidity tx hash: ${tx.hash}`);
-          setAddTxn(tx.hash);
+          setTxHash(tx.hash);
           toast.success(<ToastContent title={t('pages.vault.toast.adding')} bodyLines={[]} />);
         });
       })
@@ -112,8 +117,12 @@ export const Add = memo(() => {
         console.error(err);
         let msg = (err?.message ?? err) as string;
         msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-        // TODO: VOV: Replace text to translation
-        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: msg }]} />);
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error.body'), value: msg }]}
+          />
+        );
       })
       .finally(() => {
         setAddAmount(0);

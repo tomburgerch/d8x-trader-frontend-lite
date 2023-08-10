@@ -1,7 +1,6 @@
 import { HashZero } from '@ethersproject/constants';
 import { useAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
@@ -35,19 +34,12 @@ import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
-
-import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
-import { PositionBlock } from './elements/position-block/PositionBlock';
-import { PositionRow } from './elements/PositionRow';
-
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
-import { formatNumber } from 'utils/formatNumber';
-import { formatToCurrency } from 'utils/formatToCurrency';
-
 import {
   getAddCollateral,
   getAvailableMargin,
@@ -69,10 +61,14 @@ import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
 import type { AddressT, MarginAccountI, OrderI, TableHeaderI } from 'types/types';
+import { formatNumber } from 'utils/formatNumber';
+import { formatToCurrency } from 'utils/formatToCurrency';
+
+import { ModifyTypeE, ModifyTypeSelector } from './elements/modify-type-selector/ModifyTypeSelector';
+import { PositionBlock } from './elements/position-block/PositionBlock';
+import { PositionRow } from './elements/PositionRow';
 
 import styles from './PositionsTable.module.scss';
-
-import { Separator } from 'components/separator/Separator';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -107,7 +103,9 @@ export const PositionsTable = memo(() => {
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHashForAdd, setTxHashForAdd] = useState<AddressT | undefined>(undefined);
+  const [txHashForClose, setTxHashForClose] = useState<AddressT | undefined>(undefined);
+  const [txHashForRemove, setTxHashForRemove] = useState<AddressT | undefined>(undefined);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -124,23 +122,90 @@ export const PositionsTable = memo(() => {
   }, []);
 
   useWaitForTransaction({
-    hash: txHash,
+    hash: txHashForClose,
     onSuccess() {
-      if (modifyType === ModifyTypeE.Add) {
-        toast.success(<ToastContent title="Collateral Added" bodyLines={[]} />);
-      } else if (modifyType === ModifyTypeE.Remove) {
-        toast.success(<ToastContent title="Collateral Removed" bodyLines={[]} />);
-      } else if (modifyType === ModifyTypeE.Close) {
-        toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
-      }
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.submitted.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.positions-table.toasts.submitted.body'),
+              value: selectedPosition.symbol,
+            },
+          ]}
+        />
+      );
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
-      setTxHash(undefined);
+      setTxHashForClose(undefined);
     },
-    enabled: !!address,
+    enabled: !!address && !!txHashForClose,
+  });
+
+  useWaitForTransaction({
+    hash: txHashForAdd,
+    onSuccess() {
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.collateral-added.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.positions-table.toasts.collateral-added.body'),
+              value: selectedPosition.symbol,
+            },
+          ]}
+        />
+      );
+    },
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
+        />
+      );
+    },
+    onSettled() {
+      setTxHashForAdd(undefined);
+    },
+    enabled: !!address && !!txHashForAdd,
+  });
+
+  useWaitForTransaction({
+    hash: txHashForRemove,
+    onSuccess() {
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.positions-table.toasts.collateral-removed.body'),
+              value: selectedPosition.symbol,
+            },
+          ]}
+        />
+      );
+    },
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
+        />
+      );
+    },
+    onSettled() {
+      setTxHashForRemove(undefined);
+    },
+    enabled: !!address && !!txHashForRemove,
   });
 
   const handleModifyPositionConfirm = useCallback(async () => {
@@ -172,7 +237,7 @@ export const PositionsTable = memo(() => {
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
               postOrder(walletClient, signatures, data.data)
                 .then((tx) => {
-                  setTxHash(tx.hash);
+                  setTxHashForClose(tx.hash);
                   console.log(`postOrder tx hash: ${tx.hash}`);
                   toast.success(
                     <ToastContent title={t('pages.trade.positions-table.toasts.submit-close.title')} bodyLines={[]} />
@@ -215,7 +280,7 @@ export const PositionsTable = memo(() => {
             deposit(walletClient, data)
               .then((tx) => {
                 console.log(`deposit tx hash: ${tx.hash}`);
-                setTxHash(tx.hash);
+                setTxHashForAdd(tx.hash);
                 toast.success(
                   <ToastContent
                     title={t('pages.trade.positions-table.toasts.adding-collateral.title')}
@@ -256,7 +321,7 @@ export const PositionsTable = memo(() => {
           withdraw(walletClient, data)
             .then((tx) => {
               console.log(`withdraw tx hash: ${tx.hash}`);
-              setTxHash(tx.hash);
+              setTxHashForRemove(tx.hash);
               toast.success(
                 <ToastContent
                   title={t('pages.trade.positions-table.toasts.removing-collateral.title')}

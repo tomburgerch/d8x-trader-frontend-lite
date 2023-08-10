@@ -17,8 +17,8 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
+import type { AddressT } from 'types/types';
 
-import { AddressT } from 'types/types';
 import styles from './Action.module.scss';
 
 export const Initiate = memo(() => {
@@ -62,10 +62,15 @@ export const Initiate = memo(() => {
   useWaitForTransaction({
     hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Withdrawal Initiated" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.vault.toast.initiated')} bodyLines={[]} />);
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.vault.toast.error-initiating.title')}
+          bodyLines={[{ label: t('pages.vault.toast.error-initiating.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
       setTxHash(undefined);
@@ -96,8 +101,12 @@ export const Initiate = memo(() => {
         console.error(err);
         let msg = (err?.message ?? err) as string;
         msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-        // TODO: VOV: Replace texts to translation
-        toast.error(<ToastContent title="Error Initiating Withdrawal" bodyLines={[{ label: 'Reason', value: msg }]} />);
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error-initiating.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error-initiating.body'), value: msg }]}
+          />
+        );
       })
       .finally(() => {
         setInitiateAmount(0);
@@ -107,7 +116,15 @@ export const Initiate = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [initiateAmount, liqProvTool, walletClient, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
+  }, [
+    initiateAmount,
+    liqProvTool,
+    walletClient,
+    selectedPool,
+    setTriggerUserStatsUpdate,
+    setTriggerWithdrawalsUpdate,
+    t,
+  ]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
