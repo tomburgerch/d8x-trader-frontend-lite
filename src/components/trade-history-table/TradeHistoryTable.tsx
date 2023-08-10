@@ -70,7 +70,7 @@ export const TradeHistoryTable = memo(() => {
     refreshTradesHistory();
   }, [openOrders, refreshTradesHistory]);
 
-  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 

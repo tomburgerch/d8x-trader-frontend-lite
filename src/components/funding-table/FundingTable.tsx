@@ -70,7 +70,7 @@ export const FundingTable = memo(() => {
     refreshFundingList();
   }, [positions, refreshFundingList]); // "positions" change should affect refresh for Funding table
 
-  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 

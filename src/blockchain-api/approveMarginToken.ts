@@ -12,7 +12,7 @@ export function approveMarginToken(
   proxyAddr: string,
   minAmount: number,
   decimals: number,
-  allowance?: bigint | number | string | undefined | boolean
+  allowance?: bigint
 ) {
   if (allowance) {
     const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);

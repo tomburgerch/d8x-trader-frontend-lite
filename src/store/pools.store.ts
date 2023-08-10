@@ -51,7 +51,7 @@ export const showChartForMobileAtom = atom(
     }
     return isShown;
   },
-  (get, set, isShown: boolean) => {
+  (_get, set, isShown: boolean) => {
     set(showChartForMobileLSAtom, isShown);
   }
 );
@@ -71,7 +71,7 @@ export const selectedPoolAtom = atom(
 
     return allPools[0];
   },
-  (get, set, newPool: string) => {
+  (_get, set, newPool: string) => {
     set(selectedPoolNameLSAtom, newPool);
     // Clear data about previous stats and orders
     set(perpetualsStatsAtom, {});
@@ -101,7 +101,7 @@ export const selectedPerpetualAtom = atom(
 
     return perpetuals[0];
   },
-  (get, set, perpetualId: number) => {
+  (_get, set, perpetualId: number) => {
     set(selectedPerpetualIdLSAtom, perpetualId);
   }
 );
@@ -133,7 +133,7 @@ export const openOrdersAtom = atom(
   }
 );
 
-export const removeOpenOrderAtom = atom(null, (get, set, orderIdToRemove: string) => {
+export const removeOpenOrderAtom = atom(null, (_get, set, orderIdToRemove: string) => {
   set(ordersAtom, (prev) => {
     const updatedOpenOrders = { ...prev };
     delete updatedOpenOrders[orderIdToRemove];
@@ -141,7 +141,7 @@ export const removeOpenOrderAtom = atom(null, (get, set, orderIdToRemove: string
   });
 });
 
-export const removePositionAtom = atom(null, (get, set, symbolToRemove: string) => {
+export const removePositionAtom = atom(null, (_get, set, symbolToRemove: string) => {
   set(perpetualsStatsAtom, (prev) => {
     const perpetualsStats = { ...prev };
     delete perpetualsStats[symbolToRemove];
@@ -149,7 +149,7 @@ export const removePositionAtom = atom(null, (get, set, symbolToRemove: string) 
   });
 });
 
-export const failOrderAtom = atom(null, (get, set, orderIdToUpdate: string) => {
+export const failOrderAtom = atom(null, (_get, set, orderIdToUpdate: string) => {
   set(ordersAtom, (prev) => {
     const updatedOpenOrders = { ...prev };
     delete updatedOpenOrders[orderIdToUpdate];
@@ -157,6 +157,6 @@ export const failOrderAtom = atom(null, (get, set, orderIdToUpdate: string) => {
   });
 });
 
-export const clearOpenOrdersAtom = atom(null, (get, set) => {
+export const clearOpenOrdersAtom = atom(null, (_get, set) => {
   set(ordersAtom, {});
 });

@@ -63,7 +63,7 @@ export const limitPriceAtom = atom(
 
     return limitPrice < 0 ? null : limitPrice;
   },
-  (get, set, newLimitPrice: string) => {
+  (_get, set, newLimitPrice: string) => {
     set(limitPriceValueAtom, newLimitPrice === '' || +newLimitPrice < 0 ? -1 : +newLimitPrice);
   }
 );
@@ -77,7 +77,7 @@ export const triggerPriceAtom = atom(
     const triggerPrice = get(triggerPriceValueAtom);
     return triggerPrice < 0 ? 0 : triggerPrice;
   },
-  (get, set, newTriggerPrice: string) => {
+  (_get, set, newTriggerPrice: string) => {
     set(triggerPriceValueAtom, newTriggerPrice === '' || +newTriggerPrice < 0 ? -1 : +newTriggerPrice);
   }
 );
@@ -206,7 +206,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   };
 });
 
-export const clearInputsDataAtom = atom(null, (get, set) => {
+export const clearInputsDataAtom = atom(null, (_get, set) => {
   // TODO: Check it if really required
   set(orderTypeValueAtom, OrderTypeE.Market);
 
