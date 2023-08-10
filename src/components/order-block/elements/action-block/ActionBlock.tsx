@@ -468,7 +468,9 @@ export const ActionBlock = memo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
   }, [isOrderValid, requestSent]);
 
-  const validityColor = validityCheckType === ValidityCheckE.GoodToGo ? 'green' : 'red';
+  const validityColor = validityCheckType === ValidityCheckE.GoodToGo 
+    ? 'rgba(var(--d8x-background-buy-rgb), 1)' 
+    : 'rgba(var(--d8x-background-sell-rgb), 1)';
 
   useEffect(() => {
     if (validityCheckType === ValidityCheckE.GoodToGo) {
