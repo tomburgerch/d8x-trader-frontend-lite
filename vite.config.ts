@@ -11,6 +11,9 @@ import svgr from 'vite-plugin-svgr';
 export default defineConfig({
   build: {
     outDir: 'build',
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
   },
   resolve: {
     alias: [
