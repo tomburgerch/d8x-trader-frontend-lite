@@ -1,17 +1,16 @@
-import { toUtf8String } from '@ethersproject/strings';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useSigner } from 'wagmi';
+import { useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
 import { PERIOD_OF_2_DAYS } from 'app-constants';
+import { executeLiquidityWithdrawal } from 'blockchain-api/contract-interactions/executeLiquidityWithdrawal';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { Initiate } from './Initiate';
 
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
@@ -21,8 +20,10 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
-
 import { formatToCurrency } from 'utils/formatToCurrency';
+import type { AddressT } from 'types/types';
+
+import { Initiate } from './Initiate';
 
 import styles from './Action.module.scss';
 
@@ -40,82 +41,60 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [, setTriggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
   const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
 
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
 
   const [requestSent, setRequestSent] = useState(false);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
+
+  useWaitForTransaction({
+    hash: txHash,
+    onSuccess() {
+      toast.success(<ToastContent title="Liquidity Withdrawn" bodyLines={[]} />);
+    },
+    onError() {
+      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    },
+    onSettled() {
+      setTxHash(undefined);
+      setTriggerUserStatsUpdate((prevValue) => !prevValue);
+    },
+    enabled: !!txHash,
+  });
 
   const handleWithdrawLiquidity = useCallback(() => {
     if (requestSentRef.current) {
       return;
     }
 
-    if (!liqProvTool || !selectedPool || !signer) {
+    if (!liqProvTool || !selectedPool || !walletClient) {
       return;
     }
 
     requestSentRef.current = true;
     setRequestSent(true);
 
-    liqProvTool
-      .executeLiquidityWithdrawal(signer, selectedPool.poolSymbol)
-      .then(async (tx) => {
+    executeLiquidityWithdrawal(walletClient, liqProvTool, selectedPool.poolSymbol)
+      .then((tx) => {
         console.log(`executeLiquidityWithdrawal tx hash: ${tx.hash}`);
+        setTxHash(tx.hash);
         toast.success(<ToastContent title={t('pages.vault.toast.withdrawing')} bodyLines={[]} />);
-        tx.wait()
-          .then((receipt) => {
-            if (receipt.status === 1) {
-              setTriggerUserStatsUpdate((prevValue) => !prevValue);
-              setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
-              requestSentRef.current = false;
-              setRequestSent(false);
-              toast.success(<ToastContent title={t('pages.vault.toast.withdrawn')} bodyLines={[]} />);
-            }
-          })
-          .catch(async (err) => {
-            console.log(err);
-            const response = await signer.call(
-              {
-                to: tx.to,
-                from: tx.from,
-                nonce: tx.nonce,
-                gasLimit: tx.gasLimit,
-                gasPrice: tx.gasPrice,
-                data: tx.data,
-                value: tx.value,
-                chainId: tx.chainId,
-                type: tx.type ?? undefined,
-                accessList: tx.accessList,
-              },
-              tx.blockNumber
-            );
-            const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-            setTriggerUserStatsUpdate((prevValue) => !prevValue);
-            setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
-            requestSentRef.current = false;
-            setRequestSent(false);
-            toast.error(
-              <ToastContent
-                title={t('pages.vault.toast.error.title')}
-                bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason }]}
-              />
-            );
-          });
       })
-      .catch(async (err) => {
+      .catch((err) => {
+        console.error(err);
+        let msg = (err?.message ?? err) as string;
+        msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+        // TODO: VOV: Replace texts with translations
+        toast.error(<ToastContent title="Error withdrawing liquidity" bodyLines={[{ label: 'Reason', value: msg }]} />);
+      })
+      .finally(() => {
         setTriggerUserStatsUpdate((prevValue) => !prevValue);
         setTriggerWithdrawalsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
-        toast.error(
-          <ToastContent
-            title={t('pages.vault.toast.error.title')}
-            bodyLines={[{ label: t('pages.vault.toast.error.body'), value: err as string }]}
-          />
-        );
       });
-  }, [liqProvTool, selectedPool, signer, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
+  }, [liqProvTool, selectedPool, walletClient, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
 
   const shareAmount = useMemo(() => {
     if (!withdrawals) {

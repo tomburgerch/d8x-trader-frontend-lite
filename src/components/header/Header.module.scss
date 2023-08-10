@@ -1,4 +1,4 @@
-@import 'styles/theme/theme';
+@import '~styles/theme/_theme.scss';
 
 .root {
   margin-top: 4 * $d8x-spacing;
@@ -81,8 +81,8 @@
 .menuButton {
   margin-left: $d8x-spacing * 1.5;
   padding: 0;
-  min-width: 50px;
-  height: 50px;
+  min-width: 48px;
+  height: 48px;
 }
 
 .logoLink {

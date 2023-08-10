@@ -32,6 +32,7 @@ import {
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { TableTypeE } from 'types/enums';
+import type { AddressT } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
@@ -65,7 +66,7 @@ export const TraderPage = memo(() => {
   const location = useLocation();
 
   const fetchPositions = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+    async (_chainId: number, _poolSymbol: string, _address: AddressT) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchPositionsRef.current) {
         return;
       }
@@ -86,7 +87,7 @@ export const TraderPage = memo(() => {
   );
 
   const fetchOrders = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: `0x${string}`) => {
+    async (_chainId: number, _poolSymbol: string, _address: AddressT) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchOrdersRef.current) {
         return;
       }
@@ -127,7 +128,7 @@ export const TraderPage = memo(() => {
   );
 
   useEffect(() => {
-    if (location.hash || !selectedPool || isPageUrlAppliedRef.current) {
+    if (location.hash || !selectedPool || selectedPool.perpetuals.length < 1 || isPageUrlAppliedRef.current) {
       return;
     }
 

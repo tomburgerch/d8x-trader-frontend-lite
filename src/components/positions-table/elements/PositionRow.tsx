@@ -14,6 +14,10 @@ interface PositionRowPropsI {
 export const PositionRow = ({ position, handlePositionModify }: PositionRowPropsI) => {
   const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
+  const pnlColor =
+    position.unrealizedPnlQuoteCCY > 0
+      ? 'rgba(var(--d8x-background-buy-rgb), 1)'
+      : 'rgba(var(--d8x-background-sell-rgb), 1)';
 
   return (
     <TableRow>
@@ -52,7 +56,7 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
         </Typography>
       </TableCell>
       <TableCell align="right">
-        <Typography variant="cellSmall">
+        <Typography variant="cellSmall" style={{ color: pnlColor }}>
           {formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>

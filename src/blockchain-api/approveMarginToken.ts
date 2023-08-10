@@ -1,30 +1,48 @@
-import { Signer } from '@ethersproject/abstract-signer';
-import { Contract } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
 import { MaxUint256 } from '@ethersproject/constants';
+import { readContract, waitForTransaction } from '@wagmi/core';
+import { parseUnits } from 'viem';
+import type { WalletClient, Account, Transport } from 'viem';
+import { type Chain, erc20ABI } from 'wagmi';
 
-import { erc20ABI } from 'wagmi';
-import { decNToFloat } from '@d8x/perpetuals-sdk';
+import type { AddressT } from 'types/types';
 
 export function approveMarginToken(
-  signer: Signer,
+  walletClient: WalletClient<Transport, Chain, Account>,
   marginTokenAddr: string,
   proxyAddr: string,
   minAmount: number,
   decimals: number
 ) {
-  const marginToken = new Contract(marginTokenAddr, erc20ABI, signer);
-  const amount = MaxUint256;
   const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
-  return signer.getAddress().then((addr: string) => {
-    return marginToken.allowance(addr, proxyAddr).then((allowance: BigNumber) => {
-      console.log('allowance =', decNToFloat(allowance, decimals), 'minAmount =', minAmount);
-      if (allowance.gt(minAmountBN)) {
-        return Promise.resolve(null);
-      } else {
-        return marginToken.approve(proxyAddr, amount, { gasLimit: BigNumber.from(1_000_000) });
+  return readContract({
+    address: marginTokenAddr as AddressT,
+    abi: erc20ABI,
+    functionName: 'allowance',
+    args: [walletClient.account.address, proxyAddr as AddressT],
+  }).then((allowance) => {
+    if (allowance > minAmountBN) {
+      return Promise.resolve(null);
+    } else {
+      const account = walletClient.account?.address;
+      if (!account) {
+        throw new Error('account not connected');
       }
-    });
+      return walletClient
+        .writeContract({
+          chain: walletClient.chain,
+          address: marginTokenAddr as AddressT,
+          abi: erc20ABI,
+          functionName: 'approve',
+          args: [proxyAddr as AddressT, BigInt(MaxUint256.toString())],
+          gas: BigInt(100_000),
+          account: account,
+        })
+        .then((tx) => {
+          waitForTransaction({
+            hash: tx,
+            timeout: 30_000,
+          }).then(() => ({ hash: tx }));
+        });
+    }
   });
 }

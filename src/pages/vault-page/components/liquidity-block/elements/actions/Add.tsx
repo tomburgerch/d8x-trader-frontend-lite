@@ -1,14 +1,14 @@
-import { toUtf8String } from '@ethersproject/strings';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
 import { ReactComponent as SwitchIcon } from 'assets/icons/switchSeparator.svg';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
+import { addLiquidity } from 'blockchain-api/contract-interactions/addLiquidity';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -23,12 +23,12 @@ import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
+import { AddressT } from 'types/types';
 
 export const Add = memo(() => {
   const { t } = useTranslation();
   const { address } = useAccount();
-
-  const { data: signer } = useSigner({
+  const { data: walletClient } = useWalletClient({
     onError(error) {
       console.log(error);
     },
@@ -47,6 +47,7 @@ export const Add = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
 
   const [inputValue, setInputValue] = useState(`${addAmount}`);
+  const [addTxn, setAddTxn] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
@@ -69,7 +70,22 @@ export const Add = memo(() => {
     inputValueChangedRef.current = false;
   }, [addAmount]);
 
-  const handleAddLiquidity = useCallback(async () => {
+  useWaitForTransaction({
+    hash: addTxn,
+    onSuccess() {
+      toast.success(<ToastContent title="Liquidity Added" bodyLines={[]} />);
+    },
+    onError() {
+      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    },
+    onSettled() {
+      setAddTxn(undefined);
+      setTriggerUserStatsUpdate((prevValue) => !prevValue);
+    },
+    enabled: !!addTxn,
+  });
+
+  const handleAddLiquidity = useCallback(() => {
     if (requestSentRef.current) {
       return;
     }
@@ -78,70 +94,33 @@ export const Add = memo(() => {
       return;
     }
 
-    if (!address || !signer || !proxyAddr) {
+    if (!address || !walletClient || !proxyAddr) {
       return;
     }
 
     requestSentRef.current = true;
     setRequestSent(true);
-    await approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
-      .then(async (res) => {
-        if (res?.hash) {
-          console.log(`token approval txn: ${res.hash}`);
-          await res.wait();
-        }
-        liqProvTool
-          .addLiquidity(signer, selectedPool.poolSymbol, addAmount, { gasLimit: 2_000_000 })
-          .then(async (tx) => {
-            console.log(`addLiquidity tx hash: ${tx.hash}`);
-            toast.success(<ToastContent title={t('pages.vault.toast.adding')} bodyLines={[]} />);
-            await tx
-              .wait()
-              .then((receipt) => {
-                if (receipt.status === 1) {
-                  setTriggerUserStatsUpdate((prevValue) => !prevValue);
-                  setAddAmount(0);
-                  setInputValue('0');
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  toast.success(<ToastContent title={t('pages.vault.toast.added')} bodyLines={[]} />);
-                }
-              })
-              .catch(async (err) => {
-                console.log(err);
-                const response = await signer.call(
-                  {
-                    to: tx.to,
-                    from: tx.from,
-                    nonce: tx.nonce,
-                    gasLimit: tx.gasLimit,
-                    gasPrice: tx.gasPrice,
-                    data: tx.data,
-                    value: tx.value,
-                    chainId: tx.chainId,
-                    type: tx.type ?? undefined,
-                    accessList: tx.accessList,
-                  },
-                  tx.blockNumber
-                );
-                const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                setTriggerUserStatsUpdate((prevValue) => !prevValue);
-                requestSentRef.current = false;
-                setRequestSent(false);
-                toast.error(
-                  <ToastContent
-                    title={t('pages.vault.toast.error.title')}
-                    bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason }]}
-                  />
-                );
-              });
-          });
+    approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
+      .then(() => {
+        addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount).then((tx) => {
+          console.log(`addLiquidity tx hash: ${tx.hash}`);
+          setAddTxn(tx.hash);
+          toast.success(<ToastContent title={t('pages.vault.toast.adding')} bodyLines={[]} />);
+        });
       })
-      .catch(async () => {
+      .catch((err) => {
+        console.error(err);
+        let msg = (err?.message ?? err) as string;
+        msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+        // TODO: VOV: Replace text to translation
+        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: msg }]} />);
+      })
+      .finally(() => {
+        setAddAmount(0);
+        setInputValue('0');
         setTriggerUserStatsUpdate((prevValue) => !prevValue);
         requestSentRef.current = false;
         setRequestSent(false);
-        toast.error(<ToastContent title={t('pages.vault.toast.error.title')} bodyLines={[]} />);
       });
   }, [
     addAmount,
@@ -149,7 +128,7 @@ export const Add = memo(() => {
     selectedPool,
     address,
     proxyAddr,
-    signer,
+    walletClient,
     isSDKConnected,
     poolTokenDecimals,
     setTriggerUserStatsUpdate,

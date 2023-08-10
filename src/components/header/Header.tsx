@@ -23,7 +23,7 @@ import {
   traderAPIAtom,
   poolTokenDecimalsAtom,
 } from 'store/pools.store';
-import { ExchangeInfoI, PerpetualDataI } from 'types/types';
+import type { AddressT, ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -131,7 +131,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
     refetch,
   } = useBalance({
     address: address,
-    token: selectedPool?.marginTokenAddr as `0x${string}` | undefined,
+    token: selectedPool?.marginTokenAddr as AddressT | undefined,
     chainId: chain?.id,
     enabled: !requestRef.current && address !== undefined && chainId === chain?.id,
   });

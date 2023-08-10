@@ -19,6 +19,7 @@ export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHi
   const { t } = useTranslation();
   const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
   const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
+  const pnlColor = tradeHistory.realizedPnl > 0 ? styles.green : styles.red;
 
   return (
     <Box className={styles.root}>
@@ -67,7 +68,7 @@ export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHi
           leftSide={headers[6].label}
           rightSide={perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName) : ''}
           leftSideStyles={styles.dataLabel}
-          rightSideStyles={styles.dataValue}
+          rightSideStyles={pnlColor}
         />
       </Box>
     </Box>

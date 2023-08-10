@@ -45,7 +45,7 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
     return headers;
   }, [isAgency, t]);
 
-  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 

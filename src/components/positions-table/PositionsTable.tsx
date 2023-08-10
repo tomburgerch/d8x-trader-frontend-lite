@@ -5,7 +5,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useSigner } from 'wagmi';
+import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import {
   Box,
@@ -18,8 +18,8 @@ import {
   FormControlLabel,
   InputAdornment,
   Link,
-  OutlinedInput,
   Table as MuiTable,
+  OutlinedInput,
   TableBody,
   TableCell,
   TableContainer,
@@ -65,16 +65,14 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
-import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
-import type { MarginAccountI, OrderI, TableHeaderI } from 'types/types';
-import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
+import { AlignE, OrderTypeE, TableTypeE } from 'types/enums';
+import type { AddressT, MarginAccountI, OrderI, TableHeaderI } from 'types/types';
 
 import styles from './PositionsTable.module.scss';
 
 import { Separator } from 'components/separator/Separator';
-
-import { toUtf8String } from '@ethersproject/strings';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
@@ -95,7 +93,7 @@ export const PositionsTable = memo(() => {
 
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient({ chainId: chainId });
   const { width, ref } = useResizeDetector();
 
   const [modifyType, setModifyType] = useState(ModifyTypeE.Close);
@@ -109,6 +107,7 @@ export const PositionsTable = memo(() => {
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -124,8 +123,28 @@ export const PositionsTable = memo(() => {
     setSelectedPosition(null);
   }, []);
 
+  useWaitForTransaction({
+    hash: txHash,
+    onSuccess() {
+      if (modifyType === ModifyTypeE.Add) {
+        toast.success(<ToastContent title="Collateral Added" bodyLines={[]} />);
+      } else if (modifyType === ModifyTypeE.Remove) {
+        toast.success(<ToastContent title="Collateral Removed" bodyLines={[]} />);
+      } else if (modifyType === ModifyTypeE.Close) {
+        toast.success(<ToastContent title="Order Submitted" bodyLines={[]} />);
+      }
+    },
+    onError() {
+      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    },
+    onSettled() {
+      setTxHash(undefined);
+    },
+    enabled: !!address,
+  });
+
   const handleModifyPositionConfirm = useCallback(async () => {
-    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !signer || !poolTokenDecimals) {
+    if (!selectedPosition || !address || !selectedPool || !proxyAddr || !walletClient || !poolTokenDecimals) {
       return;
     }
 
@@ -146,87 +165,21 @@ export const PositionsTable = memo(() => {
         leverage: selectedPosition.leverage,
       };
 
-      await orderDigest(chainId, [closeOrder], address)
+      orderDigest(chainId, [closeOrder], address)
         .then((data) => {
           if (data.data.digests.length > 0) {
-            approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then((res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
+            approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              postOrder(signer, signatures, data.data)
-                .then(async (tx) => {
-                  setRequestSent(false);
-                  setModifyModalOpen(false);
-                  setSelectedPosition(null);
-                  console.log(`closePosition tx hash: ${tx.hash}`);
+              postOrder(walletClient, signatures, data.data)
+                .then((tx) => {
+                  setTxHash(tx.hash);
+                  console.log(`postOrder tx hash: ${tx.hash}`);
                   toast.success(
                     <ToastContent title={t('pages.trade.positions-table.toasts.submit-close.title')} bodyLines={[]} />
                   );
-                  await tx
-                    .wait()
-                    .then((receipt) => {
-                      setRequestSent(false);
-                      if (receipt.status === 1) {
-                        toast.success(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.submitted.title')}
-                            bodyLines={[
-                              {
-                                label: t('pages.trade.positions-table.toasts.submitted.body'),
-                                value: closeOrder.symbol,
-                              },
-                            ]} //.concat(
-                          />
-                        );
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.error(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                      if (reason !== '') {
-                        toast.error(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-                            bodyLines={[
-                              { label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason },
-                            ]}
-                          />
-                        );
-                      } else {
-                        // false positive, probably just Metamask/RPC
-                        toast.success(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.submitted.title')}
-                            bodyLines={[
-                              {
-                                label: t('pages.trade.positions-table.toasts.submitted.body'),
-                                value: closeOrder.symbol,
-                              },
-                            ]}
-                          />
-                        );
-                      }
-                    });
                 })
                 .catch((error) => {
                   console.error(error);
-                  setRequestSent(false);
                   let msg = (error?.message ?? error) as string;
                   msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
                   toast.error(
@@ -235,6 +188,11 @@ export const PositionsTable = memo(() => {
                       bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
                     />
                   );
+                })
+                .finally(() => {
+                  setRequestSent(false);
+                  setModifyModalOpen(false);
+                  setSelectedPosition(null);
                 });
             });
           }
@@ -245,108 +203,43 @@ export const PositionsTable = memo(() => {
         });
     } else if (modifyType === ModifyTypeE.Add) {
       setRequestSent(true);
-      await getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
+      getAddCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, addCollateral)
         .then(({ data }) => {
-          approveMarginToken(signer, selectedPool.marginTokenAddr, proxyAddr, addCollateral, poolTokenDecimals).then(
-            (res) => {
-              if (res?.hash) {
-                console.log(res.hash);
-              }
-              deposit(signer, data)
-                .then(async (tx) => {
-                  setRequestSent(false);
-                  setModifyModalOpen(false);
-                  setSelectedPosition(null);
-                  console.log(`addCollateral tx hash: ${tx.hash}`);
-                  toast.success(
-                    <ToastContent
-                      title={t('pages.trade.positions-table.toasts.adding-collateral.title')}
-                      bodyLines={[]}
-                    />
-                  );
-                  await tx
-                    .wait()
-                    .then((receipt) => {
-                      if (receipt.status === 1) {
-                        toast.success(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.collateral-added.title')}
-                            bodyLines={[
-                              {
-                                label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
-                                value: selectedPosition.symbol,
-                              },
-                              {
-                                label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
-                                value: formatToCurrency(addCollateral, selectedPool.poolSymbol),
-                              },
-                            ]}
-                          />
-                        );
-                      }
-                    })
-                    .catch(async (err) => {
-                      console.error(err);
-                      const response = await signer.call(
-                        {
-                          to: tx.to,
-                          from: tx.from,
-                          nonce: tx.nonce,
-                          gasLimit: tx.gasLimit,
-                          gasPrice: tx.gasPrice,
-                          data: tx.data,
-                          value: tx.value,
-                          chainId: tx.chainId,
-                          type: tx.type ?? undefined,
-                          accessList: tx.accessList,
-                        },
-                        tx.blockNumber
-                      );
-                      const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                      setRequestSent(false);
-                      if (reason !== '') {
-                        toast.error(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-                            bodyLines={[
-                              { label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason },
-                            ]}
-                          />
-                        );
-                      } else {
-                        // false positive, probably just metamask
-                        toast.success(
-                          <ToastContent
-                            title={t('pages.trade.positions-table.toasts.collateral-added.title')}
-                            bodyLines={[
-                              {
-                                label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
-                                value: selectedPosition.symbol,
-                              },
-                              {
-                                label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
-                                value: formatToCurrency(addCollateral, selectedPool.poolSymbol),
-                              },
-                            ]}
-                          />
-                        );
-                      }
-                    });
-                })
-                .catch((error) => {
-                  let msg = (error?.message ?? error) as string;
-                  msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-                  toast.error(
-                    <ToastContent
-                      title={t('pages.trade.positions-table.toasts.error-processing.title')}
-                      bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
-                    />
-                  );
-                  console.error(error);
-                  setRequestSent(false);
-                });
-            }
-          );
+          approveMarginToken(
+            walletClient,
+            selectedPool.marginTokenAddr,
+            proxyAddr,
+            addCollateral,
+            poolTokenDecimals
+          ).then(() => {
+            deposit(walletClient, data)
+              .then((tx) => {
+                console.log(`deposit tx hash: ${tx.hash}`);
+                setTxHash(tx.hash);
+                toast.success(
+                  <ToastContent
+                    title={t('pages.trade.positions-table.toasts.adding-collateral.title')}
+                    bodyLines={[]}
+                  />
+                );
+              })
+              .catch((error) => {
+                let msg = (error?.message ?? error) as string;
+                msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+                toast.error(
+                  <ToastContent
+                    title={t('pages.trade.positions-table.toasts.error-processing.title')}
+                    bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
+                  />
+                );
+                console.error(error);
+              })
+              .finally(() => {
+                setRequestSent(false);
+                setModifyModalOpen(false);
+                setSelectedPosition(null);
+              });
+          });
         })
         .catch((error) => {
           console.error(error);
@@ -358,90 +251,21 @@ export const PositionsTable = memo(() => {
       }
 
       setRequestSent(true);
-      await getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
+      getRemoveCollateral(chainId, traderAPIRef.current, selectedPosition.symbol, removeCollateral)
         .then(({ data }) => {
-          withdraw(signer, data)
-            .then(async (tx) => {
-              setRequestSent(false);
-              setModifyModalOpen(false);
-              setSelectedPosition(null);
-              console.log(`removeCollateral tx hash: ${tx.hash}`);
+          withdraw(walletClient, data)
+            .then((tx) => {
+              console.log(`withdraw tx hash: ${tx.hash}`);
+              setTxHash(tx.hash);
               toast.success(
                 <ToastContent
                   title={t('pages.trade.positions-table.toasts.removing-collateral.title')}
                   bodyLines={[]}
                 />
               );
-              await tx
-                .wait()
-                .then((receipt) => {
-                  if (receipt.status === 1) {
-                    toast.success(
-                      <ToastContent
-                        title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
-                        bodyLines={[
-                          {
-                            label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
-                            value: selectedPosition.symbol,
-                          },
-                          {
-                            label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
-                            value: formatToCurrency(removeCollateral, selectedPool.poolSymbol),
-                          },
-                        ]}
-                      />
-                    );
-                  }
-                })
-                .catch(async (err) => {
-                  console.error(err);
-                  const response = await signer.call(
-                    {
-                      to: tx.to,
-                      from: tx.from,
-                      nonce: tx.nonce,
-                      gasLimit: tx.gasLimit,
-                      gasPrice: tx.gasPrice,
-                      data: tx.data,
-                      value: tx.value,
-                      chainId: tx.chainId,
-                      type: tx.type ?? undefined,
-                      accessList: tx.accessList,
-                    },
-                    tx.blockNumber
-                  );
-                  const reason = toUtf8String('0x' + response.substring(138)).replace(/\0/g, '');
-                  setRequestSent(false);
-                  if (reason !== '') {
-                    toast.error(
-                      <ToastContent
-                        title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-                        bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason }]}
-                      />
-                    );
-                  } else {
-                    // false positive, probably just metamask
-                    toast.success(
-                      <ToastContent
-                        title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
-                        bodyLines={[
-                          {
-                            label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
-                            value: selectedPosition.symbol,
-                          },
-                          {
-                            label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
-                            value: formatToCurrency(removeCollateral, selectedPool.poolSymbol),
-                          },
-                        ]}
-                      />
-                    );
-                  }
-                });
             })
             .catch((error) => {
               console.error(error);
-              setRequestSent(false);
               let msg = (error?.message ?? error) as string;
               msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
               toast.error(
@@ -450,6 +274,11 @@ export const PositionsTable = memo(() => {
                   bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
                 />
               );
+            })
+            .finally(() => {
+              setRequestSent(false);
+              setModifyModalOpen(false);
+              setSelectedPosition(null);
             });
         })
         .catch((error) => {
@@ -468,7 +297,7 @@ export const PositionsTable = memo(() => {
     addCollateral,
     removeCollateral,
     maxCollateral,
-    signer,
+    walletClient,
     poolTokenDecimals,
     t,
   ]);
@@ -727,7 +556,7 @@ export const PositionsTable = memo(() => {
     return formatToCurrency(selectedPosition.liquidationPrice[0], parsedSymbol?.quoteCurrency);
   }, [selectedPosition, newPositionRisk, modifyType, closePositionChecked, parsedSymbol]);
 
-  const handleChangePage = useCallback((event: unknown, newPage: number) => {
+  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 

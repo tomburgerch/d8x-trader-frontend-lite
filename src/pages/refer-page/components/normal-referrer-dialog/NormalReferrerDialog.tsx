@@ -2,7 +2,7 @@ import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
-import { useAccount, useChainId, useSigner } from 'wagmi';
+import { useAccount, useChainId, useWalletClient } from 'wagmi';
 
 import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 
@@ -41,7 +41,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   const { t } = useTranslation();
   const [referralCodesRefetchHandler] = useAtom(referralCodesRefetchHandlerRefAtom);
 
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
   const chainId = useChainId();
 
@@ -82,7 +82,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
   };
 
   const handleUpsertCode = async () => {
-    if (!address || !signer) {
+    if (!address || !walletClient) {
       return;
     }
 
@@ -103,7 +103,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
       traderRebatePerc,
       0,
       referrerRebatePerc,
-      signer,
+      walletClient,
       props.onClose
     );
     toast.success(

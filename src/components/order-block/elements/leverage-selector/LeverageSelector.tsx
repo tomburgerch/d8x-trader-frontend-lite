@@ -45,7 +45,7 @@ export const LeverageSelector = memo(() => {
   }, [maxLeverage]);
 
   const handleLeverageChange = useCallback(
-    (event: Event, newValue: number | number[]) => {
+    (_event: Event, newValue: number | number[]) => {
       if (typeof newValue === 'number') {
         setLeverage(newValue);
       }

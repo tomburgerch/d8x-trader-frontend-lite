@@ -18,6 +18,7 @@ interface PositionRowPropsI {
 export const PositionBlock = ({ headers, position, handlePositionModify }: PositionRowPropsI) => {
   const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
+  const pnlColor = position.unrealizedPnlQuoteCCY > 0 ? styles.green : styles.red;
 
   return (
     <Box className={styles.root}>
@@ -73,7 +74,7 @@ export const PositionBlock = ({ headers, position, handlePositionModify }: Posit
           leftSide={headers[6].label}
           rightSide={formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency)}
           leftSideStyles={styles.dataLabel}
-          rightSideStyles={styles.dataValue}
+          rightSideStyles={pnlColor}
         />
       </Box>
     </Box>

@@ -13,6 +13,8 @@ export interface LanguageMetaI {
   name: string;
 }
 
+export type AddressT = `0x${string}`;
+
 export interface AppDimensionsI {
   width?: number;
   height?: number;
