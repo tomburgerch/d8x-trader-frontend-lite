@@ -38,8 +38,8 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
     ];
     if (isAgency) {
       headers.push({ label: 'Agency rebate rate', align: AlignE.Right });
+      headers.push({ label: 'Modify', align: AlignE.Center });
     }
-    headers.push({ label: 'Modify', align: AlignE.Center });
     return headers;
   }, [isAgency]);
 

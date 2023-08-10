@@ -1,4 +1,5 @@
 import { useAtom } from 'jotai';
+import { useMemo } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
@@ -24,16 +25,24 @@ export const ReferralsBlock = () => {
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
+  const isCreateCodeButtonActive = useMemo(() => {
+    if (!address) {
+      return false;
+    }
+    return true;
+  }, [address]);
+
   return (
     <Box className={styles.root}>
       <Box className={styles.buttonContainer}>
-        {address ? (
-          <Button onClick={openDialog} variant="primary" className={styles.enterCodeButton}>
-            Create code
-          </Button>
-        ) : (
-          <WalletConnectButton />
-        )}
+        <Button
+          onClick={openDialog}
+          variant="primary"
+          disabled={!isCreateCodeButtonActive}
+          className={styles.enterCodeButton}
+        >
+          Create code
+        </Button>
       </Box>
       <Separator className={styles.divider} />
       {address && referralCode && referralCode.agency && referralCode.referrer ? (

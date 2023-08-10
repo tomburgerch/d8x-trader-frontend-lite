@@ -54,11 +54,13 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
             {formatToCurrency(absolutePercentages.agencyRebatePerc, '%', false, 2).replace(' ', '')}
           </TableCell>
         )}
-        <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
-          <Button variant="primary" onClick={openDialog} className={styles.modifyButton}>
-            <Typography variant="bodyTiny">Modify</Typography>
-          </Button>
-        </TableCell>
+        {isAgency && (
+          <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
+            <Button variant="primary" onClick={openDialog} className={styles.modifyButton}>
+              <Typography variant="bodyTiny">Modify</Typography>
+            </Button>
+          </TableCell>
+        )}
       </TableRow>
       {dialogOpen && isAgency && (
         <AgencyReferrerDialog
