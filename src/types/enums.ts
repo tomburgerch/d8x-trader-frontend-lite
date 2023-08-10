@@ -1,3 +1,9 @@
+export enum LanguageE {
+  EN = 'en',
+  CN = 'cn',
+  DE = 'de',
+}
+
 export enum RequestMethodE {
   Get = 'GET',
   Delete = 'DELETE',

@@ -1,8 +1,9 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
-import { useResizeDetector } from 'react-resize-detector';
 
 import {
   Box,
@@ -33,20 +34,21 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
+import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { AlignE, TableTypeE } from 'types/enums';
-import { AddressT, OrderWithIdI, TableHeaderI } from 'types/types';
+import type { AddressT, OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
-
-import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './OpenOrdersTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 900;
 
 export const OpenOrdersTable = memo(() => {
+  const { t } = useTranslation();
+
   const { address, isDisconnected, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: walletClient } = useWalletClient({ chainId: chainId });
@@ -110,10 +112,25 @@ export const OpenOrdersTable = memo(() => {
   useWaitForTransaction({
     hash: modifyTx,
     onSuccess() {
-      toast.success(<ToastContent title="Order Cancelled" bodyLines={[]} />);
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
+              value: selectedOrder.symbol,
+            },
+          ]}
+        />
+      );
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.trade.orders-table.toasts.tx-failed.title')}
+          bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: reason }]}
+        />
+      );
     },
     onSettled() {
       setModifyTx(undefined);
@@ -151,7 +168,9 @@ export const OpenOrdersTable = memo(() => {
               setSelectedOrder(null);
               setRequestSent(false);
               console.log(`cancelOrder tx hash: ${tx.hash}`);
-              toast.success(<ToastContent title="Cancelling Order" bodyLines={[]} />);
+              toast.success(
+                <ToastContent title={t('pages.trade.orders-table.toasts.cancel-order.title')} bodyLines={[]} />
+              );
               setModifyTx(tx.hash);
             })
             .catch((error) => {
@@ -161,13 +180,16 @@ export const OpenOrdersTable = memo(() => {
               let msg = (error?.message ?? error) as string;
               msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
               toast.error(
-                <ToastContent title="Error Processing Transaction" bodyLines={[{ label: 'Reason', value: msg }]} />
+                <ToastContent
+                  title={t('pages.trade.orders-table.toasts.error-processing.title')}
+                  bodyLines={[{ label: t('pages.trade.orders-table.toasts.error-processing.body'), value: msg }]}
+                />
               );
             });
         });
       }
     });
-  }, [selectedOrder, requestSent, isDisconnected, walletClient, chainId, refreshOpenOrders]);
+  }, [selectedOrder, requestSent, isDisconnected, walletClient, chainId, refreshOpenOrders, t]);
 
   const handleChangePage = useCallback((_event: unknown, newPage: number) => {
     setPage(newPage);
@@ -190,16 +212,16 @@ export const OpenOrdersTable = memo(() => {
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [
-      { label: 'Symbol', align: AlignE.Left },
-      { label: 'Side', align: AlignE.Left },
-      { label: 'Type', align: AlignE.Left },
-      { label: 'Order Size', align: AlignE.Right },
-      { label: 'Limit Price', align: AlignE.Right },
-      { label: 'Stop Price', align: AlignE.Right },
-      { label: 'Leverage', align: AlignE.Right },
-      { label: 'Good Until', align: AlignE.Left },
+      { label: t('pages.trade.orders-table.table-header.symbol'), align: AlignE.Left },
+      { label: t('pages.trade.orders-table.table-header.side'), align: AlignE.Left },
+      { label: t('pages.trade.orders-table.table-header.type'), align: AlignE.Left },
+      { label: t('pages.trade.orders-table.table-header.order-size'), align: AlignE.Right },
+      { label: t('pages.trade.orders-table.table-header.limit-price'), align: AlignE.Right },
+      { label: t('pages.trade.orders-table.table-header.stop-price'), align: AlignE.Right },
+      { label: t('pages.trade.orders-table.table-header.leverage'), align: AlignE.Right },
+      { label: t('pages.trade.orders-table.table-header.good-until'), align: AlignE.Left },
     ],
-    []
+    [t]
   );
 
   const sortedOpenOrders = useMemo(
@@ -238,7 +260,11 @@ export const OpenOrdersTable = memo(() => {
               {(!address || sortedOpenOrders.length === 0) && (
                 <EmptyTableRow
                   colSpan={openOrdersHeaders.length}
-                  text={!address ? 'Please connect your wallet' : 'No open orders'}
+                  text={
+                    !address
+                      ? t('pages.trade.orders-table.table-content.connect')
+                      : t('pages.trade.orders-table.table-content.no-open')
+                  }
                 />
               )}
             </TableBody>
@@ -259,7 +285,11 @@ export const OpenOrdersTable = memo(() => {
                 />
               ))}
           {(!address || sortedOpenOrders.length === 0) && (
-            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No open orders'}</Box>
+            <Box className={styles.noData}>
+              {!address
+                ? t('pages.trade.orders-table.table-content.connect')
+                : t('pages.trade.orders-table.table-content.no-open')}
+            </Box>
           )}
         </Box>
       )}
@@ -278,14 +308,16 @@ export const OpenOrdersTable = memo(() => {
         </Box>
       )}
       <Dialog open={isCancelModalOpen} className={styles.dialog}>
-        <DialogTitle>Cancel Open Order</DialogTitle>
-        <DialogContent className={styles.dialogContent}>Are you sure you want to cancel this order?</DialogContent>
+        <DialogTitle>{t('pages.trade.orders-table.cancel-modal.title')}</DialogTitle>
+        <DialogContent className={styles.dialogContent}>
+          {t('pages.trade.orders-table.cancel-modal.content')}
+        </DialogContent>
         <DialogActions>
           <Button onClick={closeCancelModal} variant="secondary" size="small">
-            Back
+            {t('pages.trade.orders-table.cancel-modal.back')}
           </Button>
           <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={requestSent}>
-            Cancel order
+            {t('pages.trade.orders-table.cancel-modal.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

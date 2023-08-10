@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -10,6 +12,7 @@ interface PositionRowPropsI {
 }
 
 export const PositionRow = ({ position, handlePositionModify }: PositionRowPropsI) => {
+  const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
   const pnlColor =
     position.unrealizedPnlQuoteCCY > 0
@@ -29,7 +32,11 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
         </Typography>
       </TableCell>
       <TableCell align="left">
-        <Typography variant="cellSmall">{position.side}</Typography>
+        <Typography variant="cellSmall">
+          {position.side === 'BUY'
+            ? t('pages.trade.positions-table.table-content.buy')
+            : t('pages.trade.positions-table.table-content.sell')}
+        </Typography>
       </TableCell>
       <TableCell align="right">
         <Typography variant="cellSmall">
@@ -55,7 +62,7 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
       </TableCell>
       <TableCell align="center">
         <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
-          Modify
+          {t('pages.trade.positions-table.table-content.modify')}
         </Button>
       </TableCell>
     </TableRow>

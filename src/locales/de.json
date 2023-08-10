@@ -1,0 +1,44 @@
+{
+  "navigation": {
+    "trade": "Handel",
+    "refer": "Sich beziehen",
+    "vault": "Gewölbe"
+  },
+  "pages": {
+    "trade": {
+      "stats": {
+        "mid-price": "Mittlerer Preis",
+        "mark-price": "Preis markieren",
+        "index-price": "Indexpreis",
+        "funding-rate": "Förderquote",
+        "open-interest": "Offenes Interesse"
+      }
+    },
+    "refer": {},
+    "vault": {}
+  },
+  "common": {
+    "change-language": "Sprache ändern",
+    "wallet-connect": "Verbinden",
+    "select": {
+      "collateral": {
+        "label": "Kaution:",
+        "label2": "Liquiditätspool:",
+        "headers": {
+          "collateral": "Kaution",
+          "num-of-perps": "No der Fortg."
+        }
+      },
+      "perpetual": {
+        "label": "Fortwährend:",
+        "headers": {
+          "pair": "Paar",
+          "status": "Status"
+        }
+      }
+    }
+  },
+  "error": {
+    "wrong-network": "Falsches Netzwerk"
+  }
+}

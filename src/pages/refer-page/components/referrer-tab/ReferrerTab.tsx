@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -15,12 +16,8 @@ import { ReferralsBlock } from '../referrals-block/ReferralsBlock';
 
 import styles from './ReferrerTab.module.scss';
 
-const disclaimerTextBlocks = [
-  'Earn rebates by inviting traders to trade on D8X. Rebates are airdropped to your wallet weekly.',
-  'Check out details on the D8X referral program.',
-];
-
 export const ReferrerTab = memo(() => {
+  const { t } = useTranslation();
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPoolId] = useAtom(selectedPoolIdAtom);
 
@@ -32,6 +29,11 @@ export const ReferrerTab = memo(() => {
 
   const referralVolumeRequestRef = useRef(false);
   const earnedRebateRequestRef = useRef(false);
+
+  const disclaimerTextBlocks = useMemo(
+    () => [t('pages.refer.referrer-tab.disclaimer-text-block1'), t('pages.refer.referrer-tab.disclaimer-text-block2')],
+    [t]
+  );
 
   useEffect(() => {
     if (address && chainId) {
@@ -86,22 +88,22 @@ export const ReferrerTab = memo(() => {
 
     return [
       {
-        title: 'Total referred trading volume',
+        title: t('pages.refer.referrer-tab.volume'),
         value: address ? referralVolumesAmount : '--',
         poolSymbol: selectedPool?.poolSymbol ?? '--',
       },
       {
-        title: 'Total earned rebates',
+        title: t('pages.refer.referrer-tab.rebates'),
         value: address ? earnedRebatesAmount : '--',
         poolSymbol: selectedPool?.poolSymbol ?? '--',
       },
     ];
-  }, [referralVolumes, earnedRebates, selectedPool?.poolSymbol, selectedPoolId, address]);
+  }, [referralVolumes, earnedRebates, selectedPool?.poolSymbol, selectedPoolId, address, t]);
 
   return (
     <Box className={styles.root}>
-      <Overview title="Your referrals" items={overviewItems} />
-      <Disclaimer title="Refer & Earn" textBlocks={disclaimerTextBlocks} />
+      <Overview title={t('pages.refer.referrer-tab.title1')} items={overviewItems} />
+      <Disclaimer title={t('pages.refer.referrer-tab.title2')} textBlocks={disclaimerTextBlocks} />
       <div className={styles.divider} />
       <ReferralsBlock />
     </Box>

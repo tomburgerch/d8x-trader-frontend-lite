@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -14,6 +15,7 @@ import commonStyles from '../../OrderBlock.module.scss';
 import styles from './TakeProfitSelector.module.scss';
 
 export const TakeProfitSelector = memo(() => {
+  const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
   const [, setTakeProfitPrice] = useAtom(takeProfitPriceAtom);
@@ -118,25 +120,25 @@ export const TakeProfitSelector = memo(() => {
     }
   }, [takeProfit, orderInfo?.takeProfitPrice, fractionDigits]);
 
+  const translationMap: Record<TakeProfitE, string> = {
+    [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
+    [TakeProfitE['25%']]: '35%',
+    [TakeProfitE['50%']]: '50%',
+    [TakeProfitE['100%']]: '100%',
+    [TakeProfitE['500%']]: '500%',
+  };
+
   return (
     <Box className={styles.root}>
       <Box className={styles.labelHolder}>
         <Box className={styles.label}>
           <InfoBlock
-            title="Take profit"
+            title={t('pages.trade.order-block.take-profit.title')}
             content={
               <>
-                <Typography>You can specify a take profit order to go along with your main order.</Typography>
-                <Typography>
-                  If you select e.g., 100%, you create a second order, that will be triggered if your profit on your
-                  main order reaches 100%.
-                </Typography>
-                <Typography>
-                  Technically, you are specifying a limit order of the opposing side (if your main order is a BUY order,
-                  you are specifying a limit SELL order). The limit price is automatically calculated such that your
-                  overall profit is as per your selection, assuming you entered at the worst price your slippage
-                  settings allow.
-                </Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
               </>
             }
             classname={commonStyles.actionIcon}
@@ -166,7 +168,7 @@ export const TakeProfitSelector = memo(() => {
             className={classNames({ [styles.selected]: key === takeProfit })}
             onClick={() => handleTakeProfitChange(key)}
           >
-            {key}
+            {translationMap[key]}
           </Button>
         ))}
       </Box>

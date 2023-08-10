@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
@@ -25,10 +26,12 @@ import type { SelectItemI } from '../header-select/types';
 import styles from '../header-select/HeaderSelect.module.scss';
 
 const OptionsHeader = () => {
+  const { t } = useTranslation();
+
   return (
     <MenuItem className={styles.optionsHeader} disabled>
-      <Box className={styles.leftLabel}>Collateral</Box>
-      <Box className={styles.rightLabel}>No. of perps</Box>
+      <Box className={styles.leftLabel}>{t('common.select.collateral.headers.collateral')}</Box>
+      <Box className={styles.rightLabel}>{t('common.select.collateral.headers.num-of-perps')}</Box>
     </MenuItem>
   );
 };
@@ -44,6 +47,7 @@ export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelec
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -120,7 +124,7 @@ export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelec
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
-        label={label ? label : 'Collateral'}
+        label={label ? label : t('common.select.collateral.label')}
         native={isMobileScreen}
         items={selectItems}
         width="100%"

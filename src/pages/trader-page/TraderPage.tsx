@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
@@ -37,6 +38,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import styles from './TraderPage.module.scss';
 
 export const TraderPage = memo(() => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -154,33 +156,33 @@ export const TraderPage = memo(() => {
   const positionItems: SelectorItemI[] = useMemo(
     () => [
       {
-        label: 'Positions (' + positions.length + ')',
+        label: `${t('pages.trade.positions-table.table-title')} (` + positions.length + `)`,
         item: <PositionsTable />,
         tableType: TableTypeE.POSITIONS,
       },
       {
-        label: 'Open Orders (' + openOrders.length + ')',
+        label: `${t('pages.trade.orders-table.table-title')} (` + openOrders.length + `)`,
         item: <OpenOrdersTable />,
         tableType: TableTypeE.OPEN_ORDERS,
       },
     ],
-    [positions, openOrders]
+    [positions, openOrders, t]
   );
 
   const historyItems: SelectorItemI[] = useMemo(
     () => [
       {
-        label: 'Trade History',
+        label: `${t('pages.trade.history-table.table-title')}`,
         item: <TradeHistoryTable />,
         tableType: TableTypeE.TRADE_HISTORY,
       },
       {
-        label: 'Funding',
+        label: `${t('pages.trade.funding-table.table-title')}`,
         item: <FundingTable />,
         tableType: TableTypeE.FUNDING,
       },
     ],
-    []
+    [t]
   );
 
   const selectorForAllItems: SelectorItemI[] = useMemo(

@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useWaitForTransaction, useWalletClient } from 'wagmi';
 
@@ -19,12 +20,13 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
+import type { AddressT } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
-import { AddressT } from 'types/types';
 
 export const Add = memo(() => {
+  const { t } = useTranslation();
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient({
     onError(error) {
@@ -45,7 +47,7 @@ export const Add = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
 
   const [inputValue, setInputValue] = useState(`${addAmount}`);
-  const [addTxn, setAddTxn] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
@@ -69,18 +71,23 @@ export const Add = memo(() => {
   }, [addAmount]);
 
   useWaitForTransaction({
-    hash: addTxn,
+    hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Liquidity Added" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.vault.toast.added')} bodyLines={[]} />);
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.vault.toast.error.title')}
+          bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
-      setAddTxn(undefined);
+      setTxHash(undefined);
       setTriggerUserStatsUpdate((prevValue) => !prevValue);
     },
-    enabled: !!addTxn,
+    enabled: !!txHash,
   });
 
   const handleAddLiquidity = useCallback(() => {
@@ -102,15 +109,20 @@ export const Add = memo(() => {
       .then(() => {
         addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount).then((tx) => {
           console.log(`addLiquidity tx hash: ${tx.hash}`);
-          setAddTxn(tx.hash);
-          toast.success(<ToastContent title="Adding Liquidity" bodyLines={[]} />);
+          setTxHash(tx.hash);
+          toast.success(<ToastContent title={t('pages.vault.toast.adding')} bodyLines={[]} />);
         });
       })
       .catch((err) => {
         console.error(err);
         let msg = (err?.message ?? err) as string;
         msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-        toast.error(<ToastContent title="Error adding liquidity" bodyLines={[{ label: 'Reason', value: msg }]} />);
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error.body'), value: msg }]}
+          />
+        );
       })
       .finally(() => {
         setAddAmount(0);
@@ -129,6 +141,7 @@ export const Add = memo(() => {
     isSDKConnected,
     poolTokenDecimals,
     setTriggerUserStatsUpdate,
+    t,
   ]);
 
   const handleMaxAmount = useCallback(() => {
@@ -154,31 +167,20 @@ export const Add = memo(() => {
   return (
     <div className={styles.root}>
       <Box className={styles.infoBlock}>
-        <Typography variant="h5">Add Liquidity</Typography>
+        <Typography variant="h5">{t('pages.vault.add.title')}</Typography>
         <Typography variant="body2" className={styles.text}>
-          Add liquidity to the {selectedPool?.poolSymbol} pool and receive d{selectedPool?.poolSymbol}, an ERC-20 token
-          that represents your ownership in the liquidity pool.
+          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.poolSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          As a liquidity provider, you'll earn trading fees and funding rate payments on all trades collateralized in{' '}
-          {selectedPool?.poolSymbol}. You'll also participate in the PnL of the pool. d{selectedPool?.poolSymbol}{' '}
-          accumulates fees, funding rate payments and PnL in real-time.
+          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.poolSymbol })}
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
         <Box className={styles.inputLine}>
           <Box className={styles.label}>
             <InfoBlock
-              title={
-                <>
-                  Amount of <strong>{selectedPool?.poolSymbol}</strong>
-                </>
-              }
-              content={
-                <>
-                  <Typography>Specify the amount of {selectedPool?.poolSymbol} you want to add to the pool.</Typography>
-                </>
-              }
+              title={<>{t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.poolSymbol })}</>}
+              content={<>{t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.poolSymbol })}</>}
               classname={styles.actionIcon}
             />
           </Box>
@@ -195,16 +197,15 @@ export const Add = memo(() => {
         </Box>
         {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
-            Max: <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
+            {t('pages.vault.add.max')}{' '}
+            <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
           </Typography>
         ) : null}
         <Box className={styles.iconSeparator}>
           <SwitchIcon />
         </Box>
         <Box className={styles.inputLine}>
-          <Box className={styles.label}>
-            You receive <strong>d{selectedPool?.poolSymbol}</strong>
-          </Box>
+          <Box className={styles.label}>{t('pages.vault.add.receive', { poolSymbol: selectedPool?.poolSymbol })}</Box>
           <Box className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"
@@ -226,7 +227,7 @@ export const Add = memo(() => {
             onClick={handleAddLiquidity}
             className={styles.actionButton}
           >
-            Add
+            {t('pages.vault.add.button')}
           </Button>
         </Box>
       </Box>

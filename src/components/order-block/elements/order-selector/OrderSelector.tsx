@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import classNames from 'classnames';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button, CardHeader } from '@mui/material';
 
@@ -10,6 +11,7 @@ import { OrderBlockE } from 'types/enums';
 import styles from './OrderSelector.module.scss';
 
 export const OrderSelector = memo(() => {
+  const { t } = useTranslation();
   const [orderBlock, setOrderBlock] = useAtom(orderBlockAtom);
 
   return (
@@ -22,7 +24,7 @@ export const OrderSelector = memo(() => {
               className={classNames({ [styles.selected]: key === orderBlock })}
               onClick={() => setOrderBlock(key)}
             >
-              {key}
+              {t(`pages.trade.order-block.selector.${key.toLowerCase()}`)}
             </Button>
           ))}
         </Box>

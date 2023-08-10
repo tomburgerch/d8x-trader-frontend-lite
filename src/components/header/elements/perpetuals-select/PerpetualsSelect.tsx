@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useChainId, useNetwork } from 'wagmi';
 
@@ -27,10 +28,12 @@ import { SelectItemI } from '../header-select/types';
 import styles from '../header-select/HeaderSelect.module.scss';
 
 const OptionsHeader = () => {
+  const { t } = useTranslation();
+
   return (
     <MenuItem className={styles.optionsHeader} disabled>
-      <Box className={styles.leftLabel}>Pair</Box>
-      <Box className={styles.rightLabel}>Status</Box>
+      <Box className={styles.leftLabel}>{t('common.select.perpetual.headers.pair')}</Box>
+      <Box className={styles.rightLabel}>{t('common.select.perpetual.headers.status')}</Box>
     </MenuItem>
   );
 };
@@ -46,6 +49,7 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,7 +167,7 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
       </Box>
       <HeaderSelect<PerpetualI>
         id="perpetuals-select"
-        label="Perpetual"
+        label={t('common.select.perpetual.label')}
         native={isMobileScreen}
         items={selectItems}
         width="100%"

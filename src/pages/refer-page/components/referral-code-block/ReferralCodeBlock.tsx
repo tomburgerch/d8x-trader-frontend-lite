@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
@@ -20,6 +21,7 @@ export const ReferralCodeBlock = ({
   traderRebatePercentage,
   onCodeApplySuccess,
 }: ReferralCodeBlockPropsI) => {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const { address } = useAccount();
 
@@ -28,7 +30,7 @@ export const ReferralCodeBlock = ({
       <Box className={styles.topSection}>
         <Box>
           <Typography variant="bodySmall" component="p" className={styles.dataTitle}>
-            Your rebate rate
+            {t('pages.refer.trader-tab.your-rebate-rate')}
           </Typography>
           <Typography variant="bodyLarge" className={styles.dataValue}>
             {address && traderRebatePercentage ? `${traderRebatePercentage.toFixed(2)}%` : 'N/A'}
@@ -36,7 +38,7 @@ export const ReferralCodeBlock = ({
         </Box>
         {address ? (
           <Button variant="primary" onClick={() => setDialogOpen(true)} className={styles.newCodeButton}>
-            Enter new code
+            {t('pages.refer.trader-tab.enter-new-code')}
           </Button>
         ) : (
           <WalletConnectButton />
@@ -44,7 +46,7 @@ export const ReferralCodeBlock = ({
       </Box>
       <div className={styles.divider} />
       <Typography variant="bodySmall" component="p" className={styles.dataTitle}>
-        Your active code
+        {t('pages.refer.trader-tab.your-active-code')}
       </Typography>
       <Typography variant="bodyLarge" className={styles.dataValue}>
         {address && referralCode ? referralCode : 'N/A'}

@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
@@ -10,6 +11,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import styles from './InfoBlock.module.scss';
 
 export const InfoBlock = memo(() => {
+  const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [orderSize] = useAtom(orderSizeAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
@@ -37,7 +39,7 @@ export const InfoBlock = memo(() => {
     <Box className={styles.root}>
       <Box className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
-          Wallet balance
+          {t('pages.trade.order-block.info.balance')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
           {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
@@ -45,7 +47,7 @@ export const InfoBlock = memo(() => {
       </Box>
       <Box className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
-          Order size
+          {t('pages.trade.order-block.info.order-size')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
           {formatToCurrency(orderSize, selectedPerpetual?.baseCurrency)}
@@ -53,7 +55,7 @@ export const InfoBlock = memo(() => {
       </Box>
       <Box className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
-          Fees
+          {t('pages.trade.order-block.info.fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
           {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}

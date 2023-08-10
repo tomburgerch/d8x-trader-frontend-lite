@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Box,
@@ -66,6 +67,7 @@ function valueLabelFormat(value: number) {
 }
 
 export const OrderSettings = memo(() => {
+  const { t } = useTranslation();
   // const [positions] = useAtom(positionsAtom);
   const [orderBlock] = useAtom(orderBlockAtom);
   const [orderType] = useAtom(orderTypeAtom);
@@ -167,7 +169,7 @@ export const OrderSettings = memo(() => {
           {orderType === OrderTypeE.Market && (
             <>
               <SettingsIcon className={styles.settingsIcon} onClick={openSettingsModal} />
-              <Typography variant="bodyTiny">Slippage settings</Typography>
+              <Typography variant="bodyTiny">{t('pages.trade.order-block.slippage.title')}</Typography>
             </>
           )}
           {orderType !== OrderTypeE.Market && (
@@ -178,19 +180,19 @@ export const OrderSettings = memo(() => {
                 defaultChecked={reduceOnly}
                 onChange={(_event, checked) => setReduceOnly(checked)}
                 control={reduceOnly ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
-                label="Reduce only"
+                label={t('pages.trade.order-block.reduce-only')}
                 labelPlacement="end"
               />
               <SettingsIcon className={styles.settingsIcon} onClick={openExpiryModal} />
-              <Typography variant="bodyTiny">Expiry settings</Typography>
+              <Typography variant="bodyTiny">{t('pages.trade.order-block.expiry.title')}</Typography>
             </Box>
           )}
         </Box>
       </Box>
       <Dialog open={showSettingsModal} className={styles.dialog}>
-        <DialogTitle>Slippage settings</DialogTitle>
+        <DialogTitle>{t('pages.trade.order-block.slippage.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
-          <Typography variant="bodyMedium">Choose slippage tolerance</Typography>
+          <Typography variant="bodyMedium">{t('pages.trade.order-block.slippage.body')}</Typography>
           <Box className={styles.sliderHolder}>
             <Slider
               aria-label="Slippage tolerance values"
@@ -220,27 +222,26 @@ export const OrderSettings = memo(() => {
             />
           </Box>
           <Typography variant="body2" className={styles.maxEntryPrice}>
-            {orderBlock === OrderBlockE.Long ? 'Max' : 'Min'} entry price:{' '}
+            {orderBlock === OrderBlockE.Long
+              ? t('pages.trade.order-block.slippage.max')
+              : t('pages.trade.order-block.slippage.min')}{' '}
             {formatToCurrency(entryPrice, selectedPerpetual?.quoteCurrency)}
           </Typography>
         </DialogContent>
         <Separator />
         <DialogActions>
           <Button onClick={closeSettingsModal} variant="secondary" size="small">
-            Cancel
+            {t('pages.trade.order-block.slippage.cancel')}
           </Button>
           <Button onClick={handleSettingsConfirm} variant="primary" size="small">
-            Confirm
+            {t('pages.trade.order-block.slippage.confirm')}
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog open={showExpiryModal} className={styles.dialog}>
-        <DialogTitle>Expiry settings</DialogTitle>
+        <DialogTitle>{t('pages.trade.order-block.expiry.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
-          <Typography variant="bodyMedium">
-            Set the number of days after, which your main order will expire (this setting does not affect your
-            take-profit and stop-loss orders).
-          </Typography>
+          <Typography variant="bodyMedium">{t('pages.trade.order-block.expiry.body')}</Typography>
         </DialogContent>
         <Box className={styles.expiryBox}>
           <ExpirySelector />
@@ -248,7 +249,7 @@ export const OrderSettings = memo(() => {
         <Separator />
         <DialogActions className={styles.dialogAction}>
           <Button onClick={closeExpiryModal} variant="secondary" size="small">
-            Close
+            {t('pages.trade.order-block.expiry.close')}
           </Button>
         </DialogActions>
       </Dialog>

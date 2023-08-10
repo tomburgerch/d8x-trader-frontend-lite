@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -14,6 +15,7 @@ import commonStyles from '../../OrderBlock.module.scss';
 import styles from './StopLossSelector.module.scss';
 
 export const StopLossSelector = memo(() => {
+  const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
   const [, setStopLossPrice] = useAtom(stopLossPriceAtom);
@@ -121,25 +123,25 @@ export const StopLossSelector = memo(() => {
     }
   }, [stopLoss, orderInfo?.stopLossPrice, fractionDigits]);
 
+  const translationMap: Record<StopLossE, string> = {
+    [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),
+    [StopLossE['10%']]: '10%',
+    [StopLossE['25%']]: '25%',
+    [StopLossE['50%']]: '50%',
+    [StopLossE['75%']]: '75%',
+  };
+
   return (
     <Box className={styles.root}>
       <Box className={styles.labelHolder}>
         <Box className={styles.label}>
           <InfoBlock
-            title="Stop loss"
+            title={t('pages.trade.order-block.stop-loss.title')}
             content={
               <>
-                <Typography>You can specify a stop loss order to go along with your main order.</Typography>
-                <Typography>
-                  If you select e.g. -50%, you create a second order, that will be triggered if your loss on your main
-                  order reaches -50%.
-                </Typography>
-                <Typography>
-                  Technically, you are specifying a stop-market order, of the opposing side (if your main order is a BUY
-                  order, you are specifying a stop-market SELL order). The trigger price is automatically calculated
-                  such that your overall loss is as per your selection, assuming you entered at the worst price your
-                  slippage settings allow.
-                </Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
               </>
             }
             classname={commonStyles.actionIcon}
@@ -169,7 +171,7 @@ export const StopLossSelector = memo(() => {
             className={classNames({ [styles.selected]: key === stopLoss })}
             onClick={() => handleStopLossChange(key)}
           >
-            {key}
+            {translationMap[key]}
           </Button>
         ))}
       </Box>

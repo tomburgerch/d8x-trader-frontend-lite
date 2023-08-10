@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { useAccount } from 'wagmi';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button, Typography } from '@mui/material';
 
@@ -17,6 +18,7 @@ import { ReferralDialogActionE } from 'types/enums';
 import styles from './ReferralsBlock.module.scss';
 
 export const ReferralsBlock = () => {
+  const { t } = useTranslation();
   const [isAgency] = useAtom(isAgencyAtom);
   const [referralCode] = useAtom(referralCodeAtom);
 
@@ -29,7 +31,7 @@ export const ReferralsBlock = () => {
       <Box className={styles.buttonContainer}>
         {address ? (
           <Button onClick={openDialog} variant="primary" className={styles.enterCodeButton}>
-            Create code
+            {t('pages.refer.referrer-tab.create')}
           </Button>
         ) : (
           <WalletConnectButton />
@@ -41,10 +43,10 @@ export const ReferralsBlock = () => {
       ) : (
         <>
           <Typography variant="bodySmall" component="p" className={styles.dataTitle}>
-            Your codes
+            {t('pages.refer.referrer-tab.codes')}
           </Typography>
           <Typography variant="bodyLarge" className={styles.dataValue}>
-            N/A
+            {t('pages.refer.referrer-tab.na')}
           </Typography>
         </>
       )}
