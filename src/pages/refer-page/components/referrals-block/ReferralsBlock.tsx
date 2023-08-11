@@ -1,12 +1,10 @@
 import { useAtom } from 'jotai';
-import { useMemo } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
 import { Separator } from 'components/separator/Separator';
 import { ReferralCodesTable } from 'components/referral-codes-table/ReferralCodesTable';
-import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
 import { useDialog } from 'hooks/useDialog';
 import { isAgencyAtom, referralCodeAtom } from 'store/refer.store';
 
@@ -25,22 +23,10 @@ export const ReferralsBlock = () => {
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
-  const isCreateCodeButtonActive = useMemo(() => {
-    if (!address) {
-      return false;
-    }
-    return true;
-  }, [address]);
-
   return (
     <Box className={styles.root}>
       <Box className={styles.buttonContainer}>
-        <Button
-          onClick={openDialog}
-          variant="primary"
-          disabled={!isCreateCodeButtonActive}
-          className={styles.enterCodeButton}
-        >
+        <Button onClick={openDialog} variant="primary" disabled={!address} className={styles.enterCodeButton}>
           Create code
         </Button>
       </Box>
