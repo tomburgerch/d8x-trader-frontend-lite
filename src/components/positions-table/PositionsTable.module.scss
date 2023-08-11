@@ -4,11 +4,6 @@
   overflow-x: auto;
 }
 
-.helperText {
-  text-align: right;
-  margin-top: calc($d8x-spacing / 2);
-}
-
 .tableHead {
   background-color: var(--d8x-color-white);
 
@@ -43,41 +38,11 @@
   justify-content: center;
 }
 
-.dialog {
-
-  :global(.MuiPaper-root) {
-    max-width: 400px;
-    width: 100%;
-    border-radius: $d8x-border-radius;
-  }
-}
-
-.centered {
-  display: block;
-  font-weight: 600;
-  text-align: left;
-}
-
-.newPositionHeader {
-  margin: 20px 0;
-}
-
-.inputBlock {
-  justify-content: left;
-  margin-top: $d8x-spacing * 3;
-  margin-bottom: $d8x-spacing * 3;
-}
-
 .formControlLabel {
 
   :global(.MuiFormControlLabel-label) {
     font-size: 14px;
   }
-}
-
-.newPositionDetails {
-  margin-top: $d8x-spacing * 3;
-  margin-bottom: $d8x-spacing * 3;
 }
 
 @media screen and ($d8x-breakpoint-min-md) and ($d8x-breakpoint-max-lg) {

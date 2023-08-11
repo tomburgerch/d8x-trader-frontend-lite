@@ -8,7 +8,6 @@ import { Box, Button } from '@mui/material';
 import styles from './ModifyTypeSelector.module.scss';
 
 export enum ModifyTypeE {
-  Close = 'Close',
   Add = 'Add',
   Remove = 'Remove',
 }

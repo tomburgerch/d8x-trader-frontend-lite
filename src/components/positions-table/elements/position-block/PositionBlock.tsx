@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { Box, Button, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import { DeleteForeverOutlined, ModeEditOutlineOutlined } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -12,10 +14,11 @@ import styles from './PositionBlock.module.scss';
 interface PositionRowPropsI {
   headers: TableHeaderI[];
   position: MarginAccountI;
+  handlePositionClose: (position: MarginAccountI) => void;
   handlePositionModify: (position: MarginAccountI) => void;
 }
 
-export const PositionBlock = ({ headers, position, handlePositionModify }: PositionRowPropsI) => {
+export const PositionBlock = ({ headers, position, handlePositionClose, handlePositionModify }: PositionRowPropsI) => {
   const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
   const pnlColor = position.unrealizedPnlQuoteCCY > 0 ? styles.green : styles.red;
@@ -31,9 +34,20 @@ export const PositionBlock = ({ headers, position, handlePositionModify }: Posit
             {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
           </Typography>
         </Box>
-        <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
-          {t('pages.trade.positions-table.position-block-mobile.modify')}
-        </Button>
+        <IconButton
+          aria-label={t('pages.trade.positions-table.table-content.modify')}
+          title={t('pages.trade.positions-table.table-content.modify')}
+          onClick={() => handlePositionModify(position)}
+        >
+          <ModeEditOutlineOutlined className={styles.actionIcon} />
+        </IconButton>
+        <IconButton
+          aria-label={t('pages.trade.positions-table.table-content.modify')}
+          title={t('pages.trade.positions-table.modify-modal.close')}
+          onClick={() => handlePositionClose(position)}
+        >
+          <DeleteForeverOutlined className={styles.actionIcon} />
+        </IconButton>
       </Box>
       <Box className={styles.dataWrapper}>
         <SidesRow

@@ -1,23 +1,24 @@
 import { useTranslation } from 'react-i18next';
 
-import { Button, TableCell, TableRow, Typography } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import { ModeEditOutlineOutlined, DeleteForeverOutlined } from '@mui/icons-material';
+import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
 import type { MarginAccountI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
+import styles from './PositionRow.module.scss';
+
 interface PositionRowPropsI {
   position: MarginAccountI;
+  handlePositionClose: (position: MarginAccountI) => void;
   handlePositionModify: (position: MarginAccountI) => void;
 }
 
-export const PositionRow = ({ position, handlePositionModify }: PositionRowPropsI) => {
+export const PositionRow = ({ position, handlePositionClose, handlePositionModify }: PositionRowPropsI) => {
   const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
-  const pnlColor =
-    position.unrealizedPnlQuoteCCY > 0
-      ? 'rgba(var(--d8x-background-buy-rgb), 1)'
-      : 'rgba(var(--d8x-background-sell-rgb), 1)';
 
   return (
     <TableRow>
@@ -56,14 +57,28 @@ export const PositionRow = ({ position, handlePositionModify }: PositionRowProps
         </Typography>
       </TableCell>
       <TableCell align="right">
-        <Typography variant="cellSmall" style={{ color: pnlColor }}>
+        <Typography
+          variant="cellSmall"
+          className={position.unrealizedPnlQuoteCCY > 0 ? styles.pnlPositive : styles.pnlNegative}
+        >
           {formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency)}
         </Typography>
       </TableCell>
       <TableCell align="center">
-        <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
-          {t('pages.trade.positions-table.table-content.modify')}
-        </Button>
+        <IconButton
+          aria-label={t('pages.trade.positions-table.table-content.modify')}
+          title={t('pages.trade.positions-table.table-content.modify')}
+          onClick={() => handlePositionModify(position)}
+        >
+          <ModeEditOutlineOutlined className={styles.actionIcon} />
+        </IconButton>
+        <IconButton
+          aria-label={t('pages.trade.positions-table.table-content.modify')}
+          title={t('pages.trade.positions-table.modify-modal.close')}
+          onClick={() => handlePositionClose(position)}
+        >
+          <DeleteForeverOutlined className={styles.actionIcon} />
+        </IconButton>
       </TableCell>
     </TableRow>
   );
