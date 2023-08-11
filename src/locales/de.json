@@ -466,6 +466,9 @@
   "common": {
     "change-language": "Sprache wechseln",
     "wallet-connect": "Verbinden",
+    "pagination": {
+      "per-page": "Pro Seite"
+    },
     "select": {
       "collateral": {
         "label": "Sicherheit:",
