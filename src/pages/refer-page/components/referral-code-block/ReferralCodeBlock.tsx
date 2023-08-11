@@ -4,14 +4,12 @@ import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
-import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
-
 import { EnterCodeDialog } from '../enter-code-dialog/EnterCodeDialog';
 
 import styles from './ReferralCodeBlock.module.scss';
 
 interface ReferralCodeBlockPropsI {
-  referralCode: string;
+  referralCode: string | null;
   traderRebatePercentage: number;
   onCodeApplySuccess: () => void;
 }
@@ -36,13 +34,11 @@ export const ReferralCodeBlock = ({
             {address && traderRebatePercentage ? `${traderRebatePercentage.toFixed(2)}%` : 'N/A'}
           </Typography>
         </Box>
-        {address ? (
+        {address && referralCode === '' ? (
           <Button variant="primary" onClick={() => setDialogOpen(true)} className={styles.newCodeButton}>
             {t('pages.refer.trader-tab.enter-new-code')}
           </Button>
-        ) : (
-          <WalletConnectButton />
-        )}
+        ) : null}
       </Box>
       <div className={styles.divider} />
       <Typography variant="bodySmall" component="p" className={styles.dataTitle}>

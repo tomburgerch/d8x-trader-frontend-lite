@@ -6,12 +6,9 @@ import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
 import { AgencyReferrerDialog } from 'pages/refer-page/components/agency-referrer-dialog/AgencyReferrerDialog';
 import { NormalReferrerDialog } from 'pages/refer-page/components/normal-referrer-dialog/NormalReferrerDialog';
-
 import { useDialog } from 'hooks/useDialog';
 import { ReferrerRoleE, useRebateRate } from 'pages/refer-page/hooks';
-
 import { formatToCurrency } from 'utils/formatToCurrency';
-
 import type { ReferrerDataI } from 'types/types';
 import { ReferralDialogActionE } from 'types/enums';
 
@@ -50,15 +47,17 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
           {formatToCurrency(absolutePercentages.traderRebatePerc, '%', false, 2).replace(' ', '')}
         </TableCell>
         {isAgency && (
-          <TableCell align="right" className={styles.bodyCell}>
-            {formatToCurrency(absolutePercentages.agencyRebatePerc, '%', false, 2).replace(' ', '')}
-          </TableCell>
+          <>
+            <TableCell align="right" className={styles.bodyCell}>
+              {formatToCurrency(absolutePercentages.agencyRebatePerc, '%', false, 2).replace(' ', '')}
+            </TableCell>
+            <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
+              <Button variant="primary" onClick={openDialog} className={styles.modifyButton}>
+                <Typography variant="bodyTiny">Modify</Typography>
+              </Button>
+            </TableCell>
+          </>
         )}
-        <TableCell align="center" className={classnames(styles.bodyCell, styles.modifyCell)}>
-          <Button variant="primary" onClick={openDialog} className={styles.modifyButton}>
-            <Typography variant="bodyTiny">Modify</Typography>
-          </Button>
-        </TableCell>
       </TableRow>
       {dialogOpen && isAgency && (
         <AgencyReferrerDialog

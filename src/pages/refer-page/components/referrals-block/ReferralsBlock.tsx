@@ -6,7 +6,6 @@ import { Box, Button, Typography } from '@mui/material';
 
 import { Separator } from 'components/separator/Separator';
 import { ReferralCodesTable } from 'components/referral-codes-table/ReferralCodesTable';
-import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
 import { useDialog } from 'hooks/useDialog';
 import { isAgencyAtom, referralCodeAtom } from 'store/refer.store';
 
@@ -29,13 +28,9 @@ export const ReferralsBlock = () => {
   return (
     <Box className={styles.root}>
       <Box className={styles.buttonContainer}>
-        {address ? (
-          <Button onClick={openDialog} variant="primary" className={styles.enterCodeButton}>
-            {t('pages.refer.referrer-tab.create')}
-          </Button>
-        ) : (
-          <WalletConnectButton />
-        )}
+        <Button onClick={openDialog} variant="primary" disabled={!address} className={styles.enterCodeButton}>
+          {t('pages.refer.referrer-tab.create')}
+        </Button>
       </Box>
       <Separator className={styles.divider} />
       {address && referralCode && referralCode.agency && referralCode.referrer ? (

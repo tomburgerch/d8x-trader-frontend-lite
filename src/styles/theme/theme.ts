@@ -205,7 +205,9 @@ export const theme = createTheme({
               backgroundColor: 'rgba(var(--d8x-color-purple-rgb), 0.6)',
             },
             ':disabled': {
-              color: 'var(--d8x-color-white-opac)',
+              backgroundColor: 'rgba(var(--d8x-background-buy-inactive-rgb), 0.5)',
+              color: 'var(--d8x-color-white)',
+              border: 0,
             },
           },
         },

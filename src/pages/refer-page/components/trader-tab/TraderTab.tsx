@@ -23,7 +23,7 @@ export const TraderTab = () => {
   const [earnedRebates, setEarnedRebates] = useState(0);
   const [openRewards, setOpenRewards] = useState(0);
 
-  const [referralCode, setReferralCode] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const [traderRebatePercentage, setTraderRebatePercentage] = useState(0);
 
   const [selectedPool] = useAtom(selectedPoolAtom);
