@@ -11,6 +11,10 @@
   padding: 4 * $d8x-spacing;
 }
 
+.actionIcon {
+  color: var(--d8x-color-purple);
+}
+
 .headerWrapper {
   display: flex;
   align-items: center;

@@ -1,0 +1,37 @@
+@import '~styles/theme/_theme.scss';
+
+.root {
+
+  :global(.MuiPaper-root) {
+    max-width: 400px;
+    width: 100%;
+    border-radius: $d8x-border-radius;
+  }
+}
+
+.inputBlock {
+  justify-content: left;
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.centered {
+  display: block;
+  font-weight: 600;
+  text-align: left;
+}
+
+.newPositionHeader {
+  margin: 20px 0;
+}
+
+.newPositionDetails {
+  margin-top: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 3;
+}
+
+.helperText {
+  cursor: pointer;
+  text-align: right;
+  margin-top: calc($d8x-spacing / 2);
+}
