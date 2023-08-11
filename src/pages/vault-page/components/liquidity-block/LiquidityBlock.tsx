@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { format } from 'date-fns';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box } from '@mui/material';
 
@@ -17,12 +18,13 @@ import { LiquidityTypeSelector } from './elements/liquidity-type-selector/Liquid
 import styles from './LiquidityBlock.module.scss';
 
 export const LiquidityBlock = memo(() => {
+  const { t } = useTranslation();
   const [liquidityType] = useAtom(liquidityTypeAtom);
   const [withdrawals] = useAtom(withdrawalsAtom);
 
   const withdrawOn = useMemo(() => {
     if (!withdrawals || withdrawals.length === 0) {
-      return 'N/A';
+      return t('pages.vault.na');
     }
     const currentTime = Date.now();
     const latestWithdrawalTimeElapsed = withdrawals[withdrawals.length - 1].timeElapsedSec * 1000;
@@ -31,11 +33,11 @@ export const LiquidityBlock = memo(() => {
     if (currentTime < withdrawalTime) {
       return format(new Date(withdrawalTime), 'MMMM d yyyy HH:mm');
     } else if (currentTime >= withdrawalTime + PERIOD_OF_4_DAYS) {
-      return 'Overdue';
+      return t('pages.vault.overdue');
     } else {
-      return 'Now';
+      return t('pages.vault.now');
     }
-  }, [withdrawals]);
+  }, [withdrawals, t]);
 
   return (
     <Box className={styles.root}>

@@ -1,10 +1,15 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
+import { LanguageE } from 'types/enums';
 import { AppDimensionsI } from 'types/types';
 
+const SELECTED_LANGUAGE_LS_KEY = 'd8x_selectedLanguage';
 const SHOW_MODAl_LS_KEY = 'd8x_showWelcomeModal';
 const SHOW_MODAL = 'show';
 const HIDE_MODAL = 'hide';
+
+export const selectedLanguageAtom = atomWithStorage<LanguageE>(SELECTED_LANGUAGE_LS_KEY, LanguageE.EN);
 
 export const appDimensionsAtom = atom<AppDimensionsI>({});
 

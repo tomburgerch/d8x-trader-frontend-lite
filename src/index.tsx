@@ -16,6 +16,7 @@ import { WebSocketContextProvider } from 'context/websocket-context/d8x/WebSocke
 import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
+import './i18n';
 
 import '@rainbow-me/rainbowkit/styles.css';
 import 'react-toastify/dist/ReactToastify.css';

@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
@@ -15,6 +16,7 @@ interface FundingRowPropsI {
 }
 
 export const FundingBlock = ({ headers, perpetuals, funding }: FundingRowPropsI) => {
+  const { t } = useTranslation();
   const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
   const time = format(new Date(funding.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
@@ -23,7 +25,7 @@ export const FundingBlock = ({ headers, perpetuals, funding }: FundingRowPropsI)
       <Box className={styles.headerWrapper}>
         <Box className={styles.leftSection}>
           <Typography variant="bodySmall" component="p">
-            Symbol
+            {t('pages.trade.funding-table.funding-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
             {perpetual ? `${perpetual.baseCurrency}-${perpetual.quoteCurrency}` : ''}

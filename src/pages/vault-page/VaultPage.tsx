@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -18,6 +19,8 @@ import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools
 import styles from './VaultPage.module.scss';
 
 export const VaultPage = memo(() => {
+  const { t } = useTranslation();
+
   const chainId = useChainId();
   const { address } = useAccount();
 
@@ -54,7 +57,7 @@ export const VaultPage = memo(() => {
       </Helmet>
       <Box className={styles.root}>
         <Header>
-          <CollateralsSelect label="Liquidity pool" />
+          <CollateralsSelect label={t('common.select.collateral.label2')} />
         </Header>
         <Container className={styles.container}>
           <GlobalStats />

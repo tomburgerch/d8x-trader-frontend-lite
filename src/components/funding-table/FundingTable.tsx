@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -32,6 +33,7 @@ import styles from './FundingTable.module.scss';
 const MIN_WIDTH_FOR_TABLE = 900;
 
 export const FundingTable = memo(() => {
+  const { t } = useTranslation();
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [positions] = useAtom(positionsAtom);
@@ -81,11 +83,11 @@ export const FundingTable = memo(() => {
 
   const fundingListHeaders: TableHeaderI[] = useMemo(
     () => [
-      { label: 'Time', align: AlignE.Left },
-      { label: 'Perpetual', align: AlignE.Left },
-      { label: 'Funding Payment', align: AlignE.Right },
+      { label: t('pages.trade.funding-table.table-header.time'), align: AlignE.Left },
+      { label: t('pages.trade.funding-table.table-header.perpetual'), align: AlignE.Left },
+      { label: t('pages.trade.funding-table.table-header.funding-payment'), align: AlignE.Right },
     ],
-    []
+    [t]
   );
 
   return (
@@ -117,7 +119,11 @@ export const FundingTable = memo(() => {
               {(!address || fundingList.length === 0) && (
                 <EmptyTableRow
                   colSpan={fundingListHeaders.length}
-                  text={!address ? 'Please connect your wallet' : 'No funding data'}
+                  text={
+                    !address
+                      ? t('pages.trade.funding-table.table-content.connect')
+                      : t('pages.trade.funding-table.table-content.no-open')
+                  }
                 />
               )}
             </TableBody>
@@ -138,7 +144,11 @@ export const FundingTable = memo(() => {
                 />
               ))}
           {(!address || fundingList.length === 0) && (
-            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No funding data'}</Box>
+            <Box className={styles.noData}>
+              {!address
+                ? t('pages.trade.funding-table.table-content.connect')
+                : t('pages.trade.funding-table.table-content.no-open')}
+            </Box>
           )}
         </Box>
       )}

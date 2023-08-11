@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useChainId } from 'wagmi';
 
 import type { StatDataI } from 'components/stats-line/types';
@@ -10,6 +11,7 @@ import { dCurrencyPriceAtom, tvlAtom, triggerUserStatsUpdateAtom, sdkConnectedAt
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 
 export const GlobalStats = () => {
+  const { t } = useTranslation();
   const chainId = useChainId();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -69,26 +71,26 @@ export const GlobalStats = () => {
     () => [
       {
         id: 'weeklyAPY',
-        label: 'All Time APY',
+        label: t('pages.vault.global-stats.apy'),
         value: weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '%', true, 2) : '--',
       },
       {
         id: 'tvl',
-        label: 'TVL',
+        label: t('pages.vault.global-stats.tvl'),
         value: selectedPool && tvl != null ? formatToCurrency(tvl, selectedPool.poolSymbol, true) : '--',
       },
       {
         id: 'dSymbolPrice',
-        label: `d${selectedPool?.poolSymbol} Price`,
+        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.poolSymbol }),
         value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedPool?.poolSymbol, true) : '--',
       },
       {
         id: 'dSymbolSupply',
-        label: `d${selectedPool?.poolSymbol} Supply`,
+        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.poolSymbol }),
         value: dSupply,
       },
     ],
-    [weeklyAPI, selectedPool, tvl, dCurrencyPrice, dSupply]
+    [weeklyAPI, selectedPool, tvl, dCurrencyPrice, dSupply, t]
   );
 
   return <StatsLine items={items} />;

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { Box, Button, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -14,6 +16,7 @@ interface PositionRowPropsI {
 }
 
 export const PositionBlock = ({ headers, position, handlePositionModify }: PositionRowPropsI) => {
+  const { t } = useTranslation();
   const parsedSymbol = parseSymbol(position.symbol);
   const pnlColor = position.unrealizedPnlQuoteCCY > 0 ? styles.green : styles.red;
 
@@ -22,14 +25,14 @@ export const PositionBlock = ({ headers, position, handlePositionModify }: Posit
       <Box className={styles.headerWrapper}>
         <Box className={styles.leftSection}>
           <Typography variant="bodySmall" component="p">
-            Symbol
+            {t('pages.trade.positions-table.position-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
             {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}`}
           </Typography>
         </Box>
         <Button variant="primary" size="tableSmall" onClick={() => handlePositionModify(position)}>
-          Modify
+          {t('pages.trade.positions-table.position-block-mobile.modify')}
         </Button>
       </Box>
       <Box className={styles.dataWrapper}>

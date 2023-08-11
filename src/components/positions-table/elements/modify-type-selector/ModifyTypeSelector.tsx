@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button } from '@mui/material';
 
@@ -18,6 +19,7 @@ interface ModifyTypeSelectorPropsI {
 }
 
 export const ModifyTypeSelector = memo(({ modifyType, setModifyType }: ModifyTypeSelectorPropsI) => {
+  const { t } = useTranslation();
   return (
     <Box className={styles.root}>
       {Object.values(ModifyTypeE).map((key) => (
@@ -27,7 +29,7 @@ export const ModifyTypeSelector = memo(({ modifyType, setModifyType }: ModifyTyp
           variant={key === modifyType ? 'link' : 'link'}
           onClick={() => setModifyType(key)}
         >
-          {ModifyTypeE[key]}
+          {t(`pages.trade.positions-table.modify-modal.selector.${ModifyTypeE[key].toLowerCase()}`)}
         </Button>
       ))}
     </Box>

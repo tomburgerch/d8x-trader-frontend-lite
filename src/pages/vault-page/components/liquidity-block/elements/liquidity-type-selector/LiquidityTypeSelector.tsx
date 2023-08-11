@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { useAtom } from 'jotai';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Button } from '@mui/material';
 
@@ -9,7 +10,14 @@ import { LiquidityTypeE } from 'types/enums';
 
 import styles from './LiquidityTypeSelector.module.scss';
 
+const mapButtonName: Record<LiquidityTypeE, string> = {
+  [LiquidityTypeE.Add]: 'pages.vault.add.button',
+  [LiquidityTypeE.Withdraw]: 'pages.vault.withdraw.action.button',
+};
+
 export const LiquidityTypeSelector = memo(() => {
+  const { t } = useTranslation();
+
   const [liquidityType, setLiquidityType] = useAtom(liquidityTypeAtom);
 
   return (
@@ -21,7 +29,7 @@ export const LiquidityTypeSelector = memo(() => {
           variant="link"
           onClick={() => setLiquidityType(key)}
         >
-          {LiquidityTypeE[key]}
+          {t(mapButtonName[LiquidityTypeE[key]])}
         </Button>
       ))}
     </Box>

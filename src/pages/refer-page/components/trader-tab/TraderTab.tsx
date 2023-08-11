@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useAccount, useChainId } from 'wagmi';
 import { useAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
 
@@ -17,12 +18,8 @@ import { RebateTypeE } from 'types/enums';
 
 import styles from './TraderTab.module.scss';
 
-const disclaimerTextBlocks = [
-  'Enter a referral code to receive discounts on trading fees.',
-  'The discounts are airdropped weekly to your wallet.',
-];
-
 export const TraderTab = () => {
+  const { t } = useTranslation();
   const [earnedRebates, setEarnedRebates] = useState(0);
   const [openRewards, setOpenRewards] = useState(0);
 
@@ -33,6 +30,11 @@ export const TraderTab = () => {
 
   const { address } = useAccount();
   const chainId = useChainId();
+
+  const disclaimerTextBlocks = useMemo(
+    () => [t('pages.refer.trader-tab.disclaimer-text-block1'), t('pages.refer.trader-tab.disclaimer-text-block2')],
+    [t]
+  );
 
   const digestResponseData = useCallback((data: EarnedRebateI[] | OpenTraderRebateI[], type: 'rebates' | 'rewards') => {
     const setState = type === 'rebates' ? setEarnedRebates : setOpenRewards;
@@ -94,17 +96,21 @@ export const TraderTab = () => {
 
   const overviewItems: OverviewItemI[] = [
     {
-      title: 'Total earned rebates',
+      title: t('pages.refer.trader-tab.earned-rebates'),
       value: address ? earnedRebates : '--',
       poolSymbol: selectedPool?.poolSymbol ?? '--',
     },
-    { title: 'Open rewards', value: address ? openRewards : '--', poolSymbol: selectedPool?.poolSymbol ?? '--' },
+    {
+      title: t('pages.refer.trader-tab.open-rewards'),
+      value: address ? openRewards : '--',
+      poolSymbol: selectedPool?.poolSymbol ?? '--',
+    },
   ];
 
   return (
     <Box className={styles.root}>
-      <Overview title="Your discounts" items={overviewItems} />
-      <Disclaimer title="Trade & Earn" textBlocks={disclaimerTextBlocks} />
+      <Overview title={t('pages.refer.trader-tab.title1')} items={overviewItems} />
+      <Disclaimer title={t('pages.refer.trader-tab.title2')} textBlocks={disclaimerTextBlocks} />
       <div className={styles.divider} />
       <ReferralCodeBlock
         referralCode={referralCode}

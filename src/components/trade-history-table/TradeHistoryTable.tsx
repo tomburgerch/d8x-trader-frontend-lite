@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -32,6 +33,7 @@ import styles from './TradeHistoryTable.module.scss';
 const MIN_WIDTH_FOR_TABLE = 900;
 
 export const TradeHistoryTable = memo(() => {
+  const { t } = useTranslation();
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [openOrders] = useAtom(openOrdersAtom);
@@ -81,16 +83,15 @@ export const TradeHistoryTable = memo(() => {
 
   const tradeHistoryHeaders: TableHeaderI[] = useMemo(
     () => [
-      { label: 'Time', align: AlignE.Left },
-      { label: 'Perpetual', align: AlignE.Left },
-      { label: 'Side', align: AlignE.Left },
-      // { label: 'Type', align: AlignE.Left },
-      { label: 'Price', align: AlignE.Right },
-      { label: 'Quantity', align: AlignE.Right },
-      { label: 'Fee', align: AlignE.Right },
-      { label: 'Realized Profit', align: AlignE.Right },
+      { label: t('pages.trade.history-table.table-header.time'), align: AlignE.Left },
+      { label: t('pages.trade.history-table.table-header.perpetual'), align: AlignE.Left },
+      { label: t('pages.trade.history-table.table-header.side'), align: AlignE.Left },
+      { label: t('pages.trade.history-table.table-header.price'), align: AlignE.Right },
+      { label: t('pages.trade.history-table.table-header.quantity'), align: AlignE.Right },
+      { label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
+      { label: t('pages.trade.history-table.table-header.realized-profit'), align: AlignE.Right },
     ],
-    []
+    [t]
   );
 
   return (
@@ -123,7 +124,11 @@ export const TradeHistoryTable = memo(() => {
               {(!address || tradesHistory.length === 0) && (
                 <EmptyTableRow
                   colSpan={tradeHistoryHeaders.length}
-                  text={!address ? 'Please connect your wallet' : 'No trade history'}
+                  text={
+                    !address
+                      ? t('pages.trade.history-table.table-content.connect')
+                      : t('pages.trade.history-table.table-content.no-open')
+                  }
                 />
               )}
             </TableBody>
@@ -144,7 +149,11 @@ export const TradeHistoryTable = memo(() => {
                 />
               ))}
           {(!address || tradesHistory.length === 0) && (
-            <Box className={styles.noData}>{!address ? 'Please connect your wallet' : 'No trade history'}</Box>
+            <Box className={styles.noData}>
+              {!address
+                ? t('pages.trade.history-table.table-content.connect')
+                : t('pages.trade.history-table.table-content.no-open')}
+            </Box>
           )}
         </Box>
       )}

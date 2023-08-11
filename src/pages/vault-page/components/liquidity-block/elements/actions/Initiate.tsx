@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
@@ -16,11 +17,12 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
+import type { AddressT } from 'types/types';
 
-import { AddressT } from 'types/types';
 import styles from './Action.module.scss';
 
 export const Initiate = memo(() => {
+  const { t } = useTranslation();
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [userAmount] = useAtom(userAmountAtom);
@@ -60,10 +62,15 @@ export const Initiate = memo(() => {
   useWaitForTransaction({
     hash: txHash,
     onSuccess() {
-      toast.success(<ToastContent title="Withdrawal Initiated" bodyLines={[]} />);
+      toast.success(<ToastContent title={t('pages.vault.toast.initiated')} bodyLines={[]} />);
     },
-    onError() {
-      toast.error(<ToastContent title="Error Processing Transaction" bodyLines={[]} />);
+    onError(reason) {
+      toast.error(
+        <ToastContent
+          title={t('pages.vault.toast.error-initiating.title')}
+          bodyLines={[{ label: t('pages.vault.toast.error-initiating.body'), value: reason.message }]}
+        />
+      );
     },
     onSettled() {
       setTxHash(undefined);
@@ -88,13 +95,18 @@ export const Initiate = memo(() => {
       .then((tx) => {
         console.log(`initiateLiquidityWithdrawal tx hash: ${tx.hash}`);
         setTxHash(tx.hash);
-        toast.success(<ToastContent title="Initiating Liquidity Withdrawal" bodyLines={[]} />);
+        toast.success(<ToastContent title={t('pages.vault.toast.initiating')} bodyLines={[]} />);
       })
       .catch((err) => {
         console.error(err);
         let msg = (err?.message ?? err) as string;
         msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-        toast.error(<ToastContent title="Error Initiating Withdrawal" bodyLines={[{ label: 'Reason', value: msg }]} />);
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error-initiating.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error-initiating.body'), value: msg }]}
+          />
+        );
       })
       .finally(() => {
         setInitiateAmount(0);
@@ -104,7 +116,15 @@ export const Initiate = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [initiateAmount, liqProvTool, walletClient, selectedPool, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate]);
+  }, [
+    initiateAmount,
+    liqProvTool,
+    walletClient,
+    selectedPool,
+    setTriggerUserStatsUpdate,
+    setTriggerWithdrawalsUpdate,
+    t,
+  ]);
 
   const isButtonDisabled = useMemo(() => {
     if (!withdrawals || withdrawals.length > 0 || !userAmount || !initiateAmount || requestSent) {
@@ -118,19 +138,14 @@ export const Initiate = memo(() => {
     <>
       <Box className={styles.withdrawLabel}>
         <InfoBlock
-          title={
-            <>
-              1. Initiate withdrawal of <strong>{selectedPool?.poolSymbol}</strong>
-            </>
-          }
+          title={<>{t('pages.vault.withdraw.initiate.title', { poolSymbol: selectedPool?.poolSymbol })}</>}
           content={
             <>
               <Typography>
-                Specify the amount of d{selectedPool?.poolSymbol} you want to exchange for {selectedPool?.poolSymbol}.
+                {t('pages.vault.withdraw.initiate.info1', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
               <Typography>
-                After 48 hours, this amount can be converted to {selectedPool?.poolSymbol} and can be withdrawn from the
-                pool.
+                {t('pages.vault.withdraw.initiate.info2', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
             </>
           }
@@ -153,7 +168,7 @@ export const Initiate = memo(() => {
           onClick={handleInitiateLiquidity}
           className={styles.actionButton}
         >
-          Initiate withdrawal
+          {t('pages.vault.withdraw.initiate.button')}
         </Button>
       </Box>
     </>

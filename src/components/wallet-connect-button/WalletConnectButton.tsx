@@ -2,6 +2,7 @@ import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type PublicClient, useAccount, useChainId, useConnect, usePublicClient } from 'wagmi';
 
@@ -28,6 +29,8 @@ const loyaltyMap: Record<number, string> = {
 };
 
 export const WalletConnectButton = memo(() => {
+  const { t } = useTranslation();
+
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -151,7 +154,7 @@ export const WalletConnectButton = memo(() => {
               if (!connected) {
                 return (
                   <Button onClick={openConnectModal} variant="primary" className={styles.connectWalletButton}>
-                    Connect
+                    {t('common.wallet-connect')}
                   </Button>
                 );
               }
@@ -159,7 +162,7 @@ export const WalletConnectButton = memo(() => {
               if (chain.unsupported) {
                 return (
                   <Button onClick={openChainModal} variant="warning">
-                    Wrong network
+                    {t('error.wrong-network')}
                   </Button>
                 );
               }

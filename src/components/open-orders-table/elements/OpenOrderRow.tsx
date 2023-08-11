@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
@@ -14,8 +15,9 @@ interface OpenOrderRowPropsI {
 }
 
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
+  const { t } = useTranslation();
   const parsedSymbol = parseSymbol(order.symbol);
-  const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'MMM dd yyyy') : '';
+  const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
 
   return (
@@ -26,10 +28,14 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
         </Typography>
       </TableCell>
       <TableCell align="left">
-        <Typography variant="cellSmall">{order.side}</Typography>
+        <Typography variant="cellSmall">
+          {t(`pages.trade.orders-table.table-content.${order.side.toLowerCase()}`)}
+        </Typography>
       </TableCell>
       <TableCell align="left">
-        <Typography variant="cellSmall">{typeToLabelMap[order.type]}</Typography>
+        <Typography variant="cellSmall">
+          {t(`pages.trade.orders-table.table-content.${typeToLabelMap[order.type].toLowerCase()}`)}
+        </Typography>
       </TableCell>
       <TableCell align="right">
         <Typography variant="cellSmall">{formatToCurrency(order.quantity, parsedSymbol?.baseCurrency)}</Typography>
@@ -38,12 +44,14 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
         <Typography variant="cellSmall">
           {order.limitPrice && order.limitPrice < Infinity
             ? formatToCurrency(order.limitPrice, parsedSymbol?.quoteCurrency)
-            : 'N/A'}
+            : t('pages.trade.orders-table.table-content.na')}
         </Typography>
       </TableCell>
       <TableCell align="right">
         <Typography variant="cellSmall">
-          {order.stopPrice ? formatToCurrency(order.stopPrice, parsedSymbol?.quoteCurrency) : 'N/A'}
+          {order.stopPrice
+            ? formatToCurrency(order.stopPrice, parsedSymbol?.quoteCurrency)
+            : t('pages.trade.orders-table.table-content.na')}
         </Typography>
       </TableCell>
       <TableCell align="right">
@@ -54,7 +62,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
       </TableCell>
       <TableCell align="center">
         <Button variant="primary" size="tableSmall" onClick={() => handleOrderCancel(order)}>
-          Cancel
+          {t('pages.trade.orders-table.table-content.cancel')}
         </Button>
       </TableCell>
     </TableRow>
