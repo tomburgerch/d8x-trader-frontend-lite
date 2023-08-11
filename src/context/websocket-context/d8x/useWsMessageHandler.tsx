@@ -196,14 +196,14 @@ export function useWsMessageHandler() {
         failOpenOrder(parsedMessage.data.obj.orderId);
         toast.error(
           <ToastContent
-            title={t('pages.trade.position-table.toasts.order-failed.title')}
+            title={t('pages.trade.positions-table.toasts.order-failed.title')}
             bodyLines={[
               {
-                label: t('pages.trade.position-table.toasts.order-failed.body1'),
+                label: t('pages.trade.positions-table.toasts.order-failed.body1'),
                 value: parsedMessage.data.obj.symbol,
               },
               {
-                label: t('pages.trade.position-table.toasts.order-failed.body2'),
+                label: t('pages.trade.positions-table.toasts.order-failed.body2'),
                 value: parsedMessage.data.obj.reason,
               },
             ]}
