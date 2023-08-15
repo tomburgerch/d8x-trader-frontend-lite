@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
-import { signMessages } from 'blockchain-api/signMessage';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -43,8 +42,13 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
+import { HashZero } from '@ethersproject/constants';
+import { decodeEventLog, encodeEventTopics } from 'viem';
+import { LOB_ABI, PROXY_ABI } from '@d8x/perpetuals-sdk';
 
 const MIN_WIDTH_FOR_TABLE = 900;
+const TOPIC_CANCEL_SUCCESS = encodeEventTopics({ abi: PROXY_ABI, eventName: 'PerpetualLimitOrderCancelled' })[0];
+const TOPIC_CANCEL_FAIL = encodeEventTopics({ abi: LOB_ABI, eventName: 'ExecutionFailed' })[0];
 
 export const OpenOrdersTable = memo(() => {
   const { t } = useTranslation();
@@ -111,18 +115,44 @@ export const OpenOrdersTable = memo(() => {
 
   useWaitForTransaction({
     hash: txHash,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
-              value: selectedOrder?.symbol,
-            },
-          ]}
-        />
-      );
+    onSuccess(receipt) {
+      const cancelEventIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_SUCCESS);
+      if (cancelEventIdx >= 0) {
+        const { args } = decodeEventLog({
+          abi: PROXY_ABI,
+          data: receipt.logs[cancelEventIdx].data,
+          topics: receipt.logs[cancelEventIdx].topics,
+        });
+        toast.success(
+          <ToastContent
+            title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
+            bodyLines={[
+              {
+                label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
+                value: traderAPI?.getSymbolFromPerpId((args as { perpetualId: number }).perpetualId),
+              },
+            ]}
+          />
+        );
+      } else {
+        const execFailedIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_FAIL);
+        const { args } = decodeEventLog({
+          abi: LOB_ABI,
+          data: receipt.logs[execFailedIdx].data,
+          topics: receipt.logs[execFailedIdx].topics,
+        });
+        toast.error(
+          <ToastContent
+            title={t('pages.trade.orders-table.toasts.tx-failed.title')}
+            bodyLines={[
+              {
+                label: t('pages.trade.orders-table.toasts.tx-failed.body'),
+                value: (args as { reason: string }).reason,
+              },
+            ]}
+          />
+        );
+      }
     },
     onError(reason) {
       toast.error(
@@ -136,7 +166,7 @@ export const OpenOrdersTable = memo(() => {
       setTxHash(undefined);
       refreshOpenOrders();
     },
-    enabled: !!address && !!selectedOrder && !!txHash,
+    enabled: !!address && !!txHash,
   });
 
   const handleCancelOrderConfirm = useCallback(() => {
@@ -156,23 +186,16 @@ export const OpenOrdersTable = memo(() => {
     getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
-          signMessages(walletClient, [data.data.digest])
-            .then((signatures) => {
-              cancelOrder(walletClient, signatures[0], data.data, selectedOrder.id)
-                .then((tx) => {
-                  setCancelModalOpen(false);
-                  setSelectedOrder(null);
-                  setRequestSent(false);
-                  console.log(`cancelOrder tx hash: ${tx.hash}`);
-                  toast.success(
-                    <ToastContent title={t('pages.trade.orders-table.toasts.cancel-order.title')} bodyLines={[]} />
-                  );
-                  setTxHash(tx.hash);
-                })
-                .catch((error) => {
-                  console.error(error);
-                  setRequestSent(false);
-                });
+          cancelOrder(walletClient, HashZero, data.data, selectedOrder.id)
+            .then((tx) => {
+              setCancelModalOpen(false);
+              setSelectedOrder(null);
+              setRequestSent(false);
+              console.log(`cancelOrder tx hash: ${tx.hash}`);
+              toast.success(
+                <ToastContent title={t('pages.trade.orders-table.toasts.cancel-order.title')} bodyLines={[]} />
+              );
+              setTxHash(tx.hash);
             })
             .catch((error) => {
               console.error(error);
