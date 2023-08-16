@@ -14,7 +14,6 @@ import type {
   FundingI,
 } from 'types/types';
 
-const SELECTED_POOL_NAME_LS_KEY = 'd8x_selectedPoolName';
 const SHOW_CHART_FOR_MOBILE_LS_KEY = 'd8x_showChartForMobile';
 
 export const traderAPIAtom = atom<TraderInterface | null>(null);
@@ -40,7 +39,7 @@ export const fundingListAtom = atom<FundingI[]>([]);
 const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
 const ordersAtom = atom<Record<string, OrderI>>({});
 
-const selectedPoolNameLSAtom = atomWithStorage<string>(SELECTED_POOL_NAME_LS_KEY, '');
+const selectedPoolNameAtom = atom('');
 const showChartForMobileLSAtom = atomWithStorage(SHOW_CHART_FOR_MOBILE_LS_KEY, false);
 
 export const showChartForMobileAtom = atom(
@@ -63,7 +62,7 @@ export const selectedPoolAtom = atom(
       return null;
     }
 
-    const savedPoolName = get(selectedPoolNameLSAtom);
+    const savedPoolName = get(selectedPoolNameAtom);
     const foundPool = allPools.find((pool) => pool.poolSymbol === savedPoolName);
     if (foundPool) {
       return foundPool;
@@ -72,14 +71,14 @@ export const selectedPoolAtom = atom(
     return allPools[0];
   },
   (_get, set, newPool: string) => {
-    set(selectedPoolNameLSAtom, newPool);
+    set(selectedPoolNameAtom, newPool);
     // Clear data about previous stats and orders
     set(perpetualsStatsAtom, {});
     set(ordersAtom, {});
   }
 );
 
-const selectedPerpetualIdLSAtom = atomWithStorage<number>('d8x_selectedPerpetualName', 0);
+const selectedPerpetualIdAtom = atom(0);
 
 export const selectedPerpetualAtom = atom(
   (get) => {
@@ -93,7 +92,7 @@ export const selectedPerpetualAtom = atom(
       return null;
     }
 
-    const savedPerpetualId = get(selectedPerpetualIdLSAtom);
+    const savedPerpetualId = get(selectedPerpetualIdAtom);
     const foundPerpetual = perpetuals.find((perpetual) => perpetual.id === +savedPerpetualId);
     if (foundPerpetual) {
       return foundPerpetual;
@@ -102,7 +101,7 @@ export const selectedPerpetualAtom = atom(
     return perpetuals[0];
   },
   (_get, set, perpetualId: number) => {
-    set(selectedPerpetualIdLSAtom, perpetualId);
+    set(selectedPerpetualIdAtom, perpetualId);
   }
 );
 

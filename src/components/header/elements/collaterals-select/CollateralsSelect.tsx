@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -55,9 +55,9 @@ export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelec
 
   const [pools] = useAtom(poolsAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
-  const [, setSelectedPoolId] = useAtom(selectedPoolIdAtom);
-  const [, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const setSelectedPoolId = useSetAtom(selectedPoolIdAtom);
+  const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
+  const clearInputsData = useSetAtom(clearInputsDataAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
   const urlChangesAppliedRed = useRef(false);

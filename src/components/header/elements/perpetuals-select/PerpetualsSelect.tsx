@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -58,13 +58,13 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPeriod] = useAtom(selectedPeriodAtom);
-  const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
-  const [, setPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
-  const [, setCandles] = useAtom(candlesAtom);
-  const [, setNewCandles] = useAtom(newCandlesAtom);
-  const [, setCandlesDataReady] = useAtom(candlesDataReadyAtom);
+  const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
+  const setPerpetualStaticInfo = useSetAtom(perpetualStaticInfoAtom);
+  const setCandles = useSetAtom(candlesAtom);
+  const setNewCandles = useSetAtom(newCandlesAtom);
+  const setCandlesDataReady = useSetAtom(candlesDataReadyAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [, clearInputsData] = useAtom(clearInputsDataAtom);
+  const clearInputsData = useSetAtom(clearInputsDataAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const urlChangesAppliedRed = useRef(false);
