@@ -15,13 +15,10 @@
   border-radius: $d8x-border-radius 0 0 $d8x-border-radius;
 }
 
-.modifyCell {
-  min-width: 170px;
-  border-radius: 0 $d8x-border-radius $d8x-border-radius 0;
+.buttonCell {
+  width: 90px;
+}
 
-  .modifyButton {
-    width: 70px;
-    min-width: 70px;
-    height: 28px;
-  }
+.modifyCell {
+  border-radius: 0 $d8x-border-radius $d8x-border-radius 0;
 }

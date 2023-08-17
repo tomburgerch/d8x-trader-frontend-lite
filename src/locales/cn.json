@@ -335,6 +335,10 @@
         "referrer-rebate-rate": "邀请人返佣比例",
         "trader-rebate-rate": "交易员返佣比例",
         "agency-rebate-rate": "代理返佣比例",
+        "share": "分享",
+        "share-link": "链接",
+        "share-success": "Your referral URL is successfully copied to clipboard",
+        "share-error": "An error appeared to copy your referral URL",
         "modify": "调整",
         "no-codes": "无返佣码"
       },

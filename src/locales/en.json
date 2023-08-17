@@ -335,6 +335,10 @@
         "referrer-rebate-rate": "Referrer rebate rate",
         "trader-rebate-rate": "Trader rebate rate",
         "agency-rebate-rate": "Agency rebate rate",
+        "share": "Share",
+        "share-link": "Link",
+        "share-success": "Your referral URL is successfully copied to clipboard",
+        "share-error": "An error appeared to copy your referral URL",
         "modify": "Modify",
         "no-codes": "No rebate codes"
       },
