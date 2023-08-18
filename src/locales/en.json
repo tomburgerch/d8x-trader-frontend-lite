@@ -391,6 +391,8 @@
         "title": "Use this referral code?",
         "base": "Code",
         "trader-rebate": "Trader rebate",
+        "connect-wallet": "Please connect your wallet to proceed",
+        "already-linked": "You already applied a referral code",
         "cancel": "Cancel",
         "confirm": "Confirm"
       }

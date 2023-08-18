@@ -42,3 +42,9 @@
   font-weight: 600;
   line-height: 32px;
 }
+
+.walletButton {
+  margin-left: 4 * $d8x-spacing;
+  height: 44px !important;
+  min-width: 140px !important;
+}

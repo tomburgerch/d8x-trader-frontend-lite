@@ -16,6 +16,7 @@ import { QueryParamE, ReferTabIdE } from 'pages/refer-page/constants';
 import { PageE } from 'types/enums';
 
 import styles from './ReferralConfirmModal.module.scss';
+import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
 const REF_ID_QUERY_PARAM = 'ref';
 
@@ -84,9 +85,16 @@ export const ReferralConfirmModal = memo(() => {
     }
   }, [chainId, refId]);
 
-  if (!refId || !address || referralCode !== '') {
+  if (!refId) {
     return null;
   }
+
+  const hasAddress = !!address;
+  const hasReferralCode = referralCode !== '' && referralCode !== null;
+  const noReferralCode = referralCode === '';
+  const refIdIsValid = refIdTraderRebate !== null;
+
+  console.log(refIdTraderRebate);
 
   return (
     <Dialog open={showModal} className={styles.dialog}>
@@ -101,28 +109,37 @@ export const ReferralConfirmModal = memo(() => {
           </Typography>
         </Box>
         <Box className={styles.paddedContainer}>
-          {refIdTraderRebate == null ? (
+          {/*
+          <SidesRow
+            leftSide={t('pages.refer.use-code.trader-rebate')}
+            rightSide={`${refIdTraderRebate}%`}
+            rightSideStyles={styles.sidesRowValue}
+          />
+          */}
+          {!hasAddress && <Box className={styles.warning}>{t('pages.refer.use-code.connect-wallet')}</Box>}
+          {hasAddress && hasReferralCode && (
+            <Box className={styles.warning}>{t('pages.refer.use-code.already-linked')}</Box>
+          )}
+          {hasAddress && noReferralCode && !refIdIsValid && (
             <Box className={styles.warning}>{t('pages.refer.trader-tab.code-not-found')}</Box>
-          ) : // <SidesRow
-          //   leftSide={t('pages.refer.use-code.trader-rebate')}
-          //   rightSide={`${refIdTraderRebate}%`}
-          //   rightSideStyles={styles.sidesRowValue}
-          // />
-          null}
+          )}
         </Box>
       </Box>
       <DialogActions className={styles.dialogAction}>
         <Button onClick={handleModalClose} variant="secondary" size="small">
           {t('pages.refer.use-code.cancel')}
         </Button>
-        <Button
-          onClick={handleReferralCodeConfirm}
-          variant="primary"
-          size="small"
-          disabled={requestSent || refIdTraderRebate === null}
-        >
-          {t('pages.refer.use-code.confirm')}
-        </Button>
+        {!hasAddress && <WalletConnectButton buttonClassName={styles.walletButton} />}
+        {hasAddress && noReferralCode && (
+          <Button
+            onClick={handleReferralCodeConfirm}
+            variant="primary"
+            size="small"
+            disabled={requestSent || !refIdIsValid}
+          >
+            {t('pages.refer.use-code.confirm')}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
