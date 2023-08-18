@@ -149,7 +149,7 @@ export const OrderSize = memo(() => {
   const minPositionString = useMemo(() => {
     if (perpetualStaticInfo) {
       return formatToCurrency(
-        roundToLotString(10 * perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currentMultiplier,
+        +roundToLotString(10 * perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currentMultiplier,
         '',
         false,
         undefined,
@@ -241,7 +241,7 @@ export const OrderSize = memo(() => {
                 {t('pages.trade.order-block.order-size.body2')} {formatToCurrency(maxOrderSize, selectedCurrency)}.{' '}
                 {t('pages.trade.order-block.order-size.body3')} {minPositionString} {selectedCurrency}.{' '}
                 {t('pages.trade.order-block.order-size.body4')}{' '}
-                {formatToCurrency(orderSizeStep, selectedCurrency, false, 4)}.
+                {formatToCurrency(+orderSizeStep, selectedCurrency, false, 4)}.
               </Typography>
             </>
           }
