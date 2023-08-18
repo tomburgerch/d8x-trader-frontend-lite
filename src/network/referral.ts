@@ -101,7 +101,10 @@ export async function postUseReferralCode(
   }
 }
 
-export function getReferralCodeExists(chainId: number, code: string): Promise<ValidatedResponseI<{ code: string }[]>> {
+export function getReferralCodeExists(
+  chainId: number,
+  code: string
+): Promise<ValidatedResponseI<{ code: string; traderRebatePerc: number }[]>> {
   return fetch(`${getReferralUrlByChainId(chainId)}/code-info?code=${code}`, getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });

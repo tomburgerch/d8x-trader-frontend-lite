@@ -151,7 +151,9 @@ export const PerpetualsSelect = memo(({ withNavigate }: PerpetualsSelectPropsI) 
   const handleChange = (newItem: PerpetualI) => {
     setSelectedPerpetual(newItem.id);
     if (withNavigate) {
-      navigate(`${location.pathname}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${selectedPool?.poolSymbol}`);
+      navigate(
+        `${location.pathname}${location.search}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${selectedPool?.poolSymbol}`
+      );
     }
     clearInputsData();
   };

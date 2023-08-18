@@ -85,8 +85,14 @@ Starts a local web server that serves the built solution from `./build` folder f
 
 Creates configuration files for git hooks to work.
 
-Note: In case `.husky/pre-commit` file is not created, run this command:
+Note 1: In case `.husky/pre-commit` file is not created, run this command:
 
 ```
 npx husky add .husky/pre-commit "npm run lint:staged"
+```
+
+Note 2: In case the `.husky/pre-commit` hook was ignored because it's not set as executable, run this command:
+
+```
+chmod ug+x .husky/*
 ```

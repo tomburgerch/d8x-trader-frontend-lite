@@ -134,9 +134,9 @@ export const TraderPage = memo(() => {
 
     isPageUrlAppliedRef.current = true;
     navigate(
-      `${location.pathname}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
+      `${location.pathname}${location.search}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
     );
-  }, [selectedPool, location.hash, location.pathname, navigate]);
+  }, [selectedPool, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!chainId || !selectedPool?.poolSymbol || !address) {
