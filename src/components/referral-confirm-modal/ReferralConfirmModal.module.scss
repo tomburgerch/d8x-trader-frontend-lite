@@ -1,0 +1,50 @@
+@import '~styles/theme/_theme.scss';
+
+.dialog {
+
+  :global(.MuiPaper-root) {
+    width: 100%;
+    max-width: 450px;
+    border-radius: $d8x-border-radius;
+  }
+}
+
+.dialogRoot {
+  width: 100%;
+  padding: 6 * $d8x-spacing 0 4 * $d8x-spacing 0;
+}
+
+.codeContainer {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--d8x-color-black-50);
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.paddedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5 * $d8x-spacing;
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.warning {
+  text-align: center;
+  color: rgba(var(--d8x-background-sell-rgb), 1);
+}
+
+.dialogAction {
+  justify-content: center;
+}
+
+.dialogTitle {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.walletButton {
+  margin-left: 4 * $d8x-spacing;
+  height: 44px !important;
+  min-width: 140px !important;
+}

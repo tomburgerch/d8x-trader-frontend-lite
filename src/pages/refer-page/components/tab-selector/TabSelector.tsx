@@ -4,30 +4,49 @@ import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
+import { ReferTabIdE } from 'pages/refer-page/constants';
+
 import styles from './TabSelector.module.scss';
 
 interface TabSelectorPropsI {
-  activeTab: number;
-  onTabChange: (newIndex: number) => void;
+  activeTab: ReferTabIdE;
+  onTabChange: (newIndex: ReferTabIdE) => void;
+}
+
+interface TabItemI {
+  tabId: ReferTabIdE;
+  label: string;
 }
 
 export const TabSelector = ({ activeTab, onTabChange }: TabSelectorPropsI) => {
   const { t } = useTranslation();
 
-  const tabItems = useMemo(() => [t('pages.refer.tab-selector.referrer'), t('pages.refer.tab-selector.trader')], [t]);
+  const tabItems: TabItemI[] = useMemo(
+    () => [
+      {
+        tabId: ReferTabIdE.Referral,
+        label: t('pages.refer.tab-selector.referrer'),
+      },
+      {
+        tabId: ReferTabIdE.Trader,
+        label: t('pages.refer.tab-selector.trader'),
+      },
+    ],
+    [t]
+  );
 
   return (
     <Box className={styles.root}>
-      {tabItems.map((tab, index) => (
+      {tabItems.map((tab) => (
         <Box
-          key={tab}
-          onClick={() => onTabChange(index)}
+          key={tab.tabId}
+          onClick={() => onTabChange(tab.tabId)}
           className={classnames(styles.tab, {
-            [styles.active]: index === activeTab,
-            [styles.inactive]: index !== activeTab,
+            [styles.active]: tab.tabId === activeTab,
+            [styles.inactive]: tab.tabId !== activeTab,
           })}
         >
-          <Typography variant="bodyMedium">{tab}</Typography>
+          <Typography variant="bodyMedium">{tab.label}</Typography>
         </Box>
       ))}
     </Box>

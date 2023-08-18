@@ -5,31 +5,30 @@ import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
 
+import { useReferralCodes } from 'hooks/useReferralCodes';
+import { getEarnedRebate, getOpenTraderRebate } from 'network/referral';
 import { selectedPoolAtom } from 'store/pools.store';
+import { RebateTypeE } from 'types/enums';
+import { type EarnedRebateI, type OpenTraderRebateI } from 'types/types';
 
 import { Overview, type OverviewItemI } from '../overview/Overview';
 import { Disclaimer } from '../disclaimer/Disclaimer';
 import { ReferralCodeBlock } from '../referral-code-block/ReferralCodeBlock';
 
-import { getEarnedRebate, getOpenTraderRebate, getReferralCodes } from 'network/referral';
-
-import { type EarnedRebateI, type OpenTraderRebateI } from 'types/types';
-import { RebateTypeE } from 'types/enums';
-
 import styles from './TraderTab.module.scss';
 
 export const TraderTab = () => {
   const { t } = useTranslation();
+
   const [earnedRebates, setEarnedRebates] = useState(0);
   const [openRewards, setOpenRewards] = useState(0);
-
-  const [referralCode, setReferralCode] = useState<string | null>(null);
-  const [traderRebatePercentage, setTraderRebatePercentage] = useState(0);
 
   const [selectedPool] = useAtom(selectedPoolAtom);
 
   const { address } = useAccount();
   const chainId = useChainId();
+
+  const { referralCode, traderRebatePercentage, getReferralCodesAsync } = useReferralCodes(address, chainId);
 
   const disclaimerTextBlocks = useMemo(
     () => [t('pages.refer.trader-tab.disclaimer-text-block1'), t('pages.refer.trader-tab.disclaimer-text-block2')],
@@ -76,23 +75,6 @@ export const TraderTab = () => {
   useEffect(() => {
     getOpenRewardsAsync().then();
   }, [getOpenRewardsAsync]);
-
-  const getReferralCodesAsync = useCallback(async () => {
-    if (address) {
-      const referralCodesResponse = await getReferralCodes(chainId, address);
-      const traderReferralDataExists = !!Object.keys(referralCodesResponse.data.trader).length;
-
-      if (traderReferralDataExists) {
-        const { code, traderRebatePercFinal } = referralCodesResponse.data.trader;
-        setReferralCode(code);
-        setTraderRebatePercentage(traderRebatePercFinal ?? 0);
-      }
-    }
-  }, [address, chainId]);
-
-  useEffect(() => {
-    getReferralCodesAsync().then().catch(console.error);
-  }, [getReferralCodesAsync]);
 
   const overviewItems: OverviewItemI[] = [
     {

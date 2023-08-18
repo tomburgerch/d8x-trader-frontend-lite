@@ -107,7 +107,7 @@ export const CollateralsSelect = memo(({ label, withNavigate }: CollateralsSelec
 
     if (withNavigate) {
       navigate(
-        `${location.pathname}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
+        `${location.pathname}${location.search}#${newItem.perpetuals[0].baseCurrency}-${newItem.perpetuals[0].quoteCurrency}-${newItem.poolSymbol}`
       );
     }
     clearInputsData();

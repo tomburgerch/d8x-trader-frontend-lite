@@ -163,7 +163,7 @@ export const NormalReferrerDialog = (props: UpdatedNormalReferrerDialogPropsT) =
         {props.type === ReferralDialogActionE.CREATE && (
           <Box className={styles.codeInputContainer}>
             <OutlinedInput
-              placeholder={t('pages.refer.manage-code.enter-addr')}
+              placeholder={t('pages.refer.trader-tab.enter-a-code')}
               value={codeInputValue}
               onChange={handleCodeChange}
               className={styles.codeInput}

@@ -29,15 +29,18 @@ interface ReferralCodesTablePropsI {
 
 export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTablePropsI) => {
   const { t } = useTranslation();
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const referralCodesHeaders: TableHeaderI[] = useMemo(() => {
-    const headers = [
-      { label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
-      { label: t('pages.refer.referrer-tab.referrer-rebate-rate'), align: AlignE.Right },
-      { label: t('pages.refer.referrer-tab.trader-rebate-rate'), align: AlignE.Right },
-    ];
+    const headers = [{ label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left }];
+    if (!isAgency) {
+      headers.push({ label: '', align: AlignE.Right });
+    }
+    headers.push({ label: t('pages.refer.referrer-tab.referrer-rebate-rate'), align: AlignE.Right });
+    headers.push({ label: t('pages.refer.referrer-tab.trader-rebate-rate'), align: AlignE.Right });
+
     if (isAgency) {
       headers.push({ label: t('pages.refer.referrer-tab.agency-rebate-rate'), align: AlignE.Right });
       headers.push({ label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });

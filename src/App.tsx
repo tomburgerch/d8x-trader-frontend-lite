@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 
 import { Box } from '@mui/material';
 
+import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { StaticBackground } from 'components/static-background/StaticBackground';
 import { ReferPage } from 'pages/refer-page/ReferPage';
 import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
@@ -44,6 +45,7 @@ export const App = memo(() => {
           <Route key="trader-page" path="*" element={<TraderPage />} />
         </Routes>
         <WelcomeModal />
+        <ReferralConfirmModal />
         <ToastContainer position="top-left" autoClose={10_000} />
       </Box>
     </Box>

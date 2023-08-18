@@ -335,6 +335,9 @@
         "referrer-rebate-rate": "Rabattsatz Empfehlungsgeber",
         "trader-rebate-rate": "Rabattsatz Händler",
         "agency-rebate-rate": "Rabattsatz Agentur",
+        "share": "Teilen",
+        "share-success": "Your referral URL is successfully copied to clipboard",
+        "share-error": "An error appeared to copy your referral URL",
         "modify": "Modifizieren",
         "no-codes": "Keine Empfehlungscode"
       },

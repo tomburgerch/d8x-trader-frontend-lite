@@ -1,5 +1,6 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +29,11 @@ const loyaltyMap: Record<number, string> = {
   5: '-',
 };
 
-export const WalletConnectButton = memo(() => {
+interface WalletConnectButtonPropsI {
+  buttonClassName?: string;
+}
+
+export const WalletConnectButton = memo(({ buttonClassName }: WalletConnectButtonPropsI) => {
   const { t } = useTranslation();
 
   const theme = useTheme();
@@ -153,7 +158,11 @@ export const WalletConnectButton = memo(() => {
             {(() => {
               if (!connected) {
                 return (
-                  <Button onClick={openConnectModal} variant="primary" className={styles.connectWalletButton}>
+                  <Button
+                    onClick={openConnectModal}
+                    variant="primary"
+                    className={classnames(styles.connectWalletButton, buttonClassName)}
+                  >
                     {t('common.wallet-connect')}
                   </Button>
                 );

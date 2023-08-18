@@ -73,16 +73,9 @@ export const useCodeInput = (chainId: number) => {
       }
 
       // if input is filled
-
       // only check code on every keystroke if code has not been checked before (ref)
       if (!(filteredValue in checkedCodesRef.current)) {
-        const codeExists = await checkCodeExists(chainId, filteredValue);
-
-        if (codeExists) {
-          checkedCodesRef.current[filteredValue] = true;
-        } else {
-          checkedCodesRef.current[filteredValue] = false;
-        }
+        checkedCodesRef.current[filteredValue] = await checkCodeExists(chainId, filteredValue);
       }
 
       if (!checkedCodesRef.current[filteredValue]) {

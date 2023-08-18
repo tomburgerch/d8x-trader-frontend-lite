@@ -1,5 +1,6 @@
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
@@ -8,31 +9,63 @@ import { CollateralsSelect } from 'components/header/elements/collaterals-select
 import { Header } from 'components/header/Header';
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
+import { useQuery } from 'hooks/useQuery';
 import { getIsAgency, getReferralCodes } from 'network/referral';
 import { isAgencyAtom, referralCodeAtom, referralCodesRefetchHandlerRefAtom } from 'store/refer.store';
 
 import { TabSelector } from './components/tab-selector/TabSelector';
 import { ReferrerTab } from './components/referrer-tab/ReferrerTab';
 import { TraderTab } from './components/trader-tab/TraderTab';
+import { QueryParamE, ReferTabIdE } from './constants';
 
 import styles from './ReferPage.module.scss';
 
-const tabComponents = [<ReferrerTab key="referrerTab" />, <TraderTab key="traderTab" />];
+const tabComponents = [
+  {
+    tabId: ReferTabIdE.Referral,
+    content: <ReferrerTab key={ReferTabIdE.Referral} />,
+  },
+  {
+    tabId: ReferTabIdE.Trader,
+    content: <TraderTab key={ReferTabIdE.Trader} />,
+  },
+];
+
+const queryParamToReferTabIdMap: Record<string, ReferTabIdE> = {
+  referral: ReferTabIdE.Referral,
+  trader: ReferTabIdE.Trader,
+};
 
 export const ReferPage = memo(() => {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [, setIsAgency] = useAtom(isAgencyAtom);
-  const [, setReferralCode] = useAtom(referralCodeAtom);
+  const [activeTabId, setActiveTabId] = useState(ReferTabIdE.Referral);
 
-  const [, setReferralCodesRefetchHandler] = useAtom(referralCodesRefetchHandlerRefAtom);
+  const setIsAgency = useSetAtom(isAgencyAtom);
+  const setReferralCode = useSetAtom(referralCodeAtom);
+  const setReferralCodesRefetchHandler = useSetAtom(referralCodesRefetchHandlerRefAtom);
 
   const chainId = useChainId();
   const { address } = useAccount();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const query = useQuery();
 
   const referralCodesRequestRef = useRef(false);
   const isAgencyRequestRef = useRef(false);
 
-  const handleTabChange = (newIndex: number) => setActiveTabIndex(newIndex);
+  const handleTabChange = useCallback(
+    (tabId: ReferTabIdE) => {
+      setActiveTabId(tabId);
+
+      query.set(QueryParamE.Tab, tabId);
+
+      const newQuery = query.toString();
+      const paramsStr = newQuery ? `?${newQuery}` : '';
+
+      navigate(`${location.pathname}${paramsStr}${location.hash}`);
+    },
+    [navigate, location, query]
+  );
 
   const refreshReferralCodes = useCallback(() => {
     if (referralCodesRequestRef.current || !chainId || !address) {
@@ -76,14 +109,28 @@ export const ReferPage = memo(() => {
       });
   }, [chainId, address, setIsAgency]);
 
+  useEffect(() => {
+    const tabId = query.get(QueryParamE.Tab);
+    if (!tabId) {
+      return;
+    }
+
+    const referTabId = queryParamToReferTabIdMap[tabId];
+    if (!referTabId) {
+      return;
+    }
+
+    setActiveTabId(referTabId);
+  }, [query]);
+
   return (
     <Box className={styles.root}>
       <Header>
         <CollateralsSelect />
       </Header>
       <Container className={styles.container}>
-        <TabSelector activeTab={activeTabIndex} onTabChange={handleTabChange} />
-        {tabComponents[activeTabIndex]}
+        <TabSelector activeTab={activeTabId} onTabChange={handleTabChange} />
+        {tabComponents.find(({ tabId }) => tabId === activeTabId)?.content}
       </Container>
       <Footer />
     </Box>
