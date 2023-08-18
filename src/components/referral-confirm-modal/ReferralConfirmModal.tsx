@@ -94,8 +94,6 @@ export const ReferralConfirmModal = memo(() => {
   const noReferralCode = referralCode === '';
   const refIdIsValid = refIdTraderRebate !== null;
 
-  console.log(refIdTraderRebate);
-
   return (
     <Dialog open={showModal} className={styles.dialog}>
       <DialogTitle>{t('pages.refer.use-code.title')}</DialogTitle>

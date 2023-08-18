@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -13,11 +14,10 @@ import { useDialog } from 'hooks/useDialog';
 import { ReferrerRoleE, useRebateRate } from 'pages/refer-page/hooks';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import type { ReferrerDataI } from 'types/types';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { ReferralDialogActionE } from 'types/enums';
 
 import styles from './ReferralCodesRow.module.scss';
-import { useTranslation } from 'react-i18next';
-import { ToastContent } from '../../../toast-content/ToastContent';
 
 interface ReferralCodesRowPropsI {
   isAgency: boolean;
