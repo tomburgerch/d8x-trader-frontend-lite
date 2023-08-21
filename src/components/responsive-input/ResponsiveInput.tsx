@@ -14,7 +14,7 @@ interface ResponsiveInputPropsI {
   inputValue: string | number | null;
   setInputValue: (newValue: string) => void;
   handleInputBlur?: () => void;
-  currency: string | undefined;
+  currency: ReactNode | undefined;
   placeholder?: string;
   step?: string;
   min?: number;

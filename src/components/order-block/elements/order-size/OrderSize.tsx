@@ -253,7 +253,11 @@ export const OrderSize = memo(() => {
         inputValue={inputValue}
         setInputValue={handleOrderSizeChange}
         handleInputBlur={handleInputBlur}
-        currency={selectedCurrency}
+        currency={
+          <span onClick={handleCurrencyChangeToggle} className={styles.currencyLabel}>
+            {selectedCurrency}
+          </span>
+        }
         step={orderSizeStep}
         min={0}
         max={maxOrderSize}
@@ -288,7 +292,7 @@ export const OrderSize = memo(() => {
                 >
                   <Paper>
                     <ClickAwayListener onClickAway={handleClose}>
-                      <MenuList id="split-button-menu" autoFocusItem>
+                      <MenuList id="split-button-menu" autoFocusItem className={styles.menuItems}>
                         {currencyOptions.map((option) => (
                           <MenuItem
                             key={option}

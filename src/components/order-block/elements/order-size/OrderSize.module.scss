@@ -25,6 +25,17 @@
   }
 }
 
+.currencyLabel {
+  cursor: pointer;
+}
+
+.menuItems {
+
+  :global(.MuiButtonBase-root) {
+    border-radius: 0;
+  }
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .root {
