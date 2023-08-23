@@ -18,7 +18,7 @@
   white-space: nowrap;
   margin-bottom: $d8x-spacing * 0.5;
   color: var(--d8x-color-black-500);
-  min-width: 100px;
+  min-width: 50px;
 }
 
 .statValue {
@@ -34,6 +34,18 @@
   white-space: nowrap;
   font-size: 8px;
   margin-left: 4px;
+}
+
+.iconButton {
+  color: var(--d8x-color-white);
+  padding: 0;
+  min-width: 40px;
+  height: 40px;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
