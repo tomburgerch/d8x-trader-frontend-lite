@@ -34,7 +34,7 @@ export const PositionRow = memo(({ position, handlePositionClose, handlePosition
         </Typography>
       </TableCell>
       <TableCell align="left">
-        <Typography variant="cellSmall">
+        <Typography variant="cellSmall" className={styles.leftMargin}>
           {position.side === 'BUY'
             ? t('pages.trade.positions-table.table-content.buy')
             : t('pages.trade.positions-table.table-content.sell')}

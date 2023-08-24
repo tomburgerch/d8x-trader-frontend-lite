@@ -113,8 +113,8 @@ export const PositionsTable = () => {
         .then(({ data }) => {
           setAPIBusy(false);
           clearPositions();
-          if (data && data.length > 0) {
-            data.map((p) => setPositions(p));
+          if (data?.length > 0) {
+            data.map(setPositions);
           }
         })
         .catch((err) => {
@@ -175,9 +175,11 @@ export const PositionsTable = () => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
-                {positionsHeaders.map((header) => (
+                {positionsHeaders.map((header, index) => (
                   <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall">{header.label}</Typography>
+                    <Typography variant="bodySmall" className={index === 2 ? styles.leftMargin : ''}>
+                      {header.label}
+                    </Typography>
                   </TableCell>
                 ))}
               </TableRow>
