@@ -1,8 +1,10 @@
+import { LOB_ABI, PROXY_ABI } from '@d8x/perpetuals-sdk';
 import { useAtom, useSetAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
+import { decodeEventLog, encodeEventTopics } from 'viem';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import {
@@ -21,6 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import { HashZero } from 'app-constants';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
@@ -33,8 +36,8 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
-import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
+import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, TableTypeE } from 'types/enums';
 import type { AddressT, OrderWithIdI, TableHeaderI } from 'types/types';
 
@@ -42,9 +45,6 @@ import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
-import { HashZero } from '@ethersproject/constants';
-import { decodeEventLog, encodeEventTopics } from 'viem';
-import { LOB_ABI, PROXY_ABI } from '@d8x/perpetuals-sdk';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 const TOPIC_CANCEL_SUCCESS = encodeEventTopics({ abi: PROXY_ABI, eventName: 'PerpetualLimitOrderCancelled' })[0];

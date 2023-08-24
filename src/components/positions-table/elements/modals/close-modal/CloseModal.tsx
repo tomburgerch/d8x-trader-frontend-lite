@@ -1,4 +1,3 @@
-import { HashZero } from '@ethersproject/constants';
 import { useAtom } from 'jotai';
 import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +6,7 @@ import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from '
 
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
+import { HashZero } from 'app-constants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';

@@ -1,6 +1,4 @@
 import { SmartContractOrder } from '@d8x/perpetuals-sdk';
-import { BigNumberish } from '@ethersproject/bignumber';
-import { BytesLike } from '@ethersproject/bytes';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
@@ -148,15 +146,15 @@ export interface OrderI {
   side: string;
   type: string;
   quantity: number;
-  reduceOnly?: boolean | undefined;
-  limitPrice?: number | undefined;
-  keepPositionLvg?: boolean | undefined;
-  brokerFeeTbps?: number | undefined;
-  brokerAddr?: string | undefined;
-  brokerSignature?: BytesLike | undefined;
-  stopPrice?: number | undefined;
-  leverage?: number | undefined;
-  deadline?: number | undefined;
+  reduceOnly?: boolean;
+  limitPrice?: number;
+  keepPositionLvg?: boolean;
+  brokerFeeTbps?: number;
+  brokerAddr?: string;
+  // brokerSignature?: BytesLike;
+  stopPrice?: number;
+  leverage?: number;
+  deadline?: number;
   executionTimestamp: number;
   submittedTimestamp?: number;
   parentChildOrderIds?: [string, string];
@@ -164,22 +162,6 @@ export interface OrderI {
 
 export interface OrderWithIdI extends OrderI {
   id: string;
-}
-export interface SmartContractOrderI {
-  flags: BigNumberish;
-  iPerpetualId: number;
-  brokerFeeTbps: number;
-  traderAddr: string;
-  brokerAddr: string;
-  executorAddr: string;
-  brokerSignature: BytesLike;
-  fAmount: BigNumberish;
-  fLimitPrice: BigNumberish;
-  fTriggerPrice: BigNumberish;
-  leverageTDR: number;
-  iDeadline: number;
-  executionTimestamp: number;
-  submittedTimestamp: number;
 }
 
 export interface OrderDigestI {
