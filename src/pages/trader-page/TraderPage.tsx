@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -58,7 +58,7 @@ export const TraderPage = memo(() => {
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
-  const [, setPoolFee] = useAtom(poolFeeAtom);
+  const setPoolFee = useSetAtom(poolFeeAtom);
 
   const chainId = useChainId();
   const { address } = useAccount();

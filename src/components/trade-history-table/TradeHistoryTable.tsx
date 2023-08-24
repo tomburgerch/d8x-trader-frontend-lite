@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ export const TradeHistoryTable = memo(() => {
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [openOrders] = useAtom(openOrdersAtom);
-  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
 
   const updateTradesHistoryRef = useRef(false);

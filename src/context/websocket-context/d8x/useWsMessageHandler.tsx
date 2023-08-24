@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -79,12 +79,12 @@ export function useWsMessageHandler() {
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [, setWebSocketReady] = useAtom(webSocketReadyAtom);
-  const [, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
-  const [, setPositions] = useAtom(positionsAtom);
-  const [, setOpenOrders] = useAtom(openOrdersAtom);
-  const [, removeOpenOrder] = useAtom(removeOpenOrderAtom);
-  const [, failOpenOrder] = useAtom(failOrderAtom);
+  const setWebSocketReady = useSetAtom(webSocketReadyAtom);
+  const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
+  const setPositions = useSetAtom(positionsAtom);
+  const setOpenOrders = useSetAtom(openOrdersAtom);
+  const removeOpenOrder = useSetAtom(removeOpenOrderAtom);
+  const failOpenOrder = useSetAtom(failOrderAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
   const traderAPIRef = useRef(traderAPI);

@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ export const VaultPage = memo(() => {
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [triggerWithdrawalsUpdate] = useAtom(triggerWithdrawalsUpdateAtom);
-  const [, setWithdrawals] = useAtom(withdrawalsAtom);
+  const setWithdrawals = useSetAtom(withdrawalsAtom);
 
   const withdrawalsRequestSentRef = useRef(false);
 

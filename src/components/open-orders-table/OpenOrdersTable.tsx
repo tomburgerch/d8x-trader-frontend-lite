@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
@@ -60,11 +60,11 @@ export const OpenOrdersTable = memo(() => {
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
-  const [, clearOpenOrders] = useAtom(clearOpenOrdersAtom);
+  const clearOpenOrders = useSetAtom(clearOpenOrdersAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
-  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithIdI | null>(null);

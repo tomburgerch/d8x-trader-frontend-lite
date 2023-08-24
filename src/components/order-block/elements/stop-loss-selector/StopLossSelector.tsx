@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,7 +18,7 @@ export const StopLossSelector = memo(() => {
   const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
-  const [, setStopLossPrice] = useAtom(stopLossPriceAtom);
+  const setStopLossPrice = useSetAtom(stopLossPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);

@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
@@ -46,10 +46,10 @@ export const PositionsTable = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [, removePosition] = useAtom(removePositionAtom);
+  const removePosition = useSetAtom(removePositionAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
-  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
   const traderAPIRef = useRef(traderAPI);
   const isAPIBusyRef = useRef(isAPIBusy);

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,7 +18,7 @@ export const TakeProfitSelector = memo(() => {
   const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
-  const [, setTakeProfitPrice] = useAtom(takeProfitPriceAtom);
+  const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);

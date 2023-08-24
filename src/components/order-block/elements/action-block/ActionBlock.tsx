@@ -1,5 +1,5 @@
 import { HashZero } from '@ethersproject/constants';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -116,8 +116,8 @@ export const ActionBlock = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
-  const [, clearInputsData] = useAtom(clearInputsDataAtom);
-  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  const clearInputsData = useSetAtom(clearInputsDataAtom);
+  const setOpenOrders = useSetAtom(openOrdersAtom);
 
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
