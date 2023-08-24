@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
@@ -40,7 +40,7 @@ import styles from './PositionsTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 
-export const PositionsTable = memo(() => {
+export const PositionsTable = () => {
   const { t } = useTranslation();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -251,4 +251,4 @@ export const PositionsTable = memo(() => {
       <CloseModal isOpen={isCloseModalOpen} selectedPosition={selectedPosition} closeModal={closeCloseModal} />
     </div>
   );
-});
+};

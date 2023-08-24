@@ -155,19 +155,19 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
     enabled: !!address && !!txHashForRemove,
   });
 
-  const handleMaxCollateral = useCallback(() => {
+  const handleMaxCollateral = () => {
     if (maxCollateral) {
       setRemoveCollateral(maxCollateral);
     }
-  }, [maxCollateral]);
+  };
 
-  const handleAddCollateralCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleAddCollateralCapture = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setAddCollateral(+event.target.value);
-  }, []);
+  };
 
-  const handleRemoveCollateralCapture = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleRemoveCollateralCapture = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRemoveCollateral(+event.target.value);
-  }, []);
+  };
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
 
@@ -315,7 +315,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
     }
   }, [requestSent, modifyType, addCollateral, removeCollateral, maxCollateral]);
 
-  const handleModifyPositionConfirm = useCallback(async () => {
+  const handleModifyPositionConfirm = async () => {
     if (requestSentRef.current) {
       return;
     }
@@ -417,21 +417,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
           setRequestSent(false);
         });
     }
-  }, [
-    modifyType,
-    selectedPosition,
-    chainId,
-    address,
-    selectedPool,
-    proxyAddr,
-    addCollateral,
-    removeCollateral,
-    maxCollateral,
-    walletClient,
-    poolTokenDecimals,
-    closeModal,
-    t,
-  ]);
+  };
 
   return (
     <Dialog open={isOpen} className={styles.root}>
