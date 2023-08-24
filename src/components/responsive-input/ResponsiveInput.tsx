@@ -105,7 +105,7 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
       <OutlinedInput
         id={id}
         endAdornment={
-          <InputAdornment position="end">
+          <InputAdornment position="end" className={styles.inputAdornment}>
             <Typography variant="adornment">{currency}</Typography>
             {adornmentAction}
           </InputAdornment>
