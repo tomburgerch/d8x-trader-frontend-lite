@@ -3,7 +3,7 @@
   "version": "0.5.1",
   "private": true,
   "scripts": {
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "analyze": "vite-bundle-visualizer",
     "dev": "vite",
     "start": "vite",
     "build": "tsc && vite build",
@@ -112,13 +112,13 @@
     "lint-staged": "13.2.3",
     "prettier": "3.0.1",
     "sass": "1.65.1",
-    "source-map-explorer": "2.5.3",
     "stylelint": "14.16.1",
     "stylelint-config-css-modules": "4.3.0",
     "stylelint-config-standard-scss": "6.1.0",
     "stylelint-order": "6.0.3",
     "typescript": "5.1.6",
     "vite": "4.4.8",
+    "vite-bundle-visualizer": "^0.10.0",
     "vite-plugin-svgr": "3.2.0",
     "vite-tsconfig-paths": "4.2.0"
   }
