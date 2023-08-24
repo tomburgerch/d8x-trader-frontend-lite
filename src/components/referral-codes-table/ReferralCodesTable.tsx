@@ -81,7 +81,7 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
         </TableBody>
       </Table>
       {codes.length > 5 && (
-        <Box className={styles.paginationHolder}>
+        <Box>
           <TablePagination
             align="center"
             rowsPerPageOptions={[5, 10, 20]}

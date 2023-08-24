@@ -1,5 +1,5 @@
 import { useSetAtom } from 'jotai';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -35,7 +35,7 @@ const queryParamToReferTabIdMap: Record<string, ReferTabIdE> = {
   referral: ReferTabIdE.Referral,
 };
 
-export const ReferPage = memo(() => {
+export const ReferPage = () => {
   const [activeTabId, setActiveTabId] = useState(ReferTabIdE.Trader);
 
   const setIsAgency = useSetAtom(isAgencyAtom);
@@ -132,4 +132,4 @@ export const ReferPage = memo(() => {
       <Footer />
     </Box>
   );
-});
+};

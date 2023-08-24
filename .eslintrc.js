@@ -27,12 +27,11 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
     'airbnb-typescript',
     'airbnb/hooks',
     'prettier',
   ],
-  plugins: ['jsx-a11y', '@typescript-eslint', 'import', 'react-hooks', 'prettier'],
+  plugins: ['jsx-a11y', '@typescript-eslint', 'prettier'],
   rules: {
     'comma-dangle': [ERROR, 'only-multiline'],
     '@typescript-eslint/comma-dangle': [ERROR, 'only-multiline'],
