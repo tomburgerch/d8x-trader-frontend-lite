@@ -17,10 +17,6 @@
   }
 }
 
-.inputAdornment {
-  min-width: 65px;
-}
-
 .decreaseButton,
 .increaseButton {
   display: none;
@@ -28,6 +24,10 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
+
+  .inputAdornment {
+    min-width: 65px;
+  }
 
   .root {
     display: flex;
