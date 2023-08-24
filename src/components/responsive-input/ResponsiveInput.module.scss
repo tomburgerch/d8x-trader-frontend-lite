@@ -25,6 +25,10 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
 
+  .inputAdornment {
+    min-width: 65px;
+  }
+
   .root {
     display: flex;
     align-items: center;
@@ -62,10 +66,6 @@
         margin-left: 0;
         margin-right: 4px;
       }
-    }
-
-    :global(.MuiOutlinedInput-input) {
-      padding: 6px 10px;
     }
 
     .decreaseButton,
