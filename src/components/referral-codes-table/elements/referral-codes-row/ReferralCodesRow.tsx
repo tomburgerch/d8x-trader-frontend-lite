@@ -1,21 +1,21 @@
 import classnames from 'classnames';
-import { useCallback, useMemo } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Button, TableCell, TableRow, Typography } from '@mui/material';
 
-import { AgencyReferrerDialog } from 'pages/refer-page/components/agency-referrer-dialog/AgencyReferrerDialog';
-import { NormalReferrerDialog } from 'pages/refer-page/components/normal-referrer-dialog/NormalReferrerDialog';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { getRefLink } from 'helpers/getRefLink';
 import { useDialog } from 'hooks/useDialog';
+import { AgencyReferrerDialog } from 'pages/refer-page/components/agency-referrer-dialog/AgencyReferrerDialog';
+import { NormalReferrerDialog } from 'pages/refer-page/components/normal-referrer-dialog/NormalReferrerDialog';
 import { ReferrerRoleE, useRebateRate } from 'pages/refer-page/hooks';
-import { formatToCurrency } from 'utils/formatToCurrency';
-import type { ReferrerDataI } from 'types/types';
-import { ToastContent } from 'components/toast-content/ToastContent';
 import { ReferralDialogActionE } from 'types/enums';
+import type { ReferrerDataI } from 'types/types';
+import { copyToClipboard } from 'utils/copyToClipboard';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './ReferralCodesRow.module.scss';
 
@@ -34,30 +34,29 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
 
   const baseRebate = useRebateRate(chainId, address, data.agencyAddr ? ReferrerRoleE.AGENCY : ReferrerRoleE.NORMAL);
 
-  const handleCodeShare = useCallback(
-    (link: string, result: boolean) => {
-      if (result) {
-        toast.success(
-          <ToastContent
-            title={t('pages.refer.referrer-tab.share-success')}
-            bodyLines={[
-              {
-                label: '',
-                value: (
-                  <a href={link} target="_blank" rel="noreferrer">
-                    {link}
-                  </a>
-                ),
-              },
-            ]}
-          />
-        );
-      } else {
-        toast.error(<ToastContent title={t('pages.refer.referrer-tab.share-error')} bodyLines={[]} />);
-      }
-    },
-    [t]
-  );
+  const onCopyClick = async () => {
+    const text = getRefLink(data.code);
+    const result = await copyToClipboard(text);
+    if (result) {
+      toast.success(
+        <ToastContent
+          title={t('pages.refer.referrer-tab.share-success')}
+          bodyLines={[
+            {
+              label: '',
+              value: (
+                <a href={text} target="_blank" rel="noreferrer">
+                  {text}
+                </a>
+              ),
+            },
+          ]}
+        />
+      );
+    } else {
+      toast.error(<ToastContent title={t('pages.refer.referrer-tab.share-error')} bodyLines={[]} />);
+    }
+  };
 
   const absolutePercentages = useMemo(
     () => ({
@@ -74,11 +73,9 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
         <TableCell className={classnames(styles.bodyCell, styles.codeCell)}>{data.code}</TableCell>
         {!isAgency && (
           <TableCell align="right" className={classnames(styles.bodyCell, styles.buttonCell)}>
-            <CopyToClipboard text={getRefLink(data.code)} onCopy={handleCodeShare}>
-              <Button variant="primary" className={styles.modifyButton} size="tableSmall" disabled={!data.code}>
-                <Typography variant="bodyTiny">{t('pages.refer.referrer-tab.share')}</Typography>
-              </Button>
-            </CopyToClipboard>
+            <Button variant="primary" size="tableSmall" disabled={!data.code} onClick={onCopyClick}>
+              <Typography variant="bodyTiny">{t('pages.refer.referrer-tab.share')}</Typography>
+            </Button>
           </TableCell>
         )}
         <TableCell align="right" className={styles.bodyCell}>
@@ -93,7 +90,7 @@ export const ReferralCodesRow = ({ isAgency, data }: ReferralCodesRowPropsI) => 
               {formatToCurrency(absolutePercentages.agencyRebatePerc, '%', false, 2).replace(' ', '')}
             </TableCell>
             <TableCell align="center" className={classnames(styles.bodyCell, styles.buttonCell, styles.modifyCell)}>
-              <Button variant="primary" onClick={openDialog} className={styles.modifyButton} size="tableSmall">
+              <Button variant="primary" onClick={openDialog} size="tableSmall">
                 <Typography variant="bodyTiny">{t('pages.refer.referrer-tab.modify')}</Typography>
               </Button>
             </TableCell>
