@@ -1,24 +1,24 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
-import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
-import { PerpetualsSelect } from 'components/header/elements/perpetuals-select/PerpetualsSelect';
-import { Header } from 'components/header/Header';
 import { Footer } from 'components/footer/Footer';
 import { FundingTable } from 'components/funding-table/FundingTable';
+import { Header } from 'components/header/Header';
+import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
+import { PerpetualsSelect } from 'components/header/elements/perpetuals-select/PerpetualsSelect';
+import { Helmet } from 'components/helmet';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
-import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
-import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
+import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
 import { ChartHolder } from 'pages/trader-page/components/chart-holder/ChartHolder';
 import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/PerpetualStats';
@@ -37,7 +37,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
 
-export const TraderPage = memo(() => {
+export const TraderPage = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -73,7 +73,7 @@ export const TraderPage = memo(() => {
       fetchPositionsRef.current = true;
       await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address)
         .then(({ data }) => {
-          if (data && data.length > 0) {
+          if (data.length > 0) {
             data.map((p) => setPositions(p));
           }
           fetchFeeRef.current = false;
@@ -108,7 +108,7 @@ export const TraderPage = memo(() => {
   );
 
   const fetchFee = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: string) => {
+    (_chainId: number, _poolSymbol: string, _address: string) => {
       if (fetchFeeRef.current) {
         return;
       }
@@ -144,7 +144,7 @@ export const TraderPage = memo(() => {
     }
     fetchPositions(chainId, selectedPool.poolSymbol, address).then();
     fetchOrders(chainId, selectedPool?.poolSymbol, address).then();
-    fetchFee(chainId, selectedPool.poolSymbol, address).then();
+    fetchFee(chainId, selectedPool.poolSymbol, address);
   }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
 
   useEffect(() => {
@@ -219,19 +219,17 @@ export const TraderPage = memo(() => {
 
   return (
     <>
-      <Helmet>
-        <title>
-          {`${
-            perpetualStatistics
-              ? formatToCurrency(
-                  perpetualStatistics.midPrice,
-                  `${perpetualStatistics.baseCurrency}-${perpetualStatistics.quoteCurrency}`,
-                  true
-                )
-              : ''
-          } | D8X App`}
-        </title>
-      </Helmet>
+      <Helmet
+        title={`${
+          perpetualStatistics
+            ? formatToCurrency(
+                perpetualStatistics.midPrice,
+                `${perpetualStatistics.baseCurrency}-${perpetualStatistics.quoteCurrency}`,
+                true
+              )
+            : ''
+        } | D8X App`}
+      />
       <Box className={styles.root}>
         <Header>
           <CollateralsSelect withNavigate={true} />
@@ -280,4 +278,4 @@ export const TraderPage = memo(() => {
       </Box>
     </>
   );
-});
+};

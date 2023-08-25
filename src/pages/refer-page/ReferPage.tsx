@@ -5,15 +5,15 @@ import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
 
-import { Header } from 'components/header/Header';
 import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
+import { Header } from 'components/header/Header';
 import { useQuery } from 'hooks/useQuery';
 import { getIsAgency, getReferralCodes } from 'network/referral';
 import { isAgencyAtom, referralCodeAtom, referralCodesRefetchHandlerRefAtom } from 'store/refer.store';
 
-import { TabSelector } from './components/tab-selector/TabSelector';
 import { ReferrerTab } from './components/referrer-tab/ReferrerTab';
+import { TabSelector } from './components/tab-selector/TabSelector';
 import { TraderTab } from './components/trader-tab/TraderTab';
 import { QueryParamE, ReferTabIdE } from './constants';
 
