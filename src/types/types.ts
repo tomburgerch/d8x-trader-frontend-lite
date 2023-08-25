@@ -2,7 +2,7 @@ import { SmartContractOrder } from '@d8x/perpetuals-sdk';
 import { Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
-import { AlignE, ExpiryE, LanguageE, OrderBlockE, OrderTypeE, PageE, StopLossE, TakeProfitE } from './enums';
+import { AlignE, ExpiryE, LanguageE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
 
 export interface LanguageMetaI {
   id: LanguageE;
@@ -254,13 +254,6 @@ export interface OpenWithdrawalI {
 
 export interface OpenWithdrawalsI {
   withdrawals: OpenWithdrawalI[];
-}
-
-export interface PageI {
-  id: string;
-  path: PageE | string;
-  title: string;
-  translationKey: string;
 }
 
 export interface ReferralVolumeI {

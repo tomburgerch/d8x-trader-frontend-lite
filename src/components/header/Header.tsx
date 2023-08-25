@@ -9,19 +9,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { createSymbol } from 'helpers/createSymbol';
-import { pages } from 'navigation/pages';
 import { getExchangeInfo } from 'network/network';
-import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
+import { pages } from 'routes/pages';
 import {
   oracleFactoryAddrAtom,
+  perpetualsAtom,
   poolTokenBalanceAtom,
+  poolTokenDecimalsAtom,
   poolsAtom,
   proxyAddrAtom,
   selectedPoolAtom,
-  perpetualsAtom,
   traderAPIAtom,
-  poolTokenDecimalsAtom,
 } from 'store/pools.store';
+import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { AddressT, ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
@@ -29,8 +29,8 @@ import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 
-import { PageAppBar } from './Header.styles';
 import styles from './Header.module.scss';
+import { PageAppBar } from './Header.styles';
 
 interface HeaderPropsI extends PropsWithChildren {
   /**

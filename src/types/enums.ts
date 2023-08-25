@@ -88,12 +88,6 @@ export enum TableTypeE {
   FUNDING,
 }
 
-export enum PageE {
-  Trade = '/',
-  Refer = '/refer',
-  Vault = '/vault',
-}
-
 export enum RebateTypeE {
   Agency = 'agency',
   Trader = 'trader',

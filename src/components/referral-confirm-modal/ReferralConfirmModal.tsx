@@ -13,10 +13,10 @@ import { useQuery } from 'hooks/useQuery';
 import { useReferralCodes } from 'hooks/useReferralCodes';
 import { getReferralCodeExists, postUseReferralCode } from 'network/referral';
 import { QueryParamE, ReferTabIdE } from 'pages/refer-page/constants';
-import { PageE } from 'types/enums';
+import { RoutesE } from 'routes/RoutesE';
 
-import styles from './ReferralConfirmModal.module.scss';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
+import styles from './ReferralConfirmModal.module.scss';
 
 const REF_ID_QUERY_PARAM = 'ref';
 
@@ -53,7 +53,7 @@ export const ReferralConfirmModal = memo(() => {
   }, [query, refId, location, navigate]);
 
   const onCodeApplySuccess = useCallback(() => {
-    navigate(`${PageE.Refer}?${QueryParamE.Tab}=${ReferTabIdE.Trader}`, { replace: true });
+    navigate(`${RoutesE.Refer}?${QueryParamE.Tab}=${ReferTabIdE.Trader}`, { replace: true });
   }, [navigate]);
 
   const handleReferralCodeConfirm = useCallback(async () => {

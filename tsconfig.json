@@ -22,8 +22,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "types": ["node"]
+    "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [".eslintrc.js", "src"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -1,7 +1,6 @@
 import { useSetAtom } from 'jotai';
 import { memo, useEffect } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
-import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 import { Box } from '@mui/material';
@@ -9,11 +8,8 @@ import { Box } from '@mui/material';
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { StaticBackground } from 'components/static-background/StaticBackground';
 import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
-import { ReferPage } from 'pages/refer-page/ReferPage';
-import { TraderPage } from 'pages/trader-page/TraderPage';
-import { VaultPage } from 'pages/vault-page/VaultPage';
+import { AppRoutes } from 'routes/routes';
 import { appDimensionsAtom } from 'store/app.store';
-import { PageE } from 'types/enums';
 
 import 'core-js/es/array';
 import 'core-js/es/map';
@@ -38,11 +34,7 @@ export const App = memo(() => {
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
         <StaticBackground />
-        <Routes>
-          <Route key="vault-page" path={PageE.Vault} element={<VaultPage />} />
-          <Route key="refer-page" path={PageE.Refer} element={<ReferPage />} />
-          <Route key="trader-page" path="*" element={<TraderPage />} />
-        </Routes>
+        <AppRoutes />
         <WelcomeModal />
         <ReferralConfirmModal />
         <ToastContainer position="top-left" autoClose={10_000} />
