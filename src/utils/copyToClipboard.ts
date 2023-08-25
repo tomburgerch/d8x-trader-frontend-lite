@@ -3,7 +3,10 @@ const copyThroughInput = (text: string) => {
   const textArea = document.createElement('span');
 
   const range = document.createRange();
-  const selection = document.getSelection()!;
+  const selection = document.getSelection();
+  if (!selection) {
+    return false;
+  }
 
   textArea.textContent = text;
   // avoid screen readers from reading out loud the text

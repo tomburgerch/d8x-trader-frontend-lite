@@ -175,11 +175,9 @@ export const PositionsTable = () => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
-                {positionsHeaders.map((header, index) => (
+                {positionsHeaders.map((header) => (
                   <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall" className={index === 2 ? styles.leftMargin : ''}>
-                      {header.label}
-                    </Typography>
+                    <Typography variant="bodySmall">{header.label}</Typography>
                   </TableCell>
                 ))}
               </TableRow>
