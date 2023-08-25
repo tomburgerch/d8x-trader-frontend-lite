@@ -37,7 +37,7 @@ jobs:
 
       - name: Install dependencies (if not cached)
         if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
-        run: pnpm ci
+        run: pnpm i
         env:
           CI: true
 
