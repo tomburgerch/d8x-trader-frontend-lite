@@ -34,7 +34,9 @@ export const App = memo(() => {
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
         <StaticBackground />
-        <AppRoutes />
+        <Suspense fallback={null}>
+          <AppRoutes />
+        </Suspense>
         <WelcomeModal />
         <ReferralConfirmModal />
         <ToastContainer position="top-left" autoClose={10_000} />
