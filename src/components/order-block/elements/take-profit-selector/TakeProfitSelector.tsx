@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
@@ -26,27 +26,21 @@ export const TakeProfitSelector = memo(() => {
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const handleTakeProfitPriceChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const takeProfitPriceValue = event.target.value;
-      if (takeProfitPriceValue !== '') {
-        setTakeProfitInputPrice(+takeProfitPriceValue);
-        setTakeProfit(null);
-      } else {
-        setTakeProfitInputPrice(null);
-      }
-    },
-    [setTakeProfit]
-  );
-
-  const handleTakeProfitChange = useCallback(
-    (takeProfitValue: TakeProfitE) => {
-      setTakeProfitPrice(null);
+  const handleTakeProfitPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const takeProfitPriceValue = event.target.value;
+    if (takeProfitPriceValue !== '') {
+      setTakeProfitInputPrice(+takeProfitPriceValue);
+      setTakeProfit(null);
+    } else {
       setTakeProfitInputPrice(null);
-      setTakeProfit(takeProfitValue);
-    },
-    [setTakeProfitPrice, setTakeProfit]
-  );
+    }
+  };
+
+  const handleTakeProfitChange = (takeProfitValue: TakeProfitE) => {
+    setTakeProfitPrice(null);
+    setTakeProfitInputPrice(null);
+    setTakeProfit(takeProfitValue);
+  };
 
   const minTakeProfitPrice = useMemo(() => {
     if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Long) {

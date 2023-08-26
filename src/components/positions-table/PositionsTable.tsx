@@ -143,15 +143,6 @@ export const PositionsTable = () => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
 
-  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  }, []);
-
   const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
       { label: t('pages.trade.positions-table.table-header.symbol'), align: AlignE.Left },
@@ -240,8 +231,11 @@ export const PositionsTable = () => {
             count={positions.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(+event.target.value);
+              setPage(0);
+            }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
         </Box>

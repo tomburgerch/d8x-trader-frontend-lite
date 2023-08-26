@@ -90,7 +90,7 @@ export const Add = memo(() => {
     enabled: !!txHash,
   });
 
-  const handleAddLiquidity = useCallback(() => {
+  const handleAddLiquidity = () => {
     if (requestSentRef.current) {
       return;
     }
@@ -131,24 +131,7 @@ export const Add = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [
-    addAmount,
-    liqProvTool,
-    selectedPool,
-    address,
-    proxyAddr,
-    walletClient,
-    isSDKConnected,
-    poolTokenDecimals,
-    setTriggerUserStatsUpdate,
-    t,
-  ]);
-
-  const handleMaxAmount = useCallback(() => {
-    if (poolTokenBalance) {
-      handleInputCapture(`${poolTokenBalance}`);
-    }
-  }, [handleInputCapture, poolTokenBalance]);
+  };
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -198,7 +181,16 @@ export const Add = memo(() => {
         {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
             {t('pages.vault.add.max')}{' '}
-            <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
+            {/* //TODO: Link? To where? */}
+            <Link
+              onClick={() => {
+                if (poolTokenBalance) {
+                  handleInputCapture(`${poolTokenBalance}`);
+                }
+              }}
+            >
+              {formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}
+            </Link>
           </Typography>
         ) : null}
         <Box className={styles.iconSeparator}>

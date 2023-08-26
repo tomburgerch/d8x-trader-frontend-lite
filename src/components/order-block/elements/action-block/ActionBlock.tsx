@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
@@ -133,7 +133,7 @@ export const ActionBlock = memo(() => {
     traderAPIRef.current = traderAPI;
   }, [traderAPI]);
 
-  const openReviewOrderModal = useCallback(async () => {
+  const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPIRef.current) {
       return;
     }
@@ -158,12 +158,12 @@ export const ActionBlock = memo(() => {
       .finally(() => {
         validityCheckRef.current = false;
       });
-  }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
+  };
 
-  const closeReviewOrderModal = useCallback(() => {
+  const closeReviewOrderModal = () => {
     setShowReviewOrderModal(false);
     setIsValidityCheckDone(false);
-  }, []);
+  };
 
   const isBuySellButtonActive = useMemo(() => {
     if (!orderInfo || !address) {
@@ -268,7 +268,7 @@ export const ActionBlock = memo(() => {
     enabled: !!address && !!orderInfo && !!txHash,
   });
 
-  const handleOrderConfirm = useCallback(() => {
+  const handleOrderConfirm = () => {
     if (!address || !walletClient || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
       return;
     }
@@ -333,18 +333,7 @@ export const ActionBlock = memo(() => {
         setRequestSent(false);
         setShowReviewOrderModal(false);
       });
-  }, [
-    parsedOrders,
-    chainId,
-    address,
-    walletClient,
-    selectedPool,
-    proxyAddr,
-    collateralDeposit,
-    poolTokenDecimals,
-    clearInputsData,
-    t,
-  ]);
+  };
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -361,7 +350,7 @@ export const ActionBlock = memo(() => {
 
   const isMarketClosed = useDebounce(
     useMemo(() => {
-      return selectedPerpetual && selectedPerpetual.isMarketClosed;
+      return selectedPerpetual?.isMarketClosed;
     }, [selectedPerpetual]),
     30_000
   );

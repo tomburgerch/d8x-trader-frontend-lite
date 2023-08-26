@@ -1,6 +1,6 @@
 import { LOB_ABI, PROXY_ABI } from '@d8x/perpetuals-sdk';
 import { useAtom, useSetAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
@@ -87,10 +87,10 @@ export const OpenOrdersTable = memo(() => {
     setSelectedOrder(order);
   }, []);
 
-  const closeCancelModal = useCallback(() => {
+  const closeCancelModal = () => {
     setCancelModalOpen(false);
     setSelectedOrder(null);
-  }, []);
+  };
 
   const refreshOpenOrders = useCallback(async () => {
     if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
@@ -169,7 +169,7 @@ export const OpenOrdersTable = memo(() => {
     enabled: !!address && !!txHash,
   });
 
-  const handleCancelOrderConfirm = useCallback(() => {
+  const handleCancelOrderConfirm = () => {
     if (!selectedOrder) {
       return;
     }
@@ -207,16 +207,7 @@ export const OpenOrdersTable = memo(() => {
         console.error(error);
         setRequestSent(false);
       });
-  }, [selectedOrder, requestSent, isDisconnected, walletClient, chainId, t]);
-
-  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  }, []);
+  };
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
@@ -320,8 +311,11 @@ export const OpenOrdersTable = memo(() => {
             count={sortedOpenOrders.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(+event.target.value);
+              setPage(0);
+            }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
         </Box>

@@ -73,15 +73,6 @@ export const TradeHistoryTable = memo(() => {
     refreshTradesHistory();
   }, [openOrders, refreshTradesHistory]);
 
-  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  }, []);
-
   const tradeHistoryHeaders: TableHeaderI[] = useMemo(
     () => [
       { label: t('pages.trade.history-table.table-header.time'), align: AlignE.Left },
@@ -168,8 +159,11 @@ export const TradeHistoryTable = memo(() => {
             count={tradesHistory.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(+event.target.value);
+              setPage(0);
+            }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
         </Box>

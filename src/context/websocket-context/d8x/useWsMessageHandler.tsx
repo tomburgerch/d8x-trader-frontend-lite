@@ -166,8 +166,8 @@ export function useWsMessageHandler() {
         // refresh open orders
         getOpenOrders(chainId, traderAPIRef.current, parsedMessage.data.obj.symbol, address)
           .then(({ data }) => {
-            if (data && data.length > 0) {
-              data.map((o) => setOpenOrders(o));
+            if (data?.length > 0) {
+              data.map(setOpenOrders);
             }
           })
           .catch(console.error);

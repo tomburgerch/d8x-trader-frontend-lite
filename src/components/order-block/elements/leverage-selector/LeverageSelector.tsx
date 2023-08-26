@@ -9,7 +9,7 @@ import { OrderSettings } from 'components/order-block/elements/order-settings/Or
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { leverageAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom } from 'store/pools.store';
-import { MarkI } from 'types/types';
+import { type MarkI } from 'types/types';
 
 import commonStyles from '../../OrderBlock.module.scss';
 import styles from './LeverageSelector.module.scss';
@@ -45,15 +45,6 @@ export const LeverageSelector = memo(() => {
     );
     return newMarks;
   }, [maxLeverage]);
-
-  const handleLeverageChange = useCallback(
-    (_event: Event, newValue: number | number[]) => {
-      if (typeof newValue === 'number') {
-        setLeverage(newValue);
-      }
-    },
-    [setLeverage]
-  );
 
   const handleLeverageInputChange = useCallback(
     (targetValue: string) => {
@@ -104,7 +95,11 @@ export const LeverageSelector = memo(() => {
             valueLabelFormat={valueLabelFormat}
             valueLabelDisplay="auto"
             marks={marks}
-            onChange={handleLeverageChange}
+            onChange={(_event, newValue) => {
+              if (typeof newValue === 'number') {
+                setLeverage(newValue);
+              }
+            }}
           />
         </Box>
         <ResponsiveInput

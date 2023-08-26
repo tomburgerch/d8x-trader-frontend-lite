@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -20,21 +20,15 @@ import { ReactComponent as SettingsIcon } from 'assets/icons/settingsIcon.svg';
 import { Dialog } from 'components/dialog/Dialog';
 import { ExpirySelector } from 'components/order-block/elements/expiry-selector/ExpirySelector';
 // import { createSymbol } from 'helpers/createSymbol';
-import {
-  // keepPositionLeverageAtom,
-  orderBlockAtom,
-  orderTypeAtom,
-  reduceOnlyAtom,
-  slippageSliderAtom,
-} from 'store/order-block.store';
+import { orderBlockAtom, orderTypeAtom, reduceOnlyAtom, slippageSliderAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom, selectedPerpetualAtom /*, positionsAtom*/ } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
-import { MarkI } from 'types/types';
+import { type MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
-import styles from './OrderSettings.module.scss';
 import { Separator } from 'components/separator/Separator';
+import styles from './OrderSettings.module.scss';
 
 const marks: MarkI[] = [
   { value: 0.5, label: '0.5%' },
@@ -83,42 +77,26 @@ export const OrderSettings = memo(() => {
   const [inputValue, setInputValue] = useState(`${updatedSlippage}`);
   const inputValueChangedRef = useRef(false);
 
-  const openSettingsModal = useCallback(() => setShowSettingsModal(true), []);
-  const openExpiryModal = useCallback(() => setShowExpiryModal(true), []);
-
-  const closeSettingsModal = useCallback(() => {
+  const closeSettingsModal = () => {
     setUpdatedSlippage(slippage);
     setShowSettingsModal(false);
-  }, [slippage]);
+  };
 
-  const closeExpiryModal = useCallback(() => {
-    setShowExpiryModal(false);
-  }, []);
-
-  const handleSettingsConfirm = useCallback(() => {
+  const handleSettingsConfirm = () => {
     setShowSettingsModal(false);
     setSlippage(updatedSlippage);
-  }, [updatedSlippage, setSlippage]);
+  };
 
-  const handleToleranceChange = useCallback((_event: Event, newValue: number | number[]) => {
-    if (typeof newValue === 'number') {
-      setUpdatedSlippage(newValue);
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const targetValue = event.target.value;
+    if (targetValue) {
+      setUpdatedSlippage(+event.target.value);
+      setInputValue(targetValue);
+    } else {
+      setUpdatedSlippage(0.5);
+      setInputValue('');
     }
-  }, []);
-
-  const handleInputChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const targetValue = event.target.value;
-      if (targetValue) {
-        setUpdatedSlippage(+event.target.value);
-        setInputValue(targetValue);
-      } else {
-        setUpdatedSlippage(0.5);
-        setInputValue('');
-      }
-    },
-    [setUpdatedSlippage]
-  );
+  };
 
   useEffect(() => {
     if (!inputValueChangedRef.current) {
@@ -168,7 +146,7 @@ export const OrderSettings = memo(() => {
         <Box className={styles.settings}>
           {orderType === OrderTypeE.Market && (
             <>
-              <SettingsIcon className={styles.settingsIcon} onClick={openSettingsModal} />
+              <SettingsIcon className={styles.settingsIcon} onClick={() => setShowSettingsModal(true)} />
               <Typography variant="bodyTiny">{t('pages.trade.order-block.slippage.title')}</Typography>
             </>
           )}
@@ -183,7 +161,7 @@ export const OrderSettings = memo(() => {
                 label={t('pages.trade.order-block.reduce-only')}
                 labelPlacement="end"
               />
-              <SettingsIcon className={styles.settingsIcon} onClick={openExpiryModal} />
+              <SettingsIcon className={styles.settingsIcon} onClick={() => setShowExpiryModal(true)} />
               <Typography variant="bodyTiny">{t('pages.trade.order-block.expiry.title')}</Typography>
             </Box>
           )}
@@ -204,7 +182,11 @@ export const OrderSettings = memo(() => {
               valueLabelFormat={valueLabelFormat}
               valueLabelDisplay="auto"
               marks={marks}
-              onChange={handleToleranceChange}
+              onChange={(_event, newValue) => {
+                if (typeof newValue === 'number') {
+                  setUpdatedSlippage(newValue);
+                }
+              }}
             />
           </Box>
           <Box className={styles.slippageBox}>
@@ -248,7 +230,7 @@ export const OrderSettings = memo(() => {
         </Box>
         <Separator />
         <DialogActions className={styles.dialogAction}>
-          <Button onClick={closeExpiryModal} variant="secondary" size="small">
+          <Button onClick={() => setShowExpiryModal(false)} variant="secondary" size="small">
             {t('pages.trade.order-block.expiry.close')}
           </Button>
         </DialogActions>

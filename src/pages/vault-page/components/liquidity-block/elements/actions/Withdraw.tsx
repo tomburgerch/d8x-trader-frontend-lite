@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useWaitForTransaction, useWalletClient } from 'wagmi';
@@ -19,8 +19,8 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
-import { formatToCurrency } from 'utils/formatToCurrency';
 import type { AddressT } from 'types/types';
+import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { Initiate } from './Initiate';
 
@@ -67,7 +67,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     enabled: !!txHash,
   });
 
-  const handleWithdrawLiquidity = useCallback(() => {
+  const handleWithdrawLiquidity = () => {
     if (requestSentRef.current) {
       return;
     }
@@ -102,7 +102,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [liqProvTool, selectedPool, walletClient, setTriggerUserStatsUpdate, setTriggerWithdrawalsUpdate, t]);
+  };
 
   const shareAmount = useMemo(() => {
     if (!withdrawals) {
@@ -138,9 +138,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     return 0;
   }, [dCurrencyPrice, withdrawals]);
 
-  const isButtonDisabled = useMemo(() => {
-    return !userAmount || !shareAmount || requestSent;
-  }, [userAmount, shareAmount, requestSent]);
+  const isButtonDisabled = !userAmount || !shareAmount || requestSent;
 
   return (
     <div className={styles.root}>

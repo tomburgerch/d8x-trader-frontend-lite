@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
@@ -39,14 +39,14 @@ import {
   traderAPIAtom,
   traderAPIBusyAtom,
 } from 'store/pools.store';
+import type { AddressT, MarginAccountI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import type { AddressT, MarginAccountI } from 'types/types';
 
 import { ModifyTypeE, ModifyTypeSelector } from '../../modify-type-selector/ModifyTypeSelector';
 
-import styles from '../Modal.module.scss';
 import { sdkConnectedAtom } from '../../../../../store/vault-pools.store';
+import styles from '../Modal.module.scss';
 
 interface ModifyModalPropsI {
   isOpen: boolean;
@@ -159,14 +159,6 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
     if (maxCollateral) {
       setRemoveCollateral(maxCollateral);
     }
-  };
-
-  const handleAddCollateralCapture = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setAddCollateral(+event.target.value);
-  };
-
-  const handleRemoveCollateralCapture = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setRemoveCollateral(+event.target.value);
   };
 
   const debouncedAddCollateral = useDebounce(addCollateral, 500);
@@ -439,7 +431,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                   type="number"
                   inputProps={{ step: 0.1, min: 0 }}
                   defaultValue={addCollateral}
-                  onChange={handleAddCollateralCapture}
+                  onChange={(event) => setAddCollateral(+event.target.value)}
                 />
               }
             />
@@ -460,7 +452,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                       type="number"
                       inputProps={{ step: 0.1, min: 0, max: maxCollateral }}
                       value={removeCollateral}
-                      onChange={handleRemoveCollateralCapture}
+                      onChange={(event) => setRemoveCollateral(+event.target.value)}
                     />
                   </FormControl>
                 }

@@ -139,7 +139,7 @@ export const WalletConnectButton = memo(({ buttonClassName }: WalletConnectButto
     }
     unloadSDK();
     loadSDK(publicClient, chainId)
-      .then(() => {})
+      .then()
       .catch((err) => console.log(err));
   }, [isConnected, publicClient, chainId, loadSDK, unloadSDK]);
 
