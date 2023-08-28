@@ -110,7 +110,17 @@ export const OpenOrdersTable = memo(() => {
           setAPIBusy(false);
         });
     }
-  }, [chainId, address, selectedPool, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders, traderAPI]);
+  }, [
+    chainId,
+    address,
+    selectedPool,
+    isConnected,
+    isSDKConnected,
+    setAPIBusy,
+    setOpenOrders,
+    clearOpenOrders,
+    traderAPI,
+  ]);
 
   useWaitForTransaction({
     hash: txHash,

@@ -1,5 +1,5 @@
 import { useSetAtom } from 'jotai';
-import { memo, useEffect } from 'react';
+import { Suspense, memo, useEffect } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { ToastContainer } from 'react-toastify';
 

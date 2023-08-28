@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId } from 'wagmi';

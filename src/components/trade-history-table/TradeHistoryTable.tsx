@@ -1,5 +1,4 @@
 import { useAtom, useSetAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
