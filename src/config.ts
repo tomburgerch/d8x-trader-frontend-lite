@@ -1,5 +1,6 @@
 const {
   VITE_PROJECT_ID: projectId = '',
+  VITE_GEONAMES_USERNAME: geonamesUsername = '',
   VITE_API_URL: apiUrls = '',
   VITE_HISTORY_URL: historyUrls = '',
   VITE_REFERRAL_URL: referralUrls = '',
@@ -25,7 +26,8 @@ function parseUrls(urlData: string): Record<string, string> {
 }
 
 export const config = {
-  projectId: projectId,
+  projectId,
+  geonamesUsername,
   apiUrl: parseUrls(apiUrls),
   historyUrl: parseUrls(historyUrls),
   referralUrl: parseUrls(referralUrls),

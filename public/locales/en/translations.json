@@ -5,6 +5,13 @@
     "vault": "Vault"
   },
   "pages": {
+    "geolocation": {
+      "access-denied": "Location access denied. Please allow location.",
+      "access-blocked": "Access to our page from your country is blocked.",
+      "not-supported": "Geolocation is not supported by your browser.",
+      "locating": "Locating...",
+      "getting-location": "Getting info about location."
+    },
     "trade": {
       "stats": {
         "mid-price": "Mid Price",

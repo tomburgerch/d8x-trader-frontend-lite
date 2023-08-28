@@ -9,7 +9,7 @@ import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
 import { Header } from 'components/header/Header';
 import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
-import { Helmet } from 'components/helmet';
+import { Helmet } from 'components/helmet/Helmet';
 import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';

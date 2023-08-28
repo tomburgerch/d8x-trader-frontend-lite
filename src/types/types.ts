@@ -2,7 +2,15 @@ import { type SmartContractOrder } from '@d8x/perpetuals-sdk';
 import { type Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
-import { type AlignE, type ExpiryE, type LanguageE, type OrderBlockE, type OrderTypeE, type StopLossE, type TakeProfitE } from './enums';
+import {
+  type AlignE,
+  type ExpiryE,
+  type LanguageE,
+  type OrderBlockE,
+  type OrderTypeE,
+  type StopLossE,
+  type TakeProfitE,
+} from './enums';
 
 export interface LanguageMetaI {
   id: LanguageE;
@@ -76,6 +84,11 @@ export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
   proxyAddr: string;
+}
+
+// Covered only required fields
+export interface GeoLocationDataI {
+  countryCode: string;
 }
 
 export interface PerpetualStaticInfoI {
