@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@d8x/perpetuals-sdk':
-    specifier: 0.8.36
-    version: 0.8.36(typescript@5.1.6)
+    specifier: 0.8.38
+    version: 0.8.38(typescript@5.1.6)
   '@emotion/react':
     specifier: 11.11.1
     version: 11.11.1(@types/react@18.2.20)(react@18.2.0)
@@ -1645,8 +1645,8 @@ packages:
       postcss-selector-parser: 6.0.13
     dev: true
 
-  /@d8x/perpetuals-sdk@0.8.36(typescript@5.1.6):
-    resolution: {integrity: sha512-VvLp1oqtOoPHm9Cm58+MJjJE+aARgdij2+L47AUE7iqviFLkuMymOiJGSGr+0IzXykneatVD0SbocPbLnPQv0w==}
+  /@d8x/perpetuals-sdk@0.8.38(typescript@5.1.6):
+    resolution: {integrity: sha512-HItQS8pRVs/Ddt3HB7E1GVHugHPvFZSxK/ixBnZQJzrpZNlkXwLGUAM0ZSVWc8eOgBCtZnqz+1ZQ2fj3F8c7AQ==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-signer': 5.7.0
