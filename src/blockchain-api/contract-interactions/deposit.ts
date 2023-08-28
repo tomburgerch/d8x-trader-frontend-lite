@@ -1,13 +1,13 @@
 import { PROXY_ABI } from '@d8x/perpetuals-sdk';
-import type { Account, Transport, WalletClient } from 'viem';
+import type { Account, Address, Transport, WalletClient } from 'viem';
 import type { Chain } from 'wagmi';
 
-import type { CollateralChangeResponseI, AddressT } from 'types/types';
+import type { CollateralChangeResponseI } from 'types/types';
 
 export function deposit(
   walletClient: WalletClient<Transport, Chain, Account>,
   data: CollateralChangeResponseI
-): Promise<{ hash: AddressT }> {
+): Promise<{ hash: Address }> {
   const account = walletClient.account?.address;
   if (account === undefined) {
     throw new Error('account is undefined');
@@ -15,7 +15,7 @@ export function deposit(
   return walletClient
     .writeContract({
       chain: walletClient.chain,
-      address: data.proxyAddr as AddressT,
+      address: data.proxyAddr as Address,
       abi: PROXY_ABI,
       functionName: 'deposit',
       args: [data.perpId, +data.amountHex, data.priceUpdate.updateData, data.priceUpdate.publishTimes],

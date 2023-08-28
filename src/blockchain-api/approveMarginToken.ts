@@ -1,10 +1,9 @@
 import { readContract, waitForTransaction } from '@wagmi/core';
-import type { Account, Transport, WalletClient } from 'viem';
+import type { Account, Address, Transport, WalletClient } from 'viem';
 import { parseUnits } from 'viem';
 import { erc20ABI, type Chain } from 'wagmi';
 
 import { MaxUint256 } from 'app-constants';
-import type { AddressT } from 'types/types';
 
 export function approveMarginToken(
   walletClient: WalletClient<Transport, Chain, Account>,
@@ -15,10 +14,10 @@ export function approveMarginToken(
 ) {
   const minAmountBN = parseUnits((4 * minAmount).toFixed(decimals), decimals);
   return readContract({
-    address: marginTokenAddr as AddressT,
+    address: marginTokenAddr as Address,
     abi: erc20ABI,
     functionName: 'allowance',
-    args: [walletClient.account.address, proxyAddr as AddressT],
+    args: [walletClient.account.address, proxyAddr as Address],
   }).then((allowance) => {
     if (allowance > minAmountBN) {
       return Promise.resolve(null);
@@ -30,10 +29,10 @@ export function approveMarginToken(
       return walletClient
         .writeContract({
           chain: walletClient.chain,
-          address: marginTokenAddr as AddressT,
+          address: marginTokenAddr as Address,
           abi: erc20ABI,
           functionName: 'approve',
-          args: [proxyAddr as AddressT, BigInt(MaxUint256)],
+          args: [proxyAddr as Address, BigInt(MaxUint256)],
           gas: BigInt(100_000),
           account: account,
         })

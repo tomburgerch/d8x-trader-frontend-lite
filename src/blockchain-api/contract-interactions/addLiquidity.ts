@@ -1,13 +1,12 @@
-import { PROXY_ABI, TraderInterface, floatToDecN } from '@d8x/perpetuals-sdk';
-import { AddressT } from 'types/types';
-import { WalletClient } from 'viem';
+import { PROXY_ABI, type TraderInterface, floatToDecN } from '@d8x/perpetuals-sdk';
+import { type Address, type WalletClient } from 'viem';
 
 export async function addLiquidity(
   walletClient: WalletClient,
   traderAPI: TraderInterface,
   symbol: string,
   amount: number
-): Promise<{ hash: AddressT }> {
+): Promise<{ hash: Address }> {
   const decimals = traderAPI.getMarginTokenDecimalsFromSymbol(symbol);
   const poolId = traderAPI.getPoolIdFromSymbol(symbol);
   const account = walletClient.account?.address;
@@ -18,7 +17,7 @@ export async function addLiquidity(
   return walletClient
     .writeContract({
       chain: walletClient.chain,
-      address: traderAPI.getProxyAddress() as AddressT,
+      address: traderAPI.getProxyAddress() as Address,
       abi: PROXY_ABI,
       functionName: 'addLiquidity',
       args: [poolId, amountParsed],

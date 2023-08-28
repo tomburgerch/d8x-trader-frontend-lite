@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAccount, useChainId } from 'wagmi';
+import { type Address, useAccount, useChainId } from 'wagmi';
 
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
@@ -17,7 +17,7 @@ import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
-import { SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { type SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { getOpenOrders, getPositionRisk, getTradingFee } from 'network/network';
 import { ChartHolder } from 'pages/trader-page/components/chart-holder/ChartHolder';
@@ -32,7 +32,6 @@ import {
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { TableTypeE } from 'types/enums';
-import type { AddressT } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
@@ -66,7 +65,7 @@ export const TraderPage = () => {
   const location = useLocation();
 
   const fetchPositions = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: AddressT) => {
+    async (_chainId: number, _poolSymbol: string, _address: Address) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchPositionsRef.current) {
         return;
       }
@@ -87,7 +86,7 @@ export const TraderPage = () => {
   );
 
   const fetchOrders = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: AddressT) => {
+    async (_chainId: number, _poolSymbol: string, _address: Address) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchOrdersRef.current) {
         return;
       }
@@ -108,7 +107,7 @@ export const TraderPage = () => {
   );
 
   const fetchFee = useCallback(
-    (_chainId: number, _poolSymbol: string, _address: string) => {
+    (_chainId: number, _poolSymbol: string, _address: Address) => {
       if (fetchFeeRef.current) {
         return;
       }

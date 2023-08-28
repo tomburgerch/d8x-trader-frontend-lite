@@ -4,7 +4,7 @@ import { Box, Button, Card, CardContent, CardHeader } from '@mui/material';
 
 import { Refresher } from './elements/refresher/Refresher';
 
-import { TableTypeE } from 'types/enums';
+import { type TableTypeE } from 'types/enums';
 
 import styles from './TableSelector.module.scss';
 

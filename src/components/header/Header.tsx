@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
+import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -22,7 +22,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
-import type { AddressT, ExchangeInfoI, PerpetualDataI } from 'types/types';
+import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
 import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
@@ -132,10 +132,10 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
     isError,
     refetch,
   } = useBalance({
-    address: address,
-    token: selectedPool?.marginTokenAddr as AddressT | undefined,
+    address,
+    token: selectedPool?.marginTokenAddr as Address,
     chainId: chain?.id,
-    enabled: !requestRef.current && address !== undefined && chainId === chain?.id && !!selectedPool?.marginTokenAddr,
+    enabled: !requestRef.current && address && chainId === chain?.id && !!selectedPool?.marginTokenAddr,
   });
 
   useEffect(() => {

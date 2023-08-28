@@ -1,8 +1,8 @@
-import { SmartContractOrder } from '@d8x/perpetuals-sdk';
-import { Time } from 'lightweight-charts';
+import { type SmartContractOrder } from '@d8x/perpetuals-sdk';
+import { type Time } from 'lightweight-charts';
 import type { ReactNode } from 'react';
 
-import { AlignE, ExpiryE, LanguageE, OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from './enums';
+import { type AlignE, type ExpiryE, type LanguageE, type OrderBlockE, type OrderTypeE, type StopLossE, type TakeProfitE } from './enums';
 
 export interface LanguageMetaI {
   id: LanguageE;
@@ -10,8 +10,6 @@ export interface LanguageMetaI {
   flag: string;
   name: string;
 }
-
-export type AddressT = `0x${string}`;
 
 export interface AppDimensionsI {
   width?: number;

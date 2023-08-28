@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useWaitForTransaction, useWalletClient } from 'wagmi';
+import { type Address, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
@@ -19,7 +19,6 @@ import {
   userAmountAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
-import type { AddressT } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { Initiate } from './Initiate';
@@ -43,7 +42,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const { data: walletClient } = useWalletClient();
 
   const [requestSent, setRequestSent] = useState(false);
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const requestSentRef = useRef(false);
 
