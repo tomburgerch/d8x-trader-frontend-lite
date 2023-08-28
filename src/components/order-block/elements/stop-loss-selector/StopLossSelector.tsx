@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import { useAtom } from 'jotai';
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
@@ -18,7 +18,7 @@ export const StopLossSelector = memo(() => {
   const { t } = useTranslation();
   const [orderInfo] = useAtom(orderInfoAtom);
   const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
-  const [, setStopLossPrice] = useAtom(stopLossPriceAtom);
+  const setStopLossPrice = useSetAtom(stopLossPriceAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
 
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
@@ -26,27 +26,21 @@ export const StopLossSelector = memo(() => {
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const handleStopLossPriceChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const stopLossPriceValue = event.target.value;
-      if (stopLossPriceValue !== '') {
-        setStopLossInputPrice(+stopLossPriceValue);
-        setStopLoss(null);
-      } else {
-        setStopLossInputPrice(null);
-      }
-    },
-    [setStopLoss]
-  );
-
-  const handleStopLossChange = useCallback(
-    (stopLossValue: StopLossE) => {
-      setStopLossPrice(null);
+  const handleStopLossPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const stopLossPriceValue = event.target.value;
+    if (stopLossPriceValue !== '') {
+      setStopLossInputPrice(+stopLossPriceValue);
+      setStopLoss(null);
+    } else {
       setStopLossInputPrice(null);
-      setStopLoss(stopLossValue);
-    },
-    [setStopLossPrice, setStopLoss]
-  );
+    }
+  };
+
+  const handleStopLossChange = (stopLossValue: StopLossE) => {
+    setStopLossPrice(null);
+    setStopLossInputPrice(null);
+    setStopLoss(stopLossValue);
+  };
 
   const minStopLossPrice = useMemo(() => {
     if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Short) {

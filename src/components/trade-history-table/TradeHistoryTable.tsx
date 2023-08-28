@@ -1,5 +1,4 @@
-import { useAtom } from 'jotai';
-import type { ChangeEvent } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
@@ -37,7 +36,7 @@ export const TradeHistoryTable = memo(() => {
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [openOrders] = useAtom(openOrdersAtom);
-  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
 
   const updateTradesHistoryRef = useRef(false);
@@ -72,15 +71,6 @@ export const TradeHistoryTable = memo(() => {
   useEffect(() => {
     refreshTradesHistory();
   }, [openOrders, refreshTradesHistory]);
-
-  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  }, []);
 
   const tradeHistoryHeaders: TableHeaderI[] = useMemo(
     () => [
@@ -168,8 +158,11 @@ export const TradeHistoryTable = memo(() => {
             count={tradesHistory.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(+event.target.value);
+              setPage(0);
+            }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
         </Box>

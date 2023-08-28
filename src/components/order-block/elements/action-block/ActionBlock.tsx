@@ -1,12 +1,12 @@
-import { HashZero } from '@ethersproject/constants';
-import { useAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
+import { HashZero } from 'app-constants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
@@ -30,7 +30,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import type { AddressT, OrderI, OrderInfoI } from 'types/types';
+import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -116,25 +116,20 @@ export const ActionBlock = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
-  const [, clearInputsData] = useAtom(clearInputsDataAtom);
-  const [, setOpenOrders] = useAtom(openOrdersAtom);
+  const clearInputsData = useSetAtom(clearInputsDataAtom);
+  const setOpenOrders = useSetAtom(openOrdersAtom);
 
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const requestSentRef = useRef(false);
-  const traderAPIRef = useRef(traderAPI);
   const validityCheckRef = useRef(false);
 
-  useEffect(() => {
-    traderAPIRef.current = traderAPI;
-  }, [traderAPI]);
-
-  const openReviewOrderModal = useCallback(async () => {
-    if (!orderInfo || !address || !traderAPIRef.current) {
+  const openReviewOrderModal = async () => {
+    if (!orderInfo || !address || !traderAPI) {
       return;
     }
     validityCheckRef.current = true;
@@ -144,7 +139,7 @@ export const ActionBlock = memo(() => {
     const mainOrder = createMainOrder(orderInfo);
     await positionRiskOnTrade(
       chainId,
-      traderAPIRef.current,
+      traderAPI,
       mainOrder,
       address,
       positions?.find((pos) => pos.symbol === orderInfo.symbol)
@@ -158,12 +153,12 @@ export const ActionBlock = memo(() => {
       .finally(() => {
         validityCheckRef.current = false;
       });
-  }, [orderInfo, chainId, address, positions, setNewPositionRisk, setCollateralDeposit]);
+  };
 
-  const closeReviewOrderModal = useCallback(() => {
+  const closeReviewOrderModal = () => {
     setShowReviewOrderModal(false);
     setIsValidityCheckDone(false);
-  }, []);
+  };
 
   const isBuySellButtonActive = useMemo(() => {
     if (!orderInfo || !address) {
@@ -257,7 +252,7 @@ export const ActionBlock = memo(() => {
     },
     onSettled() {
       setTxHash(undefined);
-      getOpenOrders(chainId, traderAPIRef.current, orderInfo?.symbol as string, address as AddressT)
+      getOpenOrders(chainId, traderAPI, orderInfo?.symbol as string, address as Address)
         .then(({ data: d }) => {
           if (d && d.length > 0) {
             d.map((o) => setOpenOrders(o));
@@ -268,7 +263,7 @@ export const ActionBlock = memo(() => {
     enabled: !!address && !!orderInfo && !!txHash,
   });
 
-  const handleOrderConfirm = useCallback(() => {
+  const handleOrderConfirm = () => {
     if (!address || !walletClient || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
       return;
     }
@@ -333,18 +328,7 @@ export const ActionBlock = memo(() => {
         setRequestSent(false);
         setShowReviewOrderModal(false);
       });
-  }, [
-    parsedOrders,
-    chainId,
-    address,
-    walletClient,
-    selectedPool,
-    proxyAddr,
-    collateralDeposit,
-    poolTokenDecimals,
-    clearInputsData,
-    t,
-  ]);
+  };
 
   const atPrice = useMemo(() => {
     if (orderInfo) {
@@ -361,7 +345,7 @@ export const ActionBlock = memo(() => {
 
   const isMarketClosed = useDebounce(
     useMemo(() => {
-      return selectedPerpetual && selectedPerpetual.isMarketClosed;
+      return selectedPerpetual?.isMarketClosed;
     }, [selectedPerpetual]),
     30_000
   );

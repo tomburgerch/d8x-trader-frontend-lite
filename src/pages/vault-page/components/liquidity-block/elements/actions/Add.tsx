@@ -1,8 +1,8 @@
-import { useAtom } from 'jotai';
-import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { type Address, useAccount, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
@@ -19,8 +19,7 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { dCurrencyPriceAtom, triggerUserStatsUpdateAtom, sdkConnectedAtom } from 'store/vault-pools.store';
-import type { AddressT } from 'types/types';
+import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
@@ -38,7 +37,7 @@ export const Add = memo(() => {
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [liqProvTool] = useAtom(traderAPIAtom);
   const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
-  const [, setTriggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
+  const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
@@ -47,7 +46,7 @@ export const Add = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
 
   const [inputValue, setInputValue] = useState(`${addAmount}`);
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
@@ -90,7 +89,7 @@ export const Add = memo(() => {
     enabled: !!txHash,
   });
 
-  const handleAddLiquidity = useCallback(() => {
+  const handleAddLiquidity = () => {
     if (requestSentRef.current) {
       return;
     }
@@ -131,24 +130,7 @@ export const Add = memo(() => {
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [
-    addAmount,
-    liqProvTool,
-    selectedPool,
-    address,
-    proxyAddr,
-    walletClient,
-    isSDKConnected,
-    poolTokenDecimals,
-    setTriggerUserStatsUpdate,
-    t,
-  ]);
-
-  const handleMaxAmount = useCallback(() => {
-    if (poolTokenBalance) {
-      handleInputCapture(`${poolTokenBalance}`);
-    }
-  }, [handleInputCapture, poolTokenBalance]);
+  };
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
@@ -197,8 +179,16 @@ export const Add = memo(() => {
         </Box>
         {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
-            {t('pages.vault.add.max')}{' '}
-            <Link onClick={handleMaxAmount}>{formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}</Link>
+            {t('pages.vault.add.max')} {/* //TODO: Link? To where? */}
+            <Link
+              onClick={() => {
+                if (poolTokenBalance) {
+                  handleInputCapture(`${poolTokenBalance}`);
+                }
+              }}
+            >
+              {formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}
+            </Link>
           </Typography>
         ) : null}
         <Box className={styles.iconSeparator}>

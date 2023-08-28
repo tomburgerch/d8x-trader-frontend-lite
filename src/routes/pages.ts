@@ -1,22 +1,28 @@
-import { PageE } from 'types/enums';
-import { PageI } from 'types/types';
+import { RoutesE } from './RoutesE';
+
+export interface PageI {
+  id: string;
+  path: RoutesE | string;
+  title: string;
+  translationKey: string;
+}
 
 export const pages: PageI[] = [
   {
     id: 'trade',
-    path: PageE.Trade,
+    path: RoutesE.Trade,
     title: 'Trade',
     translationKey: 'navigation.trade',
   },
   {
     id: 'refer',
-    path: PageE.Refer,
+    path: RoutesE.Refer,
     title: 'Refer',
     translationKey: 'navigation.refer',
   },
   {
     id: 'vault',
-    path: PageE.Vault,
+    path: RoutesE.Vault,
     title: 'Vault',
     translationKey: 'navigation.vault',
   },

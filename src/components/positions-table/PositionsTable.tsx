@@ -1,5 +1,5 @@
-import { useAtom } from 'jotai';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
@@ -40,18 +40,17 @@ import styles from './PositionsTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 
-export const PositionsTable = memo(() => {
+export const PositionsTable = () => {
   const { t } = useTranslation();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
-  const [, removePosition] = useAtom(removePositionAtom);
+  const removePosition = useSetAtom(removePositionAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
-  const [, setTableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
-  const traderAPIRef = useRef(traderAPI);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();
@@ -98,29 +97,26 @@ export const PositionsTable = memo(() => {
   }, [selectedPool, removePosition]);
 
   useEffect(() => {
-    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
+    if (isDisconnected || traderAPI?.chainId !== chainId) {
       clearPositions();
     }
-  }, [isDisconnected, chainId, clearPositions]);
+  }, [isDisconnected, chainId, clearPositions, traderAPI]);
 
   const refreshPositions = useCallback(async () => {
     if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== traderAPIRef.current?.chainId) {
+      if (isAPIBusyRef.current || chainId !== traderAPI?.chainId) {
         return;
       }
       setAPIBusy(true);
-      await getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
-        .then(({ data }) => {
-          setAPIBusy(false);
-          clearPositions();
-          if (data && data.length > 0) {
-            data.map((p) => setPositions(p));
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setAPIBusy(false);
-        });
+      try {
+        const { data } = await getPositionRisk(chainId, traderAPI, selectedPool.poolSymbol, address, Date.now());
+        clearPositions();
+        data.map(setPositions);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAPIBusy(false);
+      }
     }
   }, [
     chainId,
@@ -131,26 +127,12 @@ export const PositionsTable = memo(() => {
     setAPIBusy,
     setPositions,
     clearPositions,
+    traderAPI,
   ]);
-
-  useEffect(() => {
-    if (isSDKConnected) {
-      traderAPIRef.current = traderAPI;
-    }
-  }, [traderAPI, isSDKConnected]);
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
-
-  const handleChangePage = useCallback((_event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const handleChangeRowsPerPage = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  }, []);
 
   const positionsHeaders: TableHeaderI[] = useMemo(
     () => [
@@ -240,8 +222,11 @@ export const PositionsTable = memo(() => {
             count={positions.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(+event.target.value);
+              setPage(0);
+            }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
         </Box>
@@ -251,4 +236,4 @@ export const PositionsTable = memo(() => {
       <CloseModal isOpen={isCloseModalOpen} selectedPosition={selectedPosition} closeModal={closeCloseModal} />
     </div>
   );
-});
+};

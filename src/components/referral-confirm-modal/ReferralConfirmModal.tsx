@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -13,10 +13,10 @@ import { useQuery } from 'hooks/useQuery';
 import { useReferralCodes } from 'hooks/useReferralCodes';
 import { getReferralCodeExists, postUseReferralCode } from 'network/referral';
 import { QueryParamE, ReferTabIdE } from 'pages/refer-page/constants';
-import { PageE } from 'types/enums';
+import { RoutesE } from 'routes/RoutesE';
 
-import styles from './ReferralConfirmModal.module.scss';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
+import styles from './ReferralConfirmModal.module.scss';
 
 const REF_ID_QUERY_PARAM = 'ref';
 
@@ -41,7 +41,7 @@ export const ReferralConfirmModal = memo(() => {
 
   const refId = query.get(REF_ID_QUERY_PARAM);
 
-  const handleModalClose = useCallback(() => {
+  const handleModalClose = () => {
     if (refId) {
       query.delete(REF_ID_QUERY_PARAM);
 
@@ -50,13 +50,9 @@ export const ReferralConfirmModal = memo(() => {
       navigate(`${location.pathname}${paramsStr}${location.hash}`, { replace: true });
     }
     setShowModal(false);
-  }, [query, refId, location, navigate]);
+  };
 
-  const onCodeApplySuccess = useCallback(() => {
-    navigate(`${PageE.Refer}?${QueryParamE.Tab}=${ReferTabIdE.Trader}`, { replace: true });
-  }, [navigate]);
-
-  const handleReferralCodeConfirm = useCallback(async () => {
+  const handleReferralCodeConfirm = async () => {
     if (requestSentRef.current || !refId || refIdTraderRebate === null || !address || !walletClient) {
       return;
     }
@@ -69,13 +65,13 @@ export const ReferralConfirmModal = memo(() => {
       requestSentRef.current = false;
       setRequestSent(false);
       toast.success(<ToastContent title={t('pages.refer.toast.success-apply')} bodyLines={[]} />);
-      onCodeApplySuccess();
+      navigate(`${RoutesE.Refer}?${QueryParamE.Tab}=${ReferTabIdE.Trader}`, { replace: true });
     } catch (err) {
       requestSentRef.current = false;
       setRequestSent(false);
       console.error(err);
     }
-  }, [refId, refIdTraderRebate, chainId, address, walletClient, onCodeApplySuccess, t]);
+  };
 
   useEffect(() => {
     if (chainId && refId) {
