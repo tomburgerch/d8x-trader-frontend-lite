@@ -42,7 +42,6 @@ export const OrderSize = memo(() => {
   const chainId = useChainId();
 
   const inputValueChangedRef = useRef(false);
-  const traderAPIRef = useRef(traderAPI);
   const fetchedMaxSizes = useRef(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const latestCurrency = useRef('');
@@ -202,12 +201,6 @@ export const OrderSize = memo(() => {
       setMaxOrderSize(maxOrderSizeInBase * currentMultiplier);
     }
   }, [maxOrderSizeInBase, currentMultiplier]);
-
-  useEffect(() => {
-    if (isSDKConnected) {
-      traderAPIRef.current = traderAPI;
-    }
-  }, [traderAPI, isSDKConnected]);
 
   const handleCurrencyChangeToggle = () => {
     setOpenCurrencySelector((prevOpen) => !prevOpen);

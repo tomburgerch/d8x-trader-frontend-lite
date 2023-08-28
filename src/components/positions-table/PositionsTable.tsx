@@ -1,5 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
@@ -51,7 +51,6 @@ export const PositionsTable = () => {
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
-  const traderAPIRef = useRef(traderAPI);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   const chainId = useChainId();
@@ -98,29 +97,26 @@ export const PositionsTable = () => {
   }, [selectedPool, removePosition]);
 
   useEffect(() => {
-    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
+    if (isDisconnected || traderAPI?.chainId !== chainId) {
       clearPositions();
     }
-  }, [isDisconnected, chainId, clearPositions]);
+  }, [isDisconnected, chainId, clearPositions, traderAPI]);
 
   const refreshPositions = useCallback(async () => {
     if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== traderAPIRef.current?.chainId) {
+      if (isAPIBusyRef.current || chainId !== traderAPI?.chainId) {
         return;
       }
       setAPIBusy(true);
-      await getPositionRisk(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
-        .then(({ data }) => {
-          setAPIBusy(false);
-          clearPositions();
-          if (data?.length > 0) {
-            data.map(setPositions);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setAPIBusy(false);
-        });
+      try {
+        const { data } = await getPositionRisk(chainId, traderAPI, selectedPool.poolSymbol, address, Date.now());
+        clearPositions();
+        data.map(setPositions);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAPIBusy(false);
+      }
     }
   }, [
     chainId,
@@ -131,13 +127,8 @@ export const PositionsTable = () => {
     setAPIBusy,
     setPositions,
     clearPositions,
+    traderAPI,
   ]);
-
-  useEffect(() => {
-    if (isSDKConnected) {
-      traderAPIRef.current = traderAPI;
-    }
-  }, [traderAPI, isSDKConnected]);
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));

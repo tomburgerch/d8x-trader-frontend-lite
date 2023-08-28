@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
-import { decodeEventLog, encodeEventTopics } from 'viem';
+import { type Address, decodeEventLog, encodeEventTopics } from 'viem';
 import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import {
@@ -39,7 +39,7 @@ import {
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, TableTypeE } from 'types/enums';
-import type { AddressT, OrderWithIdI, TableHeaderI } from 'types/types';
+import type { OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
@@ -71,16 +71,15 @@ export const OpenOrdersTable = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
-  const traderAPIRef = useRef(traderAPI);
   const isAPIBusyRef = useRef(isAPIBusy);
 
   useEffect(() => {
-    if (isDisconnected || traderAPIRef.current?.chainId !== chainId) {
+    if (isDisconnected || traderAPI?.chainId !== chainId) {
       clearOpenOrders();
     }
-  }, [isDisconnected, chainId, clearOpenOrders]);
+  }, [isDisconnected, chainId, clearOpenOrders, traderAPI]);
 
   const handleOrderCancel = useCallback((order: OrderWithIdI) => {
     setCancelModalOpen(true);
@@ -94,11 +93,11 @@ export const OpenOrdersTable = memo(() => {
 
   const refreshOpenOrders = useCallback(async () => {
     if (selectedPool?.poolSymbol && address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== traderAPIRef.current?.chainId) {
+      if (isAPIBusyRef.current || chainId !== traderAPI?.chainId) {
         return;
       }
       setAPIBusy(true);
-      await getOpenOrders(chainId, traderAPIRef.current, selectedPool.poolSymbol, address, Date.now())
+      await getOpenOrders(chainId, traderAPI, selectedPool.poolSymbol, address, Date.now())
         .then(({ data }) => {
           setAPIBusy(false);
           clearOpenOrders();
@@ -111,7 +110,7 @@ export const OpenOrdersTable = memo(() => {
           setAPIBusy(false);
         });
     }
-  }, [chainId, address, selectedPool, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders]);
+  }, [chainId, address, selectedPool, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders, traderAPI]);
 
   useWaitForTransaction({
     hash: txHash,
@@ -183,7 +182,7 @@ export const OpenOrdersTable = memo(() => {
     }
 
     setRequestSent(true);
-    getCancelOrder(chainId, traderAPIRef.current, selectedOrder.symbol, selectedOrder.id)
+    getCancelOrder(chainId, traderAPI, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           cancelOrder(walletClient, HashZero, data.data, selectedOrder.id)
@@ -212,12 +211,6 @@ export const OpenOrdersTable = memo(() => {
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
   }, [refreshOpenOrders, setTableRefreshHandlers]);
-
-  useEffect(() => {
-    if (isSDKConnected) {
-      traderAPIRef.current = traderAPI;
-    }
-  }, [traderAPI, isSDKConnected]);
 
   const openOrdersHeaders: TableHeaderI[] = useMemo(
     () => [

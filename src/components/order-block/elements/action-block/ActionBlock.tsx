@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -30,7 +30,7 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import type { AddressT, OrderI, OrderInfoI } from 'types/types';
+import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
@@ -123,18 +123,13 @@ export const ActionBlock = memo(() => {
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
-  const [txHash, setTxHash] = useState<AddressT | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const requestSentRef = useRef(false);
-  const traderAPIRef = useRef(traderAPI);
   const validityCheckRef = useRef(false);
 
-  useEffect(() => {
-    traderAPIRef.current = traderAPI;
-  }, [traderAPI]);
-
   const openReviewOrderModal = async () => {
-    if (!orderInfo || !address || !traderAPIRef.current) {
+    if (!orderInfo || !address || !traderAPI) {
       return;
     }
     validityCheckRef.current = true;
@@ -144,7 +139,7 @@ export const ActionBlock = memo(() => {
     const mainOrder = createMainOrder(orderInfo);
     await positionRiskOnTrade(
       chainId,
-      traderAPIRef.current,
+      traderAPI,
       mainOrder,
       address,
       positions?.find((pos) => pos.symbol === orderInfo.symbol)
@@ -257,7 +252,7 @@ export const ActionBlock = memo(() => {
     },
     onSettled() {
       setTxHash(undefined);
-      getOpenOrders(chainId, traderAPIRef.current, orderInfo?.symbol as string, address as AddressT)
+      getOpenOrders(chainId, traderAPI, orderInfo?.symbol as string, address as Address)
         .then(({ data: d }) => {
           if (d && d.length > 0) {
             d.map((o) => setOpenOrders(o));

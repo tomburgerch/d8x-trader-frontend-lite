@@ -87,8 +87,6 @@ export function useWsMessageHandler() {
   const failOpenOrder = useSetAtom(failOrderAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
 
-  const traderAPIRef = useRef(traderAPI);
-
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
       if (selectedPool && selectedPerpetual) {
@@ -164,7 +162,7 @@ export function useWsMessageHandler() {
           return;
         }
         // refresh open orders
-        getOpenOrders(chainId, traderAPIRef.current, parsedMessage.data.obj.symbol, address)
+        getOpenOrders(chainId, traderAPI, parsedMessage.data.obj.symbol, address)
           .then(({ data }) => {
             if (data?.length > 0) {
               data.map(setOpenOrders);
@@ -221,6 +219,7 @@ export function useWsMessageHandler() {
       chainId,
       address,
       t,
+      traderAPI,
     ]
   );
 }
