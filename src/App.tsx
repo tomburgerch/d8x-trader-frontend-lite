@@ -1,12 +1,11 @@
 import { useSetAtom } from 'jotai';
-import { Suspense, memo, useEffect } from 'react';
+import { memo, Suspense, useEffect } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { ToastContainer } from 'react-toastify';
 
 import { Box } from '@mui/material';
 
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
-import { StaticBackground } from 'components/static-background/StaticBackground';
 import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
 import { AppRoutes } from 'routes/routes';
 import { appDimensionsAtom } from 'store/app.store';
@@ -33,7 +32,6 @@ export const App = memo(() => {
   return (
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
-        <StaticBackground />
         <Suspense fallback={null}>
           <AppRoutes />
         </Suspense>
