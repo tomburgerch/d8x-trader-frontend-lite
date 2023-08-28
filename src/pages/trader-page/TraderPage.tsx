@@ -70,17 +70,14 @@ export const TraderPage = () => {
         return;
       }
       fetchPositionsRef.current = true;
-      await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address)
-        .then(({ data }) => {
-          if (data.length > 0) {
-            data.map((p) => setPositions(p));
-          }
-          fetchFeeRef.current = false;
-        })
-        .catch((err) => {
-          console.error(err);
-          fetchPositionsRef.current = false;
-        });
+      try {
+        const { data } = await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address);
+        data.map(setPositions);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        fetchPositionsRef.current = false;
+      }
     },
     [traderAPI, isSDKConnected, setPositions]
   );
@@ -91,37 +88,33 @@ export const TraderPage = () => {
         return;
       }
       fetchOrdersRef.current = true;
-      await getOpenOrders(_chainId, traderAPI, _poolSymbol, _address)
-        .then(({ data }) => {
-          if (data && data.length > 0) {
-            data.map((orders) => setOpenOrders(orders));
-          }
-          fetchFeeRef.current = false;
-        })
-        .catch((err) => {
-          console.error(err);
-          fetchOrdersRef.current = false;
-        });
+      try {
+        const { data } = await getOpenOrders(_chainId, traderAPI, _poolSymbol, _address);
+        data.map(setOpenOrders);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        fetchOrdersRef.current = false;
+      }
     },
     [traderAPI, isSDKConnected, setOpenOrders]
   );
 
   const fetchFee = useCallback(
-    (_chainId: number, _poolSymbol: string, _address: Address) => {
+    async (_chainId: number, _poolSymbol: string, _address: Address) => {
       if (fetchFeeRef.current) {
         return;
       }
       fetchFeeRef.current = true;
       setPoolFee(undefined);
-      getTradingFee(_chainId, _poolSymbol, _address)
-        .then(({ data }) => {
-          setPoolFee(data);
-          fetchFeeRef.current = false;
-        })
-        .catch((error) => {
-          console.error(error);
-          fetchFeeRef.current = false;
-        });
+      try {
+        const { data } = await getTradingFee(_chainId, _poolSymbol, _address);
+        setPoolFee(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        fetchFeeRef.current = false;
+      }
     },
     [setPoolFee]
   );
@@ -141,8 +134,8 @@ export const TraderPage = () => {
     if (!chainId || !selectedPool?.poolSymbol || !address) {
       return;
     }
-    fetchPositions(chainId, selectedPool.poolSymbol, address).then();
-    fetchOrders(chainId, selectedPool?.poolSymbol, address).then();
+    fetchPositions(chainId, selectedPool.poolSymbol, address);
+    fetchOrders(chainId, selectedPool?.poolSymbol, address);
     fetchFee(chainId, selectedPool.poolSymbol, address);
   }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
 

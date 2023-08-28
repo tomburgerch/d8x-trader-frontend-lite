@@ -10,35 +10,33 @@ import type {
   ValidatedResponseI,
 } from 'types/types';
 import { RequestMethodE } from 'types/enums';
-import { CancelOrderResponseI, CollateralChangeResponseI, MaxOrderSizeResponseI } from 'types/types';
-import { TraderInterface, floatToABK64x64 } from '@d8x/perpetuals-sdk';
+import { type CancelOrderResponseI, type CollateralChangeResponseI, type MaxOrderSizeResponseI } from 'types/types';
+import { type TraderInterface, floatToABK64x64 } from '@d8x/perpetuals-sdk';
 
 function getApiUrlByChainId(chainId: number) {
-  return config.apiUrl[`${chainId}`] || config.apiUrl.default;
+  return config.apiUrl[chainId] || config.apiUrl.default;
 }
 
-export function getExchangeInfo(
+export async function getExchangeInfo(
   chainId: number,
   traderAPI: TraderInterface | null
 ): Promise<ValidatedResponseI<ExchangeInfoI>> {
   if (traderAPI) {
     // console.log('exchangeInfo via SDK');
-    return traderAPI.exchangeInfo().then((info: ExchangeInfoI) => {
-      return { type: 'exchange-info', msg: '', data: info } as ValidatedResponseI<ExchangeInfoI>;
-    });
+    const info = await traderAPI.exchangeInfo();
+    return { type: 'exchange-info', msg: '', data: info };
   } else {
     // console.log('exchangeInfo via BE');
-    return fetch(`${getApiUrlByChainId(chainId)}/exchange-info`, getRequestOptions()).then((data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
-    });
+    const data = await fetch(`${getApiUrlByChainId(chainId)}/exchange-info`, getRequestOptions());
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
   }
 }
 
-export function getPerpetualStaticInfo(
+export async function getPerpetualStaticInfo(
   chainId: number,
   traderAPI: TraderInterface | null,
   symbol: string
@@ -46,35 +44,32 @@ export function getPerpetualStaticInfo(
   if (traderAPI) {
     // console.log('perpStaticInfo via SDK');
     const info = traderAPI.getPerpetualStaticInfo(symbol);
-    return Promise.resolve({ type: 'perpetual-static-info', msg: '', data: info });
+    return { type: 'perpetual-static-info', msg: '', data: info };
   } else {
     // console.log('perpStaticInfo via BE');
-    return fetch(`${getApiUrlByChainId(chainId)}/perpetual-static-info?symbol=${symbol}`, getRequestOptions()).then(
-      (data) => {
-        if (!data.ok) {
-          console.error({ data });
-          throw new Error(data.statusText);
-        }
-        return data.json();
-      }
+    const data = await fetch(
+      `${getApiUrlByChainId(chainId)}/perpetual-static-info?symbol=${symbol}`,
+      getRequestOptions()
     );
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
   }
 }
 
 // needs broker input: should go through backend
-export function getTraderLoyalty(chainId: number, address: string): Promise<ValidatedResponseI<number>> {
-  return fetch(`${getApiUrlByChainId(chainId)}/trader-loyalty?traderAddr=${address}`, getRequestOptions()).then(
-    (data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
-    }
-  );
+export async function getTraderLoyalty(chainId: number, address: string): Promise<ValidatedResponseI<number>> {
+  const data = await fetch(`${getApiUrlByChainId(chainId)}/trader-loyalty?traderAddr=${address}`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
 }
 
-export function getPositionRisk(
+export async function getPositionRisk(
   chainId: number,
   traderAPI: TraderInterface | null,
   symbol: string,
@@ -91,18 +86,16 @@ export function getPositionRisk(
 
   if (traderAPI) {
     console.log(`positionRisk via SDK ${symbol}`);
-    return traderAPI.positionRisk(traderAddr, symbol).then((data: MarginAccountI[]) => {
-      return { type: 'position-risk', msg: '', data: data } as ValidatedResponseI<MarginAccountI[]>;
-    });
+    const data = await traderAPI.positionRisk(traderAddr, symbol);
+    return { type: 'position-risk', msg: '', data };
   } else {
     // console.log(`positionRisk via BE ${symbol}`);
-    return fetch(`${getApiUrlByChainId(chainId)}/position-risk?${params}`, getRequestOptions()).then((data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
-    });
+    const data = await fetch(`${getApiUrlByChainId(chainId)}/position-risk?${params}`, getRequestOptions());
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
   }
 }
 
@@ -169,7 +162,7 @@ export function positionRiskOnCollateralAction(
   }
 }
 
-export function getOpenOrders(
+export async function getOpenOrders(
   chainId: number,
   traderAPI: TraderInterface | null,
   symbol: string,
@@ -178,9 +171,8 @@ export function getOpenOrders(
 ): Promise<ValidatedResponseI<PerpetualOpenOrdersI[]>> {
   if (traderAPI) {
     console.log(`openOrders via SDK ${symbol} `);
-    return traderAPI.openOrders(traderAddr, symbol).then((data) => {
-      return { type: 'open-orders', msg: '', data: data } as ValidatedResponseI<PerpetualOpenOrdersI[]>;
-    });
+    const data = await traderAPI.openOrders(traderAddr, symbol);
+    return { type: 'open-orders', msg: '', data };
   } else {
     // console.log(`openOrders via BE ${symbol}`);
     const params = new URLSearchParams({
@@ -191,32 +183,30 @@ export function getOpenOrders(
       params.append('t', '' + timestamp);
     }
 
-    return fetch(`${getApiUrlByChainId(chainId)}/open-orders?${params}`, getRequestOptions()).then((data) => {
-      if (!data.ok) {
-        console.error({ data });
-        throw new Error(data.statusText);
-      }
-      return data.json();
-    });
-  }
-}
-
-// needs broker input, should go through backend
-export function getTradingFee(
-  chainId: number,
-  poolSymbol: string,
-  traderAddr?: string
-): Promise<ValidatedResponseI<number>> {
-  return fetch(
-    `${getApiUrlByChainId(chainId)}/trading-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`,
-    getRequestOptions()
-  ).then((data) => {
+    const data = await fetch(`${getApiUrlByChainId(chainId)}/open-orders?${params}`, getRequestOptions());
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);
     }
     return data.json();
-  });
+  }
+}
+
+// needs broker input, should go through backend
+export async function getTradingFee(
+  chainId: number,
+  poolSymbol: string,
+  traderAddr?: string
+): Promise<ValidatedResponseI<number>> {
+  const data = await fetch(
+    `${getApiUrlByChainId(chainId)}/trading-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`,
+    getRequestOptions()
+  );
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
 }
 
 export function getMaxOrderSizeForTrader(
@@ -427,27 +417,6 @@ export function getRemoveCollateral(
         throw new Error(data.statusText);
       }
       return data.json();
-    });
-  }
-}
-
-export function getMarketClosedStatus(
-  traderAPI: TraderInterface | null,
-  symbol: string
-): Promise<ValidatedResponseI<{ isMarketClosed: boolean }>> {
-  if (traderAPI) {
-    return traderAPI.isMarketClosed(symbol).then((isClosed) => {
-      return {
-        type: 'isMarketClosed',
-        msg: '',
-        data: { isMarketClosed: isClosed },
-      };
-    });
-  } else {
-    return Promise.resolve({
-      type: 'isMarketClosed',
-      msg: '',
-      data: { isMarketClosed: true },
     });
   }
 }
