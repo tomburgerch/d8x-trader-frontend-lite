@@ -25,7 +25,7 @@ export const LanguageSwitcherMenuItem = ({ languageMeta, onClick }: LanguageSwit
       onClick={() => {
         const lang = languageMeta.id;
         setSelectedLanguage(lang);
-        i18n.changeLanguage(lang);    
+        i18n.changeLanguage(lang);
         onClick?.();
       }}
       className={classnames('notranslate', { [styles.selected]: selectedLanguage === languageMeta.lang })}

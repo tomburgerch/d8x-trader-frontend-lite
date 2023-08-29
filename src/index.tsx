@@ -12,6 +12,7 @@ import 'polyfills';
 import { chains, wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { Disclaimer } from 'components/disclaimer/disclaimer';
 import { GeoBlockingProvider } from 'context/geo-blocking-context/GeoBlockingContext';
+import { StaticBackground } from 'components/static-background/StaticBackground';
 import { CandlesWebSocketContextProvider } from 'context/websocket-context/candles/CandlesWebSocketContextProvider';
 import { WebSocketContextProvider } from 'context/websocket-context/d8x/WebSocketContextProvider';
 import { theme } from 'styles/theme/theme';
@@ -47,6 +48,7 @@ if (container) {
                     <WebSocketContextProvider>
                       <CandlesWebSocketContextProvider>
                         <BrowserRouter>
+                          <StaticBackground />
                           <App />
                         </BrowserRouter>
                       </CandlesWebSocketContextProvider>
