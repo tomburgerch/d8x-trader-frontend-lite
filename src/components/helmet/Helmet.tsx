@@ -1,13 +1,12 @@
-import type { FC } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Helmet as ReactHelmet } from 'react-helmet-async';
 
 interface HelmetPropsI {
   title?: string;
   description?: string;
 }
 
-const HelmetWrapper: FC<HelmetPropsI> = ({ title = 'D8X App', description }) => (
-  <Helmet encodeSpecialCharacters={false}>
+export const Helmet = ({ title = 'D8X App', description }: HelmetPropsI) => (
+  <ReactHelmet encodeSpecialCharacters={false}>
     <meta charSet="utf-8" />
 
     {title && <title>{title}</title>}
@@ -23,7 +22,5 @@ const HelmetWrapper: FC<HelmetPropsI> = ({ title = 'D8X App', description }) => 
     <meta property="og:site_name" content="D8X App" />
     {description && <meta property="og:description" content={description} />}
     {title && <meta property="og:title" content={title} />}
-  </Helmet>
+  </ReactHelmet>
 );
-
-export default HelmetWrapper;

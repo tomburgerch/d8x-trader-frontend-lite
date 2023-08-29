@@ -12,7 +12,7 @@ import { FundingTable } from 'components/funding-table/FundingTable';
 import { Header } from 'components/header/Header';
 import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
 import { PerpetualsSelect } from 'components/header/elements/perpetuals-select/PerpetualsSelect';
-import { Helmet } from 'components/helmet';
+import { Helmet } from 'components/helmet/Helmet';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PositionsTable } from 'components/positions-table/PositionsTable';

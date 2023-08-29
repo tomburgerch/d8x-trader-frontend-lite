@@ -1,5 +1,4 @@
-import type { PropsWithChildren } from 'react';
-import { memo } from 'react';
+import { memo, type PropsWithChildren } from 'react';
 
 import { CommonProps } from '@mui/material/OverridableComponent';
 
