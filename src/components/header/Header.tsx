@@ -139,8 +139,10 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
   });
 
   useEffect(() => {
-    refetch().then().catch(console.error);
-  }, [refetch, triggerUserStatsUpdate]);
+    if (address) {
+      refetch().then().catch(console.error);
+    }
+  }, [address, refetch, triggerUserStatsUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
