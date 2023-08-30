@@ -5,6 +5,16 @@ export enum LanguageE {
   ES = 'es',
 }
 
+export enum BooleanE {
+  True = 'true',
+  False = 'false',
+}
+
+export enum OrderBlockPositionE {
+  Left = 'left',
+  Right = 'right',
+}
+
 export enum RequestMethodE {
   Get = 'GET',
   Delete = 'DELETE',
