@@ -6,7 +6,7 @@ import { Box, Switch, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { Build } from '@mui/icons-material';
 
 import { enabledDarkModeAtom, orderBlockPositionAtom } from 'store/app.store';
-import { BooleanE, OrderBlockPositionE } from 'types/enums';
+import { OrderBlockPositionE } from 'types/enums';
 
 import styles from './SettingsBlock.module.scss';
 
@@ -24,7 +24,7 @@ export const SettingsBlock = memo(() => {
   };
 
   const handleEnabledDarkMode = (event: ChangeEvent<HTMLInputElement>) => {
-    setEnabledDarkMode(event.target.checked ? BooleanE.True : BooleanE.False);
+    setEnabledDarkMode(event.target.checked);
   };
 
   return (
@@ -47,11 +47,7 @@ export const SettingsBlock = memo(() => {
       )}
       <Box className={styles.optionRow}>
         <Typography variant="bodyMedium">{t('common.settings.ui-settings.dark-mode')}</Typography>
-        <Switch
-          className={styles.switch}
-          checked={enabledDarkMode === BooleanE.True}
-          onChange={handleEnabledDarkMode}
-        />
+        <Switch className={styles.switch} checked={enabledDarkMode} onChange={handleEnabledDarkMode} />
       </Box>
     </Box>
   );

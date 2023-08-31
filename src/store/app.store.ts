@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { BooleanE, LanguageE, OrderBlockPositionE } from 'types/enums';
+import { LanguageE, OrderBlockPositionE } from 'types/enums';
 import { type AppDimensionsI } from 'types/types';
 
 const ENABLED_DARK_MODE_LS_KEY = 'd8x_enabledDarkMode';
@@ -15,7 +15,7 @@ export const orderBlockPositionAtom = atomWithStorage<OrderBlockPositionE>(
   ORDER_BLOCK_POSITION_LS_KEY,
   OrderBlockPositionE.Right
 );
-export const enabledDarkModeAtom = atomWithStorage<BooleanE>(ENABLED_DARK_MODE_LS_KEY, BooleanE.False);
+export const enabledDarkModeAtom = atomWithStorage<boolean>(ENABLED_DARK_MODE_LS_KEY, false);
 export const selectedLanguageAtom = atomWithStorage<LanguageE>(SELECTED_LANGUAGE_LS_KEY, LanguageE.EN);
 
 export const appDimensionsAtom = atom<AppDimensionsI>({});
