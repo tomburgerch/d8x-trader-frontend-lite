@@ -11,8 +11,7 @@ import { Container } from 'components/container/Container';
 import { Footer } from 'components/footer/Footer';
 import { FundingTable } from 'components/funding-table/FundingTable';
 import { Header } from 'components/header/Header';
-import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
-import { PerpetualsSelect } from 'components/header/elements/perpetuals-select/PerpetualsSelect';
+import { MarketSelect } from 'components/header/elements/market-select/MarketSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
 import { OrderBlock } from 'components/order-block/OrderBlock';
@@ -137,9 +136,9 @@ export const TraderPage = () => {
     if (!chainId || !selectedPool?.poolSymbol || !address) {
       return;
     }
-    fetchPositions(chainId, address);
-    fetchOrders(chainId, address);
-    fetchFee(chainId, selectedPool.poolSymbol, address);
+    fetchPositions(chainId, address).then();
+    fetchOrders(chainId, address).then();
+    fetchFee(chainId, selectedPool.poolSymbol, address).then();
   }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
 
   useEffect(() => {
@@ -226,10 +225,7 @@ export const TraderPage = () => {
         } | D8X App`}
       />
       <Box className={styles.root}>
-        <Header>
-          <CollateralsSelect withNavigate={true} />
-          <PerpetualsSelect withNavigate={true} />
-        </Header>
+        <Header>{!isBigScreen && <MarketSelect withNavigate={true} updatePerpetual={true} />}</Header>
         {isBigScreen && (
           <Container
             className={classnames(styles.sidesContainer, {
@@ -246,6 +242,7 @@ export const TraderPage = () => {
               />
             </Box>
             <Box className={styles.rightBlock}>
+              <MarketSelect withNavigate={true} updatePerpetual={true} />
               <OrderBlock />
             </Box>
           </Container>
