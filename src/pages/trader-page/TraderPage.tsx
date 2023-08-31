@@ -68,13 +68,13 @@ export const TraderPage = () => {
   const location = useLocation();
 
   const fetchPositions = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: Address) => {
+    async (_chainId: number, _address: Address) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchPositionsRef.current) {
         return;
       }
       fetchPositionsRef.current = true;
       try {
-        const { data } = await getPositionRisk(_chainId, traderAPI, _poolSymbol, _address);
+        const { data } = await getPositionRisk(_chainId, traderAPI, _address);
         data.map(setPositions);
       } catch (err) {
         console.error(err);
@@ -86,13 +86,13 @@ export const TraderPage = () => {
   );
 
   const fetchOrders = useCallback(
-    async (_chainId: number, _poolSymbol: string, _address: Address) => {
+    async (_chainId: number, _address: Address) => {
       if (!traderAPI || traderAPI.chainId !== _chainId || !isSDKConnected || fetchOrdersRef.current) {
         return;
       }
       fetchOrdersRef.current = true;
       try {
-        const { data } = await getOpenOrders(_chainId, traderAPI, _poolSymbol, _address);
+        const { data } = await getOpenOrders(_chainId, traderAPI, _address);
         data.map(setOpenOrders);
       } catch (err) {
         console.error(err);
@@ -137,8 +137,8 @@ export const TraderPage = () => {
     if (!chainId || !selectedPool?.poolSymbol || !address) {
       return;
     }
-    fetchPositions(chainId, selectedPool.poolSymbol, address);
-    fetchOrders(chainId, selectedPool?.poolSymbol, address);
+    fetchPositions(chainId, address);
+    fetchOrders(chainId, address);
     fetchFee(chainId, selectedPool.poolSymbol, address);
   }, [chainId, selectedPool, address, fetchPositions, fetchOrders, fetchFee]);
 
