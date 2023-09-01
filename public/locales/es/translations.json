@@ -5,6 +5,13 @@
     "vault": "Bóveda"
   },
   "pages": {
+    "geolocation": {
+      "access-denied": "Para continuar, debes autorizar el servicio de geolocalizacion en tu explorador. Refierete a las instrucciones de tu explorador para autorizar este servicio.",
+      "access-blocked": "EL PROTOCOLO DE SOFTWARE D8X NO HA SIDO IMPLEMENTADO PARA SER ACCESIBLE O USADO POR NINGUN USUARIO DE JURISDICCIONES PROHIBIDAS. LAS JURISDICCIONES PROHIBIDAS INCLUDEN, PERO NO SE LIMITAN A, LOS ESTADOS UNIDOS DE AMERICA, BIELORRUSIA, BURUNDI, BIRMANIA (MYANMAR), REPUBLICA CENTROAFRICANA, REPUBLICA DEMOCRATICA DEL CONGO, REPUBLICA POPULAR DEMOCRATICA DE COREA (RPDC), GUINEA, GUINEA-BISAU, HAITI, IRAN, IRAkK, YEMEN, LIBANO, LIBIA, MALI, NICARAGUA, SOMALIA, SUDAN, REPUBLICA DE SUDAN DEL SUR, SIRIA, VENEZUELA Y ZIMBABWE.",
+      "not-supported": "Tu explorador no es compatible con geolocalizacion. Para continuar, debes usar un explorador compatible con geolocalizacion",
+      "locating": "Localizando...",
+      "getting-location": "Identificando localizacion..."
+    },
     "trade": {
       "stats": {
         "mid-price": "Precio Medio",
@@ -25,8 +32,8 @@
           "pnl": "Ganancias sin Realizar"
         },
         "table-content": {
-          "buy": "COMPRAR",
-          "sell": "VENDER",
+          "buy": "COMPRA",
+          "sell": "VENTA",
           "modify": "Modificar",
           "connect": "Por favor conecte su cartera",
           "no-open": "No hay posiciones abiertas"
@@ -217,7 +224,7 @@
           "body2": "Si tu orden reduce una posicion ya existente ('cerrar parcialmente'), el apalcancamiento de tu orden no tiene ningun efecto."
         },
         "slippage": {
-          "title": "Configuracion de deslizamiento",
+          "title": "Configuración de deslizamiento",
           "body": "Deslizamiento Maximo",
           "max": "Precio de entrada maximo:",
           "min": "Precio de entrada minimo:",
@@ -373,7 +380,7 @@
         "title1": "Tus descuentos",
         "earned-rebates": "Rebates ganados",
         "open-rewards": "Ganancias pendientes",
-        "title2": "Trade & Earn",
+        "title2": "Comercia & Gana",
         "disclaimer-text-block1": "Ingresar codigo de remisión para obtener descuentos en comisiones.",
         "disclaimer-text-block2": "Los descuentos son enviados directamente a tu cartera semanalmente via airdrop.",
         "your-rebate-rate": "Tu tasa de rebate",
@@ -491,6 +498,14 @@
     "pagination": {
       "per-page": "Por página"
     },
+    "settings": {
+      "title": "Configuración",
+      "ui-settings": {
+        "title": "Configuración de UI",
+        "order-block": "Bloque de Ordenes",
+        "dark-mode": "Pronto"
+      }
+    },
     "select": {
       "collateral": {
         "label": "Colateral:",
@@ -500,6 +515,14 @@
           "num-of-perps": "No. de Perpetuos"
         }
       },
+      "market": {
+        "label": "Mercado",
+        "header": "Escoger Mercado",
+        "crypto": "Cripto",
+        "fx": "FX",
+        "commodity": "Productos Basicos"
+      },
+      "search": "Buscar...",
       "perpetual": {
         "label": "Perpetuos:",
         "headers": {

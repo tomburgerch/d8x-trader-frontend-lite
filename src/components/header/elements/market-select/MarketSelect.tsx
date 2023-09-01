@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
 
 import { Button, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
-import { ArrowDropDown, ArrowDropUp, AttachMoneyOutlined } from '@mui/icons-material';
+import { ArrowDropDown, ArrowDropUp, AccountBalanceOutlined } from '@mui/icons-material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
@@ -260,7 +260,7 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
   return (
     <div className={styles.holderRoot}>
       <div className={styles.iconWrapper}>
-        <AttachMoneyOutlined />
+        <AccountBalanceOutlined />
       </div>
       <Button onClick={() => setModalOpen(true)} className={styles.marketSelectButton} variant="outlined">
         <div className={styles.selectedMarketBlock}>
@@ -268,7 +268,7 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
             {t('common.select.market.label')}
           </Typography>
           <div className={styles.selectedMarketValue}>
-            <Typography variant="bodyMedium" className={styles.selectedMarketPerpetual}>
+            <Typography variant="bodyLarge" className={styles.selectedMarketPerpetual}>
               {selectedPerpetual?.baseCurrency}/{selectedPerpetual?.quoteCurrency}
             </Typography>
             <Typography variant="bodyTiny" className={styles.selectedMarketCollateral}>
