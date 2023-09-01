@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
 
 import { Button, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
-import { ArrowDropDown, ArrowDropUp, AccountBalanceOutlined } from '@mui/icons-material';
+import { AccountBalanceOutlined, ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
@@ -82,7 +82,12 @@ const Option = ({
         </div>
         <div className={styles.optionRightBlock}>
           <div className={styles.value}>{option.item.indexPrice.toFixed(2)}</div>
-          <div className={styles.priceChange} style={{ color: option.item.indexPrice > 0 ? '#089981' : '#F23645' }}>
+          <div
+            className={classnames(styles.priceChange, {
+              [styles.buyPrice]: option.item.indexPrice > 0,
+              [styles.sellPrice]: option.item.indexPrice < 0,
+            })}
+          >
             +2.00%
           </div>
         </div>
