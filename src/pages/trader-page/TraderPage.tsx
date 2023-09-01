@@ -108,7 +108,6 @@ export const TraderPage = () => {
         return;
       }
       fetchFeeRef.current = true;
-      setPoolFee(undefined);
       try {
         const { data } = await getTradingFee(_chainId, _poolSymbol, _address);
         setPoolFee(data);
@@ -146,12 +145,6 @@ export const TraderPage = () => {
     fetchPositions(chainId, address).then();
     fetchOrders(chainId, address).then();
   }, [chainId, address, fetchPositions, fetchOrders]);
-
-  useEffect(() => {
-    fetchOrdersRef.current = selectedPool?.poolSymbol === undefined;
-    fetchPositionsRef.current = selectedPool?.poolSymbol === undefined;
-    fetchFeeRef.current = selectedPool?.poolSymbol === undefined;
-  });
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [
