@@ -158,26 +158,28 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
   useEffect(() => {
-    if (pools.length && isConnected) {
+    if (pools.length && isConnected && selectedPool?.poolId) {
       send(JSON.stringify({ type: 'unsubscribe' }));
 
-      pools.forEach((pool) => {
-        pool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-          const symbol = createSymbol({
-            baseCurrency,
-            quoteCurrency,
-            poolSymbol: pool.poolSymbol,
+      pools
+        .filter((pool) => pool.poolId === selectedPool.poolId)
+        .forEach((pool) => {
+          pool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+            const symbol = createSymbol({
+              baseCurrency,
+              quoteCurrency,
+              poolSymbol: pool.poolSymbol,
+            });
+            send(
+              JSON.stringify({
+                traderAddr: address ?? '',
+                symbol,
+              })
+            );
           });
-          send(
-            JSON.stringify({
-              traderAddr: address ?? '',
-              symbol,
-            })
-          );
         });
-      });
     }
-  }, [pools, isConnected, send, address]);
+  }, [selectedPool?.poolId, pools, isConnected, send, address]);
 
   useEffect(() => {
     if (updatePerpetual && selectedPerpetual && isConnectedCandlesWs) {

@@ -53,7 +53,8 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
     client.onclose = () => {
       isConnected = false;
       isDisconnecting = false;
-      stateChangeListeners.forEach((fn) => fn(false));
+      // TODO: VOV: Revert this change later
+      // stateChangeListeners.forEach((fn) => fn(false));
 
       if (!reconnectOnClose) {
         // console.log('ws closed by app');
