@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
 
 import { Button, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
-import { ArrowDropDown, ArrowDropUp, AccountBalanceOutlined } from '@mui/icons-material';
+import { AccountBalanceOutlined, ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
@@ -82,7 +82,12 @@ const Option = ({
         </div>
         <div className={styles.optionRightBlock}>
           <div className={styles.value}>{option.item.indexPrice.toFixed(2)}</div>
-          <div className={styles.priceChange} style={{ color: option.item.indexPrice > 0 ? '#089981' : '#F23645' }}>
+          <div
+            className={classnames(styles.priceChange, {
+              [styles.buyPrice]: option.item.indexPrice > 0,
+              [styles.sellPrice]: option.item.indexPrice < 0,
+            })}
+          >
             +2.00%
           </div>
         </div>
@@ -153,26 +158,28 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
   useEffect(() => {
-    if (pools.length && isConnected) {
+    if (pools.length && isConnected && selectedPool?.poolId) {
       send(JSON.stringify({ type: 'unsubscribe' }));
 
-      pools.forEach((pool) => {
-        pool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-          const symbol = createSymbol({
-            baseCurrency,
-            quoteCurrency,
-            poolSymbol: pool.poolSymbol,
+      pools
+        .filter((pool) => pool.poolId === selectedPool.poolId)
+        .forEach((pool) => {
+          pool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
+            const symbol = createSymbol({
+              baseCurrency,
+              quoteCurrency,
+              poolSymbol: pool.poolSymbol,
+            });
+            send(
+              JSON.stringify({
+                traderAddr: address ?? '',
+                symbol,
+              })
+            );
           });
-          send(
-            JSON.stringify({
-              traderAddr: address ?? '',
-              symbol,
-            })
-          );
         });
-      });
     }
-  }, [pools, isConnected, send, address]);
+  }, [selectedPool?.poolId, pools, isConnected, send, address]);
 
   useEffect(() => {
     if (updatePerpetual && selectedPerpetual && isConnectedCandlesWs) {
