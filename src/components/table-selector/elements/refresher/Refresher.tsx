@@ -20,8 +20,8 @@ export const Refresher = ({ activeTableType }: RefresherPropsI) => {
   const [tableRefreshHandlers] = useAtom(tableRefreshHandlersAtom);
 
   return (
-    <Box className={styles.root}>
-      <RefreshIcon onClick={tableRefreshHandlers[activeTableType] ?? undefined} className={styles.actionIcon} />
+    <Box className={styles.root} onClick={tableRefreshHandlers[activeTableType] ?? undefined}>
+      <RefreshIcon className={styles.actionIcon} />
       <Typography variant="bodySmall" className={styles.refreshLabel}>
         {t('common.refresh')}
       </Typography>

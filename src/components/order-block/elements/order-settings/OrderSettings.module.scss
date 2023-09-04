@@ -56,6 +56,7 @@
   display: flex;
   align-items: center;
   color: var(--d8x-color-purple);
+  cursor: pointer;
 
   :global(.MuiFormControlLabel-root) {
     margin-left: -12px;
@@ -66,7 +67,6 @@
 }
 
 .settingsIcon {
-  cursor: pointer;
   transition: opacity 0.3s linear;
   margin-right: -$d8x-spacing * 5;
   margin-left: 0;
