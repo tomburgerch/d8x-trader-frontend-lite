@@ -1,32 +1,22 @@
-import { FC, SVGProps } from 'react';
-import { ReactComponent as BTCIcon } from '../../node_modules/cryptocurrency-icons/svg/color/btc.svg';
-import { ReactComponent as CHZIcon } from '../../node_modules/cryptocurrency-icons/svg/color/chz.svg';
-import { ReactComponent as ETHIcon } from '../../node_modules/cryptocurrency-icons/svg/color/eth.svg';
-import { ReactComponent as GBPIcon } from '../../node_modules/cryptocurrency-icons/svg/color/gbp.svg';
-import { ReactComponent as GenericIcon } from '../../node_modules/cryptocurrency-icons/svg/color/generic.svg';
-import { ReactComponent as MaticIcon } from '../../node_modules/cryptocurrency-icons/svg/color/matic.svg';
+import { lazy } from 'react';
 
-interface TokenI {
-  icon: FC<SVGProps<SVGSVGElement>>;
-}
+export const getDynamicLogo = (symbol: string) =>
+  lazy(async () => {
+    try {
+      return {
+        default: (await import(`../../node_modules/cryptocurrency-icons/svg/color/${symbol}.svg`)).ReactComponent,
+      };
+    } catch {
+      /* continue regardless of error */
+    }
 
-export const tokensIconsMap: Record<string, TokenI> = {
-  matic: {
-    icon: MaticIcon,
-  },
-  btc: {
-    icon: BTCIcon,
-  },
-  eth: {
-    icon: ETHIcon,
-  },
-  gbp: {
-    icon: GBPIcon,
-  },
-  chz: {
-    icon: CHZIcon,
-  },
-  default: {
-    icon: GenericIcon,
-  },
-};
+    try {
+      return {
+        default: (await import(`~assets/crypto-icons/${symbol}.svg`)).ReactComponent,
+      };
+    } catch {
+      return {
+        default: (await import(`../../node_modules/cryptocurrency-icons/svg/color/generic.svg`)).ReactComponent,
+      };
+    }
+  });
