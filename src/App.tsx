@@ -3,7 +3,7 @@ import { memo, Suspense, useEffect } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { ToastContainer } from 'react-toastify';
 
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
@@ -32,7 +32,13 @@ export const App = memo(() => {
   return (
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <div className={styles.spinnerContainer}>
+              <CircularProgress />
+            </div>
+          }
+        >
           <AppRoutes />
         </Suspense>
         <WelcomeModal />
