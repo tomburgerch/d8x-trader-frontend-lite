@@ -75,21 +75,34 @@ const Option = ({
       <div className={styles.optionHolder}>
         <div className={styles.optionLeftBlock}>
           <IconComponent width={24} height={24} />
-          <div className={styles.label}>
+          <Typography variant="bodySmall" className={styles.label}>
             {option.item.baseCurrency}/{option.item.quoteCurrency}
-            <div>{option.item.poolSymbol}</div>
-          </div>
+            <Typography variant="bodyTiny" as="div">
+              {option.item.poolSymbol}
+            </Typography>
+          </Typography>
         </div>
         <div className={styles.optionRightBlock}>
-          <div className={styles.value}>{option.item.indexPrice.toFixed(2)}</div>
-          <div
-            className={classnames(styles.priceChange, {
-              [styles.buyPrice]: option.item.indexPrice > 0,
-              [styles.sellPrice]: option.item.indexPrice < 0,
-            })}
-          >
-            +2.00%
-          </div>
+          {option.item.state === 'NORMAL' ? (
+            <>
+              <Typography variant="bodySmall" className={styles.value}>
+                {option.item.indexPrice.toFixed(2)}
+              </Typography>
+              <Typography
+                variant="bodyTiny"
+                className={classnames(styles.priceChange, {
+                  [styles.buyPrice]: option.item.indexPrice > 0,
+                  [styles.sellPrice]: option.item.indexPrice < 0,
+                })}
+              >
+                +2.00%
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="bodySmall" className={styles.status}>
+              {option.item.state}
+            </Typography>
+          )}
         </div>
       </div>
     </MenuItem>
