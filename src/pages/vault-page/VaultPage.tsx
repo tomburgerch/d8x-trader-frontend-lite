@@ -3,11 +3,10 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
-import { Footer } from 'components/footer/Footer';
-import { Header } from 'components/header/Header';
+import { HeaderPortal } from 'components/header/HeaderPortal';
 import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { getOpenWithdrawals } from 'network/history';
@@ -19,6 +18,9 @@ import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools
 import styles from './VaultPage.module.scss';
 
 export const VaultPage = () => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+
   const { t } = useTranslation();
 
   const chainId = useChainId();
@@ -54,14 +56,18 @@ export const VaultPage = () => {
     <>
       <Helmet title={`${selectedPool?.poolSymbol} Vault | D8X App`} />
       <Box className={styles.root}>
-        <Header>
+        <HeaderPortal>
           <CollateralsSelect label={t('common.select.collateral.label2')} />
-        </Header>
+        </HeaderPortal>
+        {isSmallScreen && (
+          <Box className={styles.mobileSelectBoxes}>
+            {<CollateralsSelect label={t('common.select.collateral.label2')} />}
+          </Box>
+        )}
         <Container className={styles.container}>
           <GlobalStats />
           <LiquidityBlock />
         </Container>
-        <Footer />
       </Box>
     </>
   );

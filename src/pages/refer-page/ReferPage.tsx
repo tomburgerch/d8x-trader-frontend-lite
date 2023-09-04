@@ -6,8 +6,6 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box } from '@mui/material';
 
 import { Container } from 'components/container/Container';
-import { Footer } from 'components/footer/Footer';
-import { Header } from 'components/header/Header';
 import { useQuery } from 'hooks/useQuery';
 import { getIsAgency, getReferralCodes } from 'network/referral';
 import { isAgencyAtom, referralCodeAtom, referralCodesRefetchHandlerRefAtom } from 'store/refer.store';
@@ -124,12 +122,10 @@ export const ReferPage = () => {
 
   return (
     <Box className={styles.root}>
-      <Header />
       <Container className={styles.container}>
         <TabSelector activeTab={activeTabId} onTabChange={handleTabChange} />
         {tabComponents.find(({ tabId }) => tabId === activeTabId)?.content}
       </Container>
-      <Footer />
     </Box>
   );
 };

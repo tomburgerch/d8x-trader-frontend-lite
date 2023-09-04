@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify';
 
 import { Box, CircularProgress } from '@mui/material';
 
+import { Footer } from 'components/footer/Footer';
+import { Header } from 'components/header/Header';
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { WelcomeModal } from 'components/welcome-modal/WelcomeModal';
 import { AppRoutes } from 'routes/routes';
@@ -32,6 +34,7 @@ export const App = memo(() => {
   return (
     <Box className={styles.root} ref={ref}>
       <Box className={styles.content}>
+        <Header />
         <Suspense
           fallback={
             <div className={styles.spinnerContainer}>
@@ -41,6 +44,7 @@ export const App = memo(() => {
         >
           <AppRoutes />
         </Suspense>
+        <Footer />
         <WelcomeModal />
         <ReferralConfirmModal />
         <ToastContainer position="top-left" autoClose={10_000} />

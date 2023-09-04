@@ -1,9 +1,8 @@
 import { useAtom, useSetAtom } from 'jotai';
-import type { PropsWithChildren } from 'react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
+import { useAccount, useBalance, useChainId, useNetwork, type Address } from 'wagmi';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -35,7 +34,7 @@ import { SettingsButton } from './elements/settings-button/SettingsButton';
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
 
-interface HeaderPropsI extends PropsWithChildren {
+interface HeaderPropsI {
   /**
    * Injected by the documentation to work in an iframe.
    * You won't need it on your project.
@@ -45,7 +44,7 @@ interface HeaderPropsI extends PropsWithChildren {
 
 const DRAWER_WIDTH_FOR_TABLETS = 300;
 
-export const Header = memo(({ window, children }: HeaderPropsI) => {
+export const Header = memo(({ window }: HeaderPropsI) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -222,9 +221,7 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
               )}
             </Box>
             {!isSmallScreen && (
-              <Typography variant="h6" component="div" className={styles.selectBoxes}>
-                {children}
-              </Typography>
+              <Typography id="header-side" variant="h6" component="div" className={styles.selectBoxes} />
             )}
             <Typography variant="h6" component="div" className={styles.walletConnect}>
               <WalletConnectButton />
@@ -236,7 +233,6 @@ export const Header = memo(({ window, children }: HeaderPropsI) => {
               </Button>
             )}
           </Toolbar>
-          {isSmallScreen && <Box className={styles.mobileSelectBoxes}>{children}</Box>}
         </PageAppBar>
         <Box component="nav">
           <Drawer
