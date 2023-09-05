@@ -8,9 +8,7 @@ import { type Address, useAccount, useChainId } from 'wagmi';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
-import { Footer } from 'components/footer/Footer';
 import { FundingTable } from 'components/funding-table/FundingTable';
-import { Header } from 'components/header/Header';
 import { MarketSelect } from 'components/header/elements/market-select/MarketSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
@@ -40,7 +38,7 @@ import styles from './TraderPage.module.scss';
 export const TraderPage = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
@@ -224,8 +222,10 @@ export const TraderPage = () => {
         } | D8X App`}
       />
       <Box className={styles.root}>
-        <Header>{!isBigScreen && <MarketSelect withNavigate={true} updatePerpetual={true} />}</Header>
-        {isBigScreen && (
+        {isSmallScreen && (
+          <Box className={styles.mobileSelectBoxes}>{<MarketSelect withNavigate={true} updatePerpetual={true} />}</Box>
+        )}
+        {!isSmallScreen && (
           <Container
             className={classnames(styles.sidesContainer, {
               [styles.swapSides]: orderBlockPosition === OrderBlockPositionE.Left,
@@ -246,7 +246,7 @@ export const TraderPage = () => {
             </Box>
           </Container>
         )}
-        {!isBigScreen && (
+        {isSmallScreen && (
           <Container className={styles.columnContainer}>
             <PerpetualStats />
             <ChartHolder />
@@ -269,7 +269,6 @@ export const TraderPage = () => {
             )}
           </Container>
         )}
-        <Footer />
       </Box>
     </>
   );

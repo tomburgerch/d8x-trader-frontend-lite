@@ -27,8 +27,6 @@ export const CandlesWebSocketContextProvider = ({ children }: PropsWithChildren)
 
   const handleWsMessage = useCandlesWsMessageHandler();
 
-  const candlesWsUrl = useMemo(() => config.candlesWsUrl[`${chainId}`] || config.candlesWsUrl.default, [chainId]);
-
   usePingPong({
     client,
     isConnected,
@@ -58,6 +56,7 @@ export const CandlesWebSocketContextProvider = ({ children }: PropsWithChildren)
     if (client) {
       client.close();
     }
+    const candlesWsUrl = config.candlesWsUrl[`${chainId}`] || config.candlesWsUrl.default;
 
     client = createWebSocketWithReconnect(candlesWsUrl);
     client.onStateChange(setIsConnected);
@@ -67,11 +66,9 @@ export const CandlesWebSocketContextProvider = ({ children }: PropsWithChildren)
     };
     client.on(handleMessage);
     return () => {
-      setIsConnected(false);
-      setMessages([]);
       client.off(handleMessage);
     };
-  }, [candlesWsUrl]);
+  }, [chainId]);
 
   useEffect(() => {
     if (!isConnected) {
