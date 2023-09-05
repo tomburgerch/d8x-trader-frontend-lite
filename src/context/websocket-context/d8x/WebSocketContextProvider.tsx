@@ -1,22 +1,22 @@
 import { useAtom } from 'jotai';
-import { memo, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 import { useChainId } from 'wagmi';
 
 import { config } from 'config';
 import { webSocketReadyAtom } from 'store/pools.store';
 
 import { createWebSocketWithReconnect } from '../createWebSocketWithReconnect';
-import { usePingPong } from '../hooks/usePingPong';
-import { WebSocketI } from '../types';
-import { WebSocketContext, WebSocketContextI } from './WebSocketContext';
-import { useWsMessageHandler } from './useWsMessageHandler';
 import { useHandleMessage } from '../hooks/useHandleMessage';
 import { useMessagesToSend } from '../hooks/useMessagesToSend';
+import { usePingPong } from '../hooks/usePingPong';
 import { useSend } from '../hooks/useSend';
+import { WebSocketI } from '../types';
+import { useWsMessageHandler } from './useWsMessageHandler';
+import { WebSocketContext, WebSocketContextI } from './WebSocketContext';
 
 let client: WebSocketI;
 
-export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) => {
+export const WebSocketContextProvider = ({ children }: PropsWithChildren) => {
   const [isWebSocketReady, setWebSocketReady] = useAtom(webSocketReadyAtom);
   const chainId = useChainId();
 
@@ -26,8 +26,6 @@ export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) =
   const [isConnected, setIsConnected] = useState(false);
 
   const handleWsMessage = useWsMessageHandler();
-
-  const wsUrl = useMemo(() => config.wsUrl[`${chainId}`] || config.wsUrl.default, [chainId]);
 
   usePingPong({
     client,
@@ -58,6 +56,7 @@ export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) =
     if (client) {
       client.close();
     }
+    const wsUrl = config.wsUrl[`${chainId}`] || config.wsUrl.default;
     client = createWebSocketWithReconnect(wsUrl);
     client.onStateChange(setIsConnected);
 
@@ -66,11 +65,9 @@ export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) =
     };
     client.on(handleMessage);
     return () => {
-      setIsConnected(false);
-      setMessages([]);
       client.off(handleMessage);
     };
-  }, [wsUrl]);
+  }, [chainId]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -87,4 +84,4 @@ export const WebSocketContextProvider = memo(({ children }: PropsWithChildren) =
   );
 
   return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;
-});
+};

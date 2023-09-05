@@ -118,17 +118,6 @@
   margin-right: $d8x-spacing * 6;
 }
 
-.mobileSelectBoxes {
-  display: flex;
-  max-width: 600px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: $d8x-spacing * 4;
-  gap: $d8x-spacing * 3;
-  justify-content: center;
-}
-
 .walletConnect {
   justify-content: right;
   display: flex;
@@ -181,6 +170,7 @@
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .root {
+    padding: 0 12px;
 
     :global(.MuiPaper-root) {
       height: auto;

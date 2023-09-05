@@ -143,33 +143,30 @@ export const OrderSettings = memo(() => {
             labelPlacement="end"
           />*/}
         </Box>
-        <Box className={styles.settings}>
-          {orderType === OrderTypeE.Market && (
-            <>
-              <SettingsIcon className={styles.settingsIcon} onClick={() => setShowSettingsModal(true)} />
-              <Typography variant="bodyTiny" className={styles.setting}>
-                {t('pages.trade.order-block.slippage.title')}
-              </Typography>
-            </>
-          )}
-          {orderType !== OrderTypeE.Market && (
-            <Box className={styles.settings}>
-              <FormControlLabel
-                id="reduce-only"
-                value="true"
-                defaultChecked={reduceOnly}
-                onChange={(_event, checked) => setReduceOnly(checked)}
-                control={reduceOnly ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
-                label={t('pages.trade.order-block.reduce-only')}
-                labelPlacement="end"
-              />
-              <SettingsIcon className={styles.settingsIcon} onClick={() => setShowExpiryModal(true)} />
-              <Typography variant="bodyTiny" className={styles.setting}>
-                {t('pages.trade.order-block.expiry.title')}
-              </Typography>
+
+        {orderType === OrderTypeE.Market && (
+          <Box className={styles.settings} onClick={() => setShowSettingsModal(true)}>
+            <SettingsIcon className={styles.settingsIcon} />
+            <Typography variant="bodyTiny">{t('pages.trade.order-block.slippage.title')}</Typography>
+          </Box>
+        )}
+        {orderType !== OrderTypeE.Market && (
+          <Box className={styles.settings}>
+            <FormControlLabel
+              id="reduce-only"
+              value="true"
+              defaultChecked={reduceOnly}
+              onChange={(_event, checked) => setReduceOnly(checked)}
+              control={<Checkbox checked={reduceOnly} />}
+              label={t('pages.trade.order-block.reduce-only')}
+              labelPlacement="end"
+            />
+            <Box className={styles.settings} onClick={() => setShowExpiryModal(true)}>
+              <SettingsIcon className={styles.settingsIcon} />
+              <Typography variant="bodyTiny">{t('pages.trade.order-block.expiry.title')}</Typography>
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
       </Box>
       <Dialog open={showSettingsModal} className={styles.dialog}>
         <DialogTitle>{t('pages.trade.order-block.slippage.title')}</DialogTitle>

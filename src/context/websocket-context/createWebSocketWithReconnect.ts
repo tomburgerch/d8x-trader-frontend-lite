@@ -53,14 +53,10 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
     client.onclose = () => {
       isConnected = false;
       isDisconnecting = false;
-      // TODO: VOV: Revert this change later
-      // stateChangeListeners.forEach((fn) => fn(false));
 
       if (!reconnectOnClose) {
-        // console.log('ws closed by app');
         return;
       }
-      // console.log('ws closed by server');
       setTimeout(start, RECONNECT_TIMEOUT);
     };
   };
@@ -71,12 +67,17 @@ export function createWebSocketWithReconnect(wsUrl: string): WebSocketI {
     on,
     off,
     onStateChange,
-    close: () => client.close(),
+    close: () => {
+      client.close();
+      stateChangeListeners.forEach((fn) => fn(false));
+    },
     reconnect: () => {
       client.close();
+      stateChangeListeners.forEach((fn) => fn(false));
       setTimeout(() => {
         reconnectOnClose = true;
         start();
+        stateChangeListeners.forEach((fn) => fn(true));
       }, RECONNECT_TIMEOUT);
     },
     send: (message: string) => {

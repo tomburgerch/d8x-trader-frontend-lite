@@ -1,13 +1,13 @@
 @import '~styles/theme/_theme.scss';
 
 .root {
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 2 * $d8x-spacing;
 }
 
 .actionIcon {
-  cursor: pointer;
   transition: opacity linear 200ms;
 
   &:hover {

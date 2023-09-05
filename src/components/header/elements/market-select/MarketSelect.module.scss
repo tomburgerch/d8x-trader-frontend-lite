@@ -129,17 +129,18 @@
 
   .label {
     font-weight: bold;
-    font-size: 0.875rem;
-
-    div {
-      font-size: 0.625rem;
-    }
   }
 
   .value {
     text-align: right;
     font-weight: bold;
-    font-size: 0.75rem;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-weight: bold;
   }
 }
 
@@ -156,7 +157,6 @@
 .optionRightBlock {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .priceChange {
@@ -164,11 +164,11 @@
   font-weight: bold;
   font-size: 0.625rem;
 
-  .buyPrice {
+  &.buyPrice {
     color: rgba(var(--d8x-background-buy-rgb), 1);
   }
 
-  .sellPrice {
+  &.sellPrice {
     color: rgba(var(--d8x-background-sell-rgb), 1);
   }
 }
