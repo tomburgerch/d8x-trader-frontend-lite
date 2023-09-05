@@ -89,13 +89,16 @@
 
 .settings {
   padding: $d8x-spacing * 10;
+  padding-bottom: 0;
 }
 
 .languageSwitcher {
   padding: $d8x-spacing * 10;
+  padding-top: $d8x-spacing * 6;
 }
 
 .closeAction {
+  margin-top: auto;
   text-align: center;
   padding: $d8x-spacing * 10;
 }
