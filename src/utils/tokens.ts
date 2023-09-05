@@ -1,22 +1,38 @@
-import { lazy } from 'react';
+import { FC, SVGProps, lazy } from 'react';
+
+const importedLogos: Record<string, FC<SVGProps<SVGSVGElement>>> = {};
 
 export const getDynamicLogo = (symbol: string) =>
   lazy(async () => {
-    try {
+    const importedLogo = importedLogos[symbol];
+    if (importedLogo) {
       return {
-        default: (await import(`../../node_modules/cryptocurrency-icons/svg/color/${symbol}.svg`)).ReactComponent,
+        default: importedLogo,
+      };
+    }
+    try {
+      const libraryLogo = (await import(`../../node_modules/cryptocurrency-icons/svg/color/${symbol}.svg`))
+        .ReactComponent;
+      importedLogos[symbol] = libraryLogo;
+      return {
+        default: libraryLogo,
       };
     } catch {
       /* continue regardless of error */
     }
 
     try {
+      const localLogo = (await import(`~assets/crypto-icons/${symbol}.svg`)).ReactComponent;
+      importedLogos[symbol] = localLogo;
       return {
-        default: (await import(`~assets/crypto-icons/${symbol}.svg`)).ReactComponent,
+        default: localLogo,
       };
     } catch {
+      const defaultLogo = (await import(`../../node_modules/cryptocurrency-icons/svg/color/generic.svg`))
+        .ReactComponent;
+      importedLogos[symbol] = defaultLogo;
       return {
-        default: (await import(`../../node_modules/cryptocurrency-icons/svg/color/generic.svg`)).ReactComponent,
+        default: defaultLogo,
       };
     }
   });
