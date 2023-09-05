@@ -102,6 +102,10 @@
   }
 }
 
+.optionList {
+  overflow-y: scroll;
+}
+
 .dialogAction {
   margin-top: $d8x-spacing * 6;
   justify-content: center;
