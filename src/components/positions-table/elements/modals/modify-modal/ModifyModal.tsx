@@ -412,7 +412,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
   };
 
   return (
-    <Dialog open={isOpen} className={styles.root}>
+    <Dialog open={isOpen} className={styles.root} onClose={() => closeModal()}>
       <DialogTitle>{t('pages.trade.positions-table.modify-modal.title')}</DialogTitle>
       <DialogContent>
         <ModifyTypeSelector modifyType={modifyType} setModifyType={setModifyType} />

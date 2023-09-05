@@ -306,7 +306,7 @@ export const OpenOrdersTable = memo(() => {
           />
         </Box>
       )}
-      <Dialog open={isCancelModalOpen} className={styles.dialog}>
+      <Dialog open={isCancelModalOpen} className={styles.dialog} onClose={() => setCancelModalOpen(false)}>
         <DialogTitle>{t('pages.trade.orders-table.cancel-modal.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
           {t('pages.trade.orders-table.cancel-modal.content')}

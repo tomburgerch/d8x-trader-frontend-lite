@@ -168,7 +168,7 @@ export const OrderSettings = memo(() => {
           </Box>
         )}
       </Box>
-      <Dialog open={showSettingsModal} className={styles.dialog}>
+      <Dialog open={showSettingsModal} className={styles.dialog} onClose={() => setShowSettingsModal(false)}>
         <DialogTitle>{t('pages.trade.order-block.slippage.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
           <Typography variant="bodyMedium">{t('pages.trade.order-block.slippage.body')}</Typography>
@@ -221,7 +221,7 @@ export const OrderSettings = memo(() => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={showExpiryModal} className={styles.dialog}>
+      <Dialog open={showExpiryModal} className={styles.dialog} onClose={() => setShowExpiryModal(false)}>
         <DialogTitle>{t('pages.trade.order-block.expiry.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
           <Typography variant="bodyMedium">{t('pages.trade.order-block.expiry.body')}</Typography>
