@@ -1,12 +1,12 @@
 import classnames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
 
-import { Button, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
 import { AccountBalanceOutlined, ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
+import { Button, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
@@ -25,12 +25,12 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { candlesDataReadyAtom, newCandlesAtom, selectedPeriodAtom } from 'store/tv-chart.store';
-import { tokensIconsMap } from 'utils/tokens';
+import { getDynamicLogo } from 'utils/tokens';
 
 import type { SelectItemI } from '../header-select/types';
 import { CollateralFilter } from './components/collateral-filter/CollateralFilter';
-import { SearchInput } from './components/search-input/SearchInput';
 import { Filters } from './components/filters/Filters';
+import { SearchInput } from './components/search-input/SearchInput';
 import { PerpetualWithPoolI } from './types';
 import { useMarketsFilter } from './useMarketsFilter';
 
@@ -63,7 +63,7 @@ const Option = ({
   option: SelectItemI<PerpetualWithPoolI>;
   onClick: () => void;
 }) => {
-  const IconComponent = tokensIconsMap[option.item.baseCurrency.toLowerCase()]?.icon ?? tokensIconsMap.default.icon;
+  const IconComponent = getDynamicLogo(option.item.baseCurrency.toLowerCase());
 
   return (
     <MenuItem
@@ -74,7 +74,9 @@ const Option = ({
     >
       <div className={styles.optionHolder}>
         <div className={styles.optionLeftBlock}>
-          <IconComponent width={24} height={24} />
+          <Suspense fallback={null}>
+            <IconComponent width={24} height={24} />
+          </Suspense>
           <Typography variant="bodySmall" className={styles.label}>
             {option.item.baseCurrency}/{option.item.quoteCurrency}
             <Typography variant="bodyTiny" as="div">
@@ -291,9 +293,7 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
             <Typography variant="bodyLarge" className={styles.selectedMarketPerpetual}>
               {selectedPerpetual?.baseCurrency}/{selectedPerpetual?.quoteCurrency}
             </Typography>
-            <Typography variant="bodyTiny" className={styles.selectedMarketCollateral}>
-              {selectedPool?.poolSymbol}
-            </Typography>
+            <Typography variant="bodyTiny">{selectedPool?.poolSymbol}</Typography>
           </div>
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
@@ -302,7 +302,7 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
       <Dialog open={isModalOpen} className={styles.dialog} onClose={() => setModalOpen(false)} scroll="paper">
         <OptionsHeader />
         <Separator />
-        <DialogContent className={styles.dialogContent}></DialogContent>
+        <DialogContent />
         {filteredMarkets.map((market) => (
           <Option
             key={market.value}

@@ -1,12 +1,12 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
-import { memo, MouseEvent, useState } from 'react';
+import { memo, MouseEvent, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Menu, MenuItem, Typography } from '@mui/material';
 
-import { tokensIconsMap } from 'utils/tokens';
+import { getDynamicLogo } from 'utils/tokens';
 
 import { collateralFilterAtom, collateralsAtom } from '../../collaterals.store';
 
@@ -81,7 +81,7 @@ export const CollateralFilter = memo(() => {
           {t('common.select.option-all')}
         </MenuItem>
         {collaterals.map((collateral) => {
-          const IconComponent = tokensIconsMap[collateral.toLowerCase()]?.icon ?? tokensIconsMap.default.icon;
+          const IconComponent = getDynamicLogo(collateral.toLowerCase());
 
           return (
             <MenuItem
@@ -92,7 +92,9 @@ export const CollateralFilter = memo(() => {
               }}
               className={classnames(styles.menuItem, { [styles.selected]: collateralFilter === collateral })}
             >
-              <IconComponent className={styles.tokenIcon} />
+              <Suspense fallback={null}>
+                <IconComponent className={styles.tokenIcon} />
+              </Suspense>
               {collateral}
             </MenuItem>
           );

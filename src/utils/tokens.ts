@@ -1,32 +1,38 @@
-import { FC, SVGProps } from 'react';
-import { ReactComponent as BTCIcon } from '../../node_modules/cryptocurrency-icons/svg/color/btc.svg';
-import { ReactComponent as CHZIcon } from '../../node_modules/cryptocurrency-icons/svg/color/chz.svg';
-import { ReactComponent as ETHIcon } from '../../node_modules/cryptocurrency-icons/svg/color/eth.svg';
-import { ReactComponent as GBPIcon } from '../../node_modules/cryptocurrency-icons/svg/color/gbp.svg';
-import { ReactComponent as GenericIcon } from '../../node_modules/cryptocurrency-icons/svg/color/generic.svg';
-import { ReactComponent as MaticIcon } from '../../node_modules/cryptocurrency-icons/svg/color/matic.svg';
+import { FC, SVGProps, lazy } from 'react';
 
-interface TokenI {
-  icon: FC<SVGProps<SVGSVGElement>>;
-}
+const importedLogos: Record<string, FC<SVGProps<SVGSVGElement>>> = {};
 
-export const tokensIconsMap: Record<string, TokenI> = {
-  matic: {
-    icon: MaticIcon,
-  },
-  btc: {
-    icon: BTCIcon,
-  },
-  eth: {
-    icon: ETHIcon,
-  },
-  gbp: {
-    icon: GBPIcon,
-  },
-  chz: {
-    icon: CHZIcon,
-  },
-  default: {
-    icon: GenericIcon,
-  },
-};
+export const getDynamicLogo = (symbol: string) =>
+  lazy(async () => {
+    const importedLogo = importedLogos[symbol];
+    if (importedLogo) {
+      return {
+        default: importedLogo,
+      };
+    }
+    try {
+      const libraryLogo = (await import(`../../node_modules/cryptocurrency-icons/svg/color/${symbol}.svg`))
+        .ReactComponent;
+      importedLogos[symbol] = libraryLogo;
+      return {
+        default: libraryLogo,
+      };
+    } catch {
+      /* continue regardless of error */
+    }
+
+    try {
+      const localLogo = (await import(`~assets/crypto-icons/${symbol}.svg`)).ReactComponent;
+      importedLogos[symbol] = localLogo;
+      return {
+        default: localLogo,
+      };
+    } catch {
+      const defaultLogo = (await import(`../../node_modules/cryptocurrency-icons/svg/color/generic.svg`))
+        .ReactComponent;
+      importedLogos[symbol] = defaultLogo;
+      return {
+        default: defaultLogo,
+      };
+    }
+  });
