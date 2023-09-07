@@ -161,7 +161,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   };
 
   const drawer = (
-    <Box>
+    <>
       <Typography variant="h6" sx={{ my: 2, textAlign: 'center' }} onClick={handleDrawerToggle}>
         <InteractiveLogo />
       </Typography>
@@ -181,7 +181,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       <Box className={styles.settings}>
         <SettingsBlock />
       </Box>
-      <Divider />
       <Box className={styles.languageSwitcher}>
         <LanguageSwitcher />
       </Box>
@@ -190,7 +189,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           {t('common.info-modal.close')}
         </Button>
       </Box>
-    </Box>
+    </>
   );
 
   const container = window !== undefined ? () => window().document.body : undefined;
