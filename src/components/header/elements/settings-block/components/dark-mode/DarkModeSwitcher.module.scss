@@ -1,0 +1,37 @@
+@import '~styles/theme/_theme.scss';
+
+.languageButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 40%;
+  height: 48px;
+  padding-left: 3 * $d8x-spacing;
+  padding-right: 3 * $d8x-spacing;
+  border-radius: $d8x-spacing;
+}
+
+.selectedLanguage {
+  display: flex;
+  align-items: center;
+  gap: 2 * $d8x-spacing;
+  font-size: 16px;
+
+  svg {
+    color: var(--d8x-color-purple);
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.arrowDropDown {
+  color: var(--d8x-color-purple);
+  padding-top: 2 * $d8x-spacing;
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .selectedLanguage {
+    font-size: 14px;
+  }
+}

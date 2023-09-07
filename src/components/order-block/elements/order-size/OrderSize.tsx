@@ -1,6 +1,6 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
-import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -10,12 +10,12 @@ import { Box, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Po
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { getMaxOrderSizeForTrader } from 'network/network';
+import { defaultCurrencyAtom } from 'store/app.store';
 import { orderBlockAtom, orderSizeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, selectedPerpetualAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { OrderBlockE } from 'types/enums';
-import { formatToCurrency } from 'utils/formatToCurrency';
-import { valueToFractionDigits } from 'utils/formatToCurrency';
+import { DefaultCurrencyE, OrderBlockE } from 'types/enums';
+import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
 
 import commonStyles from '../../OrderBlock.module.scss';
 import styles from './OrderSize.module.scss';
@@ -30,6 +30,7 @@ export const OrderSize = memo(() => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [orderBlock] = useAtom(orderBlockAtom);
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
+  const [defaultCurrency] = useAtom(defaultCurrencyAtom);
 
   const [selectedCurrency, setSelectedCurrency] = useState('');
   const [openCurrencySelector, setOpenCurrencySelector] = useState(false);
@@ -98,10 +99,15 @@ export const OrderSize = memo(() => {
   }, [selectedCurrency, selectedPool, selectedPerpetual, orderSize, setOrderSize]);
 
   useEffect(() => {
-    if (selectedPerpetual) {
+    if (!selectedPerpetual || !selectedPool) return;
+    if (defaultCurrency === DefaultCurrencyE.Base) {
       setSelectedCurrency(selectedPerpetual.baseCurrency);
+    } else if (defaultCurrency === DefaultCurrencyE.Quote) {
+      setSelectedCurrency(selectedPerpetual.quoteCurrency);
+    } else {
+      setSelectedCurrency(selectedPool.poolSymbol);
     }
-  }, [selectedPerpetual]);
+  }, [selectedPerpetual, selectedPool, defaultCurrency]);
 
   const handleInputBlur = useCallback(() => {
     if (perpetualStaticInfo) {

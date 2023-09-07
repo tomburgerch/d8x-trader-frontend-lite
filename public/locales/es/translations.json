@@ -502,8 +502,22 @@
       "title": "Configuración",
       "ui-settings": {
         "title": "Configuración de UI",
-        "order-block": "Bloque de Ordenes",
-        "dark-mode": "Pronto"
+        "order-block": {
+          "title": "Bloque de Ordenes",
+          "left": "Izquierda",
+          "right": "Derecha"
+        },
+        "dark-mode": {
+          "title": "Pronto",
+          "on": "En",
+          "off": "Off"
+        },
+        "default-currency": {
+          "title": "Moneda por defecto",
+          "base": "Base",
+          "quote": "Quote",
+          "pool": "Pool"
+        }
       }
     },
     "select": {
