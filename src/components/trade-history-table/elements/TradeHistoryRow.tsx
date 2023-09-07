@@ -1,14 +1,14 @@
-import { useTranslation } from 'react-i18next';
-
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
+import { DATETIME_FORMAT } from 'app-constants';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 interface TradeHistoryRowPropsI {
-  headers: TableHeaderI[];
+  headers: TableHeaderI<TradeHistoryWithSymbolDataI>[];
   tradeHistory: TradeHistoryWithSymbolDataI;
 }
 
@@ -16,7 +16,7 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
   const { t } = useTranslation();
 
   const perpetual = tradeHistory.perpetual;
-  const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
+  const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
   const pnlColor =
     tradeHistory.realizedPnl > 0 ? 'rgba(var(--d8x-background-buy-rgb), 1)' : 'rgba(var(--d8x-background-sell-rgb), 1)';
 

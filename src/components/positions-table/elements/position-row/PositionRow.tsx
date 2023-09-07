@@ -13,8 +13,8 @@ import styles from './PositionRow.module.scss';
 
 interface PositionRowPropsI {
   position: MarginAccountWithLiqPriceI;
-  handlePositionClose: (position: MarginAccountI) => void;
-  handlePositionModify: (position: MarginAccountI) => void;
+  handlePositionClose: (position: MarginAccountWithLiqPriceI) => void;
+  handlePositionModify: (position: MarginAccountWithLiqPriceI) => void;
 }
 
 export const PositionRow = memo(({ position, handlePositionClose, handlePositionModify }: PositionRowPropsI) => {

@@ -56,7 +56,7 @@ export const PositionsTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Asc);
-  const [orderBy, setOrderBy] = useState<keyof MarginAccountI>('symbol');
+  const [orderBy, setOrderBy] = useState<keyof MarginAccountWithLiqPriceI>('symbol');
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -119,36 +119,46 @@ export const PositionsTable = () => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
 
-  const positionsHeaders: TableHeaderI[] = useMemo(
+  const positionsHeaders: TableHeaderI<MarginAccountWithLiqPriceI>[] = useMemo(
     () => [
-      { id: 'symbol', numeric: false, label: t('pages.trade.positions-table.table-header.symbol'), align: AlignE.Left },
       {
-        id: 'positionNotionalBaseCCY',
+        field: 'symbol',
+        numeric: false,
+        label: t('pages.trade.positions-table.table-header.symbol'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'positionNotionalBaseCCY',
         numeric: true,
         label: t('pages.trade.positions-table.table-header.size'),
         align: AlignE.Right,
       },
-      { id: 'side', numeric: false, label: t('pages.trade.positions-table.table-header.side'), align: AlignE.Left },
       {
-        id: 'entryPrice',
+        field: 'side',
+        numeric: false,
+        label: t('pages.trade.positions-table.table-header.side'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'entryPrice',
         numeric: true,
         label: t('pages.trade.positions-table.table-header.entry-price'),
         align: AlignE.Right,
       },
       {
-        id: 'liqPrice',
+        field: 'liqPrice',
         numeric: false,
         label: t('pages.trade.positions-table.table-header.liq-price'),
         align: AlignE.Right,
       },
       {
-        id: 'collateralCC',
+        field: 'collateralCC',
         numeric: true,
         label: t('pages.trade.positions-table.table-header.margin'),
         align: AlignE.Right,
       },
       {
-        id: 'unrealizedPnlQuoteCCY',
+        field: 'unrealizedPnlQuoteCCY',
         numeric: true,
         label: t('pages.trade.positions-table.table-header.pnl'),
         align: AlignE.Right,
@@ -157,8 +167,8 @@ export const PositionsTable = () => {
     [t]
   );
 
-  const positionsWithLiqPrice: MarginAccountWithLiqPriceI[] = useMemo(() => {
-    return positions.map((position) => {
+  const positionsWithLiqPrice = useMemo(() => {
+    return positions.map((position): MarginAccountWithLiqPriceI => {
       return {
         ...position,
         liqPrice: position.liquidationPrice[0],

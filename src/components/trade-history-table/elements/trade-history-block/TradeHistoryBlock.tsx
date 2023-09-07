@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
+import { DATETIME_FORMAT } from 'app-constants';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -10,7 +11,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import styles from './TradeHistoryBlock.module.scss';
 
 interface TradeHistoryRowPropsI {
-  headers: TableHeaderI[];
+  headers: TableHeaderI<TradeHistoryWithSymbolDataI>[];
   tradeHistory: TradeHistoryWithSymbolDataI;
 }
 
@@ -18,7 +19,7 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
   const { t } = useTranslation();
 
   const perpetual = tradeHistory.perpetual;
-  const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
+  const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
   const pnlColor = tradeHistory.realizedPnl > 0 ? styles.green : styles.red;
 
   return (

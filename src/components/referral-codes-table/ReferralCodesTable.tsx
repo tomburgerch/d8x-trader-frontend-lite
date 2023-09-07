@@ -7,7 +7,7 @@ import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { AlignE, SortOrderE } from 'types/enums';
-import type { FundingWithSymbolDataI, ReferrerDataI, TableHeaderI } from 'types/types';
+import type { ReferrerDataI, TableHeaderI } from 'types/types';
 
 import { ReferralCodesRow } from './elements/referral-codes-row/ReferralCodesRow';
 
@@ -24,23 +24,25 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
-  const [orderBy, setOrderBy] = useState<keyof FundingWithSymbolDataI>('timestamp');
+  const [orderBy, setOrderBy] = useState<keyof ReferrerDataI>('createdOn');
 
-  const referralCodesHeaders: TableHeaderI<ReferrerDataI>[] = useMemo(() => {
-    const headers = [{ id: 'code', numeric: false, label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left }];
+  const referralCodesHeaders = useMemo(() => {
+    const headers: TableHeaderI<ReferrerDataI>[] = [
+      { field: 'code', numeric: false, label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
+    ];
 
     if (!isAgency) {
-      headers.push({ id: 'share', numeric: false, label: '', align: AlignE.Right });
+      headers.push({ label: '', align: AlignE.Right });
     }
 
     headers.push({
-      id: 'referrerRebatePerc',
+      field: 'referrerRebatePerc',
       numeric: true,
       label: t('pages.refer.referrer-tab.referrer-rebate-rate'),
       align: AlignE.Right,
     });
     headers.push({
-      id: 'traderRebatePerc',
+      field: 'traderRebatePerc',
       numeric: true,
       label: t('pages.refer.referrer-tab.trader-rebate-rate'),
       align: AlignE.Right,
@@ -48,12 +50,12 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
 
     if (isAgency) {
       headers.push({
-        id: 'agencyRebatePerc',
+        field: 'agencyRebatePerc',
         numeric: true,
         label: t('pages.refer.referrer-tab.agency-rebate-rate'),
         align: AlignE.Right,
       });
-      headers.push({ id: 'modify', numeric: false, label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });
+      headers.push({ label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });
     }
     return headers;
   }, [isAgency, t]);
@@ -68,7 +70,7 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
       <Table>
         <TableHead>
           <TableRow className={styles.headerLabel}>
-            <SortableHeaders<FundingWithSymbolDataI>
+            <SortableHeaders<ReferrerDataI>
               headers={referralCodesHeaders}
               order={order}
               orderBy={orderBy}

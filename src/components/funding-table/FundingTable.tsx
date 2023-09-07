@@ -68,15 +68,20 @@ export const FundingTable = memo(() => {
 
   const fundingListHeaders: TableHeaderI<FundingWithSymbolDataI>[] = useMemo(
     () => [
-      { id: 'timestamp', numeric: false, label: t('pages.trade.funding-table.table-header.time'), align: AlignE.Left },
       {
-        id: 'symbol',
+        field: 'timestamp',
+        numeric: false,
+        label: t('pages.trade.funding-table.table-header.time'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'symbol',
         numeric: false,
         label: t('pages.trade.funding-table.table-header.perpetual'),
         align: AlignE.Left,
       },
       {
-        id: 'amount',
+        field: 'amount',
         numeric: true,
         label: t('pages.trade.funding-table.table-header.funding-payment'),
         align: AlignE.Right,
@@ -85,8 +90,8 @@ export const FundingTable = memo(() => {
     [t]
   );
 
-  const fundingListWithSymbol: FundingWithSymbolDataI[] = useMemo(() => {
-    return fundingList.map((funding) => {
+  const fundingListWithSymbol = useMemo(() => {
+    return fundingList.map((funding): FundingWithSymbolDataI => {
       const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
 
       return {

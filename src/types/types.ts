@@ -38,17 +38,17 @@ export interface PerpetualI {
   isMarketClosed: boolean;
 }
 
-export interface SymbolDataI {
-  symbol: string;
-  perpetual: PerpetualI | null;
-}
-
 export interface PerpetualDataI {
   id: number;
   poolName: string;
   baseCurrency: string;
   quoteCurrency: string;
   symbol: string;
+}
+
+export interface SymbolDataI {
+  symbol: string;
+  perpetual: PerpetualDataI | null;
 }
 
 export interface PerpetualStatisticsI {
@@ -219,10 +219,10 @@ export interface MaxOrderSizeResponseI {
 }
 
 export interface TableHeaderI<T> {
-  id: keyof T;
   label: ReactElement | string;
   align: AlignE;
-  numeric: boolean;
+  field?: keyof T;
+  numeric?: boolean;
 }
 
 export interface TvChartCandleI {

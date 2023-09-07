@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
-import { Suspense, memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
@@ -79,7 +79,7 @@ const Option = ({
           </Suspense>
           <Typography variant="bodySmall" className={styles.label}>
             {option.item.baseCurrency}/{option.item.quoteCurrency}
-            <Typography variant="bodyTiny" as="div">
+            <Typography variant="bodyTiny" component="div">
               {option.item.poolSymbol}
             </Typography>
           </Typography>

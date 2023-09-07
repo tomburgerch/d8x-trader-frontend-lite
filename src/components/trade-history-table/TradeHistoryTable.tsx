@@ -68,24 +68,39 @@ export const TradeHistoryTable = memo(() => {
 
   const tradeHistoryHeaders: TableHeaderI<TradeHistoryWithSymbolDataI>[] = useMemo(
     () => [
-      { id: 'timestamp', numeric: false, label: t('pages.trade.history-table.table-header.time'), align: AlignE.Left },
       {
-        id: 'symbol',
+        field: 'timestamp',
+        numeric: false,
+        label: t('pages.trade.history-table.table-header.time'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'symbol',
         numeric: false,
         label: t('pages.trade.history-table.table-header.perpetual'),
         align: AlignE.Left,
       },
-      { id: 'side', numeric: false, label: t('pages.trade.history-table.table-header.side'), align: AlignE.Left },
-      { id: 'price', numeric: true, label: t('pages.trade.history-table.table-header.price'), align: AlignE.Right },
       {
-        id: 'quantity',
+        field: 'side',
+        numeric: false,
+        label: t('pages.trade.history-table.table-header.side'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'price',
+        numeric: true,
+        label: t('pages.trade.history-table.table-header.price'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'quantity',
         numeric: true,
         label: t('pages.trade.history-table.table-header.quantity'),
         align: AlignE.Right,
       },
-      { id: 'fee', numeric: true, label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
+      { field: 'fee', numeric: true, label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
       {
-        id: 'realizedPnl',
+        field: 'realizedPnl',
         numeric: true,
         label: t('pages.trade.history-table.table-header.realized-profit'),
         align: AlignE.Right,
@@ -156,12 +171,7 @@ export const TradeHistoryTable = memo(() => {
         <Box>
           {address &&
             visibleRows.map((tradeHistory) => (
-              <TradeHistoryBlock
-                key={tradeHistory.orderId}
-                headers={tradeHistoryHeaders}
-                perpetuals={perpetuals}
-                tradeHistory={tradeHistory}
-              />
+              <TradeHistoryBlock key={tradeHistory.orderId} headers={tradeHistoryHeaders} tradeHistory={tradeHistory} />
             ))}
           {(!address || tradesHistory.length === 0) && (
             <Box className={styles.noData}>

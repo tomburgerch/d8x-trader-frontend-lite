@@ -3,15 +3,16 @@ import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import type {
+  FundingI,
   MarginAccountI,
+  OrderI,
+  OrderWithIdI,
   PerpetualDataI,
   PerpetualOpenOrdersI,
-  PerpetualStatisticsI,
   PerpetualStaticInfoI,
+  PerpetualStatisticsI,
   PoolWithIdI,
-  OrderI,
   TradeHistoryI,
-  FundingI,
 } from 'types/types';
 
 const SHOW_CHART_FOR_MOBILE_LS_KEY = 'd8x_showChartForMobile';
@@ -118,7 +119,7 @@ export const positionsAtom = atom(
 );
 
 export const openOrdersAtom = atom(
-  (get) => {
+  (get): OrderWithIdI[] => {
     const orders = get(ordersAtom);
     return Object.entries(orders).map(([key, value]) => ({ id: key, ...value }));
   },
