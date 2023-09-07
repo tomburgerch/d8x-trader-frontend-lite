@@ -303,14 +303,16 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
         <OptionsHeader />
         <Separator />
         <DialogContent />
-        {filteredMarkets.map((market) => (
-          <Option
-            key={market.value}
-            option={market}
-            isSelected={market.item.id === selectedPerpetual?.id}
-            onClick={() => handleChange(market.item)}
-          />
-        ))}
+        <div className={styles.optionList}>
+          {filteredMarkets.map((market) => (
+            <Option
+              key={market.value}
+              option={market}
+              isSelected={market.item.id === selectedPerpetual?.id}
+              onClick={() => handleChange(market.item)}
+            />
+          ))}
+        </div>
         <DialogActions className={styles.dialogAction}>
           <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
             {t('common.info-modal.close')}
