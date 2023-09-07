@@ -6,13 +6,13 @@ import { TableCell, TableRow, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import type { MarginAccountI } from 'types/types';
+import type { MarginAccountWithLiqPriceI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './PositionRow.module.scss';
 
 interface PositionRowPropsI {
-  position: MarginAccountI;
+  position: MarginAccountWithLiqPriceI;
   handlePositionClose: (position: MarginAccountI) => void;
   handlePositionModify: (position: MarginAccountI) => void;
 }
@@ -47,9 +47,9 @@ export const PositionRow = memo(({ position, handlePositionClose, handlePosition
       </TableCell>
       <TableCell align="right">
         <Typography variant="cellSmall">
-          {position.liquidationPrice[0] < 0
+          {position.liqPrice < 0
             ? `- ${parsedSymbol?.quoteCurrency}`
-            : formatToCurrency(position.liquidationPrice[0], parsedSymbol?.quoteCurrency, true)}
+            : formatToCurrency(position.liqPrice, parsedSymbol?.quoteCurrency, true)}
         </Typography>
       </TableCell>
       <TableCell align="right">

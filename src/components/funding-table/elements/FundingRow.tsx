@@ -2,17 +2,16 @@ import { format } from 'date-fns';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
-import type { FundingI, PerpetualDataI, TableHeaderI } from 'types/types';
+import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 interface FundingRowPropsI {
   headers: TableHeaderI[];
-  perpetuals: PerpetualDataI[];
-  funding: FundingI;
+  funding: FundingWithSymbolDataI;
 }
 
-export const FundingRow = ({ headers, perpetuals, funding }: FundingRowPropsI) => {
-  const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
+export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
+  const perpetual = funding.perpetual;
   const time = format(new Date(funding.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
   return (
@@ -21,9 +20,7 @@ export const FundingRow = ({ headers, perpetuals, funding }: FundingRowPropsI) =
         <Typography variant="cellSmall">{time}</Typography>
       </TableCell>
       <TableCell align={headers[1].align}>
-        <Typography variant="cellSmall">
-          {perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : ''}
-        </Typography>
+        <Typography variant="cellSmall">{funding.symbol}</Typography>
       </TableCell>
       <TableCell align={headers[2].align}>
         <Typography variant="cellSmall">

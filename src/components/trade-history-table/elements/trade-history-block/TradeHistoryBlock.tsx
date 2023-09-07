@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
-import type { PerpetualDataI, TradeHistoryI, TableHeaderI } from 'types/types';
+import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TradeHistoryBlock.module.scss';
 
 interface TradeHistoryRowPropsI {
   headers: TableHeaderI[];
-  perpetuals: PerpetualDataI[];
-  tradeHistory: TradeHistoryI;
+  tradeHistory: TradeHistoryWithSymbolDataI;
 }
 
-export const TradeHistoryBlock = ({ headers, perpetuals, tradeHistory }: TradeHistoryRowPropsI) => {
+export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowPropsI) => {
   const { t } = useTranslation();
-  const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
+
+  const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
   const pnlColor = tradeHistory.realizedPnl > 0 ? styles.green : styles.red;
 

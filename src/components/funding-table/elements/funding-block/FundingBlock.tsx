@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
-import type { PerpetualDataI, TableHeaderI, FundingI } from 'types/types';
+import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './FundingBlock.module.scss';
 
 interface FundingRowPropsI {
   headers: TableHeaderI[];
-  perpetuals: PerpetualDataI[];
-  funding: FundingI;
+  funding: FundingWithSymbolDataI;
 }
 
-export const FundingBlock = ({ headers, perpetuals, funding }: FundingRowPropsI) => {
+export const FundingBlock = ({ headers, funding }: FundingRowPropsI) => {
   const { t } = useTranslation();
-  const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
+
+  const perpetual = funding.perpetual;
   const time = format(new Date(funding.timestamp), 'yyyy-MM-dd HH:mm:ss');
 
   return (

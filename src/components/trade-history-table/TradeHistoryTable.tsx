@@ -4,23 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
-import {
-  Box,
-  Table as MuiTable,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { getComparator, stableSort } from 'helpers/tableSort';
 import { getTradesHistory } from 'network/history';
 import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
-import { AlignE, TableTypeE } from 'types/enums';
-import type { TableHeaderI } from 'types/types';
+import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
+import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 
 import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
@@ -28,11 +19,13 @@ import { TradeHistoryRow } from './elements/TradeHistoryRow';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 
 import styles from './TradeHistoryTable.module.scss';
+import { SortableHeaders } from '../table/sortable-header/SortableHeaders';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 
 export const TradeHistoryTable = memo(() => {
   const { t } = useTranslation();
+
   const [tradesHistory, setTradesHistory] = useAtom(tradesHistoryAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [openOrders] = useAtom(openOrdersAtom);
@@ -46,6 +39,8 @@ export const TradeHistoryTable = memo(() => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
+  const [orderBy, setOrderBy] = useState<keyof TradeHistoryWithSymbolDataI>('timestamp');
 
   const refreshTradesHistory = useCallback(() => {
     if (updateTradesHistoryRef.current || !address || !isConnected) {
@@ -71,18 +66,52 @@ export const TradeHistoryTable = memo(() => {
     refreshTradesHistory();
   }, [openOrders, refreshTradesHistory]);
 
-  const tradeHistoryHeaders: TableHeaderI[] = useMemo(
+  const tradeHistoryHeaders: TableHeaderI<TradeHistoryWithSymbolDataI>[] = useMemo(
     () => [
-      { label: t('pages.trade.history-table.table-header.time'), align: AlignE.Left },
-      { label: t('pages.trade.history-table.table-header.perpetual'), align: AlignE.Left },
-      { label: t('pages.trade.history-table.table-header.side'), align: AlignE.Left },
-      { label: t('pages.trade.history-table.table-header.price'), align: AlignE.Right },
-      { label: t('pages.trade.history-table.table-header.quantity'), align: AlignE.Right },
-      { label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
-      { label: t('pages.trade.history-table.table-header.realized-profit'), align: AlignE.Right },
+      { id: 'timestamp', numeric: false, label: t('pages.trade.history-table.table-header.time'), align: AlignE.Left },
+      {
+        id: 'symbol',
+        numeric: false,
+        label: t('pages.trade.history-table.table-header.perpetual'),
+        align: AlignE.Left,
+      },
+      { id: 'side', numeric: false, label: t('pages.trade.history-table.table-header.side'), align: AlignE.Left },
+      { id: 'price', numeric: true, label: t('pages.trade.history-table.table-header.price'), align: AlignE.Right },
+      {
+        id: 'quantity',
+        numeric: true,
+        label: t('pages.trade.history-table.table-header.quantity'),
+        align: AlignE.Right,
+      },
+      { id: 'fee', numeric: true, label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
+      {
+        id: 'realizedPnl',
+        numeric: true,
+        label: t('pages.trade.history-table.table-header.realized-profit'),
+        align: AlignE.Right,
+      },
     ],
     [t]
   );
+
+  const tradesHistoryWithSymbol: TradeHistoryWithSymbolDataI[] = useMemo(() => {
+    return tradesHistory.map((tradeHistory) => {
+      const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
+
+      return {
+        ...tradeHistory,
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
+        perpetual: perpetual ?? null,
+      };
+    });
+  }, [tradesHistory, perpetuals]);
+
+  const visibleRows = address
+    ? stableSort(tradesHistoryWithSymbol, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      )
+    : [];
 
   return (
     <div className={styles.root} ref={ref}>
@@ -91,28 +120,26 @@ export const TradeHistoryTable = memo(() => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow className={styles.tableHolder}>
-                {tradeHistoryHeaders.map((header) => (
-                  <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall">{header.label}</Typography>
-                  </TableCell>
-                ))}
+                <SortableHeaders<TradeHistoryWithSymbolDataI>
+                  headers={tradeHistoryHeaders}
+                  order={order}
+                  orderBy={orderBy}
+                  setOrder={setOrder}
+                  setOrderBy={setOrderBy}
+                />
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
               {address &&
-                tradesHistory
-                  .sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((tradeHistory) => (
-                    <TradeHistoryRow
-                      key={tradeHistory.orderId}
-                      headers={tradeHistoryHeaders}
-                      perpetuals={perpetuals}
-                      tradeHistory={tradeHistory}
-                    />
-                  ))}
+                visibleRows.map((tradeHistory) => (
+                  <TradeHistoryRow
+                    key={tradeHistory.orderId}
+                    headers={tradeHistoryHeaders}
+                    tradeHistory={tradeHistory}
+                  />
+                ))}
               {(!address || tradesHistory.length === 0) && (
-                <EmptyTableRow
+                <EmptyRow
                   colSpan={tradeHistoryHeaders.length}
                   text={
                     !address
@@ -128,16 +155,14 @@ export const TradeHistoryTable = memo(() => {
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           {address &&
-            tradesHistory
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((tradeHistory) => (
-                <TradeHistoryBlock
-                  key={tradeHistory.orderId}
-                  headers={tradeHistoryHeaders}
-                  perpetuals={perpetuals}
-                  tradeHistory={tradeHistory}
-                />
-              ))}
+            visibleRows.map((tradeHistory) => (
+              <TradeHistoryBlock
+                key={tradeHistory.orderId}
+                headers={tradeHistoryHeaders}
+                perpetuals={perpetuals}
+                tradeHistory={tradeHistory}
+              />
+            ))}
           {(!address || tradesHistory.length === 0) && (
             <Box className={styles.noData}>
               {!address

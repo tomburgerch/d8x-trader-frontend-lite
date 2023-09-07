@@ -38,6 +38,11 @@ export interface PerpetualI {
   isMarketClosed: boolean;
 }
 
+export interface SymbolDataI {
+  symbol: string;
+  perpetual: PerpetualI | null;
+}
+
 export interface PerpetualDataI {
   id: number;
   poolName: string;
@@ -115,6 +120,10 @@ export interface MarginAccountI {
   liquidationPrice: [number, number | undefined];
   liquidationLvg: number;
   collToQuoteConversion: number;
+}
+
+export interface MarginAccountWithLiqPriceI extends MarginAccountI {
+  liqPrice: number;
 }
 
 export interface PerpetualOpenOrdersI {
@@ -209,9 +218,11 @@ export interface MaxOrderSizeResponseI {
   sell: number;
 }
 
-export interface TableHeaderI {
+export interface TableHeaderI<T> {
+  id: keyof T;
   label: ReactElement | string;
   align: AlignE;
+  numeric: boolean;
 }
 
 export interface TvChartCandleI {
@@ -237,12 +248,16 @@ export interface TradeHistoryI {
   timestamp: string;
 }
 
+export interface TradeHistoryWithSymbolDataI extends TradeHistoryI, SymbolDataI {}
+
 export interface FundingI {
   perpetualId: number;
   amount: number;
   timestamp: string;
   transactionHash: string;
 }
+
+export interface FundingWithSymbolDataI extends FundingI, SymbolDataI {}
 
 export interface WeeklyApiI {
   startTimestamp: number;

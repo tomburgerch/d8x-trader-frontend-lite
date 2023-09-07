@@ -48,6 +48,12 @@ module.exports = {
     'no-nested-ternary': WARN,
     'no-param-reassign': WARN,
     'no-plusplus': OFF,
+    'no-restricted-imports': [
+      ERROR,
+      {
+        patterns: ['@mui/*/*/*'],
+      },
+    ],
     'no-unused-expressions': [WARN, { allowShortCircuit: true, allowTernary: true }],
     'no-unused-vars': WARN,
     'react-hooks/exhaustive-deps': ERROR,

@@ -4,18 +4,18 @@ import { format } from 'date-fns';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
-import type { PerpetualDataI, TableHeaderI, TradeHistoryI } from 'types/types';
+import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 interface TradeHistoryRowPropsI {
   headers: TableHeaderI[];
-  perpetuals: PerpetualDataI[];
-  tradeHistory: TradeHistoryI;
+  tradeHistory: TradeHistoryWithSymbolDataI;
 }
 
-export const TradeHistoryRow = ({ headers, perpetuals, tradeHistory }: TradeHistoryRowPropsI) => {
+export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI) => {
   const { t } = useTranslation();
-  const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
+
+  const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), 'yyyy-MM-dd HH:mm:ss');
   const pnlColor =
     tradeHistory.realizedPnl > 0 ? 'rgba(var(--d8x-background-buy-rgb), 1)' : 'rgba(var(--d8x-background-sell-rgb), 1)';
@@ -26,9 +26,7 @@ export const TradeHistoryRow = ({ headers, perpetuals, tradeHistory }: TradeHist
         <Typography variant="cellSmall">{time}</Typography>
       </TableCell>
       <TableCell align={headers[1].align}>
-        <Typography variant="cellSmall">
-          {perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : ''}
-        </Typography>
+        <Typography variant="cellSmall">{tradeHistory.symbol}</Typography>
       </TableCell>
       <TableCell align={headers[2].align}>
         <Typography variant="cellSmall">

@@ -10,6 +10,11 @@ export enum OrderBlockPositionE {
   Right = 'right',
 }
 
+export enum SortOrderE {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
 export enum RequestMethodE {
   Get = 'GET',
   Delete = 'DELETE',
