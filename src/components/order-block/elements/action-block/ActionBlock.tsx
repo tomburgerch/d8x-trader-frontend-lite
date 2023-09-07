@@ -470,7 +470,7 @@ export const ActionBlock = memo(() => {
         {t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}
       </Button>
       {orderInfo && (
-        <Dialog open={showReviewOrderModal} className={styles.dialog} onClose={() => setShowReviewOrderModal(false)}>
+        <Dialog open={showReviewOrderModal} className={styles.dialog}>
           <DialogTitle className={styles.dialogTitle}> {t('pages.trade.action-block.review.title')} </DialogTitle>
           <Box className={styles.emphasis}>
             <SidesRow

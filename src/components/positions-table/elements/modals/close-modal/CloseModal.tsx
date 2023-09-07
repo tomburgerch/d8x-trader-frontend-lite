@@ -136,7 +136,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
   };
 
   return (
-    <Dialog open={isOpen} className={styles.root} onClose={() => closeModal()}>
+    <Dialog open={isOpen} className={styles.root}>
       <DialogTitle>{t('pages.trade.positions-table.modify-modal.close')}</DialogTitle>
       <Separator />
       <DialogContent>

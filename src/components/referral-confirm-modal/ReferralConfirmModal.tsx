@@ -91,7 +91,7 @@ export const ReferralConfirmModal = memo(() => {
   const refIdIsValid = refIdTraderRebate !== null;
 
   return (
-    <Dialog open={showModal} className={styles.dialog} onClose={() => setShowModal(false)}>
+    <Dialog open={showModal} className={styles.dialog}>
       <DialogTitle>{t('pages.refer.use-code.title')}</DialogTitle>
       <Box className={styles.dialogRoot}>
         <Box className={styles.codeContainer}>
