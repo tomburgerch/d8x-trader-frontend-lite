@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useChainId } from 'wagmi';
 
@@ -65,12 +65,15 @@ export const GlobalStats = () => {
     }
   }, [traderAPI, selectedPool?.poolSymbol, triggerUserStatsUpdate, isSDKConnected, setTvl]);
 
-  const dSupply = useMemo(() => {
-    if (selectedPool?.poolSymbol && dCurrencyPrice && tvl) {
-      return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.poolSymbol}`, true);
-    }
-    return '--';
-  }, [selectedPool?.poolSymbol, dCurrencyPrice, tvl]);
+  const getDSupply = useCallback(
+    (justNumber: boolean) => {
+      if (selectedPool?.poolSymbol && dCurrencyPrice && tvl) {
+        return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.poolSymbol}`, true, undefined, justNumber);
+      }
+      return '--';
+    },
+    [selectedPool?.poolSymbol, dCurrencyPrice, tvl]
+  );
 
   const weeklyAPY: StatDataI = useMemo(
     () => ({
@@ -102,11 +105,11 @@ export const GlobalStats = () => {
       {
         id: 'dSymbolSupply',
         label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.poolSymbol }),
-        value: dSupply,
-        numberOnly: dSupply,
+        value: getDSupply(false),
+        numberOnly: getDSupply(true),
       },
     ],
-    [selectedPool, tvl, dCurrencyPrice, dSupply, t]
+    [selectedPool, tvl, dCurrencyPrice, getDSupply, t]
   );
 
   if (isMobileScreen) {
