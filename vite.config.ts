@@ -6,6 +6,8 @@ import react from '@vitejs/plugin-react';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import svgr from 'vite-plugin-svgr';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,6 +31,12 @@ export default defineConfig({
     viteTsconfigPaths(),
     // svgr options: https://react-svgr.com/docs/options/
     svgr({ svgrOptions: { icon: true } }),
+    checker({
+      typescript: true,
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
+    }),
   ],
   server: {
     open: true,
