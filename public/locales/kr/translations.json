@@ -18,7 +18,8 @@
         "mark-price": "Mark Price",
         "index-price": "지수 가격",
         "funding-rate": "펀딩 비율",
-        "open-interest": "미결제약정"
+        "open-interest": "미결제약정",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "포지션 열기",
