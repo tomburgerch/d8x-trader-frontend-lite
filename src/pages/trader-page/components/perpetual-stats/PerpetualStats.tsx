@@ -2,13 +2,16 @@ import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+
+import { ReactComponent as ViewChartIcon } from 'assets/icons/viewChart.svg';
 
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
-import { StatsLineMobile } from 'components/stats-line/StatsLineMobile';
-import { perpetualStatisticsAtom } from 'store/pools.store';
+import { perpetualStatisticsAtom, showChartForMobileAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import styles from './PerpetualStats.module.scss';
 
 export const PerpetualStats = () => {
   const { t } = useTranslation();
@@ -17,20 +20,29 @@ export const PerpetualStats = () => {
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
+  const [showChartForMobile, setShowChartForMobile] = useAtom(showChartForMobileAtom);
+
+  const handleChartIconClick = () => {
+    setShowChartForMobile(!showChartForMobile);
+  };
+
+  const midPrice: StatDataI = useMemo(
+    () => ({
+      id: 'midPrice',
+      label: t('pages.trade.stats.mid-price'),
+      value: perpetualStatistics
+        ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true)
+        : '--',
+      numberOnly: perpetualStatistics
+        ? formatToCurrency(perpetualStatistics.midPrice, '', true, undefined, true)
+        : '--',
+      currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
+    }),
+    [t, perpetualStatistics]
+  );
 
   const items: StatDataI[] = useMemo(
     () => [
-      {
-        id: 'midPrice',
-        label: t('pages.trade.stats.mid-price'),
-        value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true)
-          : '--',
-        numberOnly: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
-          : '--',
-        currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
-      },
       {
         id: 'markPrice',
         label: t('pages.trade.stats.mark-price'),
@@ -38,9 +50,8 @@ export const PerpetualStats = () => {
           ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
         numberOnly: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
+          ? formatToCurrency(perpetualStatistics.markPrice, '', true, undefined, true)
           : '--',
-        columnNr: 1,
       },
       {
         id: 'indexPrice',
@@ -49,15 +60,15 @@ export const PerpetualStats = () => {
           ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true)
           : '--',
         numberOnly: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
+          ? formatToCurrency(perpetualStatistics.indexPrice, '', true, undefined, true)
           : '--',
-        columnNr: 1,
       },
       {
         id: 'fundingRate',
         label: t('pages.trade.stats.funding-rate'),
         value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(2)} %` : '--',
-        columnNr: 2,
+        numberOnly: perpetualStatistics ? (perpetualStatistics.currentFundingRateBps / 100).toFixed(2) : '--',
+        currencyOnly: perpetualStatistics ? '%' : '',
       },
       {
         id: 'openInterestBC',
@@ -65,15 +76,44 @@ export const PerpetualStats = () => {
         value: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.openInterestBC, perpetualStatistics.baseCurrency, true)
           : '--',
-        columnNr: 2,
+        numberOnly: perpetualStatistics ? formatToCurrency(perpetualStatistics.openInterestBC, '', true) : '--',
+        currencyOnly: perpetualStatistics ? perpetualStatistics.baseCurrency : '',
       },
     ],
     [t, perpetualStatistics]
   );
 
   if (isMobileScreen) {
-    return <StatsLineMobile items={items} />;
+    return (
+      <div className={styles.statContainer}>
+        <div className={styles.mainMobileLine}>
+          <div>
+            <div className={styles.statMainLabel}>{midPrice.label}</div>
+            <span className={styles.statMainValue}>{midPrice.numberOnly}</span>{' '}
+            <span className={styles.statValue}>{midPrice.currencyOnly}</span>
+          </div>
+          <div>
+            <Box className={styles.viewChart} onClick={handleChartIconClick}>
+              <ViewChartIcon className={styles.viewChartIcon} />
+              <Typography variant="bodyTiny">{t('pages.trade.stats.view-graph')}</Typography>
+            </Box>
+          </div>
+        </div>
+        <div className={styles.statsBlock}>
+          {items.map((item) => (
+            <div key={item.id}>
+              <div className={styles.statLabel}>{item.label}</div>
+              <span className={styles.statValue}>{item.numberOnly}</span>{' '}
+              <span className={styles.statCurrency}>{item.currencyOnly}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    // TODO: VOV: Make StatsLineMobile common
+    // return <StatsLineMobile items={items} />;
   }
 
-  return <StatsLine items={items} />;
+  return <StatsLine items={[midPrice, ...items]} />;
 };

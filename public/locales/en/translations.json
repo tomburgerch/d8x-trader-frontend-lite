@@ -18,7 +18,8 @@
         "mark-price": "Mark Price",
         "index-price": "Index Price",
         "funding-rate": "Funding Rate",
-        "open-interest": "Open Interest"
+        "open-interest": "Open Interest",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "Positions",

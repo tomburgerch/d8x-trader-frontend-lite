@@ -18,7 +18,8 @@
         "mark-price": "标记价格",
         "index-price": "指数价格",
         "funding-rate": "资金费率",
-        "open-interest": "持仓量"
+        "open-interest": "持仓量",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "持仓",
