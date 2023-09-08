@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useWaitForTransaction, useWalletClient, type Address } from 'wagmi';
+import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import {
   Box,
@@ -412,7 +412,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
   };
 
   return (
-    <Dialog open={isOpen} className={styles.root} onClose={() => closeModal()}>
+    <Dialog open={isOpen} className={styles.root}>
       <DialogTitle>{t('pages.trade.positions-table.modify-modal.title')}</DialogTitle>
       <DialogContent>
         <ModifyTypeSelector modifyType={modifyType} setModifyType={setModifyType} />

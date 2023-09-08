@@ -19,7 +19,7 @@ export const WelcomeModal = () => {
   };
 
   return (
-    <Dialog open={showModal} className={styles.dialog} onClose={() => setShowModal(false)}>
+    <Dialog open={showModal} className={styles.dialog}>
       <DialogTitle>Join the D8X UX Challenge!</DialogTitle>
       <DialogContent className={styles.dialogContent}>
         <p>
