@@ -15,24 +15,24 @@ import {
   DialogTitle,
   Table as MuiTable,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
 } from '@mui/material';
 
 import { HashZero } from 'app-constants';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { Dialog } from 'components/dialog/Dialog';
-import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { getComparator, stableSort } from 'helpers/tableSort';
 import { getCancelOrder, getOpenOrders } from 'network/network';
 import { clearOpenOrdersAtom, openOrdersAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { AlignE, TableTypeE } from 'types/enums';
+import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
 import type { OrderWithIdI, TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
@@ -64,6 +64,8 @@ export const OpenOrdersTable = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
+  const [orderBy, setOrderBy] = useState<keyof OrderWithIdI>('executionTimestamp');
   const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const isAPIBusyRef = useRef(isAPIBusy);
@@ -74,9 +76,9 @@ export const OpenOrdersTable = memo(() => {
     }
   }, [isDisconnected, chainId, clearOpenOrders, traderAPI]);
 
-  const handleOrderCancel = useCallback((order: OrderWithIdI) => {
+  const handleOrderCancel = useCallback((orderToCancel: OrderWithIdI) => {
     setCancelModalOpen(true);
-    setSelectedOrder(order);
+    setSelectedOrder(orderToCancel);
   }, []);
 
   const closeCancelModal = () => {
@@ -156,7 +158,7 @@ export const OpenOrdersTable = memo(() => {
     },
     onSettled() {
       setTxHash(undefined);
-      refreshOpenOrders();
+      refreshOpenOrders().then();
     },
     enabled: !!address && !!txHash,
   });
@@ -205,32 +207,65 @@ export const OpenOrdersTable = memo(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
   }, [refreshOpenOrders, setTableRefreshHandlers]);
 
-  const openOrdersHeaders: TableHeaderI[] = useMemo(
+  const openOrdersHeaders: TableHeaderI<OrderWithIdI>[] = useMemo(
     () => [
-      { label: t('pages.trade.orders-table.table-header.symbol'), align: AlignE.Left },
-      { label: t('pages.trade.orders-table.table-header.side'), align: AlignE.Left },
-      { label: t('pages.trade.orders-table.table-header.type'), align: AlignE.Left },
-      { label: t('pages.trade.orders-table.table-header.order-size'), align: AlignE.Right },
-      { label: t('pages.trade.orders-table.table-header.limit-price'), align: AlignE.Right },
-      { label: t('pages.trade.orders-table.table-header.stop-price'), align: AlignE.Right },
-      { label: t('pages.trade.orders-table.table-header.leverage'), align: AlignE.Right },
-      { label: t('pages.trade.orders-table.table-header.good-until'), align: AlignE.Left },
+      {
+        field: 'symbol',
+        numeric: false,
+        label: t('pages.trade.orders-table.table-header.symbol'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'side',
+        numeric: false,
+        label: t('pages.trade.orders-table.table-header.side'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'type',
+        numeric: false,
+        label: t('pages.trade.orders-table.table-header.type'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'quantity',
+        numeric: true,
+        label: t('pages.trade.orders-table.table-header.order-size'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'limitPrice',
+        numeric: true,
+        label: t('pages.trade.orders-table.table-header.limit-price'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'stopPrice',
+        numeric: true,
+        label: t('pages.trade.orders-table.table-header.stop-price'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'leverage',
+        numeric: true,
+        label: t('pages.trade.orders-table.table-header.leverage'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'deadline',
+        numeric: false,
+        label: t('pages.trade.orders-table.table-header.good-until'),
+        align: AlignE.Left,
+      },
     ],
     [t]
   );
 
-  const sortedOpenOrders = useMemo(
-    () =>
-      openOrders.sort((order1, order2) => {
-        if (!order2.executionTimestamp) {
-          return -1;
-        }
-        if (!order1.executionTimestamp) {
-          return 1;
-        }
-        return order2.executionTimestamp - order1.executionTimestamp;
-      }),
-    [openOrders]
+  // FIXME: VOV: Get rid from `<any>` later
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const visibleRows = stableSort(openOrders, getComparator<any>(order, orderBy)).slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
   );
 
   return (
@@ -240,20 +275,22 @@ export const OpenOrdersTable = memo(() => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
-                {openOrdersHeaders.map((header) => (
-                  <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall">{header.label}</Typography>
-                  </TableCell>
-                ))}
+                <SortableHeaders<OrderWithIdI>
+                  headers={openOrdersHeaders}
+                  order={order}
+                  orderBy={orderBy}
+                  setOrder={setOrder}
+                  setOrderBy={setOrderBy}
+                />
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
               {address &&
-                sortedOpenOrders
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((order) => <OpenOrderRow key={order.id} order={order} handleOrderCancel={handleOrderCancel} />)}
-              {(!address || sortedOpenOrders.length === 0) && (
-                <EmptyTableRow
+                visibleRows.map((openOrder) => (
+                  <OpenOrderRow key={openOrder.id} order={openOrder} handleOrderCancel={handleOrderCancel} />
+                ))}
+              {(!address || openOrders.length === 0) && (
+                <EmptyRow
                   colSpan={openOrdersHeaders.length}
                   text={
                     !address
@@ -269,17 +306,15 @@ export const OpenOrdersTable = memo(() => {
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           {address &&
-            sortedOpenOrders
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((order) => (
-                <OpenOrderBlock
-                  key={order.id}
-                  headers={openOrdersHeaders}
-                  order={order}
-                  handleOrderCancel={handleOrderCancel}
-                />
-              ))}
-          {(!address || sortedOpenOrders.length === 0) && (
+            visibleRows.map((openOrder) => (
+              <OpenOrderBlock
+                key={openOrder.id}
+                headers={openOrdersHeaders}
+                order={openOrder}
+                handleOrderCancel={handleOrderCancel}
+              />
+            ))}
+          {(!address || openOrders.length === 0) && (
             <Box className={styles.noData}>
               {!address
                 ? t('pages.trade.orders-table.table-content.connect')
@@ -288,13 +323,13 @@ export const OpenOrdersTable = memo(() => {
           )}
         </Box>
       )}
-      {address && sortedOpenOrders.length > 5 && (
+      {address && openOrders.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"
             rowsPerPageOptions={[5, 10, 20]}
             component="div"
-            count={sortedOpenOrders.length}
+            count={openOrders.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={(_event, newPage) => setPage(newPage)}

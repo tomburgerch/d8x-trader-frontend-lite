@@ -4,23 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
-import {
-  Box,
-  Table as MuiTable,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
+import { getComparator, stableSort } from 'helpers/tableSort';
 import { getFundingRatePayments } from 'network/history';
 import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
-import { AlignE, TableTypeE } from 'types/enums';
-import type { TableHeaderI } from 'types/types';
+import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
+import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 
 import { FundingBlock } from './elements/funding-block/FundingBlock';
 import { FundingRow } from './elements/FundingRow';
@@ -33,6 +25,7 @@ const MIN_WIDTH_FOR_TABLE = 788;
 
 export const FundingTable = memo(() => {
   const { t } = useTranslation();
+
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const [perpetuals] = useAtom(perpetualsAtom);
   const [positions] = useAtom(positionsAtom);
@@ -46,6 +39,8 @@ export const FundingTable = memo(() => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
+  const [orderBy, setOrderBy] = useState<keyof FundingWithSymbolDataI>('timestamp');
 
   const refreshFundingList = useCallback(() => {
     if (updateTradesHistoryRef.current || !address || !isConnected) {
@@ -71,14 +66,48 @@ export const FundingTable = memo(() => {
     refreshFundingList();
   }, [positions, refreshFundingList]); // "positions" change should affect refresh for Funding table
 
-  const fundingListHeaders: TableHeaderI[] = useMemo(
+  const fundingListHeaders: TableHeaderI<FundingWithSymbolDataI>[] = useMemo(
     () => [
-      { label: t('pages.trade.funding-table.table-header.time'), align: AlignE.Left },
-      { label: t('pages.trade.funding-table.table-header.perpetual'), align: AlignE.Left },
-      { label: t('pages.trade.funding-table.table-header.funding-payment'), align: AlignE.Right },
+      {
+        field: 'timestamp',
+        numeric: false,
+        label: t('pages.trade.funding-table.table-header.time'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'symbol',
+        numeric: false,
+        label: t('pages.trade.funding-table.table-header.perpetual'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'amount',
+        numeric: true,
+        label: t('pages.trade.funding-table.table-header.funding-payment'),
+        align: AlignE.Right,
+      },
     ],
     [t]
   );
+
+  const fundingListWithSymbol = useMemo(() => {
+    return fundingList.map((funding): FundingWithSymbolDataI => {
+      const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
+
+      return {
+        ...funding,
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
+        perpetual: perpetual ?? null,
+      };
+    });
+  }, [fundingList, perpetuals]);
+
+  const visibleRows = address
+    ? stableSort(fundingListWithSymbol, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      )
+    : [];
 
   return (
     <div className={styles.root} ref={ref}>
@@ -87,28 +116,26 @@ export const FundingTable = memo(() => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow className={styles.tableHolder}>
-                {fundingListHeaders.map((header) => (
-                  <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall">{header.label}</Typography>
-                  </TableCell>
-                ))}
+                <SortableHeaders<FundingWithSymbolDataI>
+                  headers={fundingListHeaders}
+                  order={order}
+                  orderBy={orderBy}
+                  setOrder={setOrder}
+                  setOrderBy={setOrderBy}
+                />
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
               {address &&
-                fundingList
-                  .sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((funding) => (
-                    <FundingRow
-                      key={`${funding.perpetualId}-${funding.timestamp}`}
-                      headers={fundingListHeaders}
-                      perpetuals={perpetuals}
-                      funding={funding}
-                    />
-                  ))}
+                visibleRows.map((funding) => (
+                  <FundingRow
+                    key={`${funding.perpetualId}-${funding.timestamp}`}
+                    headers={fundingListHeaders}
+                    funding={funding}
+                  />
+                ))}
               {(!address || fundingList.length === 0) && (
-                <EmptyTableRow
+                <EmptyRow
                   colSpan={fundingListHeaders.length}
                   text={
                     !address
@@ -124,16 +151,13 @@ export const FundingTable = memo(() => {
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           {address &&
-            fundingList
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((funding) => (
-                <FundingBlock
-                  key={`${funding.perpetualId}-${funding.timestamp}`}
-                  headers={fundingListHeaders}
-                  perpetuals={perpetuals}
-                  funding={funding}
-                />
-              ))}
+            visibleRows.map((funding) => (
+              <FundingBlock
+                key={`${funding.perpetualId}-${funding.timestamp}`}
+                headers={fundingListHeaders}
+                funding={funding}
+              />
+            ))}
           {(!address || fundingList.length === 0) && (
             <Box className={styles.noData}>
               {!address

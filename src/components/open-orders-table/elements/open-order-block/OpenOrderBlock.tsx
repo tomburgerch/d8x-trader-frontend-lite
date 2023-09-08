@@ -15,13 +15,14 @@ import { typeToLabelMap } from '../../typeToLabelMap';
 import styles from './OpenOrderBlock.module.scss';
 
 interface OpenOrderBlockPropsI {
-  headers: TableHeaderI[];
+  headers: TableHeaderI<OrderWithIdI>[];
   order: OrderWithIdI;
   handleOrderCancel: (order: OrderWithIdI) => void;
 }
 
 export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderBlockPropsI) => {
   const { t } = useTranslation();
+
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;

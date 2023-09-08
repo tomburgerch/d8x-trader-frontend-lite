@@ -1,13 +1,13 @@
 import { TableCell, TableRow, Typography } from '@mui/material';
 
-import styles from './EmptyTableRow.module.scss';
+import styles from './EmptyRow.module.scss';
 
-interface EmptyTableRowPropsI {
+interface EmptyRowPropsI {
   colSpan: number;
   text: string;
 }
 
-export const EmptyTableRow = ({ colSpan, text }: EmptyTableRowPropsI) => {
+export const EmptyRow = ({ colSpan, text }: EmptyRowPropsI) => {
   return (
     <TableRow>
       <TableCell colSpan={colSpan} align="center">
