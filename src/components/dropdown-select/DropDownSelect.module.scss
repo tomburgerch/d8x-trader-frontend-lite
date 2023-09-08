@@ -1,6 +1,6 @@
 @import '~styles/theme/_theme.scss';
 
-.languageButton {
+.dropDownButton {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -9,9 +9,13 @@
   padding-left: 3 * $d8x-spacing;
   padding-right: 3 * $d8x-spacing;
   border-radius: $d8x-spacing;
+
+  &.fullWidth {
+    width: 100%;
+  }
 }
 
-.selectedLanguage {
+.selectedValue {
   display: flex;
   align-items: center;
   gap: 2 * $d8x-spacing;
@@ -31,7 +35,7 @@
 
 @media screen and ($d8x-breakpoint-max-md) {
 
-  .selectedLanguage {
+  .selectedValue {
     font-size: 14px;
   }
 }

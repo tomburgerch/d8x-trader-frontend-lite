@@ -1,6 +1,6 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -99,7 +99,9 @@ export const OrderSize = memo(() => {
   }, [selectedCurrency, selectedPool, selectedPerpetual, orderSize, setOrderSize]);
 
   useEffect(() => {
-    if (!selectedPerpetual || !selectedPool) return;
+    if (!selectedPerpetual || !selectedPool) {
+      return;
+    }
     if (defaultCurrency === DefaultCurrencyE.Base) {
       setSelectedCurrency(selectedPerpetual.baseCurrency);
     } else if (defaultCurrency === DefaultCurrencyE.Quote) {

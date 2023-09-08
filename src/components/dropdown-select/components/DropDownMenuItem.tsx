@@ -2,15 +2,15 @@ import classnames from 'classnames';
 
 import { MenuItem } from '@mui/material';
 
-import styles from './DefaultCurrencyMenuItem.module.scss';
+import styles from './DropDownMenuItem.module.scss';
 
-export interface DefaultCurrencyMenuItemPropsI {
+export interface DropDownMenuItemPropsI {
   option: string;
   isActive: boolean;
   onClick: () => void;
 }
 
-export const DefaultCurrencyMenuItem = ({ option, isActive, onClick }: DefaultCurrencyMenuItemPropsI) => (
+export const DropDownMenuItem = ({ option, isActive, onClick }: DropDownMenuItemPropsI) => (
   <MenuItem onClick={onClick} className={classnames('notranslate', { [styles.selected]: isActive })}>
     {option}
   </MenuItem>
