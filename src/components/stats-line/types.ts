@@ -4,6 +4,5 @@ export interface StatDataI {
   value: string;
   numberOnly?: string;
   currencyOnly?: string;
-  grouped?: boolean;
   columnNr?: number;
 }

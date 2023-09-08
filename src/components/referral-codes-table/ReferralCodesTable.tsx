@@ -1,22 +1,14 @@
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Table, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { AlignE } from 'types/enums';
+import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
+import { getComparator, stableSort } from 'helpers/tableSort';
+import { AlignE, SortOrderE } from 'types/enums';
 import type { ReferrerDataI, TableHeaderI } from 'types/types';
 
-import { EmptyTableRow } from '../empty-table-row/EmptyTableRow';
 import { ReferralCodesRow } from './elements/referral-codes-row/ReferralCodesRow';
 
 import styles from './ReferralCodesTable.module.scss';
@@ -31,42 +23,68 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
+  const [orderBy, setOrderBy] = useState<keyof ReferrerDataI>('createdOn');
 
-  const referralCodesHeaders: TableHeaderI[] = useMemo(() => {
-    const headers = [{ label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left }];
+  const referralCodesHeaders = useMemo(() => {
+    const headers: TableHeaderI<ReferrerDataI>[] = [
+      { field: 'code', numeric: false, label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
+    ];
+
     if (!isAgency) {
       headers.push({ label: '', align: AlignE.Right });
     }
-    headers.push({ label: t('pages.refer.referrer-tab.referrer-rebate-rate'), align: AlignE.Right });
-    headers.push({ label: t('pages.refer.referrer-tab.trader-rebate-rate'), align: AlignE.Right });
+
+    headers.push({
+      field: 'referrerRebatePerc',
+      numeric: true,
+      label: t('pages.refer.referrer-tab.referrer-rebate-rate'),
+      align: AlignE.Right,
+    });
+    headers.push({
+      field: 'traderRebatePerc',
+      numeric: true,
+      label: t('pages.refer.referrer-tab.trader-rebate-rate'),
+      align: AlignE.Right,
+    });
 
     if (isAgency) {
-      headers.push({ label: t('pages.refer.referrer-tab.agency-rebate-rate'), align: AlignE.Right });
+      headers.push({
+        field: 'agencyRebatePerc',
+        numeric: true,
+        label: t('pages.refer.referrer-tab.agency-rebate-rate'),
+        align: AlignE.Right,
+      });
       headers.push({ label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });
     }
     return headers;
   }, [isAgency, t]);
 
+  const visibleRows = stableSort(codes, getComparator(order, orderBy)).slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   return (
     <TableContainer>
       <Table>
         <TableHead>
-          <TableRow>
-            {referralCodesHeaders.map(({ label, align }) => (
-              <TableCell key={label.toString()} align={align}>
-                <Typography variant="bodyTiny" className={styles.headerLabel}>
-                  {label}
-                </Typography>
-              </TableCell>
-            ))}
+          <TableRow className={styles.headerLabel}>
+            <SortableHeaders<ReferrerDataI>
+              headers={referralCodesHeaders}
+              order={order}
+              orderBy={orderBy}
+              setOrder={setOrder}
+              setOrderBy={setOrderBy}
+            />
           </TableRow>
         </TableHead>
         <TableBody>
-          {codes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data) => (
+          {visibleRows.map((data) => (
             <ReferralCodesRow key={data.code} data={data} isAgency={isAgency} />
           ))}
           {codes.length === 0 && (
-            <EmptyTableRow colSpan={referralCodesHeaders.length} text={t('pages.refer.referrer-tab.no-codes')} />
+            <EmptyRow colSpan={referralCodesHeaders.length} text={t('pages.refer.referrer-tab.no-codes')} />
           )}
         </TableBody>
       </Table>

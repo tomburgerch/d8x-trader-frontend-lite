@@ -18,7 +18,8 @@
         "mark-price": "标记价格",
         "index-price": "指数价格",
         "funding-rate": "资金费率",
-        "open-interest": "持仓量"
+        "open-interest": "持仓量",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "持仓",
@@ -502,8 +503,22 @@
       "title": "设置",
       "ui-settings": {
         "title": "用户界面设置",
-        "order-block": "订单号",
-        "dark-mode": "黑夜模式"
+        "order-block": {
+          "title": "订单号",
+          "left": "左",
+          "right": "右"
+        },
+        "dark-mode": {
+          "title": "黑夜模式",
+          "on": "关于",
+          "off": "关闭"
+        },
+        "default-currency": {
+          "title": "默认货币",
+          "base": "基准",
+          "quote": "报价",
+          "pool": "联营"
+        }
       }
     },
     "select": {

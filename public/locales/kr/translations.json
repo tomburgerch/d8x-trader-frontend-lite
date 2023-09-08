@@ -18,7 +18,8 @@
         "mark-price": "Mark Price",
         "index-price": "지수 가격",
         "funding-rate": "펀딩 비율",
-        "open-interest": "미결제약정"
+        "open-interest": "미결제약정",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "포지션 열기",
@@ -502,8 +503,22 @@
       "title": "Settings",
       "ui-settings": {
         "title": "UI Settings",
-        "order-block": "Order Block",
-        "dark-mode": "Dark Mode"
+        "order-block": {
+          "title": "Order Block",
+          "left": "Left",
+          "right": "Right"
+        },
+        "dark-mode": {
+          "title": "Coming soon",
+          "on": "On",
+          "off": "Off"
+        },
+        "default-currency": {
+          "title": "Default Currency",
+          "base": "Base",
+          "quote": "Quote",
+          "pool": "Pool"
+        }
       }
     },
     "select": {

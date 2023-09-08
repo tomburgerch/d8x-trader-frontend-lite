@@ -18,7 +18,8 @@
         "mark-price": "Precio de Marca",
         "index-price": "Precio de Índice",
         "funding-rate": "Tasa de Financiación",
-        "open-interest": "Interés Abierto"
+        "open-interest": "Interés Abierto",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "Posiciones",
@@ -502,8 +503,22 @@
       "title": "Configuración",
       "ui-settings": {
         "title": "Configuración de UI",
-        "order-block": "Bloque de Ordenes",
-        "dark-mode": "Pronto"
+        "order-block": {
+          "title": "Bloque de Ordenes",
+          "left": "Izquierda",
+          "right": "Derecha"
+        },
+        "dark-mode": {
+          "title": "Pronto",
+          "on": "En",
+          "off": "Off"
+        },
+        "default-currency": {
+          "title": "Moneda por defecto",
+          "base": "Base",
+          "quote": "Quote",
+          "pool": "Pool"
+        }
       }
     },
     "select": {

@@ -1,0 +1,85 @@
+@import '~styles/theme/_theme.scss';
+
+.statContainer {
+  flex: 1;
+  padding: $d8x-spacing * 2 $d8x-spacing * 3;
+  border-radius: 8px;
+  background-color: var(--d8x-color-white);
+  line-height: 1.2;
+  margin-top: $d8x-spacing * 2;
+}
+
+.mainMobileLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewChart {
+  display: flex;
+  align-items: center;
+  color: var(--d8x-color-purple);
+  cursor: pointer;
+
+  :global(.MuiFormControlLabel-root) {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .viewChartIcon {
+    transition: opacity 0.3s linear;
+    margin-right: -$d8x-spacing * 5;
+    margin-left: 0;
+    padding: $d8x-spacing $d8x-spacing * 3 $d8x-spacing $d8x-spacing;
+    width: 60px;
+    height: 24px;
+    margin-bottom: 2px;
+    color: var(--d8x-color-purple);
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.statMainLabel {
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--d8x-color-black-500);
+}
+
+.statMainValue {
+  font-size: 1rem;
+  color: var(--d8x-color-purple-dark);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.statsBlock {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statLabel {
+  white-space: nowrap;
+  margin-top: $d8x-spacing * 2;
+  color: var(--d8x-color-black-500);
+  font-size: 0.5rem;
+  min-width: 50px;
+}
+
+.statValue {
+  color: var(--d8x-color-purple-dark);
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.statCurrency {
+  color: var(--d8x-color-purple-dark);
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.5rem;
+}

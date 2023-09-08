@@ -31,7 +31,6 @@ export const SettingsButton = memo(() => {
         <DialogContent className={styles.dialogContent}>
           <SettingsBlock />
         </DialogContent>
-        <Separator />
         <DialogContent className={styles.dialogContent}>
           <LanguageSwitcher />
         </DialogContent>

@@ -1,12 +1,13 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { LanguageE, OrderBlockPositionE } from 'types/enums';
+import { DefaultCurrencyE, LanguageE, OrderBlockPositionE } from 'types/enums';
 import { type AppDimensionsI } from 'types/types';
 
 const ENABLED_DARK_MODE_LS_KEY = 'd8x_enabledDarkMode';
 const ORDER_BLOCK_POSITION_LS_KEY = 'd8x_orderBlockPosition';
 const SELECTED_LANGUAGE_LS_KEY = 'd8x_selectedLanguage';
+const DEFAULT_CURRENCY_LS_KEY = 'd8x_defaultCurrency';
 const SHOW_MODAl_LS_KEY = 'd8x_showWelcomeModal';
 const SHOW_MODAL = 'show';
 const HIDE_MODAL = 'hide';
@@ -17,6 +18,7 @@ export const orderBlockPositionAtom = atomWithStorage<OrderBlockPositionE>(
 );
 export const enabledDarkModeAtom = atomWithStorage<boolean>(ENABLED_DARK_MODE_LS_KEY, false);
 export const selectedLanguageAtom = atomWithStorage<LanguageE>(SELECTED_LANGUAGE_LS_KEY, LanguageE.EN);
+export const defaultCurrencyAtom = atomWithStorage<DefaultCurrencyE>(DEFAULT_CURRENCY_LS_KEY, DefaultCurrencyE.Base);
 
 export const appDimensionsAtom = atom<AppDimensionsI>({});
 

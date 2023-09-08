@@ -4,20 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
-import {
-  Box,
-  Table as MuiTable,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
-import { EmptyTableRow } from 'components/empty-table-row/EmptyTableRow';
+import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { createSymbol } from 'helpers/createSymbol';
+import { getComparator, stableSort } from 'helpers/tableSort';
 import { getPositionRisk } from 'network/network';
 import {
   positionsAtom,
@@ -28,8 +20,9 @@ import {
 } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { AlignE, TableTypeE } from 'types/enums';
+import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
 import type { MarginAccountI, TableHeaderI } from 'types/types';
+import { MarginAccountWithLiqPriceI } from 'types/types';
 
 import { CloseModal } from './elements/modals/close-modal/CloseModal';
 import { ModifyModal } from './elements/modals/modify-modal/ModifyModal';
@@ -62,6 +55,8 @@ export const PositionsTable = () => {
   const [selectedPosition, setSelectedPosition] = useState<MarginAccountI | null>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<SortOrderE>(SortOrderE.Asc);
+  const [orderBy, setOrderBy] = useState<keyof MarginAccountWithLiqPriceI>('symbol');
 
   const handlePositionModify = useCallback((position: MarginAccountI) => {
     setModifyModalOpen(true);
@@ -124,20 +119,66 @@ export const PositionsTable = () => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.POSITIONS]: refreshPositions }));
   }, [refreshPositions, setTableRefreshHandlers]);
 
-  const positionsHeaders: TableHeaderI[] = useMemo(
+  const positionsHeaders: TableHeaderI<MarginAccountWithLiqPriceI>[] = useMemo(
     () => [
-      { label: t('pages.trade.positions-table.table-header.symbol'), align: AlignE.Left },
-      { label: t('pages.trade.positions-table.table-header.size'), align: AlignE.Right },
-      { label: t('pages.trade.positions-table.table-header.side'), align: AlignE.Left },
-      { label: t('pages.trade.positions-table.table-header.entry-price'), align: AlignE.Right },
-      { label: t('pages.trade.positions-table.table-header.liq-price'), align: AlignE.Right },
       {
+        field: 'symbol',
+        numeric: false,
+        label: t('pages.trade.positions-table.table-header.symbol'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'positionNotionalBaseCCY',
+        numeric: true,
+        label: t('pages.trade.positions-table.table-header.size'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'side',
+        numeric: false,
+        label: t('pages.trade.positions-table.table-header.side'),
+        align: AlignE.Left,
+      },
+      {
+        field: 'entryPrice',
+        numeric: true,
+        label: t('pages.trade.positions-table.table-header.entry-price'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'liqPrice',
+        numeric: false,
+        label: t('pages.trade.positions-table.table-header.liq-price'),
+        align: AlignE.Right,
+      },
+      {
+        field: 'collateralCC',
+        numeric: true,
         label: t('pages.trade.positions-table.table-header.margin'),
         align: AlignE.Right,
       },
-      { label: t('pages.trade.positions-table.table-header.pnl'), align: AlignE.Right },
+      {
+        field: 'unrealizedPnlQuoteCCY',
+        numeric: true,
+        label: t('pages.trade.positions-table.table-header.pnl'),
+        align: AlignE.Right,
+      },
     ],
     [t]
+  );
+
+  const positionsWithLiqPrice = useMemo(() => {
+    return positions.map((position): MarginAccountWithLiqPriceI => {
+      return {
+        ...position,
+        liqPrice: position.liquidationPrice[0],
+      };
+    });
+  }, [positions]);
+
+  const visibleRows = stableSort(positionsWithLiqPrice, getComparator(order, orderBy)).slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
   );
 
   return (
@@ -147,27 +188,27 @@ export const PositionsTable = () => {
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
-                {positionsHeaders.map((header) => (
-                  <TableCell key={header.label.toString()} align={header.align}>
-                    <Typography variant="bodySmall">{header.label}</Typography>
-                  </TableCell>
-                ))}
+                <SortableHeaders<MarginAccountWithLiqPriceI>
+                  headers={positionsHeaders}
+                  order={order}
+                  orderBy={orderBy}
+                  setOrder={setOrder}
+                  setOrderBy={setOrderBy}
+                />
               </TableRow>
             </TableHead>
             <TableBody className={styles.tableBody}>
               {address &&
-                positions
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((position) => (
-                    <PositionRow
-                      key={position.symbol}
-                      position={position}
-                      handlePositionClose={handlePositionClose}
-                      handlePositionModify={handlePositionModify}
-                    />
-                  ))}
+                visibleRows.map((position) => (
+                  <PositionRow
+                    key={position.symbol}
+                    position={position}
+                    handlePositionClose={handlePositionClose}
+                    handlePositionModify={handlePositionModify}
+                  />
+                ))}
               {(!address || positions.length === 0) && (
-                <EmptyTableRow
+                <EmptyRow
                   colSpan={positionsHeaders.length}
                   text={
                     !address
@@ -183,17 +224,15 @@ export const PositionsTable = () => {
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
         <Box>
           {address &&
-            positions
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((position) => (
-                <PositionBlock
-                  key={position.symbol}
-                  headers={positionsHeaders}
-                  position={position}
-                  handlePositionClose={handlePositionClose}
-                  handlePositionModify={handlePositionModify}
-                />
-              ))}
+            visibleRows.map((position) => (
+              <PositionBlock
+                key={position.symbol}
+                headers={positionsHeaders}
+                position={position}
+                handlePositionClose={handlePositionClose}
+                handlePositionModify={handlePositionModify}
+              />
+            ))}
           {(!address || positions.length === 0) && (
             <Box className={styles.noData}>
               {!address

@@ -18,7 +18,8 @@
         "mark-price": "Mark Price",
         "index-price": "Index Price",
         "funding-rate": "Funding Rate",
-        "open-interest": "Open Interest"
+        "open-interest": "Open Interest",
+        "view-graph": "View Graph"
       },
       "positions-table": {
         "table-title": "Positions",
@@ -502,8 +503,22 @@
       "title": "Settings",
       "ui-settings": {
         "title": "UI Settings",
-        "order-block": "Order Block",
-        "dark-mode": "Coming soon"
+        "order-block": {
+          "title": "Order Block",
+          "left": "Left",
+          "right": "Right"
+        },
+        "dark-mode": {
+          "title": "Coming soon",
+          "on": "On",
+          "off": "Off"
+        },
+        "default-currency": {
+          "title": "Default Currency",
+          "base": "Base",
+          "quote": "Quote",
+          "pool": "Pool"
+        }
       }
     },
     "select": {

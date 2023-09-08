@@ -7,14 +7,14 @@ import IconButton from '@mui/material/IconButton';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import type { MarginAccountI, TableHeaderI } from 'types/types';
+import type { MarginAccountI, MarginAccountWithLiqPriceI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './PositionBlock.module.scss';
 
 interface PositionRowPropsI {
-  headers: TableHeaderI[];
-  position: MarginAccountI;
+  headers: TableHeaderI<MarginAccountWithLiqPriceI>[];
+  position: MarginAccountWithLiqPriceI;
   handlePositionClose: (position: MarginAccountI) => void;
   handlePositionModify: (position: MarginAccountI) => void;
 }
@@ -22,6 +22,7 @@ interface PositionRowPropsI {
 export const PositionBlock = memo(
   ({ headers, position, handlePositionClose, handlePositionModify }: PositionRowPropsI) => {
     const { t } = useTranslation();
+
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY > 0 ? styles.green : styles.red;
 
@@ -77,9 +78,9 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[4].label}
             rightSide={
-              position.liquidationPrice[0] < 0
+              position.liqPrice < 0
                 ? `- ${parsedSymbol?.quoteCurrency}`
-                : formatToCurrency(position.liquidationPrice[0], parsedSymbol?.quoteCurrency, true)
+                : formatToCurrency(position.liqPrice, parsedSymbol?.quoteCurrency, true)
             }
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}

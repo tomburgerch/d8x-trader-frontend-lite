@@ -5,9 +5,20 @@ export enum LanguageE {
   ES = 'es',
 }
 
+export enum DefaultCurrencyE {
+  Base = 'base',
+  Pool = 'pool',
+  Quote = 'quote',
+}
+
 export enum OrderBlockPositionE {
   Left = 'left',
   Right = 'right',
+}
+
+export enum SortOrderE {
+  Asc = 'asc',
+  Desc = 'desc',
 }
 
 export enum RequestMethodE {
