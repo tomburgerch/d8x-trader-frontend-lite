@@ -502,8 +502,22 @@
       "title": "Einstellungen",
       "ui-settings": {
         "title": "UI-Einstellungen",
-        "order-block": "Order Block",
-        "dark-mode": "Coming soon"
+        "order-block": {
+          "title": "Order Block",
+          "left": "Left",
+          "right": "Right"
+        },
+        "dark-mode": {
+          "title": "Coming soon",
+          "on": "On",
+          "off": "Off"
+        },
+        "default-currency": {
+          "title": "Default Currency",
+          "base": "Base",
+          "quote": "Quote",
+          "pool": "Pool"
+        }
       }
     },
     "select": {

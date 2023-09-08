@@ -1,31 +1,19 @@
-import { useAtom } from 'jotai';
-import { type ChangeEvent, memo } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Box, Switch, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { Build } from '@mui/icons-material';
-
-import { enabledDarkModeAtom, orderBlockPositionAtom } from 'store/app.store';
-import { OrderBlockPositionE } from 'types/enums';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import styles from './SettingsBlock.module.scss';
+import { DarkModeSwitcher } from './components/dark-mode/DarkModeSwitcher';
+import { DefaultCurrencySwitcher } from './components/default-currency/DefaultCurrencySwitcher';
+import { OrderBlockSwitcher } from './components/order-block/OrderBlockSwitcher';
 
 export const SettingsBlock = memo(() => {
   const { t } = useTranslation();
 
   const theme = useTheme();
   const isBigScreen = useMediaQuery(theme.breakpoints.up('lg'));
-
-  const [orderBlockPosition, setOrderBlockPosition] = useAtom(orderBlockPositionAtom);
-  const [enabledDarkMode, setEnabledDarkMode] = useAtom(enabledDarkModeAtom);
-
-  const handleOrderBlockChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setOrderBlockPosition(event.target.checked ? OrderBlockPositionE.Right : OrderBlockPositionE.Left);
-  };
-
-  const handleEnabledDarkMode = (event: ChangeEvent<HTMLInputElement>) => {
-    setEnabledDarkMode(event.target.checked);
-  };
 
   return (
     <Box className={styles.root}>
@@ -38,20 +26,22 @@ export const SettingsBlock = memo(() => {
       {isBigScreen && (
         <Box className={styles.optionRow}>
           <Typography variant="bodyMedium" className={styles.setting}>
-            {t('common.settings.ui-settings.order-block')}
+            {t('common.settings.ui-settings.order-block.title')}
           </Typography>
-          <Switch
-            className={styles.switch}
-            checked={orderBlockPosition === OrderBlockPositionE.Right}
-            onChange={handleOrderBlockChange}
-          />
+          <OrderBlockSwitcher />
         </Box>
       )}
       <Box className={styles.optionRow}>
         <Typography variant="bodyMedium" className={styles.setting}>
-          {t('common.settings.ui-settings.dark-mode')}
+          {t('common.settings.ui-settings.dark-mode.title')}
         </Typography>
-        <Switch className={styles.switch} checked={enabledDarkMode} onChange={handleEnabledDarkMode} />
+        <DarkModeSwitcher />
+      </Box>
+      <Box className={styles.optionRow}>
+        <Typography variant="bodyMedium" className={styles.setting}>
+          {t('common.settings.ui-settings.default-currency.title')}
+        </Typography>
+        <DefaultCurrencySwitcher />
       </Box>
     </Box>
   );

@@ -5,6 +5,12 @@ export enum LanguageE {
   ES = 'es',
 }
 
+export enum DefaultCurrencyE {
+  Base = 'base',
+  Pool = 'pool',
+  Quote = 'quote',
+}
+
 export enum OrderBlockPositionE {
   Left = 'left',
   Right = 'right',
