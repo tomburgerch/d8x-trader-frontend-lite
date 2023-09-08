@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useChainId } from 'wagmi';
 
+import { useMediaQuery, useTheme } from '@mui/material';
+
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPI } from 'network/history';
@@ -11,10 +13,10 @@ import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom, tvlAt
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 
 import styles from './GlobalStats.module.scss';
-import { useMediaQuery, useTheme } from '@mui/material';
 
 export const GlobalStats = () => {
   const { t } = useTranslation();
+
   const chainId = useChainId();
   const theme = useTheme();
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -105,7 +107,7 @@ export const GlobalStats = () => {
       {
         id: 'dSymbolSupply',
         label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.poolSymbol }),
-        value: getDSupply(false),
+        value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
     ],
@@ -133,5 +135,5 @@ export const GlobalStats = () => {
     );
   }
 
-  return <StatsLine items={items} />;
+  return <StatsLine items={[weeklyAPY, ...items]} />;
 };
