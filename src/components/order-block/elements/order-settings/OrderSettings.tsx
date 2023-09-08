@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { type ChangeEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -21,7 +21,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { ExpirySelector } from 'components/order-block/elements/expiry-selector/ExpirySelector';
 // import { createSymbol } from 'helpers/createSymbol';
 import { orderBlockAtom, orderTypeAtom, reduceOnlyAtom, slippageSliderAtom } from 'store/order-block.store';
-import { perpetualStatisticsAtom, selectedPerpetualAtom /*, positionsAtom*/ } from 'store/pools.store';
+import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, ToleranceE } from 'types/enums';
 import { type MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -221,7 +221,7 @@ export const OrderSettings = memo(() => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={showExpiryModal} className={styles.dialog}>
+      <Dialog open={showExpiryModal} className={styles.dialog} onClose={() => setShowExpiryModal(false)}>
         <DialogTitle>{t('pages.trade.order-block.expiry.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>
           <Typography variant="bodyMedium">{t('pages.trade.order-block.expiry.body')}</Typography>
