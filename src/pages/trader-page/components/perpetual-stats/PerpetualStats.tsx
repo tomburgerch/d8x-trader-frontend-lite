@@ -40,7 +40,6 @@ export const PerpetualStats = () => {
         numberOnly: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
           : '--',
-        grouped: true,
         columnNr: 1,
       },
       {
@@ -52,14 +51,12 @@ export const PerpetualStats = () => {
         numberOnly: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true, undefined, true)
           : '--',
-        grouped: true,
         columnNr: 1,
       },
       {
         id: 'fundingRate',
         label: t('pages.trade.stats.funding-rate'),
         value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(2)} %` : '--',
-        grouped: true,
         columnNr: 2,
       },
       {
@@ -68,7 +65,6 @@ export const PerpetualStats = () => {
         value: perpetualStatistics
           ? formatToCurrency(perpetualStatistics.openInterestBC, perpetualStatistics.baseCurrency, true)
           : '--',
-        grouped: true,
         columnNr: 2,
       },
     ],
