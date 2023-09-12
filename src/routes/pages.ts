@@ -22,8 +22,11 @@ export const pages: PageI[] = [
     path: RoutesE.Vault,
     translationKey: 'navigation.vault',
   },
+];
+
+export const authPages: PageI[] = [
   {
-    id: 'vault',
+    id: 'portfolio',
     path: RoutesE.Portfolio,
     translationKey: 'navigation.portfolio',
   },

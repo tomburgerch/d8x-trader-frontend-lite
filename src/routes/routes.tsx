@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import { PrivateRoutes } from './PrivateRoutes';
 import { RoutesE } from './RoutesE';
 
 const ReferPage = lazy(async () => ({ default: (await import('pages/refer-page/ReferPage')).ReferPage }));
@@ -15,7 +16,9 @@ export const AppRoutes = () => {
     <Routes>
       <Route key="vault-page" path={RoutesE.Vault} element={<VaultPage />} />
       <Route key="refer-page" path={RoutesE.Refer} element={<ReferPage />} />
-      <Route path={RoutesE.Portfolio} element={<PortfolioPage />} />
+      <Route element={<PrivateRoutes />}>
+        <Route path={RoutesE.Portfolio} element={<PortfolioPage />} />
+      </Route>
       <Route key="trader-page" path="*" element={<TraderPage />} />
     </Routes>
   );
