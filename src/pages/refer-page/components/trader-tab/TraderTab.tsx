@@ -6,21 +6,21 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box } from '@mui/material';
 
 import { useReferralCodes } from 'hooks/useReferralCodes';
-import { getEarnedRebate, getOpenTraderRebate } from 'network/referral';
+import { getOpenTraderRebate } from 'network/referral';
 import { poolsAtom } from 'store/pools.store';
 import { RebateTypeE } from 'types/enums';
-import type { EarnedRebateI, OpenTraderRebateI, OverviewItemI, OverviewPoolItemI } from 'types/types';
+import type { OpenTraderRebateI, OverviewItemI, OverviewPoolItemI } from 'types/types';
 
-import { Overview } from '../overview/Overview';
 import { Disclaimer } from '../disclaimer/Disclaimer';
+import { Overview } from '../overview/Overview';
 import { ReferralCodeBlock } from '../referral-code-block/ReferralCodeBlock';
 
+import { useFetchEarnedRebate } from '../referrer-tab/useFetchEarnedRebate';
 import styles from './TraderTab.module.scss';
 
 export const TraderTab = () => {
   const { t } = useTranslation();
 
-  const [earnedRebates, setEarnedRebates] = useState<EarnedRebateI[]>([]);
   const [openRewards, setOpenRewards] = useState<OpenTraderRebateI[]>([]);
 
   const [pools] = useAtom(poolsAtom);
@@ -28,7 +28,6 @@ export const TraderTab = () => {
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const earnedRebateRequestRef = useRef(false);
   const openRewardsRequestRef = useRef(false);
 
   const { referralCode, traderRebatePercentage, getReferralCodesAsync } = useReferralCodes(address, chainId);
@@ -38,26 +37,7 @@ export const TraderTab = () => {
     [t]
   );
 
-  useEffect(() => {
-    if (address && chainId) {
-      if (earnedRebateRequestRef.current) {
-        return;
-      }
-
-      earnedRebateRequestRef.current = true;
-
-      getEarnedRebate(chainId, address, RebateTypeE.Trader)
-        .then(({ data }) => {
-          setEarnedRebates(data);
-        })
-        .catch(console.error)
-        .finally(() => {
-          earnedRebateRequestRef.current = false;
-        });
-    } else {
-      setEarnedRebates([]);
-    }
-  }, [address, chainId]);
+  const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
 
   useEffect(() => {
     if (address && chainId) {

@@ -1,10 +1,37 @@
+import { useAtom } from 'jotai';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PieChart } from 'react-minimal-pie-chart';
+
+import { useFetchEarnedRebate } from 'pages/refer-page/components/referrer-tab/useFetchEarnedRebate';
+import { poolsAtom } from 'store/pools.store';
+import { RebateTypeE } from 'types/enums';
+import { OverviewPoolItemI } from 'types/types';
+
 import { AssetLine } from '../perpetuals/Perpetuals';
 import styles from './Vault.module.scss';
-import { PieChart } from 'react-minimal-pie-chart';
 
 export const Vault = () => {
   const { t } = useTranslation();
+
+  const [pools] = useAtom(poolsAtom);
+
+  const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
+
+  const overviewItems = useMemo(() => {
+    const earnedRebatesByPools: OverviewPoolItemI[] = [];
+
+    pools.forEach((pool) => {
+      const earnedRebatesAmount = earnedRebates
+        .filter((rebate) => rebate.poolId === pool.poolId)
+        .reduce((accumulator, currentValue) => accumulator + currentValue.amountCC, 0);
+
+      earnedRebatesByPools.push({ poolSymbol: pool.poolSymbol, value: earnedRebatesAmount });
+    });
+
+    return earnedRebatesByPools;
+  }, [pools, earnedRebates]);
+
   return (
     <>
       <div className={styles.pnlBlock}>
@@ -33,10 +60,9 @@ export const Vault = () => {
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.vault.earnings-pool')}</div>
         <div className={styles.assetsList}>
-          <AssetLine symbol="BTC" value={22} />
-          <AssetLine symbol="ETH" value={1444} />
-          <AssetLine symbol="MATIC" value={3444} />
-          <AssetLine symbol="USDC" value={67888} />
+          {overviewItems.map((rebate) => (
+            <AssetLine key={rebate.poolSymbol} symbol={rebate.poolSymbol} value={rebate.value} />
+          ))}
         </div>
       </div>
     </>
