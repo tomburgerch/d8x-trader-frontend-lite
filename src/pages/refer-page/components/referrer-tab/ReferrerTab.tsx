@@ -73,7 +73,7 @@ export const ReferrerTab = memo(() => {
           earnedRebateRequestRef.current = false;
         });
     } else {
-      setReferralVolumes([]);
+      setEarnedRebates([]);
     }
   }, [address, chainId]);
 
