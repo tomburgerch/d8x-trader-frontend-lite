@@ -10,11 +10,15 @@ import { OverviewPoolItemI } from 'types/types';
 
 import { AssetLine } from '../perpetuals/Perpetuals';
 import styles from './Vault.module.scss';
+import { poolShareTokensShareAtom } from 'pages/portfolio-page/components/AccountValue/fetchEverything';
+
+const colorsArray = ['#6649DF', '#FDA13A', '#F24141', '#515151'];
 
 export const Vault = () => {
   const { t } = useTranslation();
 
   const [pools] = useAtom(poolsAtom);
+  const [poolShareTokensShare] = useAtom(poolShareTokensShareAtom);
 
   const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
 
@@ -39,21 +43,19 @@ export const Vault = () => {
         <div className={styles.chartBlock}>
           <PieChart
             className={styles.pie}
-            data={[
-              { title: 'BTC', value: 40, color: '#6649DF' },
-              { title: 'ETH', value: 30, color: '#FDA13A' },
-              { title: 'MATIC', value: 20, color: '#F24141' },
-              { title: 'USDC', value: 10, color: '#515151' },
-            ]}
+            data={poolShareTokensShare.map((share, index) => ({
+              title: share.balance,
+              value: share.percent * 100,
+              color: colorsArray[index % colorsArray.length],
+            }))}
             startAngle={-90}
             paddingAngle={1}
             lineWidth={25}
           />
           <div className={styles.assetsList}>
-            <AssetLine symbol="BTC" value="40%" />
-            <AssetLine symbol="ETH" value="30%" />
-            <AssetLine symbol="MATIC" value="20%" />
-            <AssetLine symbol="USDC" value="10%" />
+            {poolShareTokensShare.map((share) => (
+              <AssetLine key={share.symbol} symbol={share.symbol} value={`${(share.percent * 100).toFixed(2)}%`} />
+            ))}
           </div>
         </div>
       </div>
