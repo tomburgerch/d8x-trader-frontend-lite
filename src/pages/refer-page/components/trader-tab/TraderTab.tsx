@@ -1,34 +1,30 @@
 import { useAtom } from 'jotai';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
 import { Box } from '@mui/material';
 
 import { useReferralCodes } from 'hooks/useReferralCodes';
-import { getOpenTraderRebate } from 'network/referral';
 import { poolsAtom } from 'store/pools.store';
 import { RebateTypeE } from 'types/enums';
-import type { OpenTraderRebateI, OverviewItemI, OverviewPoolItemI } from 'types/types';
+import type { OverviewItemI, OverviewPoolItemI } from 'types/types';
 
 import { Disclaimer } from '../disclaimer/Disclaimer';
 import { Overview } from '../overview/Overview';
 import { ReferralCodeBlock } from '../referral-code-block/ReferralCodeBlock';
-
 import { useFetchEarnedRebate } from '../referrer-tab/useFetchEarnedRebate';
+
 import styles from './TraderTab.module.scss';
+import { useFetchOpenRewards } from './useFetchOpenRewards';
 
 export const TraderTab = () => {
   const { t } = useTranslation();
-
-  const [openRewards, setOpenRewards] = useState<OpenTraderRebateI[]>([]);
 
   const [pools] = useAtom(poolsAtom);
 
   const { address } = useAccount();
   const chainId = useChainId();
-
-  const openRewardsRequestRef = useRef(false);
 
   const { referralCode, traderRebatePercentage, getReferralCodesAsync } = useReferralCodes(address, chainId);
 
@@ -38,27 +34,7 @@ export const TraderTab = () => {
   );
 
   const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
-
-  useEffect(() => {
-    if (address && chainId) {
-      if (openRewardsRequestRef.current) {
-        return;
-      }
-
-      openRewardsRequestRef.current = true;
-
-      getOpenTraderRebate(chainId, address)
-        .then(({ data }) => {
-          setOpenRewards(data);
-        })
-        .catch(console.error)
-        .finally(() => {
-          openRewardsRequestRef.current = false;
-        });
-    } else {
-      setOpenRewards([]);
-    }
-  }, [address, chainId]);
+  const { openRewards } = useFetchOpenRewards();
 
   const overviewItems: OverviewItemI[] = useMemo(() => {
     const earnedRebatesByPools: OverviewPoolItemI[] = [];
