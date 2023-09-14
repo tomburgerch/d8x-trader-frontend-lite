@@ -111,13 +111,13 @@ const fetchUnrealizedPnLAtom = atom(
     let totalCollateralCC = 0;
     activePositions.forEach((position) => {
       const [baseSymbol, , poolSymbol] = position.symbol.split('-');
-      totalUnrealizedPnl += position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].collateral;
+      const positionUnrealizedPnl = position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote;
+      totalUnrealizedPnl += positionUnrealizedPnl;
 
       totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
       totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
 
-      const unrealizedPnl =
-        (position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote) / poolUsdPrice[poolSymbol].collateral;
+      const unrealizedPnl = positionUnrealizedPnl / poolUsdPrice[poolSymbol].collateral;
       if (!unrealizedPnLReduced[poolSymbol]) {
         unrealizedPnLReduced[poolSymbol] = unrealizedPnl;
       } else {
