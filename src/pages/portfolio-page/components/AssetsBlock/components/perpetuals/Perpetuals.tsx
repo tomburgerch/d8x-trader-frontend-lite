@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getDynamicLogo } from 'utils/tokens';
 
-import { realizedPnLListAtom } from 'pages/portfolio-page/components/AccountValue/fetchRealizedPnL';
-import { unrealizedPnLListAtom } from 'pages/portfolio-page/components/AccountValue/fetchUnrealizedPnLAtom';
+import { realizedPnLListAtom } from 'pages/portfolio-page/store/fetchRealizedPnL';
+import { unrealizedPnLListAtom } from 'pages/portfolio-page/store/fetchUnrealizedPnL';
 
 import styles from './Perpetuals.module.scss';
 

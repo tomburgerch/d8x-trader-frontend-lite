@@ -1,15 +1,13 @@
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
+import { accountValueAtom, totalOpenRewardsAtom } from 'pages/portfolio-page/store/fetchPortfolio';
+import { poolShareTokensUSDBalanceAtom } from 'pages/portfolio-page/store/fetchPoolShare';
+import { poolTokensUSDBalanceAtom } from 'pages/portfolio-page/store/fetchPoolTokensUSDBalance';
+import { leverageAtom, totalUnrealizedPnLAtom } from 'pages/portfolio-page/store/fetchUnrealizedPnL';
+
+import { totalEstimatedEarningsAtom } from '../../store/fetchEarnings';
 import styles from './AccountValue.module.scss';
-import {
-  accountValueAtom,
-  poolShareTokensUSDBalanceAtom,
-  totalEstimatedEarningsAtom,
-  totalOpenRewardsAtom,
-} from './fetchEverything';
-import { poolTokensUSDBalanceAtom } from './fetchPoolTokensUSDBalance';
-import { leverageAtom, totalUnrealizedPnLAtom } from './fetchUnrealizedPnLAtom';
 
 const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 

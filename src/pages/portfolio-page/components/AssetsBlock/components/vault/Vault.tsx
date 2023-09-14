@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PieChart } from 'react-minimal-pie-chart';
 
-import { poolShareTokensShareAtom } from 'pages/portfolio-page/components/AccountValue/fetchEverything';
+import { poolShareTokensShareAtom } from 'pages/portfolio-page/store/fetchPoolShare';
 import { useFetchEarnedRebate } from 'pages/refer-page/components/referrer-tab/useFetchEarnedRebate';
 import { poolsAtom } from 'store/pools.store';
 import { RebateTypeE } from 'types/enums';
@@ -21,6 +21,11 @@ export const Vault = () => {
   const [poolShareTokensShare] = useAtom(poolShareTokensShareAtom);
 
   const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
+
+  const totalPoolShare = useMemo(
+    () => poolShareTokensShare.reduce((acc, curr) => acc + curr.balance, 0),
+    [poolShareTokensShare]
+  );
 
   const overviewItems = useMemo(() => {
     const earnedRebatesByPools: OverviewPoolItemI[] = [];
@@ -41,17 +46,19 @@ export const Vault = () => {
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.vault.assets-pool')}</div>
         <div className={styles.chartBlock}>
-          <PieChart
-            className={styles.pie}
-            data={poolShareTokensShare.map((share, index) => ({
-              title: share.balance,
-              value: share.percent * 100,
-              color: colorsArray[index % colorsArray.length],
-            }))}
-            startAngle={-90}
-            paddingAngle={1}
-            lineWidth={25}
-          />
+          {!!totalPoolShare && (
+            <PieChart
+              className={styles.pie}
+              data={poolShareTokensShare.map((share, index) => ({
+                title: share.balance,
+                value: share.percent * 100,
+                color: colorsArray[index % colorsArray.length],
+              }))}
+              startAngle={-90}
+              paddingAngle={1}
+              lineWidth={25}
+            />
+          )}
           <div className={styles.assetsList}>
             {poolShareTokensShare.map((share) => (
               <AssetLine key={share.symbol} symbol={share.symbol} value={`${(share.percent * 100).toFixed(2)}%`} />
