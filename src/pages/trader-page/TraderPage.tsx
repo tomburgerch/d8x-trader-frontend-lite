@@ -222,9 +222,18 @@ export const TraderPage = () => {
         } | D8X App`}
       />
       <Box className={styles.root}>
-        {isSmallScreen && (
-          <Box className={styles.mobileSelectBoxes}>{<MarketSelect withNavigate={true} updatePerpetual={true} />}</Box>
-        )}
+        <Container
+          className={classnames(styles.headerContainer, {
+            [styles.swapSides]: !isSmallScreen && orderBlockPosition === OrderBlockPositionE.Left,
+          })}
+        >
+          <Box className={styles.leftBlock}>
+            <PerpetualStats />
+          </Box>
+          <Box className={styles.rightBlock}>
+            <MarketSelect withNavigate={true} updatePerpetual={true} />
+          </Box>
+        </Container>
         {!isSmallScreen && (
           <Container
             className={classnames(styles.sidesContainer, {
@@ -232,7 +241,6 @@ export const TraderPage = () => {
             })}
           >
             <Box className={styles.leftBlock}>
-              <PerpetualStats />
               <ChartHolder />
               <TableSelector
                 selectorItems={selectorForAllItems}
@@ -241,14 +249,12 @@ export const TraderPage = () => {
               />
             </Box>
             <Box className={styles.rightBlock}>
-              <MarketSelect withNavigate={true} updatePerpetual={true} />
               <OrderBlock />
             </Box>
           </Container>
         )}
         {isSmallScreen && (
           <Container className={styles.columnContainer}>
-            <PerpetualStats />
             <ChartHolder />
             <OrderBlock />
             {isMobile ? (
