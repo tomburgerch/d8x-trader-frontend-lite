@@ -1,26 +1,37 @@
 import { useAtom } from 'jotai';
-import { useFetchOpenRewards } from 'pages/refer-page/components/trader-tab/useFetchOpenRewards';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAccount, useChainId } from 'wagmi';
+
+import { useFetchOpenRewards } from 'pages/refer-page/components/trader-tab/useFetchOpenRewards';
 import { traderAPIAtom } from 'store/pools.store';
-import { useAccount } from 'wagmi';
+
 import styles from './AccountValue.module.scss';
-import { fetchPositionsAtom, poolShareTokensUSDBalanceAtom, poolTokensUSDBalanceAtom } from './fetchEverything';
+import {
+  fetchPositionsAtom,
+  poolShareTokensUSDBalanceAtom,
+  poolTokensUSDBalanceAtom,
+  totalEstimatedEarningsAtom,
+  totalUnrealizedPnLAtom,
+} from './fetchEverything';
 
 const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 export const AccountValue = () => {
   const { t } = useTranslation();
   const { address } = useAccount();
+  const chainId = useChainId();
 
   const { openRewards } = useFetchOpenRewards();
 
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokensUSDBalance] = useAtom(poolTokensUSDBalanceAtom);
   const [poolShareTokensUSDBalance] = useAtom(poolShareTokensUSDBalanceAtom);
+  const [totalUnrealizedPnL] = useAtom(totalUnrealizedPnLAtom);
+  const [totalEstimatedEarnings] = useAtom(totalEstimatedEarningsAtom);
   const [{ openRewardsByPools }, fetchPositions] = useAtom(fetchPositionsAtom);
 
-  const totalEstimEarning = useMemo(
+  const totalReferralRewards = useMemo(
     () => openRewardsByPools.reduce((acc, curr) => acc + Number(curr.value), 0),
     [openRewardsByPools]
   );
@@ -28,9 +39,9 @@ export const AccountValue = () => {
   useEffect(() => {
     if (traderAPI) {
       // eslint-disable-next-line
-      fetchPositions(address!, openRewards);
+      fetchPositions(address!, chainId, openRewards);
     }
-  }, [openRewards, traderAPI, address, fetchPositions]);
+  }, [openRewards, traderAPI, address, chainId, fetchPositions]);
   return (
     <div className={styles.sideBlock}>
       <div>
@@ -55,11 +66,15 @@ export const AccountValue = () => {
         </div>
         <div className={styles.detailsLine}>
           <div>{t('pages.portfolio.account-value.details.perps.unrealized')}</div>
-          <div className={styles.detailsValue}>$233222</div>
+          <div className={styles.detailsValue}>
+            {totalUnrealizedPnL < 0
+              ? '-$' + formatCurrency(Math.abs(totalUnrealizedPnL))
+              : '$' + formatCurrency(totalUnrealizedPnL)}
+          </div>
         </div>
         <div className={styles.detailsLine}>
           <div>{t('pages.portfolio.account-value.details.perps.referral')}</div>
-          <div className={styles.detailsValue}>${formatCurrency(totalEstimEarning)}</div>
+          <div className={styles.detailsValue}>${formatCurrency(totalReferralRewards)}</div>
         </div>
       </div>
       <div className={styles.detailsContainer}>
@@ -71,7 +86,7 @@ export const AccountValue = () => {
         </div>
         <div className={styles.detailsLine}>
           <div>{t('pages.portfolio.account-value.details.vault.total')}</div>
-          <div className={styles.detailsValue}>${formatCurrency(totalEstimEarning)}</div>
+          <div className={styles.detailsValue}>${formatCurrency(totalEstimatedEarnings)}</div>
         </div>
       </div>
     </div>

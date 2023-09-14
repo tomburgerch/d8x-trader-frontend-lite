@@ -1,12 +1,21 @@
+import { useAtom } from 'jotai';
 import { Suspense } from 'react';
-import { getDynamicLogo } from 'utils/tokens';
-import styles from './Perpetuals.module.scss';
 import { useTranslation } from 'react-i18next';
+import { getDynamicLogo } from 'utils/tokens';
+
+import {
+  realizedPnLListAtom,
+  unrealizedPnLListAtom,
+} from 'pages/portfolio-page/components/AccountValue/fetchEverything';
+
+import styles from './Perpetuals.module.scss';
 
 interface AssetLinePropsI {
   symbol: string;
   value: string | number;
 }
+
+const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 export const AssetLine = ({ symbol, value }: AssetLinePropsI) => {
   const IconComponent = getDynamicLogo(symbol.toLowerCase());
@@ -24,24 +33,25 @@ export const AssetLine = ({ symbol, value }: AssetLinePropsI) => {
 export const Perpetuals = () => {
   const { t } = useTranslation();
 
+  const [unrealizedPnLList] = useAtom(unrealizedPnLListAtom);
+  const [realizedPnLList] = useAtom(realizedPnLListAtom);
+
   return (
     <>
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.realized')}</div>
         <div className={styles.assetsList}>
-          <AssetLine symbol="BTC" value={22} />
-          <AssetLine symbol="ETH" value={1444} />
-          <AssetLine symbol="MATIC" value={3444} />
-          <AssetLine symbol="USDC" value={67888} />
+          {realizedPnLList.map((token) => (
+            <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+          ))}
         </div>
       </div>
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.unrealized')}</div>
         <div className={styles.assetsList}>
-          <AssetLine symbol="BTC" value={22} />
-          <AssetLine symbol="ETH" value={1444} />
-          <AssetLine symbol="MATIC" value={3444} />
-          <AssetLine symbol="USDC" value={67888} />
+          {unrealizedPnLList.map((token) => (
+            <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+          ))}
         </div>
       </div>
     </>

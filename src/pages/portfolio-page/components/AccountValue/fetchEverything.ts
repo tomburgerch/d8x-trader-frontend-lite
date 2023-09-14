@@ -1,25 +1,31 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { multicall } from '@wagmi/core';
 import { atom } from 'jotai';
-import { poolsAtom, traderAPIAtom } from 'store/pools.store';
-import { OpenTraderRebateI, OverviewPoolItemI, PoolWithIdI } from 'types/types';
 import { Address } from 'viem';
 import { erc20ABI } from 'wagmi';
 
+import { getEarnings, getTradesHistory } from 'network/history';
+import { getPositionRisk } from 'network/network';
+import { perpetualsAtom, poolsAtom, traderAPIAtom } from 'store/pools.store';
+import { OpenTraderRebateI, OverviewPoolItemI, PoolWithIdI } from 'types/types';
+
 const getPoolUsdPrice = async (traderAPI: TraderInterface, pool: PoolWithIdI) => {
-  // TODO: Bug for USDC pool, returns MATIC-USD while perpetuals[0] looks for MATIC-USDC
   const info = await traderAPI.getPriceInUSD(
     `${pool.perpetuals[0].baseCurrency}-${pool.perpetuals[0].quoteCurrency}-${pool.poolSymbol}`
   );
-  const priceInUsd = info.get('MATIC-USD');
-  // const priceInUsd = info.get(`${pool.perpetuals[0].baseCurrency}-${pool.perpetuals[0].quoteCurrency}`);
+  const priceInUsd = info.get(`${pool.perpetuals[0].baseCurrency}-USD`);
   if (priceInUsd) {
-    return priceInUsd / pool.perpetuals[0].indexPrice;
+    const quotePrice = priceInUsd / pool.perpetuals[0].indexPrice;
+    return { collateral: pool.perpetuals[0].collToQuoteIndexPrice * quotePrice, quote: quotePrice };
   }
-  return 0;
+  return { collateral: 0, quote: 0 };
 };
 
-const collateralPriceInUSDAtom = atom<Record<string, number>>({});
+interface PoolUsdPriceI {
+  collateral: number;
+  quote: number;
+}
+const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
 const isLoadingAtom = atom(true);
 const openRewardsAtom = atom<OverviewPoolItemI[]>([]);
 export const poolTokensUSDBalanceAtom = atom(0);
@@ -30,52 +36,19 @@ interface TokenPoolSharePercentI {
   percent: number;
 }
 export const poolShareTokensShareAtom = atom<TokenPoolSharePercentI[]>([]);
-export const fetchPositionsAtom = atom(
-  (get) => ({ isLoading: get(isLoadingAtom), openRewardsByPools: get(openRewardsAtom) }),
-  async (get, set, userAddress: Address, openRewards: OpenTraderRebateI[]) => {
+export const totalUnrealizedPnLAtom = atom(0);
+interface UnrealizedPnLListAtomI {
+  symbol: string;
+  value: number;
+}
+export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
+export const realizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
+export const totalEstimatedEarningsAtom = atom(0);
+const fetchPoolTokensUSDBalanceAtom = atom(
+  () => ({}),
+  async (get, set, userAddress: Address) => {
     const pools = get(poolsAtom);
-    const traderAPI = get(traderAPIAtom);
-    if (!traderAPI) return;
-
-    const openRewardsByPools: OverviewPoolItemI[] = [];
-
-    const poolUsdPriceMap: Record<string, number> = {};
-    const dCurrencyPriceMap: Record<string, number> = {};
-    const poolShareTokenBalances: { symbol: string; balance: number }[] = [];
-
-    for (const pool of pools) {
-      const collateralPriceInUSD = await getPoolUsdPrice(traderAPI, pool);
-      poolUsdPriceMap[pool.poolSymbol] = collateralPriceInUSD;
-
-      const openRewardsAmount = openRewards
-        .filter((volume) => volume.poolId === pool.poolId)
-        .reduce((accumulator, currentValue) => accumulator + currentValue.amountCC, 0);
-
-      openRewardsByPools.push({ poolSymbol: pool.poolSymbol, value: openRewardsAmount * collateralPriceInUSD });
-
-      dCurrencyPriceMap[pool.poolSymbol] = await traderAPI.getShareTokenPrice(pool.poolSymbol);
-      const poolShareBalance = await traderAPI.getPoolShareTokenBalance(userAddress, pool.poolSymbol);
-      poolShareTokenBalances.push({
-        symbol: pool.poolSymbol,
-        balance: poolShareBalance * dCurrencyPriceMap[pool.poolSymbol],
-      });
-    }
-    set(collateralPriceInUSDAtom, poolUsdPriceMap);
-    set(openRewardsAtom, openRewardsByPools);
-
-    const poolShareTokensUSDBalance = poolShareTokenBalances.reduce(
-      (acc, balance) => acc + balance.balance * poolUsdPriceMap[balance.symbol],
-      0
-    );
-    set(
-      poolShareTokensShareAtom,
-      poolShareTokenBalances.map((balance) => ({
-        symbol: balance.symbol,
-        balance: balance.balance,
-        percent: (balance.balance * poolUsdPriceMap[balance.symbol]) / poolShareTokensUSDBalance || 0,
-      }))
-    );
-    set(poolShareTokensUSDBalanceAtom, poolShareTokensUSDBalance);
+    const poolUsdPrice = get(poolUsdPriceAtom);
 
     const poolTokensBalances = await multicall({
       contracts: pools.map((pool) => ({
@@ -100,11 +73,133 @@ export const fetchPositionsAtom = atom(
           // eslint-disable-next-line
           // @ts-ignore
           const tokenBalance = Number(balance.result) / 10 ** poolTokensDecimals[index].result;
-          return acc + tokenBalance * poolUsdPriceMap[pools[index].poolSymbol];
+          return acc + tokenBalance * poolUsdPrice[pools[index].poolSymbol].collateral;
         }
         return acc;
       }, 0)
     );
+  }
+);
+
+const fetchUnrealizedPnLAtom = atom(
+  () => ({}),
+  async (get, set, userAddress: Address, chainId: number) => {
+    const poolUsdPrice = get(poolUsdPriceAtom);
+    const traderAPI = get(traderAPIAtom);
+    if (!traderAPI) return;
+
+    const { data } = await getPositionRisk(chainId, traderAPI, userAddress, Date.now());
+    const activePositions = data.filter(({ side }) => side !== 'CLOSED');
+    let totalUnrealizedPnl = 0;
+    const unrealizedPnLReduced: Record<string, number> = {};
+    activePositions.forEach((position) => {
+      const poolSymbol = position.symbol.split('-')[2];
+      totalUnrealizedPnl += position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].collateral;
+
+      const unrealizedPnl =
+        (position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote) / poolUsdPrice[poolSymbol].collateral;
+      if (!unrealizedPnLReduced[poolSymbol]) {
+        unrealizedPnLReduced[poolSymbol] = unrealizedPnl;
+      } else {
+        unrealizedPnLReduced[poolSymbol] += unrealizedPnl;
+      }
+    });
+    set(totalUnrealizedPnLAtom, totalUnrealizedPnl);
+    set(
+      unrealizedPnLListAtom,
+      Object.keys(unrealizedPnLReduced).map((key) => ({
+        symbol: key,
+        value: unrealizedPnLReduced[key],
+      }))
+    );
+  }
+);
+const fetchRealizedPnLAtom = atom(
+  () => ({}),
+  async (get, set, userAddress: Address, chainId: number) => {
+    const perpetuals = get(perpetualsAtom);
+
+    const tradeHistory = await getTradesHistory(chainId, userAddress);
+    const realizedPnLReduced = tradeHistory.reduce<Record<string, number>>((acc, current) => {
+      const poolName = perpetuals.find(({ id }) => id === current.perpetualId)?.poolName || '';
+      if (acc[poolName]) {
+        acc[poolName] += current.realizedPnl;
+      } else {
+        acc[poolName] = current.realizedPnl;
+      }
+      return acc;
+    }, {});
+    set(
+      realizedPnLListAtom,
+      Object.keys(realizedPnLReduced).map((key) => ({
+        symbol: key,
+        value: realizedPnLReduced[key],
+      }))
+    );
+  }
+);
+
+export const fetchPositionsAtom = atom(
+  (get) => ({ isLoading: get(isLoadingAtom), openRewardsByPools: get(openRewardsAtom) }),
+  async (get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
+    const pools = get(poolsAtom);
+    const traderAPI = get(traderAPIAtom);
+    if (!traderAPI) return;
+
+    const openRewardsByPools: OverviewPoolItemI[] = [];
+
+    const poolUsdPriceMap: Record<string, PoolUsdPriceI> = {};
+    const dCurrencyPriceMap: Record<string, number> = {};
+    const poolShareTokenBalances: { symbol: string; balance: number }[] = [];
+
+    let totalEstimatedEarnings = 0;
+
+    for (const pool of pools) {
+      const poolUSDPrice = await getPoolUsdPrice(traderAPI, pool);
+      poolUsdPriceMap[pool.poolSymbol] = {
+        collateral: poolUSDPrice.collateral,
+        quote: poolUSDPrice.quote,
+      };
+
+      const openRewardsAmount = openRewards
+        .filter((volume) => volume.poolId === pool.poolId)
+        .reduce((accumulator, currentValue) => accumulator + currentValue.amountCC, 0);
+
+      openRewardsByPools.push({ poolSymbol: pool.poolSymbol, value: openRewardsAmount * poolUSDPrice.collateral });
+
+      const earnings = await getEarnings(chainId, userAddress, pool.poolSymbol);
+      totalEstimatedEarnings += earnings.earnings;
+
+      dCurrencyPriceMap[pool.poolSymbol] = await traderAPI.getShareTokenPrice(pool.poolSymbol);
+      const poolShareBalance = await traderAPI.getPoolShareTokenBalance(userAddress, pool.poolSymbol);
+      poolShareTokenBalances.push({
+        symbol: pool.poolSymbol,
+        balance: poolShareBalance * dCurrencyPriceMap[pool.poolSymbol],
+      });
+    }
+    set(poolUsdPriceAtom, poolUsdPriceMap);
+    set(openRewardsAtom, openRewardsByPools);
+    set(totalEstimatedEarningsAtom, totalEstimatedEarnings);
+
+    const poolShareTokensUSDBalance = poolShareTokenBalances.reduce(
+      (acc, balance) => acc + balance.balance * poolUsdPriceMap[balance.symbol].collateral,
+      0
+    );
+    set(
+      poolShareTokensShareAtom,
+      poolShareTokenBalances.map((balance) => ({
+        symbol: balance.symbol,
+        balance: balance.balance,
+        percent: (balance.balance * poolUsdPriceMap[balance.symbol].collateral) / poolShareTokensUSDBalance || 0,
+      }))
+    );
+    set(poolShareTokensUSDBalanceAtom, poolShareTokensUSDBalance);
+
+    await Promise.all([
+      set(fetchUnrealizedPnLAtom, userAddress, chainId),
+      set(fetchRealizedPnLAtom, userAddress, chainId),
+      set(fetchPoolTokensUSDBalanceAtom, userAddress),
+    ]);
     set(isLoadingAtom, false);
   }
 );

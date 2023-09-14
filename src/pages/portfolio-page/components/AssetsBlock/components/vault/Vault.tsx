@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PieChart } from 'react-minimal-pie-chart';
 
+import { poolShareTokensShareAtom } from 'pages/portfolio-page/components/AccountValue/fetchEverything';
 import { useFetchEarnedRebate } from 'pages/refer-page/components/referrer-tab/useFetchEarnedRebate';
 import { poolsAtom } from 'store/pools.store';
 import { RebateTypeE } from 'types/enums';
@@ -10,7 +11,6 @@ import { OverviewPoolItemI } from 'types/types';
 
 import { AssetLine } from '../perpetuals/Perpetuals';
 import styles from './Vault.module.scss';
-import { poolShareTokensShareAtom } from 'pages/portfolio-page/components/AccountValue/fetchEverything';
 
 const colorsArray = ['#6649DF', '#FDA13A', '#F24141', '#515151'];
 
