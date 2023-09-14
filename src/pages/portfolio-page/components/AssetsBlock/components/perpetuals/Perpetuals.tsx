@@ -3,19 +3,17 @@ import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getDynamicLogo } from 'utils/tokens';
 
-import {
-  realizedPnLListAtom,
-  unrealizedPnLListAtom,
-} from 'pages/portfolio-page/components/AccountValue/fetchEverything';
+import { realizedPnLListAtom } from 'pages/portfolio-page/components/AccountValue/fetchRealizedPnL';
+import { unrealizedPnLListAtom } from 'pages/portfolio-page/components/AccountValue/fetchUnrealizedPnLAtom';
 
 import styles from './Perpetuals.module.scss';
+
+const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 interface AssetLinePropsI {
   symbol: string;
   value: string | number;
 }
-
-const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 export const AssetLine = ({ symbol, value }: AssetLinePropsI) => {
   const IconComponent = getDynamicLogo(symbol.toLowerCase());

@@ -1,33 +1,21 @@
 import { useAtom } from 'jotai';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAccount, useChainId } from 'wagmi';
-
-import { useFetchOpenRewards } from 'pages/refer-page/components/trader-tab/useFetchOpenRewards';
-import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './AccountValue.module.scss';
 import {
   accountValueAtom,
-  fetchPositionsAtom,
-  leverageAtom,
   poolShareTokensUSDBalanceAtom,
-  poolTokensUSDBalanceAtom,
   totalEstimatedEarningsAtom,
   totalOpenRewardsAtom,
-  totalUnrealizedPnLAtom,
 } from './fetchEverything';
+import { poolTokensUSDBalanceAtom } from './fetchPoolTokensUSDBalance';
+import { leverageAtom, totalUnrealizedPnLAtom } from './fetchUnrealizedPnLAtom';
 
 const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 export const AccountValue = () => {
   const { t } = useTranslation();
-  const { address } = useAccount();
-  const chainId = useChainId();
 
-  const { openRewards } = useFetchOpenRewards();
-
-  const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokensUSDBalance] = useAtom(poolTokensUSDBalanceAtom);
   const [poolShareTokensUSDBalance] = useAtom(poolShareTokensUSDBalanceAtom);
   const [leverage] = useAtom(leverageAtom);
@@ -35,14 +23,7 @@ export const AccountValue = () => {
   const [totalEstimatedEarnings] = useAtom(totalEstimatedEarningsAtom);
   const [totalReferralRewards] = useAtom(totalOpenRewardsAtom);
   const [accountValue] = useAtom(accountValueAtom);
-  const [, fetchPositions] = useAtom(fetchPositionsAtom);
 
-  useEffect(() => {
-    if (traderAPI) {
-      // eslint-disable-next-line
-      fetchPositions(address!, chainId, openRewards);
-    }
-  }, [openRewards, traderAPI, address, chainId, fetchPositions]);
   return (
     <div className={styles.sideBlock}>
       <div>
