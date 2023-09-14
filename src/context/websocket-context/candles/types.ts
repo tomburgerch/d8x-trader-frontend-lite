@@ -25,10 +25,6 @@ export interface ConnectWsMessageI extends CommonWsMessageI {
   type: MessageTypeE.Connect;
 }
 
-export interface ErrorWsMessageI extends CommonWsMessageI {
-  type: MessageTypeE.Error;
-}
-
 export interface CandleDataI {
   start: number;
   time: string;

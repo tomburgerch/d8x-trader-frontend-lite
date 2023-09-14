@@ -32,10 +32,6 @@ function isConnectMessage(message: CommonWsMessageI): message is ConnectWsMessag
   return message.type === MessageTypeE.Connect;
 }
 
-// function isErrorMessage(message: CommonWsMessageI): message is ErrorWsMessageI {
-//   return message.type === MessageTypeE.Error;
-// }
-
 function isSubscribeMessage(message: SubscribeWsMessageI): message is SubscribeWsMessageI {
   return (
     message.type === MessageTypeE.Subscribe && message.topic !== MessageTopicE.Markets && Array.isArray(message.data)

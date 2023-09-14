@@ -235,25 +235,23 @@ export const TraderPage = () => {
           </Box>
         </Container>
         {!isSmallScreen && (
-          <>
-            <Container
-              className={classnames(styles.sidesContainer, {
-                [styles.swapSides]: orderBlockPosition === OrderBlockPositionE.Left,
-              })}
-            >
-              <Box className={styles.leftBlock}>
-                <ChartHolder />
-                <TableSelector
-                  selectorItems={selectorForAllItems}
-                  activeIndex={activeAllIndex}
-                  setActiveIndex={handleActiveAllIndex}
-                />
-              </Box>
-              <Box className={styles.rightBlock}>
-                <OrderBlock />
-              </Box>
-            </Container>
-          </>
+          <Container
+            className={classnames(styles.sidesContainer, {
+              [styles.swapSides]: orderBlockPosition === OrderBlockPositionE.Left,
+            })}
+          >
+            <Box className={styles.leftBlock}>
+              <ChartHolder />
+              <TableSelector
+                selectorItems={selectorForAllItems}
+                activeIndex={activeAllIndex}
+                setActiveIndex={handleActiveAllIndex}
+              />
+            </Box>
+            <Box className={styles.rightBlock}>
+              <OrderBlock />
+            </Box>
+          </Container>
         )}
         {isSmallScreen && (
           <Container className={styles.columnContainer}>
