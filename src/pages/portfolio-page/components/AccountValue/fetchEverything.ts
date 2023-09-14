@@ -40,7 +40,7 @@ interface PoolUsdPriceI {
 }
 const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
 const isLoadingAtom = atom(true);
-const openRewardsAtom = atom<OverviewPoolItemI[]>([]);
+export const totalOpenRewardsAtom = atom<number>(0);
 export const poolTokensUSDBalanceAtom = atom(0);
 export const poolShareTokensUSDBalanceAtom = atom(0);
 interface TokenPoolSharePercentI {
@@ -58,6 +58,7 @@ interface UnrealizedPnLListAtomI {
 export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 export const realizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 export const totalEstimatedEarningsAtom = atom(0);
+export const accountValueAtom = atom(0);
 const fetchPoolTokensUSDBalanceAtom = atom(
   () => ({}),
   async (get, set, userAddress: Address) => {
@@ -80,18 +81,17 @@ const fetchPoolTokensUSDBalanceAtom = atom(
       })),
     });
 
-    set(
-      poolTokensUSDBalanceAtom,
-      poolTokensBalances.reduce((acc, balance, index) => {
-        if (balance.result && poolTokensDecimals[index].result) {
-          // eslint-disable-next-line
-          // @ts-ignore
-          const tokenBalance = Number(balance.result) / 10 ** poolTokensDecimals[index].result;
-          return acc + tokenBalance * poolUsdPrice[pools[index].poolSymbol].collateral;
-        }
-        return acc;
-      }, 0)
-    );
+    const poolTokensUSDBalance = poolTokensBalances.reduce((acc, balance, index) => {
+      if (balance.result && poolTokensDecimals[index].result) {
+        // eslint-disable-next-line
+        // @ts-ignore
+        const tokenBalance = Number(balance.result) / 10 ** poolTokensDecimals[index].result;
+        return acc + tokenBalance * poolUsdPrice[pools[index].poolSymbol].collateral;
+      }
+      return acc;
+    }, 0);
+    set(poolTokensUSDBalanceAtom, poolTokensUSDBalance);
+    return poolTokensUSDBalance;
   }
 );
 
@@ -136,6 +136,7 @@ const fetchUnrealizedPnLAtom = atom(
         value: unrealizedPnLReduced[key],
       }))
     );
+    return { totalCollateralCC, totalUnrealizedPnl };
   }
 );
 const fetchRealizedPnLAtom = atom(
@@ -164,7 +165,7 @@ const fetchRealizedPnLAtom = atom(
 );
 
 export const fetchPositionsAtom = atom(
-  (get) => ({ isLoading: get(isLoadingAtom), openRewardsByPools: get(openRewardsAtom) }),
+  (get) => ({ isLoading: get(isLoadingAtom) }),
   async (get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
     const pools = get(poolsAtom);
     const traderAPI = get(traderAPIAtom);
@@ -204,7 +205,8 @@ export const fetchPositionsAtom = atom(
       });
     }
     set(poolUsdPriceAtom, poolUsdPriceMap);
-    set(openRewardsAtom, openRewardsByPools);
+    const totalReferralRewards = openRewardsByPools.reduce((acc, curr) => acc + Number(curr.value), 0);
+    set(totalOpenRewardsAtom, totalReferralRewards);
     set(totalEstimatedEarningsAtom, totalEstimatedEarnings);
 
     const poolShareTokensUSDBalance = poolShareTokenBalances.reduce(
@@ -221,11 +223,23 @@ export const fetchPositionsAtom = atom(
     );
     set(poolShareTokensUSDBalanceAtom, poolShareTokensUSDBalance);
 
-    await Promise.all([
+    const [unrealizedPnL, , poolTokensUSDBalance] = await Promise.all([
       set(fetchUnrealizedPnLAtom, userAddress, chainId),
       set(fetchRealizedPnLAtom, userAddress, chainId),
       set(fetchPoolTokensUSDBalanceAtom, userAddress),
     ]);
+
+    let totalCollateralCC = 0;
+    let totalUnrealizedPnl = 0;
+    if (unrealizedPnL) {
+      totalCollateralCC = unrealizedPnL.totalCollateralCC;
+      totalUnrealizedPnl = unrealizedPnL.totalUnrealizedPnl;
+    }
+
+    const accountValue =
+      poolTokensUSDBalance + totalCollateralCC + totalUnrealizedPnl + poolShareTokensUSDBalance + totalReferralRewards;
+
+    set(accountValueAtom, accountValue);
     set(isLoadingAtom, false);
   }
 );

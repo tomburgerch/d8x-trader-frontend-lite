@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -8,11 +8,13 @@ import { traderAPIAtom } from 'store/pools.store';
 
 import styles from './AccountValue.module.scss';
 import {
+  accountValueAtom,
   fetchPositionsAtom,
   leverageAtom,
   poolShareTokensUSDBalanceAtom,
   poolTokensUSDBalanceAtom,
   totalEstimatedEarningsAtom,
+  totalOpenRewardsAtom,
   totalUnrealizedPnLAtom,
 } from './fetchEverything';
 
@@ -28,14 +30,12 @@ export const AccountValue = () => {
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokensUSDBalance] = useAtom(poolTokensUSDBalanceAtom);
   const [poolShareTokensUSDBalance] = useAtom(poolShareTokensUSDBalanceAtom);
+  const [leverage] = useAtom(leverageAtom);
   const [totalUnrealizedPnL] = useAtom(totalUnrealizedPnLAtom);
   const [totalEstimatedEarnings] = useAtom(totalEstimatedEarningsAtom);
-  const [{ openRewardsByPools }, fetchPositions] = useAtom(fetchPositionsAtom);
-
-  const totalReferralRewards = useMemo(
-    () => openRewardsByPools.reduce((acc, curr) => acc + Number(curr.value), 0),
-    [openRewardsByPools]
-  );
+  const [totalReferralRewards] = useAtom(totalOpenRewardsAtom);
+  const [accountValue] = useAtom(accountValueAtom);
+  const [, fetchPositions] = useAtom(fetchPositionsAtom);
 
   useEffect(() => {
     if (traderAPI) {
@@ -47,7 +47,7 @@ export const AccountValue = () => {
     <div className={styles.sideBlock}>
       <div>
         <div className={styles.detailsHeader}>{t('pages.portfolio.account-value.title')}</div>
-        <div className={styles.accountValue}>$99999.23</div>
+        <div className={styles.accountValue}>${formatCurrency(accountValue)}</div>
       </div>
 
       <div className={styles.detailsContainer}>
