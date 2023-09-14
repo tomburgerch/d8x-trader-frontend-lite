@@ -9,6 +9,7 @@ import { traderAPIAtom } from 'store/pools.store';
 import styles from './AccountValue.module.scss';
 import {
   fetchPositionsAtom,
+  leverageAtom,
   poolShareTokensUSDBalanceAtom,
   poolTokensUSDBalanceAtom,
   totalEstimatedEarningsAtom,
@@ -62,7 +63,7 @@ export const AccountValue = () => {
         <div className={styles.separator} />
         <div className={styles.detailsLine}>
           <div>{t('pages.portfolio.account-value.details.perps.leverage')}</div>
-          <div className={styles.detailsValue}>12.21x</div>
+          <div className={styles.detailsValue}>{formatCurrency(leverage)}x</div>
         </div>
         <div className={styles.detailsLine}>
           <div>{t('pages.portfolio.account-value.details.perps.unrealized')}</div>

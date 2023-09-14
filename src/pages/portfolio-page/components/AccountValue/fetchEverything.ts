@@ -21,9 +21,22 @@ const getPoolUsdPrice = async (traderAPI: TraderInterface, pool: PoolWithIdI) =>
   return { collateral: 0, quote: 0 };
 };
 
+const getBaseUSDPrice = async (traderAPI: TraderInterface, pool: PoolWithIdI) => {
+  const basePricesMap: Record<string, number> = {};
+
+  for (const perpetual of pool.perpetuals) {
+    const info = await traderAPI.getPriceInUSD(
+      `${perpetual.baseCurrency}-${perpetual.quoteCurrency}-${pool.poolSymbol}`
+    );
+    basePricesMap[perpetual.baseCurrency] = info.get(`${perpetual.baseCurrency}-USD`) || 0;
+  }
+  return basePricesMap;
+};
+
 interface PoolUsdPriceI {
   collateral: number;
   quote: number;
+  bases: Record<string, number>;
 }
 const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
 const isLoadingAtom = atom(true);
@@ -36,6 +49,7 @@ interface TokenPoolSharePercentI {
   percent: number;
 }
 export const poolShareTokensShareAtom = atom<TokenPoolSharePercentI[]>([]);
+export const leverageAtom = atom(0);
 export const totalUnrealizedPnLAtom = atom(0);
 interface UnrealizedPnLListAtomI {
   symbol: string;
@@ -92,9 +106,15 @@ const fetchUnrealizedPnLAtom = atom(
     const activePositions = data.filter(({ side }) => side !== 'CLOSED');
     let totalUnrealizedPnl = 0;
     const unrealizedPnLReduced: Record<string, number> = {};
+
+    let totalPositionNotionalBaseCCY = 0;
+    let totalCollateralCC = 0;
     activePositions.forEach((position) => {
-      const poolSymbol = position.symbol.split('-')[2];
+      const [baseSymbol, , poolSymbol] = position.symbol.split('-');
       totalUnrealizedPnl += position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].collateral;
+
+      totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
+      totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
 
       const unrealizedPnl =
         (position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote) / poolUsdPrice[poolSymbol].collateral;
@@ -104,6 +124,10 @@ const fetchUnrealizedPnLAtom = atom(
         unrealizedPnLReduced[poolSymbol] += unrealizedPnl;
       }
     });
+
+    const leverage = totalPositionNotionalBaseCCY / totalCollateralCC;
+
+    set(leverageAtom, leverage);
     set(totalUnrealizedPnLAtom, totalUnrealizedPnl);
     set(
       unrealizedPnLListAtom,
@@ -156,9 +180,11 @@ export const fetchPositionsAtom = atom(
 
     for (const pool of pools) {
       const poolUSDPrice = await getPoolUsdPrice(traderAPI, pool);
+      const baseUSDPrice = await getBaseUSDPrice(traderAPI, pool);
       poolUsdPriceMap[pool.poolSymbol] = {
         collateral: poolUSDPrice.collateral,
         quote: poolUSDPrice.quote,
+        bases: baseUSDPrice,
       };
 
       const openRewardsAmount = openRewards
