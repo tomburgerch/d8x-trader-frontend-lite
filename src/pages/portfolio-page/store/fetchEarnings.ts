@@ -24,12 +24,11 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
   const earningsArray = await Promise.all(earningsPromises);
   let totalEstimatedEarnings = 0;
   const earningsList = earningsArray.reduce<Record<string, number>>((acc, curr, index) => {
-    const earning = curr.earnings * collateralPrices[index];
-    totalEstimatedEarnings += earning;
+    totalEstimatedEarnings += curr.earnings * collateralPrices[index];
     if (acc[poolSymbols[index]]) {
-      acc[poolSymbols[index]] += earning;
+      acc[poolSymbols[index]] += curr.earnings;
     } else {
-      acc[poolSymbols[index]] = earning;
+      acc[poolSymbols[index]] = curr.earnings;
     }
     return acc;
   }, {});
