@@ -5,18 +5,15 @@
   justify-content: space-between;
 }
 
+.inactive,
 .active {
-  background-color: var(--d8x-color-purple-50);
   padding: $d8x-spacing $d8x-spacing * 3;
   border-radius: 8px;
   font-size: 12px;
-  color: var(--d8x-color-purple);
   cursor: pointer;
 }
 
-.inactive {
-  padding: $d8x-spacing $d8x-spacing * 3;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
+.active {
+  background-color: var(--d8x-color-purple-50);
+  color: var(--d8x-color-purple);
 }

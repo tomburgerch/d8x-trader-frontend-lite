@@ -2,7 +2,8 @@
   "navigation": {
     "trade": "Trade",
     "refer": "Refer",
-    "vault": "Vault"
+    "vault": "Vault",
+    "portfolio": "Portfolio"
   },
   "pages": {
     "geolocation": {
@@ -491,6 +492,33 @@
           "body": "Reason"
         }
       }
+    },
+    "portfolio": {
+      "perpetuals": "Perpetuals",
+      "vault": "Vault",
+      "account-value": {
+        "title": "Account Value",
+        "details": {
+          "wallet": {
+            "title": "Wallet details",
+            "funds": "Funds"
+          },
+          "perps": {
+            "title": "Perps details",
+            "leverage": "Leverage",
+            "unrealized": "Unrealized PnL",
+            "realized": "Realized PnL",
+            "referral": "Referral earnings"
+          },
+          "vault": {
+            "title": "Vault details",
+            "assets": "Assets",
+            "assets-pool": "Assets in pools",
+            "earnings-pool": "Earnings per pool",
+            "total": "Total estim. Earnings"
+          }
+        }
+      }
     }
   },
   "common": {
@@ -536,7 +564,8 @@
         "header": "Choose Market",
         "crypto": "Crypto",
         "fx": "FX",
-        "commodity": "Commodity"
+        "commodity": "Commodity",
+        "closed": "Closed"
       },
       "search": "Search...",
       "perpetual": {

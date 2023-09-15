@@ -1,0 +1,20 @@
+@import '~styles/theme/_theme.scss';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.inactive,
+.active {
+  padding: $d8x-spacing * 2 $d8x-spacing * 3;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.active {
+  background-color: var(--d8x-color-purple-50);
+  color: var(--d8x-color-purple);
+}
