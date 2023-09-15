@@ -156,10 +156,12 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
       return;
     }
 
+    urlChangesAppliedRef.current = true;
+
     const symbolHash = location.hash.slice(1);
     const result = parseSymbol(symbolHash);
-    urlChangesAppliedRef.current = true;
-    if (result && selectedPool?.poolSymbol !== result.poolSymbol) {
+
+    if (result) {
       setSelectedPool(result.poolSymbol);
 
       const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
@@ -218,13 +220,13 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
   }, [selectedPool?.poolId, pools, isConnected, send, address]);
 
   useEffect(() => {
-    if (isConnectedCandlesWs && isConnectedCandlesWs !== wsConnectedStateRef.current) {
-      sendToCandlesWs(JSON.stringify({ type: 'subscribe', topic: 'markets' }));
-    }
-
-    wsConnectedStateRef.current = isConnectedCandlesWs;
-
     if (updatePerpetual && selectedPerpetual && isConnectedCandlesWs) {
+      if (isConnectedCandlesWs !== wsConnectedStateRef.current) {
+        sendToCandlesWs(JSON.stringify({ type: 'subscribe', topic: 'markets' }));
+      }
+
+      wsConnectedStateRef.current = isConnectedCandlesWs;
+
       const topicInfo = `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}:${selectedPeriod}`;
       if (topicInfo !== topicRef.current) {
         if (topicRef.current) {
@@ -240,6 +242,9 @@ export const MarketSelect = memo(({ withNavigate, updatePerpetual }: MarketSelec
         setNewCandle(null);
         setCandlesDataReady(false);
       }
+    } else if (!isConnectedCandlesWs) {
+      wsConnectedStateRef.current = false;
+      topicRef.current = '';
     }
   }, [
     updatePerpetual,
