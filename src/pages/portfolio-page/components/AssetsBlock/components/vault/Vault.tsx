@@ -3,43 +3,26 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PieChart } from 'react-minimal-pie-chart';
 
+import { earningsListAtom } from 'pages/portfolio-page/store/fetchEarnings';
 import { poolShareTokensShareAtom } from 'pages/portfolio-page/store/fetchPoolShare';
-import { useFetchEarnedRebate } from 'pages/refer-page/components/referrer-tab/useFetchEarnedRebate';
-import { poolsAtom } from 'store/pools.store';
-import { RebateTypeE } from 'types/enums';
-import { OverviewPoolItemI } from 'types/types';
 
 import { AssetLine } from '../perpetuals/Perpetuals';
 import styles from './Vault.module.scss';
 
 const colorsArray = ['#6649DF', '#FDA13A', '#F24141', '#515151'];
 
+const formatCurrency = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 2 });
+
 export const Vault = () => {
   const { t } = useTranslation();
 
-  const [pools] = useAtom(poolsAtom);
   const [poolShareTokensShare] = useAtom(poolShareTokensShareAtom);
-
-  const { earnedRebates } = useFetchEarnedRebate(RebateTypeE.Trader);
+  const [earningsList] = useAtom(earningsListAtom);
 
   const totalPoolShare = useMemo(
     () => poolShareTokensShare.reduce((acc, curr) => acc + curr.balance, 0),
     [poolShareTokensShare]
   );
-
-  const overviewItems = useMemo(() => {
-    const earnedRebatesByPools: OverviewPoolItemI[] = [];
-
-    pools.forEach((pool) => {
-      const earnedRebatesAmount = earnedRebates
-        .filter((rebate) => rebate.poolId === pool.poolId)
-        .reduce((accumulator, currentValue) => accumulator + currentValue.amountCC, 0);
-
-      earnedRebatesByPools.push({ poolSymbol: pool.poolSymbol, value: earnedRebatesAmount });
-    });
-
-    return earnedRebatesByPools;
-  }, [pools, earnedRebates]);
 
   return (
     <>
@@ -69,8 +52,8 @@ export const Vault = () => {
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.vault.earnings-pool')}</div>
         <div className={styles.assetsList}>
-          {overviewItems.map((rebate) => (
-            <AssetLine key={rebate.poolSymbol} symbol={rebate.poolSymbol} value={rebate.value} />
+          {earningsList.map((earning) => (
+            <AssetLine key={earning.symbol} symbol={earning.symbol} value={formatCurrency(earning.value)} />
           ))}
         </div>
       </div>

@@ -13,12 +13,7 @@ export const Tabs = ({ options, currentValue, setCurrentValue }: TabsPropsI) => 
         <div
           key={option.value}
           className={currentValue === option.value ? styles.active : styles.inactive}
-          onClick={() => {
-            // if (currentValue === option.value) {
-            //   return setCurrentValue(null);
-            // }
-            return setCurrentValue(option.value);
-          }}
+          onClick={() => setCurrentValue(option.value)}
         >
           {option.label}
         </div>
