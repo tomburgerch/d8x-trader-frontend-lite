@@ -1,4 +1,5 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { CircularProgress } from '@mui/material';
+import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -16,7 +17,7 @@ export const PortfolioPage = () => {
   const chainId = useChainId();
   const { openRewards } = useFetchOpenRewards();
   const [traderAPI] = useAtom(traderAPIAtom);
-  const fetchPortfolio = useSetAtom(fetchPortfolioAtom);
+  const [{ isLoading }, fetchPortfolio] = useAtom(fetchPortfolioAtom);
 
   useEffect(() => {
     if (traderAPI) {
@@ -24,6 +25,14 @@ export const PortfolioPage = () => {
       fetchPortfolio(address!, chainId, openRewards);
     }
   }, [openRewards, traderAPI, address, chainId, fetchPortfolio]);
+
+  if (isLoading) {
+    return (
+      <div className={styles.spinnerContainer}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.root}>

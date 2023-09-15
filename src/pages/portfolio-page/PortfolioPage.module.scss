@@ -24,3 +24,10 @@
     gap: 16px;
   }
 }
+
+.spinnerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 0;
+}

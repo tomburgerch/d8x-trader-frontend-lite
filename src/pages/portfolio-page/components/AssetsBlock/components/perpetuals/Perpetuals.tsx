@@ -39,17 +39,21 @@ export const Perpetuals = () => {
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.realized')}</div>
         <div className={styles.assetsList}>
-          {realizedPnLList.map((token) => (
-            <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
-          ))}
+          {realizedPnLList.length
+            ? realizedPnLList.map((token) => (
+                <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+              ))
+            : 'No data'}
         </div>
       </div>
       <div className={styles.pnlBlock}>
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.perps.unrealized')}</div>
         <div className={styles.assetsList}>
-          {unrealizedPnLList.map((token) => (
-            <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
-          ))}
+          {unrealizedPnLList.length
+            ? unrealizedPnLList.map((token) => (
+                <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+              ))
+            : 'No data'}
         </div>
       </div>
     </>
