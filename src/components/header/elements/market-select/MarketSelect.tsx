@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useChainId, useNetwork } from 'wagmi';
@@ -64,7 +64,10 @@ const Option = memo(
     option: SelectItemI<PerpetualWithPoolAndMarketI>;
     onClick: () => void;
   }) => {
-    const IconComponent = getDynamicLogo(option.item.baseCurrency.toLowerCase());
+    const IconComponent = useMemo(
+      () => getDynamicLogo(option.item.baseCurrency.toLowerCase()),
+      [option.item.baseCurrency]
+    );
     const { t } = useTranslation();
 
     return (
