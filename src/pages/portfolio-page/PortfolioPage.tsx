@@ -11,6 +11,7 @@ import styles from './PortfolioPage.module.scss';
 import { AccountValue } from './components/AccountValue/AccountValue';
 import { AssetsBlock } from './components/AssetsBlock/AssetsBlock';
 import { fetchPortfolioAtom } from './store/fetchPortfolio';
+import { Helmet } from '../../components/helmet/Helmet';
 
 export const PortfolioPage = () => {
   const { address } = useAccount();
@@ -35,13 +36,16 @@ export const PortfolioPage = () => {
   }
 
   return (
-    <div className={styles.root}>
-      <Container>
-        <div className={styles.container}>
-          <AccountValue />
-          <AssetsBlock />
-        </div>
-      </Container>
-    </div>
+    <>
+      <Helmet title="Portfolio | D8X App" />
+      <div className={styles.root}>
+        <Container>
+          <div className={styles.container}>
+            <AccountValue />
+            <AssetsBlock />
+          </div>
+        </Container>
+      </div>
+    </>
   );
 };
