@@ -4,7 +4,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 6 * $d8x-spacing;
 
   .label {
     display: flex;
@@ -54,5 +53,17 @@
 
   .root {
     margin-top: 2 * $d8x-spacing;
+  }
+}
+
+.sliderHolder {
+  margin: 0 9px;
+
+  @include media-phone {
+    display: none;
+  }
+
+  @include media-desktop {
+    margin-bottom: 4px;
   }
 }
