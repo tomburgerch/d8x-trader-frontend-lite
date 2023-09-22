@@ -21,7 +21,7 @@ import commonStyles from '../../OrderBlock.module.scss';
 import { OrderSizeSlider } from './components/OrderSizeSlider';
 import styles from './OrderSize.module.scss';
 import {
-  currentMultiplierAtom,
+  currencyMultiplierAtom,
   inputValueAtom,
   maxTraderOrderSizeAtom,
   orderSizeAtom,
@@ -49,7 +49,7 @@ export const OrderSize = memo(() => {
   const [isSDKConnected] = useAtom(sdkConnectedAtom);
   const [defaultCurrency] = useAtom(defaultCurrencyAtom);
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
-  const [currentMultiplier] = useAtom(currentMultiplierAtom);
+  const [currencyMultiplier] = useAtom(currencyMultiplierAtom);
   const setInputFromOrderSize = useSetAtom(setInputFromOrderSizeAtom);
   const setOrderSize = useSetAtom(setOrderSizeAtom);
   const [maxOrderSize, setMaxOrderSize] = useAtom(maxTraderOrderSizeAtom);
@@ -65,14 +65,14 @@ export const OrderSize = memo(() => {
   const onInputChange = useCallback(
     (value: string) => {
       if (value) {
-        setOrderSize(Number(value) / currentMultiplier);
+        setOrderSize(Number(value) / currencyMultiplier);
         setInputValue(value);
       } else {
         setOrderSizeDirect(0);
         setInputValue('');
       }
     },
-    [setOrderSizeDirect, setOrderSize, setInputValue, currentMultiplier]
+    [setOrderSizeDirect, setOrderSize, setInputValue, currencyMultiplier]
   );
 
   useEffect(() => {
@@ -106,24 +106,22 @@ export const OrderSize = memo(() => {
 
   const orderSizeStep = useMemo(() => {
     if (perpetualStaticInfo) {
-      const numberDigits = valueToFractionDigits(
-        +roundToLotString(perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currentMultiplier
-      );
-      if (currentMultiplier === 1) {
+      if (currencyMultiplier === 1) {
         return roundToLotString(perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC);
       } else {
-        return (
-          +roundToLotString(perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currentMultiplier
-        ).toFixed(numberDigits);
+        const roundedValueBase =
+          Number(roundToLotString(perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC)) * currencyMultiplier;
+        const numberDigits = valueToFractionDigits(roundedValueBase);
+        return roundedValueBase.toFixed(numberDigits);
       }
     }
     return '0.1';
-  }, [perpetualStaticInfo, currentMultiplier]);
+  }, [perpetualStaticInfo, currencyMultiplier]);
 
   const minPositionString = useMemo(() => {
     if (perpetualStaticInfo) {
       return formatToCurrency(
-        +roundToLotString(10 * perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currentMultiplier,
+        +roundToLotString(10 * perpetualStaticInfo.lotSizeBC, perpetualStaticInfo.lotSizeBC) * currencyMultiplier,
         '',
         false,
         undefined,
@@ -131,7 +129,7 @@ export const OrderSize = memo(() => {
       );
     }
     return '0.1';
-  }, [perpetualStaticInfo, currentMultiplier]);
+  }, [perpetualStaticInfo, currencyMultiplier]);
 
   const fetchMaxOrderSize = useCallback(
     async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
@@ -191,6 +189,7 @@ export const OrderSize = memo(() => {
     setOpenCurrencySelector(false);
   };
 
+  const maxOrderSizeCurrent = maxOrderSize && maxOrderSize * currencyMultiplier;
   return (
     <>
       <Box className={styles.root}>
@@ -202,7 +201,7 @@ export const OrderSize = memo(() => {
                 <Typography> {t('pages.trade.order-block.order-size.body1')} </Typography>
                 <Typography>
                   {t('pages.trade.order-block.order-size.body2')}{' '}
-                  {formatToCurrency(maxOrderSize && maxOrderSize * currentMultiplier, selectedCurrency)}.{' '}
+                  {formatToCurrency(maxOrderSizeCurrent, selectedCurrency)}.{' '}
                   {t('pages.trade.order-block.order-size.body3')} {minPositionString} {selectedCurrency}.{' '}
                   {t('pages.trade.order-block.order-size.body4')}{' '}
                   {formatToCurrency(+orderSizeStep, selectedCurrency, false, 4)}.
@@ -224,7 +223,7 @@ export const OrderSize = memo(() => {
           }
           step={orderSizeStep}
           min={0}
-          max={maxOrderSize && roundMaxOrderSize(maxOrderSize * currentMultiplier)}
+          max={maxOrderSizeCurrent && roundMaxOrderSize(maxOrderSizeCurrent)}
           className={styles.inputHolder}
           adornmentAction={
             <div ref={anchorRef}>
