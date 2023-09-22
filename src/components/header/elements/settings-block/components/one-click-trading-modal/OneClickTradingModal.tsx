@@ -18,7 +18,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getDelegateKey } from 'helpers/getDelegateKey';
-import { activatedOneClickTradingAtom } from 'store/app.store';
+import { activatedOneClickTradingAtom, delegateAddressAtom } from 'store/app.store';
 import { storageKeyAtom } from 'store/order-block.store';
 import { proxyAddrAtom } from 'store/pools.store';
 
@@ -33,6 +33,7 @@ export const OneClickTradingModal = () => {
   const { data: walletClient } = useWalletClient();
 
   const [activatedOneClickTrading, setActivatedOneClickTrading] = useAtom(activatedOneClickTradingAtom);
+  const [delegateAddress, setDelegateAddress] = useAtom(delegateAddressAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const setStorageKey = useSetAtom(storageKeyAtom);
 
@@ -40,7 +41,6 @@ export const OneClickTradingModal = () => {
   const [isLoading, setLoading] = useState(false);
   const [isActionLoading, setActionLoading] = useState(false);
   const [isDelegated, setDelegated] = useState<boolean | null>(null);
-  const [delegateAddress, setDelegateAddr] = useState<string>('');
 
   const handleRemoveRef = useRef(false);
   const handleActivateRef = useRef(false);
@@ -76,7 +76,7 @@ export const OneClickTradingModal = () => {
     await setDelegate(walletClient, proxyAddr as Address, delegateAddr);
     setDelegated(true);
     setActivatedOneClickTrading(true);
-    setDelegateAddr(delegateAddr);
+    setDelegateAddress(delegateAddr);
 
     toast.success(
       <ToastContent title={t('common.settings.one-click-modal.create-delegate.create-success-result')} bodyLines={[]} />
@@ -101,7 +101,7 @@ export const OneClickTradingModal = () => {
       if (!delegateKey) {
         await generateDelegate(walletClient, storageKey);
       }
-      setDelegateAddr(privateKeyToAccount(delegateKey as Address).address);
+      setDelegateAddress(privateKeyToAccount(delegateKey as Address).address);
       setActivatedOneClickTrading(true);
       toast.success(
         <ToastContent
@@ -259,7 +259,7 @@ export const OneClickTradingModal = () => {
         </Box>
       </Dialog>
 
-      {isFundingModalOpen && (
+      {activatedOneClickTrading && (
         <FundingModal
           isOpen={isFundingModalOpen}
           onClose={() => setFundingModalOpen(false)}

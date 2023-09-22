@@ -22,6 +22,7 @@ export const selectedLanguageAtom = atomWithStorage<LanguageE>(SELECTED_LANGUAGE
 export const defaultCurrencyAtom = atomWithStorage<DefaultCurrencyE>(DEFAULT_CURRENCY_LS_KEY, DefaultCurrencyE.Base);
 
 export const appDimensionsAtom = atom<AppDimensionsI>({});
+export const delegateAddressAtom = atom('');
 
 export const activatedOneClickTradingAtom = atom(false);
 
