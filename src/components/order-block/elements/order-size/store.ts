@@ -50,48 +50,38 @@ export const maxOrderSizeAtom = atom((get) => {
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 
-export const currentMultiplierAtom = atom((get) => {
-  let currentMultiplier = 1;
+export const currencyMultiplierAtom = atom((get) => {
+  let currencyMultiplier = 1;
 
   const selectedPool = get(selectedPoolAtom);
   const selectedPerpetual = get(selectedPerpetualAtom);
   if (!selectedPool || !selectedPerpetual) {
-    return currentMultiplier;
+    return currencyMultiplier;
   }
 
   const selectedCurrency = get(selectedCurrencyPrimitiveAtom);
 
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
   if (selectedCurrency === selectedPerpetual.quoteCurrency) {
-    currentMultiplier = selectedPerpetual.indexPrice;
+    currencyMultiplier = selectedPerpetual.indexPrice;
   } else if (selectedCurrency === selectedPool.poolSymbol) {
-    currentMultiplier = indexPrice / collToQuoteIndexPrice;
+    currencyMultiplier = indexPrice / collToQuoteIndexPrice;
   }
-  return currentMultiplier;
+  return currencyMultiplier;
 });
 
 export const setInputFromOrderSizeAtom = atom(null, (get, set, orderSize: number) => {
-  const currentMultiplier = get(currentMultiplierAtom);
+  const currencyMultiplier = get(currencyMultiplierAtom);
 
   let inputValue;
-  if (currentMultiplier === 1 || orderSize === 0) {
+  if (currencyMultiplier === 1 || orderSize === 0) {
     inputValue = orderSize.toString();
   } else {
-    const numberDigits = valueToFractionDigits(orderSize * currentMultiplier);
-    inputValue = (orderSize * currentMultiplier).toFixed(numberDigits);
+    const numberDigits = valueToFractionDigits(orderSize * currencyMultiplier);
+    inputValue = (orderSize * currencyMultiplier).toFixed(numberDigits);
   }
   set(inputValueAtom, inputValue);
 });
-
-export const selectedCurrencyAtom = atom(
-  (get) => get(selectedCurrencyPrimitiveAtom),
-  (get, set, currency: string) => {
-    const orderSize = get(orderSizeAtom);
-
-    set(selectedCurrencyPrimitiveAtom, currency);
-    set(setInputFromOrderSizeAtom, orderSize);
-  }
-);
 
 export const setOrderSizeAtom = atom(null, (get, set, value: number) => {
   const perpetualStaticInfo = get(perpetualStaticInfoAtom);
@@ -104,6 +94,16 @@ export const setOrderSizeAtom = atom(null, (get, set, value: number) => {
   set(orderSizeAtom, roundedValueBase);
   return roundedValueBase;
 });
+
+export const selectedCurrencyAtom = atom(
+  (get) => get(selectedCurrencyPrimitiveAtom),
+  (get, set, currency: string) => {
+    const orderSize = get(orderSizeAtom);
+
+    set(selectedCurrencyPrimitiveAtom, currency);
+    set(setInputFromOrderSizeAtom, orderSize);
+  }
+);
 
 export const orderSizeSliderAtom = atom(
   (get) => {
