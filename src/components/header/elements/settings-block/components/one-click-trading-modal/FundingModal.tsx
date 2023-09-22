@@ -71,7 +71,7 @@ export const FundingModal = ({ isOpen, onClose, delegateAddress }: FundingModalP
               const transferTxHash = await transferFunds(walletClient, delegateAddress, Number(inputValue));
               setTxHash(transferTxHash.hash);
             }}
-            disabled={!!txHash}
+            disabled={!!txHash || !inputValue || +inputValue === 0}
           >
             {t(`common.settings.one-click-modal.funding-modal.fund`)}
           </Button>
