@@ -15,7 +15,7 @@ export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
 export const slippageSliderAtom = atom(3);
 export const keepPositionLeverageAtom = atom(false);
 export const reduceOnlyAtom = atom(false);
-export const expireDaysAtom = atom(ExpiryE['90D']);
+export const expireDaysAtom = atom(Number(ExpiryE['90D']));
 export const stopLossAtom = atom<StopLossE | null>(StopLossE.None);
 export const stopLossPriceAtom = atom<number | null>(null);
 export const takeProfitAtom = atom<TakeProfitE | null>(TakeProfitE.None);
@@ -228,7 +228,7 @@ export const clearInputsDataAtom = atom(null, (_get, set) => {
   set(triggerPriceValueAtom, 0);
   set(keepPositionLeverageAtom, false);
   set(reduceOnlyAtom, false);
-  set(expireDaysAtom, ExpiryE['90D']);
+  set(expireDaysAtom, Number(ExpiryE['90D']));
   set(stopLossAtom, StopLossE.None);
   set(takeProfitAtom, TakeProfitE.None);
 });

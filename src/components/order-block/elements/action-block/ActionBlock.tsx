@@ -33,7 +33,6 @@ import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
 
@@ -52,7 +51,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 
   let deadlineMultiplier = 200; // By default, is it set to 200 hours
   if (orderInfo.orderType !== OrderTypeE.Market && orderInfo.expireDays) {
-    deadlineMultiplier = 24 * mapExpiryToNumber(orderInfo.expireDays);
+    deadlineMultiplier = 24 * Number(orderInfo.expireDays);
   }
 
   return {
