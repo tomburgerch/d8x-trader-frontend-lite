@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { memo, useMemo, useState, type ChangeEvent } from 'react';
+import { type ChangeEvent, memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -19,7 +19,7 @@ import {
 import { ReactComponent as SettingsIcon } from 'assets/icons/settingsIcon.svg';
 import { Dialog } from 'components/dialog/Dialog';
 import { ExpirySelector } from 'components/order-block/elements/expiry-selector/ExpirySelector';
-// import { createSymbol } from 'helpers/createSymbol';
+import { Separator } from 'components/separator/Separator';
 import { orderBlockAtom, orderTypeAtom, reduceOnlyAtom, slippageSliderAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
@@ -27,7 +27,6 @@ import { type MarkI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { mapSlippageToNumber } from 'utils/mapSlippageToNumber';
 
-import { Separator } from 'components/separator/Separator';
 import styles from './OrderSettings.module.scss';
 
 const marks: MarkI[] = [
@@ -47,8 +46,8 @@ function valueLabelFormat(value: number) {
   return `${value}%`;
 }
 
-const minSlippage = 0.5;
-const maxSlippage = 5;
+const MIN_SLIPPAGE = 0.5;
+const MAX_SLIPPAGE = 5;
 
 export const OrderSettings = memo(() => {
   const { t } = useTranslation();
@@ -86,16 +85,16 @@ export const OrderSettings = memo(() => {
     if (targetValue) {
       const valueNumber = Number(targetValue);
       let valueToSet;
-      if (valueNumber < minSlippage) {
-        valueToSet = minSlippage;
-      } else if (valueNumber > maxSlippage) {
-        valueToSet = maxSlippage;
+      if (valueNumber < MIN_SLIPPAGE) {
+        valueToSet = MIN_SLIPPAGE;
+      } else if (valueNumber > MAX_SLIPPAGE) {
+        valueToSet = MAX_SLIPPAGE;
       } else {
         valueToSet = valueNumber;
       }
       updateSlippage(valueToSet);
     } else {
-      setUpdatedSlippage(minSlippage);
+      setUpdatedSlippage(MIN_SLIPPAGE);
       setInputValue('');
     }
   };
@@ -171,8 +170,8 @@ export const OrderSettings = memo(() => {
             <Slider
               aria-label="Slippage tolerance values"
               value={updatedSlippage}
-              min={minSlippage}
-              max={maxSlippage}
+              min={MIN_SLIPPAGE}
+              max={MAX_SLIPPAGE}
               step={0.5}
               getAriaValueText={valueLabelFormat}
               valueLabelFormat={valueLabelFormat}
@@ -189,7 +188,7 @@ export const OrderSettings = memo(() => {
             <OutlinedInput
               id="slippage"
               type="number"
-              inputProps={{ min: minSlippage, max: maxSlippage, step: 0.5 }}
+              inputProps={{ min: MIN_SLIPPAGE, max: MAX_SLIPPAGE, step: 0.5 }}
               endAdornment={
                 <InputAdornment position="end">
                   <Typography variant="adornment">%</Typography>

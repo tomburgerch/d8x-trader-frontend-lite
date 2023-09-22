@@ -9,8 +9,8 @@ import { ExpiryE, OrderTypeE } from 'types/enums';
 
 import styles from './ExpirySelector.module.scss';
 
-const minExpire = 1;
-const maxExpire = 365;
+const MIN_EXPIRE = 1;
+const MAX_EXPIRE = 365;
 
 export const ExpirySelector = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
@@ -22,17 +22,17 @@ export const ExpirySelector = memo(() => {
     if (targetValue) {
       const valueNumber = Number(targetValue);
       let valueToSet;
-      if (valueNumber < minExpire) {
-        valueToSet = minExpire;
-      } else if (valueNumber > maxExpire) {
-        valueToSet = maxExpire;
+      if (valueNumber < MIN_EXPIRE) {
+        valueToSet = MIN_EXPIRE;
+      } else if (valueNumber > MAX_EXPIRE) {
+        valueToSet = MAX_EXPIRE;
       } else {
         valueToSet = valueNumber;
       }
       setExpireDays(valueToSet);
       setInputValue(`${valueToSet}`);
     } else {
-      setExpireDays(minExpire);
+      setExpireDays(MIN_EXPIRE);
       setInputValue('');
     }
   };
@@ -60,7 +60,7 @@ export const ExpirySelector = memo(() => {
       </Box>
       <OutlinedInput
         type="number"
-        inputProps={{ min: minExpire, max: maxExpire, step: 1 }}
+        inputProps={{ min: MIN_EXPIRE, max: MAX_EXPIRE, step: 1 }}
         endAdornment={
           <InputAdornment position="end">
             <Typography variant="adornment">D</Typography>
