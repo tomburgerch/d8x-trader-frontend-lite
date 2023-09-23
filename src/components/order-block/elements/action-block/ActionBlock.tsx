@@ -15,7 +15,7 @@ import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { useDebounce } from 'helpers/useDebounce';
 import { getOpenOrders, getPositionRisk, orderDigest, positionRiskOnTrade } from 'network/network';
-import { clearInputsDataAtom, orderInfoAtom } from 'store/order-block.store';
+import { clearInputsDataAtom, orderInfoAtom, storageKeyAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
@@ -33,9 +33,12 @@ import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { mapExpiryToNumber } from 'utils/mapExpiryToNumber';
 
 import styles from './ActionBlock.module.scss';
+import { createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { getDelegateKey } from 'helpers/getDelegateKey';
+import { activatedOneClickTradingAtom } from 'store/app.store';
 
 const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
@@ -52,7 +55,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 
   let deadlineMultiplier = 200; // By default, is it set to 200 hours
   if (orderInfo.orderType !== OrderTypeE.Market && orderInfo.expireDays) {
-    deadlineMultiplier = 24 * mapExpiryToNumber(orderInfo.expireDays);
+    deadlineMultiplier = 24 * Number(orderInfo.expireDays);
   }
 
   return {
@@ -105,6 +108,8 @@ export const ActionBlock = memo(() => {
     },
   });
 
+  const [activatedOneClickTrading] = useAtom(activatedOneClickTradingAtom);
+  const [storageKey] = useAtom(storageKeyAtom);
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
@@ -127,6 +132,20 @@ export const ActionBlock = memo(() => {
 
   const requestSentRef = useRef(false);
   const validityCheckRef = useRef(false);
+
+  const tradingClient = useMemo(() => {
+    if (activatedOneClickTrading && storageKey && walletClient?.chain && window?.ethereum) {
+      const dlgt = getDelegateKey(walletClient, storageKey);
+      if (dlgt) {
+        return createWalletClient({
+          account: privateKeyToAccount(dlgt as Address),
+          chain: walletClient.chain,
+          transport: http(),
+        });
+      }
+    }
+    return walletClient;
+  }, [walletClient, storageKey, activatedOneClickTrading]);
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI) {
@@ -280,7 +299,15 @@ export const ActionBlock = memo(() => {
   });
 
   const handleOrderConfirm = () => {
-    if (!address || !walletClient || !parsedOrders || !selectedPool || !proxyAddr || !poolTokenDecimals) {
+    if (
+      !address ||
+      !walletClient ||
+      !tradingClient ||
+      !parsedOrders ||
+      !selectedPool ||
+      !proxyAddr ||
+      !poolTokenDecimals
+    ) {
       return;
     }
     setRequestSent(true);
@@ -300,7 +327,7 @@ export const ActionBlock = memo(() => {
             .then(() => {
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-              postOrder(walletClient, signatures, data.data)
+              postOrder(tradingClient, signatures, data.data)
                 .then((tx) => {
                   setShowReviewOrderModal(false);
                   // success submitting order to the node
@@ -407,7 +434,7 @@ export const ActionBlock = memo(() => {
     ) {
       return ValidityCheckE.BelowMinPosition;
     }
-    if (poolTokenBalance === undefined || poolTokenBalance < 1.1 * collateralDeposit) {
+    if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
       return ValidityCheckE.InsufficientBalance;
       // return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
     }
@@ -691,7 +718,7 @@ export const ActionBlock = memo(() => {
               }
               rightSide={
                 !isValidityCheckDone ? (
-                  <Box className={styles.loaderHolder}>
+                  <Box>
                     <CircularProgress color="primary" />
                   </Box>
                 ) : (
