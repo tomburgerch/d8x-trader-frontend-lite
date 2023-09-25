@@ -215,7 +215,7 @@ export const theme = createTheme({
           props: { variant: 'secondary' },
           style: {
             ...MuiButtonSharedStyle,
-            backgroundColor: 'var(--d8x-color-white)',
+            backgroundColor: 'var(--d8x-background-white)',
             border: '1px solid var(--d8x-color-purple)',
             color: 'var(--d8x-color-purple)',
             ':hover': {

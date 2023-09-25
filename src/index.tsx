@@ -1,4 +1,3 @@
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { Provider as JotaiProvider } from 'jotai';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -9,15 +8,15 @@ import { WagmiConfig } from 'wagmi';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 
 import 'polyfills';
-import { chains, wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
-import { Disclaimer } from 'components/disclaimer/disclaimer';
-import { GeoBlockingProvider } from 'context/geo-blocking-context/GeoBlockingContext';
+import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { StaticBackground } from 'components/static-background/StaticBackground';
+import { GeoBlockingProvider } from 'context/geo-blocking-context/GeoBlockingContext';
 import { CandlesWebSocketContextProvider } from 'context/websocket-context/candles/CandlesWebSocketContextProvider';
 import { WebSocketContextProvider } from 'context/websocket-context/d8x/WebSocketContextProvider';
 import { theme } from 'styles/theme/theme';
 
 import { App } from './App';
+import { RainbowKitProviderWrapper } from './RainbowKitProviderWrapper';
 import './i18n';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -39,12 +38,7 @@ if (container) {
             <ThemeProvider theme={theme}>
               <GeoBlockingProvider>
                 <WagmiConfig config={wagmiConfig}>
-                  <RainbowKitProvider
-                    chains={chains}
-                    initialChain={1442}
-                    appInfo={{ appName: 'D8X', disclaimer: Disclaimer, learnMoreUrl: 'https://d8x.exchange/' }}
-                    modalSize="compact"
-                  >
+                  <RainbowKitProviderWrapper>
                     <WebSocketContextProvider>
                       <CandlesWebSocketContextProvider>
                         <BrowserRouter>
@@ -53,7 +47,7 @@ if (container) {
                         </BrowserRouter>
                       </CandlesWebSocketContextProvider>
                     </WebSocketContextProvider>
-                  </RainbowKitProvider>
+                  </RainbowKitProviderWrapper>
                 </WagmiConfig>
               </GeoBlockingProvider>
             </ThemeProvider>

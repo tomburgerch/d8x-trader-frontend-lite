@@ -20,9 +20,11 @@
 
 .dataTitle {
   margin-bottom: $d8x-spacing;
+  color: var(--d8x-color-black-maintext);
 }
 
 .dataValue {
+  color: var(--d8x-color-black-maintext);
   font-weight: 600;
 }
 
