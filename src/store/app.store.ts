@@ -17,7 +17,20 @@ export const orderBlockPositionAtom = atomWithStorage<OrderBlockPositionE>(
   OrderBlockPositionE.Right
 );
 
-export const enabledDarkModeAtom = atomWithStorage<boolean>(ENABLED_DARK_MODE_LS_KEY, false);
+const enabledDarkModePrimitiveAtom = atomWithStorage<boolean>(
+  ENABLED_DARK_MODE_LS_KEY,
+  window.matchMedia('(prefers-color-scheme: dark)').matches
+);
+export const enabledDarkModeAtom = atom(
+  (get) => {
+    const enabled = get(enabledDarkModePrimitiveAtom);
+    document.documentElement.dataset.theme = enabled ? 'dark' : 'light';
+    return enabled;
+  },
+  (_get, set, value: boolean) => {
+    set(enabledDarkModePrimitiveAtom, value);
+  }
+);
 export const selectedLanguageAtom = atomWithStorage<LanguageE>(SELECTED_LANGUAGE_LS_KEY, LanguageE.EN);
 export const defaultCurrencyAtom = atomWithStorage<DefaultCurrencyE>(DEFAULT_CURRENCY_LS_KEY, DefaultCurrencyE.Base);
 
