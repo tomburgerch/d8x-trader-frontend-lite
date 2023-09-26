@@ -534,10 +534,6 @@
       "title": "设置",
       "ui-settings": {
         "title": "用户界面设置",
-        "conditional-options": {
-          "on": "关于",
-          "off": "关闭"
-        },
         "one-click-trading": {
           "title": "One-click trading"
         },
@@ -546,8 +542,10 @@
           "left": "左",
           "right": "右"
         },
-        "dark-mode": {
-          "title": "黑夜模式"
+        "theme": {
+          "title": "主题",
+          "dark": "深色",
+          "light": "浅色"
         },
         "default-currency": {
           "title": "默认货币",

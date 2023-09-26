@@ -534,10 +534,6 @@
       "title": "Settings",
       "ui-settings": {
         "title": "UI Settings",
-        "conditional-options": {
-          "on": "On",
-          "off": "Off"
-        },
         "one-click-trading": {
           "title": "One-click trading"
         },
@@ -546,8 +542,10 @@
           "left": "Left",
           "right": "Right"
         },
-        "dark-mode": {
-          "title": "Coming soon"
+        "theme": {
+          "title": "Theme",
+          "dark": "Dark",
+          "light": "Light"
         },
         "default-currency": {
           "title": "Default currency",
