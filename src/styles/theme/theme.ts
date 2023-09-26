@@ -379,6 +379,11 @@ export const theme = createTheme({
               borderWidth: '1px',
             },
           },
+          '&.Mui-disabled': {
+            borderColor: 'var(--d8x-color-black-opac)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          },
         },
         input: {
           padding: '10px 10px 6px',
@@ -487,6 +492,9 @@ export const theme = createTheme({
     },
     MuiTablePagination: {
       styleOverrides: {
+        root: {
+          color: 'var(--d8x-color-black-maintext)',
+        },
         selectIcon: {
           top: 0,
         },
