@@ -164,7 +164,9 @@ export const OrderSize = memo(() => {
         perpetualStaticInfo.id,
         orderBlock === OrderBlockE.Long
       ).then((result) => {
-        setMaxOrderSize(result);
+        if (result) {
+          setMaxOrderSize(result * 0.995);
+        }
       });
     }
   }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]);
