@@ -116,7 +116,7 @@ export const theme = createTheme({
           border: 'none',
           boxShadow: 'none',
           backgroundColor: 'transparent',
-          color: 'var(--d8x-text-color)',
+          color: 'var(--d8x-color-black-maintext)',
         },
       },
     },
@@ -141,7 +141,7 @@ export const theme = createTheme({
     MuiLink: {
       styleOverrides: {
         root: {
-          color: 'var(--d8x-text-color)',
+          color: 'var(--d8x-color-black-maintext)',
           marginLeft: '48px',
           ':first-of-type': {
             marginLeft: '0',
@@ -241,7 +241,7 @@ export const theme = createTheme({
             ...MuiButtonSharedStyle,
             backgroundColor: 'var(--d8x-color-yellow)',
             border: '1px solid var(--d8x-color-rose)',
-            color: 'var(--d8x-text-color)',
+            color: 'var(--d8x-color-black-maintext)',
             ':hover': {
               backgroundColor: 'var(--d8x-color-rose)',
             },
@@ -402,6 +402,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           minWidth: '30px',
+          color: 'var(--d8x-color-black-opac2)',
         },
       },
     },
@@ -465,6 +466,7 @@ export const theme = createTheme({
         markLabel: {
           fontSize: '12px',
           lineHeight: '16px',
+          color: 'var(--d8x-color-black-maintext)',
         },
       },
     },
