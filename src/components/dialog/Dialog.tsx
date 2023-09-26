@@ -13,7 +13,7 @@ interface DialogPropsI extends DialogProps {
 
 export const Dialog = ({ open, loading, errorMsg, children, onCloseClick, ...rest }: DialogPropsI) => {
   return (
-    <MuiDialog open={open} {...rest}>
+    <MuiDialog open={open} className={styles.dialog} {...rest}>
       {loading && (
         <Box className={styles.loaderWrapper}>
           <CircularProgress />
