@@ -499,6 +499,7 @@
       "perpetuals": "万年历",
       "vault": "金库",
       "account-value": {
+        "main-title": "你的帐户",
         "title": "账户价值",
         "details": {
           "wallet": {

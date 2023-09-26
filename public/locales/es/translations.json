@@ -499,6 +499,7 @@
       "perpetuals": "Perpetuos",
       "vault": "Bóveda",
       "account-value": {
+        "main-title": "Su cuenta",
         "title": "Valor de la cuenta",
         "details": {
           "wallet": {

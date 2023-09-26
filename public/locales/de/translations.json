@@ -499,6 +499,7 @@
       "perpetuals": "Perpetuals",
       "vault": "Tresor",
       "account-value": {
+        "main-title": "Ihr Konto",
         "title": "Konto Wert",
         "details": {
           "wallet": {

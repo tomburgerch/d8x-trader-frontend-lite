@@ -499,6 +499,7 @@
       "perpetuals": "Perpetuals",
       "vault": "Vault",
       "account-value": {
+        "main-title": "Your account",
         "title": "Account Value",
         "details": {
           "wallet": {

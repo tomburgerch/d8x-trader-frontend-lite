@@ -499,6 +499,7 @@
       "perpetuals": "퍼페추얼",
       "vault": "볼트",
       "account-value": {
+        "main-title": "Your account",
         "title": "계정 가치",
         "details": {
           "wallet": {
