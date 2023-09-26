@@ -6,7 +6,7 @@ import { memo, Ref, useMemo } from 'react';
 import { useTheme } from '@mui/material';
 
 import { TvChartCandleI } from 'types/types';
-import { appDimensionsAtom } from 'store/app.store';
+import { appDimensionsAtom, enabledDarkModeAtom } from 'store/app.store';
 
 interface CandlesSeriesPropsI {
   width?: number;
@@ -18,6 +18,8 @@ const MIN_CHART_HEIGHT = 300;
 
 export const ChartBlock = memo(({ width, candles, seriesRef }: CandlesSeriesPropsI) => {
   const [dimensions] = useAtom(appDimensionsAtom);
+  // A hack to make it rerender and update chart's layout
+  const [,] = useAtom(enabledDarkModeAtom);
 
   const theme = useTheme();
 
@@ -32,6 +34,10 @@ export const ChartBlock = memo(({ width, candles, seriesRef }: CandlesSeriesProp
     <Chart
       width={width}
       height={chartHeight}
+      layout={{
+        background: { color: getComputedStyle(document.documentElement).getPropertyValue('--d8x-background-white') },
+        textColor: getComputedStyle(document.documentElement).getPropertyValue('--d8x-color-black-maintext'),
+      }}
       crosshair={{ mode: CrosshairMode.Normal }}
       timeScale={{ timeVisible: true, barSpacing: candles.length < 60 ? 22 : 8 }}
     >

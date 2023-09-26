@@ -28,7 +28,7 @@ export const LanguageSwitcherMenuItem = ({ languageMeta, onClick }: LanguageSwit
         i18n.changeLanguage(lang);
         onClick?.();
       }}
-      className={classnames('notranslate', { [styles.selected]: selectedLanguage === languageMeta.lang })}
+      className={classnames(styles.menuItem, { [styles.selected]: selectedLanguage === languageMeta.lang })}
     >
       <Flag code={languageMeta.flag} width="20" height="16" className={styles.flagIcon} />
       {languageMeta.name}

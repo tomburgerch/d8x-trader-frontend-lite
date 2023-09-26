@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   gap: 0.5 * $d8x-spacing;
-  background-color: white;
+  background-color: var(--d8x-background-white);
   border-radius: 8px;
   height: 84px;
 }
@@ -16,7 +16,7 @@
   height: 45px;
   min-width: 45px;
   border-radius: 50%;
-  background-color: var(--d8x-color-white);
+  background-color: var(--d8x-background-white);
   color: var(--d8x-color-purple);
   margin-left: $d8x-spacing * 3;
 
@@ -96,6 +96,7 @@
   }
 
   :global(.MuiPaper-root) {
+    background-color: var(--d8x-background);
     width: 100%;
     max-width: 350px;
     border-radius: $d8x-border-radius;
