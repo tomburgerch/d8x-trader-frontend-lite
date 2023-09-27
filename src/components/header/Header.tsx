@@ -9,13 +9,13 @@ import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTh
 
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo } from 'network/network';
-import { pages, authPages } from 'routes/pages';
+import { authPages, pages } from 'routes/pages';
 import {
   oracleFactoryAddrAtom,
   perpetualsAtom,
-  poolsAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
+  poolsAtom,
   proxyAddrAtom,
   selectedPoolAtom,
   traderAPIAtom,
@@ -24,9 +24,9 @@ import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
 import { Container } from '../container/Container';
-import { InteractiveLogo } from '../interactive-logo/InteractiveLogo';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
+import { InteractiveLogo } from './elements/interactive-logo/InteractiveLogo';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';

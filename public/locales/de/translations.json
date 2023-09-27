@@ -499,6 +499,7 @@
       "perpetuals": "Perpetuals",
       "vault": "Tresor",
       "account-value": {
+        "main-title": "Ihr Konto",
         "title": "Konto Wert",
         "details": {
           "wallet": {
@@ -533,10 +534,6 @@
       "title": "Einstellungen",
       "ui-settings": {
         "title": "UI-Einstellungen",
-        "conditional-options": {
-          "on": "On",
-          "off": "Off"
-        },
         "one-click-trading": {
           "title": "One-click trading"
         },
@@ -545,8 +542,10 @@
           "left": "Left",
           "right": "Right"
         },
-        "dark-mode": {
-          "title": "Coming soon"
+        "theme": {
+          "title": "Thema",
+          "dark": "Dunkel",
+          "light": "Licht"
         },
         "default-currency": {
           "title": "Default currency",

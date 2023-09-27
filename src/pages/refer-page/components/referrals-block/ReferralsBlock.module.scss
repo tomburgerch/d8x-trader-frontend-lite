@@ -3,6 +3,7 @@
 .root {
   padding: 10 * $d8x-spacing 8 * $d8x-spacing;
   flex: 1;
+  background-color: var(--d8x-background-white);
 }
 
 .buttonContainer {
@@ -16,13 +17,16 @@
 
 .divider {
   margin: 6 * $d8x-spacing 0;
+  background-color: var(--d8x-color-black-150);
 }
 
 .dataTitle {
   margin-bottom: $d8x-spacing;
+  color: var(--d8x-color-black-maintext);
 }
 
 .dataValue {
+  color: var(--d8x-color-black-maintext);
   font-weight: 600;
 }
 

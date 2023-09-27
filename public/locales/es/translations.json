@@ -499,6 +499,7 @@
       "perpetuals": "Perpetuos",
       "vault": "Bóveda",
       "account-value": {
+        "main-title": "Su cuenta",
         "title": "Valor de la cuenta",
         "details": {
           "wallet": {
@@ -533,10 +534,6 @@
       "title": "Configuración",
       "ui-settings": {
         "title": "Configuración de UI",
-        "conditional-options": {
-          "on": "En",
-          "off": "Off"
-        },
         "one-click-trading": {
           "title": "One-click trading"
         },
@@ -545,8 +542,10 @@
           "left": "Izquierda",
           "right": "Derecha"
         },
-        "dark-mode": {
-          "title": "Pronto"
+        "theme": {
+          "title": "Tema",
+          "dark": "Oscura",
+          "light": "Ligera"
         },
         "default-currency": {
           "title": "Moneda por defecto",

@@ -23,9 +23,14 @@
   color: var(--d8x-color-purple);
 }
 
+.inputAdornment {
+  color: var(--d8x-color-black-opac2);
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
 
   .inputAdornment {
+    color: var(--d8x-color-black-maintext);
     min-width: 65px;
   }
 

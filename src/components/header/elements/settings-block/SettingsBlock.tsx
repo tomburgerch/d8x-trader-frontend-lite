@@ -40,7 +40,7 @@ export const SettingsBlock = memo(() => {
       )}
       <Box className={styles.optionRow}>
         <Typography variant="bodyMedium" className={styles.setting}>
-          {t('common.settings.ui-settings.dark-mode.title')}
+          {t('common.settings.ui-settings.theme.title')}
         </Typography>
         <DarkModeSelect />
       </Box>
