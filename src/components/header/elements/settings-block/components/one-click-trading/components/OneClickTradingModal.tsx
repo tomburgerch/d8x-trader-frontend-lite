@@ -6,8 +6,7 @@ import { type Address } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { useAccount, useBalance, usePublicClient, useWalletClient } from 'wagmi';
 
-import { Settings } from '@mui/icons-material';
-import { Box, Button, CircularProgress, Tooltip, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
 import { hasDelegate } from 'blockchain-api/contract-interactions/hasDelegate';
 import { removeDelegate } from 'blockchain-api/contract-interactions/removeDelegate';
@@ -23,9 +22,14 @@ import { storageKeyAtom } from 'store/order-block.store';
 import { proxyAddrAtom } from 'store/pools.store';
 
 import { FundingModal } from './FundingModal';
-import styles from './OneClickTradingDialog.module.scss';
+import styles from '../OneClickTradingButton.module.scss';
 
-export const OneClickTradingModal = () => {
+interface OneClickTradingModalPropsI {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPropsI) => {
   const { t } = useTranslation();
 
   const publicClient = usePublicClient();
@@ -37,7 +41,6 @@ export const OneClickTradingModal = () => {
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const setStorageKey = useSetAtom(storageKeyAtom);
 
-  const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [isActionLoading, setActionLoading] = useState(false);
   const [isDelegated, setDelegated] = useState<boolean | null>(null);
@@ -57,10 +60,6 @@ export const OneClickTradingModal = () => {
       .then(setDelegated)
       .finally(() => setLoading(false));
   }, [publicClient, proxyAddr, address]);
-
-  const onClose = () => {
-    setModalOpen(false);
-  };
 
   const handleCreate = async () => {
     if (!walletClient || !proxyAddr || !address || handleActivateRef.current) {
@@ -174,14 +173,7 @@ export const OneClickTradingModal = () => {
 
   return (
     <>
-      <Tooltip title={t('common.settings.one-click-modal.modal-button')}>
-        <Button onClick={() => setModalOpen(true)} className={styles.modalButton} variant="outlined">
-          <Typography variant="bodyMedium">{t('common.settings.one-click-modal.modal-button')}</Typography>
-          <Settings />
-        </Button>
-      </Tooltip>
-
-      <Dialog open={isModalOpen} onClose={onClose}>
+      <Dialog open={isOpen} onClose={onClose}>
         <Box className={styles.dialogContent}>
           <Typography variant="h4" className={styles.title}>
             {t('common.settings.one-click-modal.title')}
@@ -199,9 +191,30 @@ export const OneClickTradingModal = () => {
               <Typography variant="h6">
                 {t(`common.settings.one-click-modal.${isDelegated ? 'manage' : 'create'}-delegate.title`)}
               </Typography>
-              <Typography variant="bodyMedium">
-                {t(`common.settings.one-click-modal.${isDelegated ? 'manage' : 'create'}-delegate.description`)}
-              </Typography>
+              {isDelegated ? (
+                <div>
+                  <div className={styles.infoLine}>
+                    <div className={styles.infoTitle}>One-click trading status</div>
+                    <div>{activatedOneClickTrading ? 'Active' : 'Inactive'}</div>
+                  </div>
+                  {delegateAddress && (
+                    <div className={styles.infoLine}>
+                      <div className={styles.infoTitle}>Delegate addr</div>
+                      <div>{delegateAddress}</div>
+                    </div>
+                  )}
+                  {delegateBalance && (
+                    <div className={styles.infoLine}>
+                      <div className={styles.infoTitle}>Delegate wallet amount (gas)</div>
+                      <div>{delegateBalance.formatted} ETH</div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Typography variant="bodyMedium">
+                  {t('common.settings.one-click-modal.create-delegate.description')}
+                </Typography>
+              )}
             </>
           )}
         </Box>

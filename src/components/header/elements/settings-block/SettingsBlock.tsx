@@ -8,7 +8,7 @@ import styles from './SettingsBlock.module.scss';
 import { DarkModeSelect } from './components/dark-mode/DarkModeSelect';
 import { DefaultCurrencySelect } from './components/default-currency/DefaultCurrencySelect';
 import { OrderBlockSelect } from './components/order-block/OrderBlockSelect';
-import { OneClickTradingModal } from './components/one-click-trading-modal/OneClickTradingModal';
+import { OneClickTradingButton } from './components/one-click-trading/OneClickTradingButton';
 
 export const SettingsBlock = memo(() => {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ export const SettingsBlock = memo(() => {
         <Typography variant="bodyMedium" className={styles.setting}>
           {t('common.settings.ui-settings.one-click-trading.title')}
         </Typography>
-        <OneClickTradingModal />
+        <OneClickTradingButton />
       </Box>
       {isBigScreen && (
         <Box className={styles.optionRow}>
