@@ -33,6 +33,11 @@
   color: var(--d8x-color-black-400);
 }
 
+.address {
+  word-break: break-all;
+  text-align: right;
+}
+
 .spinnerContainer {
   display: flex;
   align-items: center;
