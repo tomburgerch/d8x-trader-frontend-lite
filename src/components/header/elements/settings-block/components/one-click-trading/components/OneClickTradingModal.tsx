@@ -194,18 +194,28 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
               {isDelegated ? (
                 <div>
                   <div className={styles.infoLine}>
-                    <div className={styles.infoTitle}>One-click trading status</div>
-                    <div>{activatedOneClickTrading ? 'Active' : 'Inactive'}</div>
+                    <div className={styles.infoTitle}>
+                      {t('common.settings.one-click-modal.manage-delegate.status.title')}
+                    </div>
+                    <div>
+                      {activatedOneClickTrading
+                        ? t('common.settings.one-click-modal.manage-delegate.status.active')
+                        : t('common.settings.one-click-modal.manage-delegate.status.inactive')}
+                    </div>
                   </div>
                   {delegateAddress && (
                     <div className={styles.infoLine}>
-                      <div className={styles.infoTitle}>Delegate addr</div>
+                      <div className={styles.infoTitle}>
+                        {t('common.settings.one-click-modal.manage-delegate.address')}
+                      </div>
                       <div className={styles.address}>{delegateAddress}</div>
                     </div>
                   )}
                   {delegateBalance && (
                     <div className={styles.infoLine}>
-                      <div className={styles.infoTitle}>Delegate wallet amount (gas)</div>
+                      <div className={styles.infoTitle}>
+                        {t('common.settings.one-click-modal.manage-delegate.amount')}
+                      </div>
                       <div>{delegateBalance.formatted} ETH</div>
                     </div>
                   )}

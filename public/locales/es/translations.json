@@ -571,6 +571,13 @@
           "activate-error-result": "Invalid wallet. Re-set your delegate and try again.",
           "activate": "Activate",
           "deactivate": "Deactivate",
+          "status": {
+            "title": "One-click trading status",
+            "active": "Active",
+            "inactive": "Inactive"
+          },
+          "address": "Delegate addr",
+          "amount": "Delegate wallet amount (gas)",
           "remove": "Remove",
           "fund": "Fund" 
         },
