@@ -4,11 +4,11 @@
 @import 'colors';
 @import 'darkColors';
 
-:root[data-theme='light'] {
+@include theme-light {
   @include colors;
 }
 
-:root[data-theme='dark'] {
+@include theme-dark {
   @include dark-colors;
 }
 

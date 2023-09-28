@@ -84,7 +84,7 @@
   }
 }
 
-:root[data-theme='light'] {
+@include theme-light {
 
   .codeInput {
     background-color: var(--d8x-color-black-100);
