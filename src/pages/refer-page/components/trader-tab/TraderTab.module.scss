@@ -3,6 +3,7 @@
 .root {
   display: flex;
   border-radius: $d8x-border-radius;
+  overflow-x: auto;
 }
 
 .divider {
