@@ -20,13 +20,6 @@
   max-width: 250px;
 }
 
-@media screen and ($d8x-breakpoint-max-md) {
-
-  .root {
-    display: none;
-  }
-}
-
 @media screen and ($d8x-breakpoint-max-sm) {
 
   .root {
