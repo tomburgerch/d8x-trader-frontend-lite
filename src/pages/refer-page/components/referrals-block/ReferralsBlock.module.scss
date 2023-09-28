@@ -4,6 +4,7 @@
   padding: 10 * $d8x-spacing 8 * $d8x-spacing;
   flex: 1;
   background-color: var(--d8x-background-white);
+  border-radius: 0 $d8x-border-radius $d8x-border-radius 0;
 }
 
 .buttonContainer {
@@ -28,6 +29,13 @@
 .dataValue {
   color: var(--d8x-color-black-maintext);
   font-weight: 600;
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .root {
+    border-radius: 0 0 $d8x-border-radius $d8x-border-radius;
+  }
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {

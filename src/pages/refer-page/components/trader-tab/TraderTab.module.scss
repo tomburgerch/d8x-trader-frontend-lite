@@ -3,6 +3,7 @@
 .root {
   display: flex;
   border-radius: $d8x-border-radius;
+  overflow-x: auto;
 }
 
 .divider {
@@ -10,7 +11,7 @@
   margin: 10 * $d8x-spacing 0;
 }
 
-@media screen and ($d8x-breakpoint-max-sm) {
+@media screen and ($d8x-breakpoint-max-md) {
 
   .root {
     flex-direction: column;

@@ -63,3 +63,17 @@ $media: (
     @content;
   }
 }
+
+@mixin theme-light() {
+
+  :root[data-theme='light'] {
+    @content;
+  }
+}
+
+@mixin theme-dark() {
+
+  :root[data-theme='dark'] {
+    @content;
+  }
+}

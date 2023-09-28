@@ -45,7 +45,6 @@
 }
 
 .kickbackInput {
-  background-color: var(--d8x-color-black-100);
   max-width: 110px;
   color: var(--d8x-color-black-400);
 
@@ -65,11 +64,21 @@
 }
 
 .codeInput {
-  background-color: var(--d8x-color-black-100);
   width: 100%;
 
   input {
     width: 100%;
+  }
+}
+
+@include theme-light {
+
+  .codeInput {
+    background-color: var(--d8x-color-black-100);
+  }
+
+  .kickbackInput {
+    background-color: var(--d8x-color-black-100);
   }
 }
 
