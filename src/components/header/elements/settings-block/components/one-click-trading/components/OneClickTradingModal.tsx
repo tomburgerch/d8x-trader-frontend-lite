@@ -200,7 +200,7 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
                   {delegateAddress && (
                     <div className={styles.infoLine}>
                       <div className={styles.infoTitle}>Delegate addr</div>
-                      <div>{delegateAddress}</div>
+                      <div className={styles.address}>{delegateAddress}</div>
                     </div>
                   )}
                   {delegateBalance && (
@@ -232,14 +232,25 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
             )}
             {!isLoading && isDelegated === true && (
               <>
-                <Button
-                  variant="primary"
-                  className={styles.actionButton}
-                  onClick={handleActivate}
-                  disabled={isActionLoading || activatedOneClickTrading}
-                >
-                  {t(`common.settings.one-click-modal.manage-delegate.activate`)}
-                </Button>
+                {activatedOneClickTrading ? (
+                  <Button
+                    variant="primary"
+                    className={styles.actionButton}
+                    onClick={() => setActivatedOneClickTrading(false)}
+                    disabled={isActionLoading}
+                  >
+                    {t(`common.settings.one-click-modal.manage-delegate.deactivate`)}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    className={styles.actionButton}
+                    onClick={handleActivate}
+                    disabled={isActionLoading}
+                  >
+                    {t(`common.settings.one-click-modal.manage-delegate.activate`)}
+                  </Button>
+                )}
                 <Button
                   variant="primary"
                   className={styles.actionButton}
