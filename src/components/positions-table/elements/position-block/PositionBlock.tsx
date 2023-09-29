@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import type { MarginAccountI, MarginAccountWithLiqPriceI, TableHeaderI } from 'types/types';
+import type { MarginAccountWithLiqPriceI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './PositionBlock.module.scss';
@@ -15,8 +15,9 @@ import styles from './PositionBlock.module.scss';
 interface PositionRowPropsI {
   headers: TableHeaderI<MarginAccountWithLiqPriceI>[];
   position: MarginAccountWithLiqPriceI;
-  handlePositionClose: (position: MarginAccountI) => void;
-  handlePositionModify: (position: MarginAccountI) => void;
+  handlePositionClose: (position: MarginAccountWithLiqPriceI) => void;
+  handlePositionModify: (position: MarginAccountWithLiqPriceI) => void;
+  handleTpSlModify: (position: MarginAccountWithLiqPriceI) => void;
 }
 
 export const PositionBlock = memo(

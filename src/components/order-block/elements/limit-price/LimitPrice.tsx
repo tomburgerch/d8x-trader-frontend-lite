@@ -12,6 +12,7 @@ import { OrderTypeE } from 'types/enums';
 
 import commonStyles from '../../OrderBlock.module.scss';
 import styles from './LimitPrice.module.scss';
+import { calculateStepSize } from '../../../../helpers/calculateStepSize';
 
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();
@@ -25,12 +26,10 @@ export const LimitPrice = memo(() => {
 
   const inputValueChangedRef = useRef(false);
 
-  const stepSize = useMemo(() => {
-    if (!selectedPerpetual?.midPrice) {
-      return '1';
-    }
-    return `${Math.min(1, 1 / 10 ** Math.ceil(2.5 - Math.log10(selectedPerpetual.midPrice)))}`;
-  }, [selectedPerpetual?.midPrice]);
+  const stepSize = useMemo(
+    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.midPrice))}`,
+    [selectedPerpetual?.midPrice]
+  );
 
   const handleLimitPriceChange = useCallback(
     (targetValue: string) => {

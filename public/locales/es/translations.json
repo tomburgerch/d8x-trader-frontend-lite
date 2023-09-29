@@ -32,14 +32,17 @@
           "entry-price": "Precio de Entrada",
           "liq-price": "Precio de Liquidación",
           "margin": "Margen",
-          "pnl": "Ganancias sin Realizar"
+          "pnl": "Ganancias sin Realizar",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "COMPRA",
           "sell": "VENTA",
           "modify": "Modificar",
           "connect": "Por favor conecte su cartera",
-          "no-open": "No hay posiciones abiertas"
+          "no-open": "No hay posiciones abiertas",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "Símbolo",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "Modificar Posición",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "Cerrar",
             "add": "Añadir",
@@ -63,7 +68,8 @@
             "liq-price": "Precio de Liquidación"
           },
           "cancel": "Cancelar",
-          "confirm": "Confirmar"
+          "confirm": "Confirmar",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {

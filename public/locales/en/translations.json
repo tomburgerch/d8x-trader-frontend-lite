@@ -32,14 +32,17 @@
           "entry-price": "Entry Price",
           "liq-price": "Liq. Price",
           "margin": "Margin",
-          "pnl": "Unr. PnL"
+          "pnl": "Unr. PnL",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "BUY",
           "sell": "SELL",
           "modify": "Modify",
           "connect": "Please connect your wallet",
-          "no-open": "No open positions"
+          "no-open": "No open positions",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "Symbol",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "Modify Position",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "Close",
             "add": "Add",
@@ -63,7 +68,8 @@
             "liq-price": "Liquidation price:"
           },
           "cancel": "Cancel",
-          "confirm": "Confirm"
+          "confirm": "Confirm",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {

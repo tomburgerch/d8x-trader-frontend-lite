@@ -7,6 +7,25 @@
     width: 100%;
     border-radius: $d8x-border-radius;
   }
+
+  &.wide {
+
+    :global(.MuiPaper-root) {
+      max-width: 600px;
+    }
+  }
+}
+
+.contentWithGap {
+  margin-bottom: $d8x-spacing * 8;
+}
+
+.selectors {
+  display: flex;
+  flex-direction: column;
+  gap: $d8x-spacing * 6;
+  padding-top: $d8x-spacing * 6;
+  padding-bottom: $d8x-spacing * 6;
 }
 
 .inputBlock {
