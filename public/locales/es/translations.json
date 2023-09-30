@@ -585,7 +585,7 @@
           "address": "Delegate addr",
           "amount": "Delegate wallet amount (gas)",
           "remove": "Remove",
-          "fund": "Fund" 
+          "fund": "Fund"
         },
         "funding-modal": {
           "title": "Fund delegate wallet",
