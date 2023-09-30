@@ -14,13 +14,13 @@ import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { orderDigest } from 'network/network';
+import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
 import { poolTokenDecimalsAtom, proxyAddrAtom, selectedPoolAtom } from 'store/pools.store';
-import { OrderTypeE } from 'types/enums';
+import { OrderSideE, OrderTypeE } from 'types/enums';
 import { type MarginAccountI, type OrderI } from 'types/types';
 
 import styles from '../Modal.module.scss';
-import { tradingClientAtom } from 'store/app.store';
 
 interface CloseModalPropsI {
   isOpen: boolean;
@@ -100,7 +100,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
 
     const closeOrder: OrderI = {
       symbol: selectedPosition.symbol,
-      side: selectedPosition.side === 'BUY' ? 'SELL' : 'BUY',
+      side: selectedPosition.side === OrderSideE.Buy ? OrderSideE.Sell : OrderSideE.Buy,
       type: OrderTypeE.Market.toUpperCase(),
       quantity: selectedPosition.positionNotionalBaseCCY,
       executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),

@@ -32,14 +32,17 @@
           "entry-price": "Einstiegspreis",
           "liq-price": "Liq. Preis",
           "margin": "Margin",
-          "pnl": "Unr. GuV"
+          "pnl": "Unr. GuV",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "KAUFEN",
           "sell": "VERKAUFEN",
           "modify": "Modifizieren",
           "connect": "Verbinden Sie Ihre Wallet",
-          "no-open": "Keine offenen Positionen"
+          "no-open": "Keine offenen Positionen",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "Symbol",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "Position Modifizieren",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "Schliessen",
             "add": "Hinzufügen",
@@ -63,7 +68,8 @@
             "liq-price": "Liq. Preis:"
           },
           "cancel": "Abbrechen",
-          "confirm": "Bestätigen"
+          "confirm": "Bestätigen",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {

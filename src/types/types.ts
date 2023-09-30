@@ -123,6 +123,7 @@ export interface MarginAccountI {
 
 export interface MarginAccountWithLiqPriceI extends MarginAccountI {
   liqPrice: number;
+  openOrders: OrderWithIdI[];
 }
 
 export interface PerpetualOpenOrdersI {

@@ -32,14 +32,17 @@
           "entry-price": "开仓价",
           "liq-price": "强平价",
           "margin": "本金",
-          "pnl": "未实现盈亏"
+          "pnl": "未实现盈亏",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "买入",
           "sell": "卖出",
           "modify": "调整",
           "connect": "请连接钱包",
-          "no-open": "无持仓"
+          "no-open": "无持仓",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "币对",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "调整仓位",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "关闭",
             "add": "增加",
@@ -63,7 +68,8 @@
             "liq-price": "强平价"
           },
           "cancel": "取消",
-          "confirm": "确认"
+          "confirm": "确认",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {

@@ -1,5 +1,13 @@
-import { useAtom, useSetAtom } from 'jotai';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type ChangeEvent,
+  type Dispatch,
+  memo,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
@@ -7,25 +15,26 @@ import { Typography } from '@mui/material';
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { orderInfoAtom, takeProfitAtom, takeProfitPriceAtom } from 'store/order-block.store';
-import { selectedPerpetualAtom } from 'store/pools.store';
-import { OrderBlockE, TakeProfitE } from 'types/enums';
+import { parseSymbol } from 'helpers/parseSymbol';
+import { OrderSideE, TakeProfitE } from 'types/enums';
+import { MarginAccountWithLiqPriceI } from 'types/types';
 import { getFractionDigits } from 'utils/formatToCurrency';
+import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 
-import commonStyles from '../../OrderBlock.module.scss';
+import styles from './CommonSelector.module.scss';
 
-export const TakeProfitSelector = memo(() => {
+interface TakeProfitSelectorPropsI {
+  setTakeProfitPrice: Dispatch<SetStateAction<number | null>>;
+  position: MarginAccountWithLiqPriceI;
+}
+
+export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakeProfitSelectorPropsI) => {
   const { t } = useTranslation();
 
-  const [orderInfo] = useAtom(orderInfoAtom);
-  const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
-
+  const [takeProfit, setTakeProfit] = useState<TakeProfitE | null>(null);
   const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);
 
-  const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
-  const currentLeverageRef = useRef(orderInfo?.leverage);
+  const parsedSymbol = parseSymbol(position.symbol);
 
   const handleTakeProfitPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const takeProfitPriceValue = event.target.value;
@@ -44,25 +53,22 @@ export const TakeProfitSelector = memo(() => {
   };
 
   const minTakeProfitPrice = useMemo(() => {
-    if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Long) {
-      return orderInfo.midPrice;
+    if (position.entryPrice && position.side === OrderSideE.Buy) {
+      return position.entryPrice;
     }
     return 0;
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock]);
+  }, [position]);
 
   const maxTakeProfitPrice = useMemo(() => {
-    if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Short) {
-      return orderInfo.midPrice;
+    if (position.entryPrice && position.side === OrderSideE.Sell) {
+      return position.entryPrice;
     }
     return undefined;
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock]);
+  }, [position]);
 
-  const fractionDigits = useMemo(
-    () => getFractionDigits(selectedPerpetual?.quoteCurrency),
-    [selectedPerpetual?.quoteCurrency]
-  );
+  const fractionDigits = useMemo(() => getFractionDigits(parsedSymbol?.quoteCurrency), [parsedSymbol?.quoteCurrency]);
 
-  const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
+  const stepSize = useMemo(() => calculateStepSize(position.entryPrice), [position.entryPrice]);
 
   const validateTakeProfitPrice = useCallback(() => {
     if (takeProfitInputPrice === null) {
@@ -88,31 +94,20 @@ export const TakeProfitSelector = memo(() => {
   }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfit, setTakeProfitPrice, fractionDigits]);
 
   useEffect(() => {
-    if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
-      currentOrderBlockRef.current = orderInfo?.orderBlock;
-
-      setTakeProfitPrice(null);
-      setTakeProfitInputPrice(null);
-
-      if (orderInfo?.takeProfit === null) {
-        setTakeProfit(TakeProfitE.None);
+    if (takeProfit && takeProfit !== TakeProfitE.None) {
+      let limitPrice;
+      if (position.side === OrderSideE.Buy) {
+        limitPrice = position.entryPrice * (1 + mapTakeProfitToNumber(takeProfit) / position.leverage);
+      } else {
+        limitPrice = position.entryPrice * (1 - mapTakeProfitToNumber(takeProfit) / position.leverage);
       }
+      setTakeProfitInputPrice(Math.max(0, +limitPrice.toFixed(fractionDigits)));
     }
-  }, [orderInfo?.orderBlock, orderInfo?.takeProfit, setTakeProfitPrice, setTakeProfit]);
+  }, [takeProfit, position, fractionDigits]);
 
   useEffect(() => {
-    if (currentLeverageRef.current !== orderInfo?.leverage) {
-      currentLeverageRef.current = orderInfo?.leverage;
-
-      validateTakeProfitPrice();
-    }
-  }, [orderInfo?.leverage, validateTakeProfitPrice]);
-
-  useEffect(() => {
-    if (takeProfit && takeProfit !== TakeProfitE.None && orderInfo?.takeProfitPrice) {
-      setTakeProfitInputPrice(Math.max(0, +orderInfo.takeProfitPrice.toFixed(fractionDigits)));
-    }
-  }, [takeProfit, orderInfo?.takeProfitPrice, fractionDigits]);
+    setTakeProfitPrice(takeProfitInputPrice);
+  }, [takeProfitInputPrice, setTakeProfitPrice]);
 
   const translationMap: Record<TakeProfitE, string> = {
     [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
@@ -135,7 +130,7 @@ export const TakeProfitSelector = memo(() => {
               <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
             </>
           }
-          classname={commonStyles.actionIcon}
+          classname={styles.actionIcon}
         />
       }
       options={Object.values(TakeProfitE)}
@@ -145,7 +140,7 @@ export const TakeProfitSelector = memo(() => {
       validateInputPrice={validateTakeProfitPrice}
       selectedInputPrice={takeProfitInputPrice}
       selectedPrice={takeProfit}
-      currency={selectedPerpetual?.quoteCurrency}
+      currency={parsedSymbol?.quoteCurrency}
       stepSize={stepSize}
     />
   );

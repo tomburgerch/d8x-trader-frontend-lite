@@ -6,7 +6,7 @@ import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletC
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
-import { HashZero } from 'app-constants';
+import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'app-constants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
@@ -15,6 +15,7 @@ import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { useDebounce } from 'helpers/useDebounce';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { tradingClientAtom } from 'store/app.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
@@ -28,15 +29,12 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
+import { OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './ActionBlock.module.scss';
-import { tradingClientAtom } from 'store/app.store';
-
-const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -56,7 +54,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 
   return {
     symbol: orderInfo.symbol,
-    side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
+    side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell,
     type: orderType,
     limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
     stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
@@ -198,7 +196,7 @@ export const ActionBlock = memo(() => {
     if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossPrice) {
       orders.push({
         // Changed values comparing to main Order
-        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Sell : OrderSideE.Buy,
         type: 'STOP_MARKET',
         stopPrice: orderInfo.stopLossPrice,
         deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),
@@ -216,7 +214,7 @@ export const ActionBlock = memo(() => {
     if (orderInfo.takeProfit !== TakeProfitE.None && orderInfo.takeProfitPrice) {
       orders.push({
         // Changed values comparing to main Order
-        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Sell : OrderSideE.Buy,
         type: OrderTypeE.Limit.toUpperCase(),
         limitPrice: orderInfo.takeProfitPrice,
         deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),

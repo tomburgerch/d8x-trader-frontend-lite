@@ -32,14 +32,17 @@
           "entry-price": "Entry Price",
           "liq-price": "청산 가격",
           "margin": "마진",
-          "pnl": "미실현손익"
+          "pnl": "미실현손익",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "매수",
           "sell": "매도",
           "modify": "Modify",
           "connect": "지갑 연결",
-          "no-open": "열린 포지션이 없습니다."
+          "no-open": "열린 포지션이 없습니다.",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "Symbol",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "Modify Position",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "Close",
             "add": "Add",
@@ -63,7 +68,8 @@
             "liq-price": "청산 가격:"
           },
           "cancel": "Cancel",
-          "confirm": "Confirm"
+          "confirm": "Confirm",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {
