@@ -1,4 +1,12 @@
-import { Chain, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { Chain, connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  coinbaseWallet,
+  metaMaskWallet,
+  okxWallet,
+  rabbyWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 import { configureChains, createConfig } from 'wagmi';
 import { polygonZkEvmTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
@@ -43,11 +51,24 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(defaultC
 
 const projectId = config.projectId;
 
-const { connectors } = getDefaultWallets({
-  appName: 'D8X App',
-  projectId: projectId,
-  chains,
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      metaMaskWallet({ projectId, chains }),
+      rabbyWallet({ chains }),
+      walletConnectWallet({ projectId, chains }),
+    ],
+  },
+  {
+    groupName: 'Others',
+    wallets: [
+      coinbaseWallet({ appName: 'D8X App', chains }),
+      okxWallet({ projectId, chains }),
+      rainbowWallet({ projectId, chains }),
+    ],
+  },
+]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,

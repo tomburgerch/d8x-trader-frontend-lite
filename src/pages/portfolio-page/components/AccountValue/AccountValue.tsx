@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { Typography } from '@mui/material';
 
 import { totalEstimatedEarningsAtom } from 'pages/portfolio-page/store/fetchEarnings';
 import { accountValueAtom, totalOpenRewardsAtom } from 'pages/portfolio-page/store/fetchPortfolio';
@@ -24,6 +25,9 @@ export const AccountValue = () => {
 
   return (
     <div className={styles.sideBlock}>
+      <Typography variant="h5" className={styles.title}>
+        {t('pages.portfolio.account-value.main-title')}
+      </Typography>
       <div>
         <div className={styles.detailsHeader}>{t('pages.portfolio.account-value.title')}</div>
         <div className={styles.accountValue}>${formatCurrency(accountValue)}</div>

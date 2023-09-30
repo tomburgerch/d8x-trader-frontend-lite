@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { memo } from 'react';
 
 import { Card, CardContent } from '@mui/material';
@@ -31,7 +32,7 @@ export const OrderBlock = memo(() => {
         <OrderSize />
       </CardContent>
       <Separator />
-      <CardContent className={styles.card}>
+      <CardContent className={classnames(styles.card, styles.selectors)}>
         <StopLossSelector />
         <TakeProfitSelector />
       </CardContent>

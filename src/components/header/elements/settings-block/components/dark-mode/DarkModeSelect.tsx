@@ -17,15 +17,15 @@ export const DarkModeSelect = () => {
 
   return (
     <DropDownSelect
-      id="dark-mode-dropdown"
-      selectedValue={t(`common.settings.ui-settings.conditional-options.${enabledDarkMode ? 'on' : 'off'}`)}
+      id="theme-dropdown"
+      selectedValue={t(`common.settings.ui-settings.theme.${enabledDarkMode ? 'dark' : 'light'}`)}
       anchorEl={anchorEl}
       setAnchorEl={setAnchorEl}
     >
       {optionsArray.map((option) => (
         <DropDownMenuItem
           key={String(option)}
-          option={t(`common.settings.ui-settings.conditional-options.${option ? 'on' : 'off'}`)}
+          option={t(`common.settings.ui-settings.theme.${option ? 'dark' : 'light'}`)}
           isActive={option === enabledDarkMode}
           onClick={() => {
             setEnabledDarkMode(option);

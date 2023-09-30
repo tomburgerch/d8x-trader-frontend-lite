@@ -23,10 +23,16 @@
 
 .input {
   width: 100%;
-  background-color: var(--d8x-color-black-100);
 
   input {
     width: 100%;
+  }
+}
+
+@include theme-light {
+
+  .input {
+    background-color: var(--d8x-color-black-100);
   }
 }
 

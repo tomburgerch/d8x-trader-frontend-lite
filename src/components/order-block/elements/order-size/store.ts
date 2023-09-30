@@ -9,7 +9,7 @@ import {
   selectedPerpetualAtom,
   selectedPoolAtom,
 } from 'store/pools.store';
-import { OrderBlockE } from 'types/enums';
+import { OrderBlockE, OrderSideE } from 'types/enums';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 
 import { leverageAtom } from '../leverage-selector/store';
@@ -44,7 +44,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const positions = get(positionsAtom);
   const selectedPerpetualSymbol = `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`;
   const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
-  const orderBlockSide = orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL';
+  const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
 
   if (openPosition && openPosition.side !== orderBlockSide) {
     collateralCC = openPosition.collateralCC;

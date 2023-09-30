@@ -1,10 +1,10 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount, useChainId } from 'wagmi';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Box, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
@@ -164,7 +164,9 @@ export const OrderSize = memo(() => {
         perpetualStaticInfo.id,
         orderBlock === OrderBlockE.Long
       ).then((result) => {
-        setMaxOrderSize(result);
+        if (result) {
+          setMaxOrderSize(result * 0.995);
+        }
       });
     }
   }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]);
@@ -234,7 +236,7 @@ export const OrderSize = memo(() => {
                 size="small"
                 className={styles.selector}
               >
-                <ArrowDropDownIcon />
+                {openCurrencySelector ? <ArrowDropUp /> : <ArrowDropDown />}
               </IconButton>
               <Popper
                 sx={{

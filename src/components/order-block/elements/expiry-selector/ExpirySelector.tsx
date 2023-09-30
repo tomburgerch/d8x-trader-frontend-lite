@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { ChangeEvent, memo, useState } from 'react';
 
@@ -15,6 +15,7 @@ const MAX_EXPIRE = 365;
 export const ExpirySelector = memo(() => {
   const [orderType] = useAtom(orderTypeAtom);
   const [expireDays, setExpireDays] = useAtom(expireDaysAtom);
+
   const [inputValue, setInputValue] = useState(`${expireDays}`);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -48,7 +49,7 @@ export const ExpirySelector = memo(() => {
           <Button
             key={key}
             variant="outlined"
-            className={classNames({ [styles.selected]: Number(key) === expireDays })}
+            className={classnames({ [styles.selected]: Number(key) === expireDays })}
             onClick={() => {
               setExpireDays(Number(key));
               setInputValue(key);

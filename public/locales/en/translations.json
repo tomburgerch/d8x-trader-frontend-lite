@@ -32,14 +32,17 @@
           "entry-price": "Entry Price",
           "liq-price": "Liq. Price",
           "margin": "Margin",
-          "pnl": "Unr. PnL"
+          "pnl": "Unr. PnL",
+          "tp-sl": "TP/SL"
         },
         "table-content": {
           "buy": "BUY",
           "sell": "SELL",
           "modify": "Modify",
           "connect": "Please connect your wallet",
-          "no-open": "No open positions"
+          "no-open": "No open positions",
+          "multiple": "multiple",
+          "partial": "partial"
         },
         "position-block-mobile": {
           "symbol": "Symbol",
@@ -47,6 +50,8 @@
         },
         "modify-modal": {
           "title": "Modify Position",
+          "tp-sl-title": "TP/SL",
+          "tp-sl-position": "Set a TP/SL for your existing position of {{positionSize}}",
           "selector": {
             "close": "Close",
             "add": "Add",
@@ -63,7 +68,8 @@
             "liq-price": "Liquidation price:"
           },
           "cancel": "Cancel",
-          "confirm": "Confirm"
+          "confirm": "Confirm",
+          "create": "Create"
         },
         "toasts": {
           "submit-close": {
@@ -499,6 +505,7 @@
       "perpetuals": "Perpetuals",
       "vault": "Vault",
       "account-value": {
+        "main-title": "Your account",
         "title": "Account Value",
         "details": {
           "wallet": {
@@ -533,10 +540,6 @@
       "title": "Settings",
       "ui-settings": {
         "title": "UI Settings",
-        "conditional-options": {
-          "on": "On",
-          "off": "Off"
-        },
         "one-click-trading": {
           "title": "One-click trading"
         },
@@ -545,8 +548,10 @@
           "left": "Left",
           "right": "Right"
         },
-        "dark-mode": {
-          "title": "Coming soon"
+        "theme": {
+          "title": "Theme",
+          "dark": "Dark",
+          "light": "Light"
         },
         "default-currency": {
           "title": "Default currency",
@@ -567,11 +572,18 @@
         },
         "manage-delegate": {
           "title": "Manage Delegate Account",
-          "description": "You have an existing Delegate Account. You can choose to activate or remove your Delegate Account. Once activated, you can fund your account to pay for gas.",
           "remove-action-result": "One-click trading is deactivated.",
           "activate-success-result": "One-click trading activated. If you reload or leave the page you will have to activate one-click trading again.",
           "activate-error-result": "Invalid wallet. Re-set your delegate and try again.",
           "activate": "Activate",
+          "deactivate": "Deactivate",
+          "status": {
+            "title": "One-click trading status",
+            "active": "Active",
+            "inactive": "Inactive"
+          },
+          "address": "Delegate addr",
+          "amount": "Delegate wallet amount (gas)",
           "remove": "Remove",
           "fund": "Fund"
         },

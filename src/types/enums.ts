@@ -39,6 +39,18 @@ export enum OrderTypeE {
   Stop = 'Stop',
 }
 
+export enum OrderSideE {
+  Buy = 'BUY',
+  Sell = 'SELL',
+}
+
+export enum OpenOrderTypeE {
+  Market = 'MARKET',
+  Limit = 'LIMIT',
+  StopLimit = 'STOP_LIMIT',
+  StopMarket = 'STOP_MARKET',
+}
+
 export enum ExpiryE {
   '1D' = '1',
   '30D' = '30',

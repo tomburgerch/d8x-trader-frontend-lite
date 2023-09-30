@@ -6,7 +6,7 @@ import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletC
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
-import { HashZero } from 'app-constants';
+import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'app-constants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
@@ -14,12 +14,12 @@ import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { useDebounce } from 'helpers/useDebounce';
-import { getOpenOrders, getPositionRisk, orderDigest, positionRiskOnTrade } from 'network/network';
-import { clearInputsDataAtom, orderInfoAtom, storageKeyAtom } from 'store/order-block.store';
+import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { tradingClientAtom } from 'store/app.store';
+import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
   newPositionRiskAtom,
-  openOrdersAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -29,18 +29,12 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { OrderBlockE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
+import { OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
 import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './ActionBlock.module.scss';
-import { createWalletClient, http } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { getDelegateKey } from 'helpers/getDelegateKey';
-import { activatedOneClickTradingAtom } from 'store/app.store';
-
-const SECONDARY_DEADLINE_MULTIPLIER = 24 * 1825;
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -60,7 +54,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
 
   return {
     symbol: orderInfo.symbol,
-    side: orderInfo.orderBlock === OrderBlockE.Long ? 'BUY' : 'SELL',
+    side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell,
     type: orderType,
     limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
     stopPrice: orderInfo.triggerPrice !== null ? orderInfo.triggerPrice : undefined,
@@ -68,7 +62,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     leverage: orderInfo.leverage,
     reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
     keepPositionLvg: orderInfo.keepPositionLeverage,
-    executionTimestamp: Math.floor(Date.now() / 1000 - 10),
+    executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
     deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
 }
@@ -98,6 +92,7 @@ enum ValidityCheckE {
 
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
+
   const { address } = useAccount();
   const chainId = useChainId();
 
@@ -108,21 +103,20 @@ export const ActionBlock = memo(() => {
     },
   });
 
-  const [activatedOneClickTrading] = useAtom(activatedOneClickTradingAtom);
-  const [storageKey] = useAtom(storageKeyAtom);
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
-  const [positions, setPositions] = useAtom(positionsAtom);
+  const [positions] = useAtom(positionsAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const [tradingClient] = useAtom(tradingClientAtom);
+  const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
-  const setOpenOrders = useSetAtom(openOrdersAtom);
 
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
   const [showReviewOrderModal, setShowReviewOrderModal] = useState(false);
@@ -132,20 +126,6 @@ export const ActionBlock = memo(() => {
 
   const requestSentRef = useRef(false);
   const validityCheckRef = useRef(false);
-
-  const tradingClient = useMemo(() => {
-    if (activatedOneClickTrading && storageKey && walletClient?.chain && window?.ethereum) {
-      const dlgt = getDelegateKey(walletClient, storageKey);
-      if (dlgt) {
-        return createWalletClient({
-          account: privateKeyToAccount(dlgt as Address),
-          chain: walletClient.chain,
-          transport: http(),
-        });
-      }
-    }
-    return walletClient;
-  }, [walletClient, storageKey, activatedOneClickTrading]);
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI) {
@@ -216,7 +196,7 @@ export const ActionBlock = memo(() => {
     if (orderInfo.stopLoss !== StopLossE.None && orderInfo.stopLossPrice) {
       orders.push({
         // Changed values comparing to main Order
-        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Sell : OrderSideE.Buy,
         type: 'STOP_MARKET',
         stopPrice: orderInfo.stopLossPrice,
         deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),
@@ -227,14 +207,14 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: Math.floor(Date.now() / 1000 - 10),
+        executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
       });
     }
 
     if (orderInfo.takeProfit !== TakeProfitE.None && orderInfo.takeProfitPrice) {
       orders.push({
         // Changed values comparing to main Order
-        side: orderInfo.orderBlock === OrderBlockE.Long ? 'SELL' : 'BUY',
+        side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Sell : OrderSideE.Buy,
         type: OrderTypeE.Limit.toUpperCase(),
         limitPrice: orderInfo.takeProfitPrice,
         deadline: Math.floor(Date.now() / 1000 + 60 * 60 * SECONDARY_DEADLINE_MULTIPLIER),
@@ -245,7 +225,7 @@ export const ActionBlock = memo(() => {
         leverage: orderInfo.leverage,
         reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
         keepPositionLvg: orderInfo.keepPositionLeverage,
-        executionTimestamp: Math.floor(Date.now() / 1000 - 10),
+        executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
       });
     }
     return orders;
@@ -254,6 +234,7 @@ export const ActionBlock = memo(() => {
   useWaitForTransaction({
     hash: txHash,
     onSuccess() {
+      setLatestOrderSentTimestamp(Date.now());
       toast.success(
         <ToastContent
           title={t('pages.trade.action-block.toasts.order-submitted.title')}
@@ -271,29 +252,7 @@ export const ActionBlock = memo(() => {
     },
     onSettled() {
       setTxHash(undefined);
-      getOpenOrders(chainId, traderAPI, address as Address)
-        .then(({ data: d }) => {
-          if (d?.length > 0) {
-            d.map(setOpenOrders);
-          }
-        })
-        .catch(console.error);
-      setTimeout(() => {
-        getOpenOrders(chainId, traderAPI, address as Address)
-          .then(({ data: d }) => {
-            if (d?.length > 0) {
-              d.map(setOpenOrders);
-            }
-          })
-          .catch(console.error);
-        getPositionRisk(chainId, traderAPI, address as Address, Date.now())
-          .then(({ data }) => {
-            if (data && data.length > 0) {
-              data.map(setPositions);
-            }
-          })
-          .catch(console.error);
-      }, 30_000);
+      setLatestOrderSentTimestamp(Date.now());
     },
     enabled: !!address && !!orderInfo && !!txHash,
   });

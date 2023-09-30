@@ -12,6 +12,7 @@ import { createSymbol } from 'helpers/createSymbol';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getPositionRisk } from 'network/network';
 import {
+  openOrdersAtom,
   positionsAtom,
   removePositionAtom,
   selectedPoolAtom,
@@ -21,11 +22,12 @@ import {
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
-import type { MarginAccountI, TableHeaderI } from 'types/types';
+import type { TableHeaderI } from 'types/types';
 import { MarginAccountWithLiqPriceI } from 'types/types';
 
 import { CloseModal } from './elements/modals/close-modal/CloseModal';
 import { ModifyModal } from './elements/modals/modify-modal/ModifyModal';
+import { ModifyTpSlModal } from './elements/modals/modify-tp-sl-modal/ModifyTpSlModal';
 import { PositionBlock } from './elements/position-block/PositionBlock';
 import { PositionRow } from './elements/position-row/PositionRow';
 
@@ -37,6 +39,7 @@ export const PositionsTable = () => {
   const { t } = useTranslation();
 
   const [selectedPool] = useAtom(selectedPoolAtom);
+  const [openOrders] = useAtom(openOrdersAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
   const removePosition = useSetAtom(removePositionAtom);
@@ -50,22 +53,33 @@ export const PositionsTable = () => {
   const { address, isConnected, isDisconnected } = useAccount();
   const { width, ref } = useResizeDetector();
 
+  const [isTpSlChangeModalOpen, setTpSlChangeModalOpen] = useState(false);
   const [isModifyModalOpen, setModifyModalOpen] = useState(false);
   const [isCloseModalOpen, setCloseModalOpen] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState<MarginAccountI | null>();
+  const [selectedPosition, setSelectedPosition] = useState<MarginAccountWithLiqPriceI | null>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Asc);
   const [orderBy, setOrderBy] = useState<keyof MarginAccountWithLiqPriceI>('symbol');
 
-  const handlePositionModify = useCallback((position: MarginAccountI) => {
+  const handleTpSlModify = useCallback((position: MarginAccountWithLiqPriceI) => {
+    setTpSlChangeModalOpen(true);
+    setSelectedPosition(position);
+  }, []);
+
+  const handlePositionModify = useCallback((position: MarginAccountWithLiqPriceI) => {
     setModifyModalOpen(true);
     setSelectedPosition(position);
   }, []);
 
-  const handlePositionClose = useCallback((position: MarginAccountI) => {
+  const handlePositionClose = useCallback((position: MarginAccountWithLiqPriceI) => {
     setCloseModalOpen(true);
     setSelectedPosition(position);
+  }, []);
+
+  const closeTpSlModal = useCallback(() => {
+    setTpSlChangeModalOpen(false);
+    setSelectedPosition(null);
   }, []);
 
   const closeModifyModal = useCallback(() => {
@@ -163,18 +177,30 @@ export const PositionsTable = () => {
         label: t('pages.trade.positions-table.table-header.pnl'),
         align: AlignE.Right,
       },
+      {
+        field: 'openOrders',
+        numeric: true,
+        label: t('pages.trade.positions-table.table-header.tp-sl'),
+        align: AlignE.Right,
+      },
     ],
     [t]
   );
 
-  const positionsWithLiqPrice = useMemo(() => {
-    return positions.map((position): MarginAccountWithLiqPriceI => {
-      return {
-        ...position,
-        liqPrice: position.liquidationPrice[0],
-      };
-    });
-  }, [positions]);
+  const positionsWithLiqPrice = useMemo(
+    () =>
+      positions.map((position): MarginAccountWithLiqPriceI => {
+        const filteredOpenOrders = openOrders.filter(
+          (openOrder) => openOrder.symbol === position.symbol && openOrder.side !== position.side
+        );
+        return {
+          ...position,
+          liqPrice: position.liquidationPrice[0],
+          openOrders: filteredOpenOrders,
+        };
+      }),
+    [positions, openOrders]
+  );
 
   const visibleRows = stableSort(positionsWithLiqPrice, getComparator(order, orderBy)).slice(
     page * rowsPerPage,
@@ -205,6 +231,7 @@ export const PositionsTable = () => {
                     position={position}
                     handlePositionClose={handlePositionClose}
                     handlePositionModify={handlePositionModify}
+                    handleTpSlModify={handleTpSlModify}
                   />
                 ))}
               {(!address || positions.length === 0) && (
@@ -231,6 +258,7 @@ export const PositionsTable = () => {
                 position={position}
                 handlePositionClose={handlePositionClose}
                 handlePositionModify={handlePositionModify}
+                handleTpSlModify={handleTpSlModify}
               />
             ))}
           {(!address || positions.length === 0) && (
@@ -261,6 +289,7 @@ export const PositionsTable = () => {
         </Box>
       )}
 
+      <ModifyTpSlModal isOpen={isTpSlChangeModalOpen} selectedPosition={selectedPosition} closeModal={closeTpSlModal} />
       <ModifyModal isOpen={isModifyModalOpen} selectedPosition={selectedPosition} closeModal={closeModifyModal} />
       <CloseModal isOpen={isCloseModalOpen} selectedPosition={selectedPosition} closeModal={closeCloseModal} />
     </div>
