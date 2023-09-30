@@ -1,5 +1,5 @@
+import classnames from 'classnames';
 import { ChangeEvent, ReactNode } from 'react';
-import classNames from 'classnames';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
@@ -61,7 +61,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
           <Button
             key={key}
             variant="outlined"
-            className={classNames({ [styles.selected]: key === selectedPrice })}
+            className={classnames({ [styles.selected]: key === selectedPrice })}
             onClick={() => handlePriceChange(key)}
           >
             {translationMap[key]}

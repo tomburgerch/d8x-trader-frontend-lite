@@ -6,13 +6,13 @@ import { Box, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
+import { calculateStepSize } from 'helpers/calculateStepSize';
 import { limitPriceAtom, orderTypeAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
 
 import commonStyles from '../../OrderBlock.module.scss';
 import styles from './LimitPrice.module.scss';
-import { calculateStepSize } from '../../../../helpers/calculateStepSize';
 
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();

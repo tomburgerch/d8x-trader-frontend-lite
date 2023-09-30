@@ -6,13 +6,13 @@ import { Box, Typography } from '@mui/material';
 
 import { InfoBlock } from 'components/info-block/InfoBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
+import { calculateStepSize } from 'helpers/calculateStepSize';
 import { orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
 
 import commonStyles from '../../OrderBlock.module.scss';
 import styles from './TriggerPrice.module.scss';
-import { calculateStepSize } from '../../../../helpers/calculateStepSize';
 
 export const TriggerPrice = memo(() => {
   const { t } = useTranslation();

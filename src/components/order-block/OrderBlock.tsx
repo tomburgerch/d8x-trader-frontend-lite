@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { memo } from 'react';
 
 import { Card, CardContent } from '@mui/material';
@@ -15,7 +16,6 @@ import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSe
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
 
 import styles from './OrderBlock.module.scss';
-import classNames from 'classnames';
 
 export const OrderBlock = memo(() => {
   return (
@@ -32,7 +32,7 @@ export const OrderBlock = memo(() => {
         <OrderSize />
       </CardContent>
       <Separator />
-      <CardContent className={classNames(styles.card, styles.selectors)}>
+      <CardContent className={classnames(styles.card, styles.selectors)}>
         <StopLossSelector />
         <TakeProfitSelector />
       </CardContent>

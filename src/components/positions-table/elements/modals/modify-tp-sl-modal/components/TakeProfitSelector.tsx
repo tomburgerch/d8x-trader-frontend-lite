@@ -19,9 +19,9 @@ import { parseSymbol } from 'helpers/parseSymbol';
 import { OrderSideE, TakeProfitE } from 'types/enums';
 import { MarginAccountWithLiqPriceI } from 'types/types';
 import { getFractionDigits } from 'utils/formatToCurrency';
+import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 
 import styles from './CommonSelector.module.scss';
-import { mapTakeProfitToNumber } from '../../../../../../utils/mapTakeProfitToNumber';
 
 interface TakeProfitSelectorPropsI {
   setTakeProfitPrice: Dispatch<SetStateAction<number | null>>;

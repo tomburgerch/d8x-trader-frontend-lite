@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +46,7 @@ function createMainOrder(position: MarginAccountWithLiqPriceI) {
     quantity: position.positionNotionalBaseCCY,
     leverage: position.leverage,
     // reduceOnly: undefined,
-    // keepPositionLvg: position.,
+    // keepPositionLvg: undefined,
     executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
     deadline: Math.floor(Date.now() / 1000 + 60 * 60 * deadlineMultiplier),
   };
@@ -311,7 +311,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
   const isDisabledConfirmButton = !selectedPool || requestSent || collateralDeposit === null;
 
   return (
-    <Dialog open={isOpen} className={classNames(styles.root, styles.wide)}>
+    <Dialog open={isOpen} className={classnames(styles.root, styles.wide)}>
       <DialogTitle>{t('pages.trade.positions-table.modify-modal.tp-sl-title')}</DialogTitle>
       <DialogContent className={styles.contentWithGap}>
         {t('pages.trade.positions-table.modify-modal.tp-sl-position', {
