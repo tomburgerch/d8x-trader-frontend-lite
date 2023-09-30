@@ -215,6 +215,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
         );
       }
       await Promise.all(cancelOrdersPromises);
+      setLatestOrderSentTimestamp(Date.now());
     }
 
     const parsedOrders: OrderI[] = [];
