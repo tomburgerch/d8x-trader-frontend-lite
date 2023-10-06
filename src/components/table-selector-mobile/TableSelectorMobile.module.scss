@@ -17,6 +17,11 @@
   }
 }
 
+.buttonsBlock {
+  display: flex;
+  gap: 2 * $d8x-spacing;
+}
+
 .dropdownSelect {
   margin-bottom: 6 * $d8x-spacing;
 }

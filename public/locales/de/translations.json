@@ -332,6 +332,13 @@
           "cancel": "Stornieren",
           "confirm": "Bestätigen"
         }
+      },
+      "filter": {
+        "field": "Feld:",
+        "type": "Typ:",
+        "value": "Wert:",
+        "value-placeholder": "Wert, der gefiltert werden soll",
+        "clear": "Filter Löschen"
       }
     },
     "refer": {
@@ -624,7 +631,8 @@
     "info-modal": {
       "close": "Schliessen"
     },
-    "refresh": "Aktualisieren"
+    "refresh": "Aktualisieren",
+    "filter": "Filter"
   },
   "error": {
     "wrong-network": "Falsches Netzwerk"

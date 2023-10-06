@@ -126,3 +126,9 @@ export enum AssetTypeE {
   Fx = 'fx',
   Metal = 'metal',
 }
+
+export enum FieldTypeE {
+  String,
+  Number,
+  Date,
+}

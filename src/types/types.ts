@@ -3,6 +3,7 @@ import { type Time } from 'lightweight-charts';
 import type { ReactElement, ReactNode } from 'react';
 
 import {
+  type FieldTypeE,
   type AlignE,
   type LanguageE,
   type OrderBlockE,
@@ -232,7 +233,7 @@ export interface TableHeaderI<T> {
   label: ReactElement | string;
   align: AlignE;
   field?: keyof T;
-  numeric?: boolean;
+  fieldType?: FieldTypeE;
 }
 
 export interface TvChartCandleI {

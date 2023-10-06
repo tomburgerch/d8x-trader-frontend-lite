@@ -7,6 +7,8 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { FilterModal } from 'components/table/filter-modal/FilterModal';
+import { useFilter } from 'components/table/filter-modal/useFilter';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { createSymbol } from 'helpers/createSymbol';
 import { getComparator, stableSort } from 'helpers/tableSort';
@@ -21,7 +23,7 @@ import {
 } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { AlignE, OpenOrderTypeE, OrderSideE, OrderValueTypeE, SortOrderE, TableTypeE } from 'types/enums';
+import { AlignE, FieldTypeE, OpenOrderTypeE, OrderSideE, OrderValueTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { TableHeaderI } from 'types/types';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 
@@ -137,45 +139,45 @@ export const PositionsTable = () => {
     () => [
       {
         field: 'symbol',
-        numeric: false,
         label: t('pages.trade.positions-table.table-header.symbol'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'positionNotionalBaseCCY',
-        numeric: true,
         label: t('pages.trade.positions-table.table-header.size'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'side',
-        numeric: false,
         label: t('pages.trade.positions-table.table-header.side'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'entryPrice',
-        numeric: true,
         label: t('pages.trade.positions-table.table-header.entry-price'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'liqPrice',
-        numeric: false,
         label: t('pages.trade.positions-table.table-header.liq-price'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'collateralCC',
-        numeric: true,
         label: t('pages.trade.positions-table.table-header.margin'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'unrealizedPnlQuoteCCY',
-        numeric: true,
         label: t('pages.trade.positions-table.table-header.pnl'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'takeProfit',
@@ -259,9 +261,15 @@ export const PositionsTable = () => {
     [positions, openOrders]
   );
 
-  const visibleRows = stableSort(positionsWithLiqPrice, getComparator(order, orderBy)).slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+  const { filter, setFilter, filteredRows } = useFilter(positionsWithLiqPrice, positionsHeaders);
+
+  const visibleRows = useMemo(
+    () =>
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      ),
+    [filteredRows, page, rowsPerPage, order, orderBy]
   );
 
   return (
@@ -346,6 +354,7 @@ export const PositionsTable = () => {
         </Box>
       )}
 
+      <FilterModal headers={positionsHeaders} filter={filter} setFilter={setFilter} />
       <ModifyTpSlModal isOpen={isTpSlChangeModalOpen} selectedPosition={selectedPosition} closeModal={closeTpSlModal} />
       <ModifyModal isOpen={isModifyModalOpen} selectedPosition={selectedPosition} closeModal={closeModifyModal} />
       <CloseModal isOpen={isCloseModalOpen} selectedPosition={selectedPosition} closeModal={closeCloseModal} />

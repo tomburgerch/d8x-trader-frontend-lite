@@ -332,6 +332,13 @@
           "cancel": "Cancelar",
           "confirm": "Confirmar"
         }
+      },
+      "filter": {
+        "field": "Campo:",
+        "type": "Tipo:",
+        "value": "Valor:",
+        "value-placeholder": "valor a filtrar",
+        "clear": "Filtro Claro"
       }
     },
     "refer": {
@@ -624,7 +631,8 @@
     "info-modal": {
       "close": "Cerrar"
     },
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "filter": "Filtrar"
   },
   "error": {
     "wrong-network": "Red Incorrecta"

@@ -7,11 +7,13 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { useFilter } from 'components/table/filter-modal/useFilter';
+import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getFundingRatePayments } from 'network/history';
 import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
-import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
+import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 
 import { FundingBlock } from './elements/funding-block/FundingBlock';
@@ -70,21 +72,21 @@ export const FundingTable = memo(() => {
     () => [
       {
         field: 'timestamp',
-        numeric: false,
         label: t('pages.trade.funding-table.table-header.time'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.Date,
       },
       {
         field: 'symbol',
-        numeric: false,
         label: t('pages.trade.funding-table.table-header.perpetual'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'amount',
-        numeric: true,
         label: t('pages.trade.funding-table.table-header.funding-payment'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
     ],
     [t]
@@ -102,12 +104,18 @@ export const FundingTable = memo(() => {
     });
   }, [fundingList, perpetuals]);
 
-  const visibleRows = address
-    ? stableSort(fundingListWithSymbol, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      )
-    : [];
+  const { filter, setFilter, filteredRows } = useFilter(fundingListWithSymbol, fundingListHeaders);
+
+  const visibleRows = useMemo(
+    () =>
+      address
+        ? stableSort(filteredRows, getComparator(order, orderBy)).slice(
+            page * rowsPerPage,
+            page * rowsPerPage + rowsPerPage
+          )
+        : [],
+    [address, filteredRows, order, orderBy, page, rowsPerPage]
+  );
 
   return (
     <div className={styles.root} ref={ref}>
@@ -185,6 +193,7 @@ export const FundingTable = memo(() => {
           />
         </Box>
       )}
+      <FilterModal headers={fundingListHeaders} filter={filter} setFilter={setFilter} />
     </div>
   );
 });
