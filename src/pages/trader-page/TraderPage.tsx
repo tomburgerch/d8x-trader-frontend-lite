@@ -34,6 +34,9 @@ import { OrderBlockPositionE, TableTypeE } from 'types/enums';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './TraderPage.module.scss';
+import { PerpetualInfoFetcher } from './components/PerpetualInfoFetcher';
+import { PoolSubscription } from './components/PoolSubscription';
+import { CandlesWebSocketListener } from './components/candles-webSocket-listener/CandlesWebSocketListener';
 import { TableDataFetcher } from './components/table-data-refetcher/TableDataFetcher';
 
 export const TraderPage = () => {
@@ -182,32 +185,26 @@ export const TraderPage = () => {
     [positionItems, historyItems]
   );
 
-  const handleActiveAllIndex = useCallback(
-    (index: number) => {
-      setActiveAllIndex(index);
+  const handleActiveAllIndex = (index: number) => {
+    setActiveAllIndex(index);
 
-      const firstTableItems = positionItems.length;
-      if (index < firstTableItems) {
-        setActivePositionIndex(index);
-      } else {
-        setActiveHistoryIndex(index - firstTableItems);
-      }
-    },
-    [positionItems]
-  );
+    const firstTableItems = positionItems.length;
+    if (index < firstTableItems) {
+      setActivePositionIndex(index);
+    } else {
+      setActiveHistoryIndex(index - firstTableItems);
+    }
+  };
 
-  const handlePositionsIndex = useCallback((index: number) => {
+  const handlePositionsIndex = (index: number) => {
     setActiveAllIndex(index);
     setActivePositionIndex(index);
-  }, []);
+  };
 
-  const handleHistoryIndex = useCallback(
-    (index: number) => {
-      setActiveAllIndex(index + positionItems.length);
-      setActiveHistoryIndex(index);
-    },
-    [positionItems]
-  );
+  const handleHistoryIndex = (index: number) => {
+    setActiveAllIndex(index + positionItems.length);
+    setActiveHistoryIndex(index);
+  };
 
   return (
     <>
@@ -232,7 +229,7 @@ export const TraderPage = () => {
             <PerpetualStats />
           </Box>
           <Box className={styles.rightBlock}>
-            <MarketSelect withNavigate={true} updatePerpetual={true} />
+            <MarketSelect />
           </Box>
         </Container>
         {!isSmallScreen && (
@@ -276,8 +273,12 @@ export const TraderPage = () => {
             )}
           </Container>
         )}
-        <TableDataFetcher />
       </Box>
+
+      <TableDataFetcher />
+      <PerpetualInfoFetcher />
+      <PoolSubscription />
+      <CandlesWebSocketListener />
     </>
   );
 };

@@ -332,6 +332,13 @@
           "cancel": "Cancel",
           "confirm": "Confirm"
         }
+      },
+      "filter": {
+        "field": "Field:",
+        "type": "Type:",
+        "value": "Value:",
+        "value-placeholder": "value to filter",
+        "clear": "Clear Filter"
       }
     },
     "refer": {
@@ -557,7 +564,7 @@
           "title": "Default currency",
           "base": "Base",
           "quote": "Quote",
-          "pool": "Pool"
+          "pool": "Collateral"
         }
       },
       "one-click-modal": {
@@ -624,7 +631,8 @@
     "info-modal": {
       "close": "Close"
     },
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "filter": "Filter"
   },
   "error": {
     "wrong-network": "Wrong network"

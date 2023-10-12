@@ -7,19 +7,20 @@ import { useAccount, useChainId } from 'wagmi';
 import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { useFilter } from 'components/table/filter-modal/useFilter';
+import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getTradesHistory } from 'network/history';
 import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
-import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
+import { tableRefreshHandlersAtom } from 'store/tables.store';
+import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 
 import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
 
-import { tableRefreshHandlersAtom } from 'store/tables.store';
-
-import styles from './TradeHistoryTable.module.scss';
 import { SortableHeaders } from '../table/sortable-header/SortableHeaders';
+import styles from './TradeHistoryTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 
@@ -70,40 +71,45 @@ export const TradeHistoryTable = memo(() => {
     () => [
       {
         field: 'timestamp',
-        numeric: false,
         label: t('pages.trade.history-table.table-header.time'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.Date,
       },
       {
         field: 'symbol',
-        numeric: false,
         label: t('pages.trade.history-table.table-header.perpetual'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'side',
-        numeric: false,
         label: t('pages.trade.history-table.table-header.side'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'price',
-        numeric: true,
         label: t('pages.trade.history-table.table-header.price'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'quantity',
-        numeric: true,
         label: t('pages.trade.history-table.table-header.quantity'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
-      { field: 'fee', numeric: true, label: t('pages.trade.history-table.table-header.fee'), align: AlignE.Right },
+      {
+        field: 'fee',
+        label: t('pages.trade.history-table.table-header.fee'),
+        align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
+      },
       {
         field: 'realizedPnl',
-        numeric: true,
         label: t('pages.trade.history-table.table-header.realized-profit'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
     ],
     [t]
@@ -121,20 +127,26 @@ export const TradeHistoryTable = memo(() => {
     });
   }, [tradesHistory, perpetuals]);
 
-  const visibleRows = address
-    ? stableSort(tradesHistoryWithSymbol, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      )
-    : [];
+  const { filter, setFilter, filteredRows } = useFilter(tradesHistoryWithSymbol, tradeHistoryHeaders);
+
+  const visibleRows = useMemo(
+    () =>
+      address
+        ? stableSort(filteredRows, getComparator(order, orderBy)).slice(
+            page * rowsPerPage,
+            page * rowsPerPage + rowsPerPage
+          )
+        : [],
+    [address, filteredRows, order, orderBy, page, rowsPerPage]
+  );
 
   return (
     <div className={styles.root} ref={ref}>
       {width && width >= MIN_WIDTH_FOR_TABLE && (
-        <TableContainer>
+        <TableContainer className={styles.tableHolder}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
-              <TableRow className={styles.tableHolder}>
+              <TableRow>
                 <SortableHeaders<TradeHistoryWithSymbolDataI>
                   headers={tradeHistoryHeaders}
                   order={order}
@@ -200,6 +212,7 @@ export const TradeHistoryTable = memo(() => {
           />
         </Box>
       )}
+      <FilterModal headers={tradeHistoryHeaders} filter={filter} setFilter={setFilter} />
     </div>
   );
 });

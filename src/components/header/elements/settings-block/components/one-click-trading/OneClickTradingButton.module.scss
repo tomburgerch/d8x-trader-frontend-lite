@@ -1,12 +1,5 @@
 @import '~styles/theme/_theme.scss';
 
-.dialog {
-
-  :global(.MuiPaper-root) {
-    border-radius: $d8x-border-radius;
-  }
-}
-
 .dialogContent {
   display: flex;
   flex-direction: column;
@@ -95,5 +88,12 @@
   .cancelButton {
     width: 100%;
     height: 50px;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-md) {
+
+  .modalButtonText {
+    font-size: 14px;
   }
 }

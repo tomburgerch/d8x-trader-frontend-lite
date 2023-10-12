@@ -25,22 +25,24 @@ import { HashZero } from 'app-constants';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
+import { FilterModal } from 'components/table/filter-modal/FilterModal';
+import { useFilter } from 'components/table/filter-modal/useFilter';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getCancelOrder, getOpenOrders } from 'network/network';
+import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
 import { clearOpenOrdersAtom, openOrdersAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { AlignE, SortOrderE, TableTypeE } from 'types/enums';
-import type { OrderWithIdI, TableHeaderI } from 'types/types';
+import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
+import { type OrderWithIdI, type TableHeaderI } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
 
 import styles from './OpenOrdersTable.module.scss';
-import { tradingClientAtom } from 'store/app.store';
 
 const MIN_WIDTH_FOR_TABLE = 788;
 const TOPIC_CANCEL_SUCCESS = encodeEventTopics({ abi: PROXY_ABI, eventName: 'PerpetualLimitOrderCancelled' })[0];
@@ -216,61 +218,67 @@ export const OpenOrdersTable = memo(() => {
     () => [
       {
         field: 'symbol',
-        numeric: false,
         label: t('pages.trade.orders-table.table-header.symbol'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'side',
-        numeric: false,
         label: t('pages.trade.orders-table.table-header.side'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'type',
-        numeric: false,
         label: t('pages.trade.orders-table.table-header.type'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.String,
       },
       {
         field: 'quantity',
-        numeric: true,
         label: t('pages.trade.orders-table.table-header.order-size'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'limitPrice',
-        numeric: true,
         label: t('pages.trade.orders-table.table-header.limit-price'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'stopPrice',
-        numeric: true,
         label: t('pages.trade.orders-table.table-header.stop-price'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'leverage',
-        numeric: true,
         label: t('pages.trade.orders-table.table-header.leverage'),
         align: AlignE.Right,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'deadline',
-        numeric: false,
         label: t('pages.trade.orders-table.table-header.good-until'),
         align: AlignE.Left,
+        fieldType: FieldTypeE.Date,
       },
     ],
     [t]
   );
 
-  // FIXME: VOV: Get rid from `<any>` later
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const visibleRows = stableSort(openOrders, getComparator<any>(order, orderBy)).slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+  const { filter, setFilter, filteredRows } = useFilter(openOrders, openOrdersHeaders);
+
+  const visibleRows = useMemo(
+    () =>
+      // FIXME: VOV: Get rid from `<any>` later
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stableSort(filteredRows, getComparator<any>(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      ),
+    [filteredRows, order, orderBy, page, rowsPerPage]
   );
 
   return (
@@ -346,6 +354,8 @@ export const OpenOrdersTable = memo(() => {
           />
         </Box>
       )}
+
+      <FilterModal headers={openOrdersHeaders} filter={filter} setFilter={setFilter} />
       <Dialog open={isCancelModalOpen} className={styles.dialog}>
         <DialogTitle>{t('pages.trade.orders-table.cancel-modal.title')}</DialogTitle>
         <DialogContent className={styles.dialogContent}>

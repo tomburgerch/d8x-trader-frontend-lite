@@ -3,11 +3,12 @@ import { type ReactNode } from 'react';
 
 import { Box, Button, Card, CardContent, CardHeader } from '@mui/material';
 
-import { Refresher } from './elements/refresher/Refresher';
-
+import { FilterModalProvider } from 'components/table/filter-modal/FilterModalContext';
 import { type TableTypeE } from 'types/enums';
 
 import styles from './TableSelector.module.scss';
+import { Filter } from './elements/filter/Filter';
+import { Refresher } from './elements/refresher/Refresher';
 
 export interface SelectorItemI {
   label: string;
@@ -23,28 +24,31 @@ interface TableSelectorPropsI {
 
 export const TableSelector = ({ selectorItems, activeIndex, setActiveIndex }: TableSelectorPropsI) => {
   return (
-    <Card className={styles.root}>
-      <CardHeader
-        className={styles.headerRoot}
-        title={
-          <Box className={styles.headerWrapper}>
-            <Box className={styles.tableSelectorsWrapper}>
-              {selectorItems.map(({ label }, index) => (
-                <Button
-                  key={label}
-                  variant="link"
-                  onClick={() => setActiveIndex(index)}
-                  className={classnames({ [styles.selected]: activeIndex === index })}
-                >
-                  {label}
-                </Button>
-              ))}
+    <FilterModalProvider>
+      <Card className={styles.root}>
+        <CardHeader
+          className={styles.headerRoot}
+          title={
+            <Box className={styles.headerWrapper}>
+              <Box className={styles.tableSelectorsWrapper}>
+                {selectorItems.map(({ label }, index) => (
+                  <Button
+                    key={label}
+                    variant="link"
+                    onClick={() => setActiveIndex(index)}
+                    className={classnames({ [styles.selected]: activeIndex === index })}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Box>
+              <Filter activeTableType={selectorItems[activeIndex].tableType} />
+              <Refresher activeTableType={selectorItems[activeIndex].tableType} />
             </Box>
-            <Refresher activeTableType={selectorItems[activeIndex].tableType} />
-          </Box>
-        }
-      />
-      <CardContent className={styles.content}>{selectorItems[activeIndex].item}</CardContent>
-    </Card>
+          }
+        />
+        <CardContent className={styles.content}>{selectorItems[activeIndex].item}</CardContent>
+      </Card>
+    </FilterModalProvider>
   );
 };

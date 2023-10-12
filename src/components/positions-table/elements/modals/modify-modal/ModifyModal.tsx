@@ -120,8 +120,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
 
   useWaitForTransaction({
     hash: txHashForRemove,
-    onSuccess(data) {
-      console.log({ data });
+    onSuccess() {
       toast.success(
         <ToastContent
           title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
@@ -467,16 +466,16 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                   </FormControl>
                 }
               />
-              <SidesRow
-                leftSide=" "
-                rightSide={
-                  maxCollateral && (
+              {!!maxCollateral && (
+                <SidesRow
+                  leftSide=" "
+                  rightSide={
                     <Typography className={styles.helperText} variant="bodyTiny">
                       Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
                     </Typography>
-                  )
-                }
-              />
+                  }
+                />
+              )}
             </Box>
           )}
         </Box>
