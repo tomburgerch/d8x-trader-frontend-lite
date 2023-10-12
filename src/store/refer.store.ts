@@ -1,8 +1,10 @@
 import { atom } from 'jotai';
 
-import type { ReferralCodeI } from 'types/types';
+import type { ReferralDataI, TokenInfoI } from 'types/types';
 
 export const isAgencyAtom = atom(false);
-export const referralCodeAtom = atom<ReferralCodeI | null>(null);
+export const commissionRateAtom = atom(0);
+export const referralCodesAtom = atom<ReferralDataI[]>([]);
+export const tokenInfoAtom = atom<TokenInfoI | null>(null);
 
 export const referralCodesRefetchHandlerRefAtom = atom<{ handleRefresh: () => void }>({ handleRefresh: () => {} });

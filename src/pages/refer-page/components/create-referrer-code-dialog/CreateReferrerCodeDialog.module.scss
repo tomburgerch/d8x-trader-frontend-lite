@@ -26,50 +26,37 @@
 
 .sidesRowValue {
   font-weight: 600;
-  font-size: 16px;
 }
 
 .divider {
   border-bottom: 1px solid var(--d8x-color-black-150);
 }
 
-.referrerKickbackInputContainer,
-.traderKickbackInputContainer {
+.kickbackRateInputContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }
 
-.traderKickbackInputContainer {
-  padding-top: 0;
-}
-
 .kickbackInput {
-  max-width: 120px;
+  max-width: 110px;
   color: var(--d8x-color-black-400);
+  font-size: 14px;
 
   input {
     width: 100%;
   }
 }
 
-.referrerChangeContainer {
-  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
-}
-
-.referrerChangeFlexWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.infoText {
+  padding: 0 8 * $d8x-spacing;
+  color: var(--d8x-color-black-400);
+  margin: 4 * $d8x-spacing 0 8 * $d8x-spacing;
 }
 
 .codeInputContainer {
-  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
-}
-
-.codeInputLabel {
-  margin-bottom: 3 * $d8x-spacing;
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing 0 * $d8x-spacing;
 }
 
 .codeInput {
@@ -77,6 +64,7 @@
 
   input {
     width: 100%;
+    font-size: 14px;
   }
 }
 
@@ -91,12 +79,6 @@
   }
 }
 
-.infoText {
-  padding: 0 8 * $d8x-spacing;
-  color: var(--d8x-color-black-400);
-  margin: -2 * $d8x-spacing 0 8 * $d8x-spacing;
-}
-
 .dialogActionsContainer {
   display: flex;
   justify-content: space-between;
@@ -107,10 +89,14 @@
   width: 200px;
 }
 
+.modifyCodeButton {
+  width: 200px;
+  margin-left: 30 * $d8x-spacing;
+}
+
 @media screen and ($d8x-breakpoint-max-xs) {
 
-  .referrerKickbackInputContainer,
-  .traderKickbackInputContainer {
+  .kickbackRateInputContainer {
     gap: 5 * $d8x-spacing;
   }
 
@@ -120,12 +106,13 @@
     gap: 4 * $d8x-spacing;
   }
 
-  .cancelButton {
+  .actionButton,
+  .modifyCodeButton {
+    width: 100%;
     height: 50px;
   }
 
-  .actionButton {
-    width: 100%;
-    height: 50px;
+  .modifyCodeButton {
+    margin-left: 0;
   }
 }

@@ -2,15 +2,15 @@ import { type SmartContractOrder } from '@d8x/perpetuals-sdk';
 import { type Time } from 'lightweight-charts';
 import type { ReactElement, ReactNode } from 'react';
 
-import {
-  type FieldTypeE,
-  type AlignE,
-  type LanguageE,
-  type OrderBlockE,
-  type OrderTypeE,
+import type {
+  AlignE,
+  FieldTypeE,
+  LanguageE,
+  OrderBlockE,
+  OrderTypeE,
   OrderValueTypeE,
-  type StopLossE,
-  type TakeProfitE,
+  StopLossE,
+  TakeProfitE,
 } from './enums';
 
 export interface LanguageMetaI {
@@ -80,10 +80,13 @@ export interface PoolWithIdI extends PoolI {
   poolId: number;
 }
 
-export interface ValidatedResponseI<T> {
+export interface ReferralResponseI<T> {
   type: string;
-  msg: string;
   data: T;
+}
+
+export interface ValidatedResponseI<T> extends ReferralResponseI<T> {
+  msg: string;
 }
 
 export interface ExchangeInfoI {
@@ -293,16 +296,27 @@ export interface OpenWithdrawalsI {
   withdrawals: OpenWithdrawalI[];
 }
 
-export interface ReferralVolumeI {
-  poolId: number;
-  quantityCC: number;
-  code: string;
+export interface RebateI {
+  cutPerc: number;
+  holding: number;
+}
+
+export interface TokenInfoI {
+  tokenAddr: string;
+  rebates: RebateI[];
+}
+
+export interface ReferralCutI {
+  isAgency: boolean;
+  passed_on_percent: number;
 }
 
 export interface EarnedRebateI {
   poolId: number;
-  amountCC: number;
   code: string;
+  earnings: number;
+  asTrader: boolean;
+  tokenName: string;
 }
 
 export interface TraderDataI {
@@ -313,7 +327,13 @@ export interface TraderDataI {
 
 export interface OpenTraderRebateI {
   poolId: number;
-  amountCC: number;
+  earnings: number;
+  tokenName: string;
+}
+
+export interface OpenEarningsI {
+  code: string;
+  openEarnings: OpenTraderRebateI[] | null;
 }
 
 export interface ReferrerDataI {
@@ -334,9 +354,21 @@ export interface ReferralCodeI {
   agency: ReferrerDataI[];
 }
 
+export interface ReferralTableDataI {
+  referralCode: string;
+  isPartner: boolean;
+  commission: number;
+  discount: number;
+}
+
+export interface ReferralDataI {
+  referral: string;
+  passOnPerc: number;
+}
+
 export interface OverviewPoolItemI {
   value: number | string;
-  poolSymbol: PoolI['poolSymbol'];
+  symbol: PoolI['poolSymbol'];
 }
 
 export interface OverviewItemI {

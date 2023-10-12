@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
+
 import { Separator } from 'components/separator/Separator';
 
 import { EnterCodeDialog } from '../enter-code-dialog/EnterCodeDialog';
@@ -21,7 +22,9 @@ export const ReferralCodeBlock = ({
   onCodeApplySuccess,
 }: ReferralCodeBlockPropsI) => {
   const { t } = useTranslation();
+
   const [dialogOpen, setDialogOpen] = useState(false);
+
   const { address } = useAccount();
 
   return (
@@ -48,7 +51,11 @@ export const ReferralCodeBlock = ({
       <Typography variant="bodyLarge" className={styles.dataValue}>
         {address && referralCode ? referralCode : 'N/A'}
       </Typography>
-      {dialogOpen && <EnterCodeDialog onClose={() => setDialogOpen(false)} onCodeApplySuccess={onCodeApplySuccess} />}
+      <EnterCodeDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onCodeApplySuccess={onCodeApplySuccess}
+      />
     </Box>
   );
 };

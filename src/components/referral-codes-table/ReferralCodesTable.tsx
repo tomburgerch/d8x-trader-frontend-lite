@@ -1,61 +1,65 @@
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Box, Table, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
+import {
+  Box,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { AlignE, SortOrderE } from 'types/enums';
-import type { ReferrerDataI, TableHeaderI } from 'types/types';
+import type { ReferralTableDataI, TableHeaderI } from 'types/types';
 
-import { ReferralCodesRow } from './elements/referral-codes-row/ReferralCodesRow';
+import { ReferralCodeRow } from './elements/referral-code-row/ReferralCodeRow';
 
 import styles from './ReferralCodesTable.module.scss';
+import { useResizeDetector } from 'react-resize-detector';
+import { ReferralCodeBlock } from './elements/referral-code-block/ReferralCodeBlock';
 
 interface ReferralCodesTablePropsI {
-  isAgency: boolean;
-  codes: ReferrerDataI[];
+  codes: ReferralTableDataI[];
 }
 
-export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTablePropsI) => {
+const MIN_WIDTH_FOR_TABLE = 678;
+
+export const ReferralCodesTable = memo(({ codes }: ReferralCodesTablePropsI) => {
   const { t } = useTranslation();
+
+  const { width, ref } = useResizeDetector();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
-  const [orderBy, setOrderBy] = useState<keyof ReferrerDataI>('createdOn');
+  const [orderBy, setOrderBy] = useState<keyof ReferralTableDataI>('referralCode');
 
-  const referralCodesHeaders = useMemo(() => {
-    const headers: TableHeaderI<ReferrerDataI>[] = [
-      { field: 'code', label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
-    ];
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('md'));
 
-    if (!isAgency) {
-      headers.push({ label: '', align: AlignE.Right });
-    }
-
-    headers.push({
-      field: 'referrerRebatePerc',
-      label: t('pages.refer.referrer-tab.referrer-rebate-rate'),
-      align: AlignE.Right,
-    });
-    headers.push({
-      field: 'traderRebatePerc',
-      label: t('pages.refer.referrer-tab.trader-rebate-rate'),
-      align: AlignE.Right,
-    });
-
-    if (isAgency) {
-      headers.push({
-        field: 'agencyRebatePerc',
-        label: t('pages.refer.referrer-tab.agency-rebate-rate'),
+  const referralCodesHeaders: TableHeaderI<ReferralTableDataI>[] = useMemo(
+    () => [
+      { field: 'referralCode', label: t('pages.refer.referrer-tab.codes'), align: AlignE.Left },
+      {
+        field: 'commission',
+        label: t('pages.refer.referrer-tab.referrer-rebate-rate'),
         align: AlignE.Right,
-      });
-      headers.push({ label: t('pages.refer.referrer-tab.modify'), align: AlignE.Center });
-    }
-    return headers;
-  }, [isAgency, t]);
+      },
+      {
+        field: 'discount',
+        label: t('pages.refer.referrer-tab.trader-rebate-rate'),
+        align: AlignE.Right,
+      },
+    ],
+    [t]
+  );
 
   const visibleRows = stableSort(codes, getComparator(order, orderBy)).slice(
     page * rowsPerPage,
@@ -63,30 +67,47 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
   );
 
   return (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow className={styles.headerLabel}>
-            <SortableHeaders<ReferrerDataI>
-              headers={referralCodesHeaders}
-              order={order}
-              orderBy={orderBy}
-              setOrder={setOrder}
-              setOrderBy={setOrderBy}
-            />
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {visibleRows.map((data) => (
-            <ReferralCodesRow key={data.code} data={data} isAgency={isAgency} />
-          ))}
-          {codes.length === 0 && (
-            <EmptyRow colSpan={referralCodesHeaders.length} text={t('pages.refer.referrer-tab.no-codes')} />
-          )}
-        </TableBody>
-      </Table>
-      {codes.length > 5 && (
+    <div className={styles.root} ref={ref}>
+      {(!isSmall || (isSmall && width && width >= MIN_WIDTH_FOR_TABLE)) && (
+        <TableContainer className={styles.tableHolder}>
+          <Table>
+            <TableHead>
+              <TableRow className={styles.headerLabel}>
+                <SortableHeaders<ReferralTableDataI>
+                  headers={referralCodesHeaders}
+                  order={order}
+                  orderBy={orderBy}
+                  setOrder={setOrder}
+                  setOrderBy={setOrderBy}
+                />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {visibleRows.map((data) => (
+                <ReferralCodeRow key={data.referralCode} data={data} fullWidth={width} />
+              ))}
+              {codes.length === 0 && (
+                <EmptyRow colSpan={referralCodesHeaders.length} text={t('pages.refer.referrer-tab.no-codes')} />
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      {isSmall && width && width < MIN_WIDTH_FOR_TABLE && (
         <Box>
+          {visibleRows.map((referralCode) => (
+            <ReferralCodeBlock
+              key={referralCode.referralCode}
+              headers={referralCodesHeaders}
+              data={referralCode}
+              fullWidth={width}
+            />
+          ))}
+          {visibleRows.length === 0 && <Box className={styles.noData}>{t('pages.refer.referrer-tab.no-codes')}</Box>}
+        </Box>
+      )}
+      {codes.length > 5 && (
+        <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"
             rowsPerPageOptions={[5, 10, 20]}
@@ -103,6 +124,6 @@ export const ReferralCodesTable = memo(({ isAgency, codes }: ReferralCodesTableP
           />
         </Box>
       )}
-    </TableContainer>
+    </div>
   );
 });
