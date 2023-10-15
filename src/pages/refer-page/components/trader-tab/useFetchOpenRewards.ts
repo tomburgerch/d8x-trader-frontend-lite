@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
-import { getOpenTraderRebate } from 'network/referral';
+import { getOpenRewards } from 'network/referral';
 import type { OpenTraderRebateI } from 'types/types';
 
 export const useFetchOpenRewards = () => {
@@ -20,9 +20,9 @@ export const useFetchOpenRewards = () => {
 
       openRewardsRequestRef.current = true;
 
-      getOpenTraderRebate(chainId, address)
+      getOpenRewards(chainId, address)
         .then(({ data }) => {
-          setOpenRewards(data);
+          setOpenRewards(data.openEarnings ?? []);
         })
         .catch(console.error)
         .finally(() => {

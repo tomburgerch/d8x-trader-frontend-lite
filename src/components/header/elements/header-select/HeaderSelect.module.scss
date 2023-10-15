@@ -32,6 +32,10 @@
     background-color: transparent !important;
   }
 
+  :global(.MuiSelect-icon) {
+    color: var(--d8x-color-purple);
+  }
+
   :global(.MuiInputBase-root) {
     min-width: 240px;
     color: var(--d8x-color-purple);

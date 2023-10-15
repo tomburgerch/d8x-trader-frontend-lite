@@ -7,16 +7,19 @@ import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 import { Dialog } from 'components/dialog/Dialog';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { postUseReferralCode } from 'network/referral';
-import { CodeStateE, useCodeInput } from 'pages/refer-page/hooks';
+import { useCodeInput } from 'pages/refer-page/hooks';
+
+import { CodeStateE } from '../../enums';
 
 import styles from './EnterCodeDialog.module.scss';
 
 interface EnterCodeDialogPropsI {
+  isOpen: boolean;
   onClose: () => void;
   onCodeApplySuccess: () => void;
 }
 
-export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialogPropsI) => {
+export const EnterCodeDialog = ({ isOpen, onClose, onCodeApplySuccess }: EnterCodeDialogPropsI) => {
   const { t } = useTranslation();
 
   const { data: walletClient } = useWalletClient();
@@ -41,7 +44,7 @@ export const EnterCodeDialog = ({ onClose, onCodeApplySuccess }: EnterCodeDialog
   };
 
   return (
-    <Dialog open={true} onClose={onClose}>
+    <Dialog open={isOpen} onClose={onClose}>
       <Box className={styles.dialogRoot}>
         <Typography variant="h5" className={styles.title}>
           {t('pages.refer.trader-tab.title3')}

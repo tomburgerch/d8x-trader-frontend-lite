@@ -66,6 +66,7 @@ export const CandlesWebSocketListener = memo(() => {
     wsRef.current.on(handleMessage);
     return () => {
       wsRef.current?.off(handleMessage);
+      wsRef.current?.close();
     };
   }, [chainId]);
 

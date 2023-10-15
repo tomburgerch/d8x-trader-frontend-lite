@@ -1,6 +1,7 @@
 @import '~styles/theme/_theme.scss';
 
 .dialogRoot {
+  min-width: 450px;
   width: 100%;
   padding: 10 * $d8x-spacing 0 8 * $d8x-spacing 0;
 }
@@ -26,22 +27,26 @@
 
 .sidesRowValue {
   font-weight: 600;
-  font-size: 16px;
 }
 
 .divider {
   border-bottom: 1px solid var(--d8x-color-black-150);
 }
 
-.kickbackRateInputContainer {
+.referrerKickbackInputContainer,
+.traderKickbackInputContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6 * $d8x-spacing 8 * $d8x-spacing;
 }
 
+.traderKickbackInputContainer {
+  padding-top: 0;
+}
+
 .kickbackInput {
-  max-width: 110px;
+  max-width: 120px;
   color: var(--d8x-color-black-400);
 
   input {
@@ -49,20 +54,29 @@
   }
 }
 
-.infoText {
-  padding: 0 8 * $d8x-spacing;
-  color: var(--d8x-color-black-400);
-  margin: 4 * $d8x-spacing 0 8 * $d8x-spacing;
+.referrerChangeContainer {
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.referrerChangeFlexWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .codeInputContainer {
-  padding: 6 * $d8x-spacing 8 * $d8x-spacing 0 * $d8x-spacing;
+  padding: 6 * $d8x-spacing 8 * $d8x-spacing;
+}
+
+.codeInputLabel {
+  margin-bottom: 3 * $d8x-spacing;
 }
 
 .codeInput {
   width: 100%;
 
   input {
+    font-size: 14px;
     width: 100%;
   }
 }
@@ -78,6 +92,12 @@
   }
 }
 
+.infoText {
+  padding: 0 8 * $d8x-spacing;
+  color: var(--d8x-color-black-400);
+  margin: -2 * $d8x-spacing 0 8 * $d8x-spacing;
+}
+
 .dialogActionsContainer {
   display: flex;
   justify-content: space-between;
@@ -88,14 +108,14 @@
   width: 200px;
 }
 
-.modifyCodeButton {
-  width: 200px;
-  margin-left: 30 * $d8x-spacing;
-}
-
 @media screen and ($d8x-breakpoint-max-xs) {
 
-  .kickbackRateInputContainer {
+  .dialogRoot {
+    min-width: 300px;
+  }
+
+  .referrerKickbackInputContainer,
+  .traderKickbackInputContainer {
     gap: 5 * $d8x-spacing;
   }
 
@@ -105,13 +125,12 @@
     gap: 4 * $d8x-spacing;
   }
 
-  .actionButton,
-  .modifyCodeButton {
-    width: 100%;
+  .cancelButton {
     height: 50px;
   }
 
-  .modifyCodeButton {
-    margin-left: 0;
+  .actionButton {
+    width: 100%;
+    height: 50px;
   }
 }
