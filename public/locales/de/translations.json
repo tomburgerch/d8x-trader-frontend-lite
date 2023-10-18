@@ -58,6 +58,7 @@
             "remove": "Entfernen"
           },
           "close": "Position schliessen",
+          "share": "Position teilen",
           "add": "Sicherheit hinzufügen",
           "remove": "Sicherheit entfernen",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "Abbrechen",
           "confirm": "Bestätigen",
           "create": "Erstellen"
+        },
+        "share-modal": {
+          "share-description": "Speichern Sie das Bild und teilen Sie es in den sozialen Medien"
         },
         "toasts": {
           "submit-close": {

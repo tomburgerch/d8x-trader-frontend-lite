@@ -58,6 +58,7 @@
             "remove": "减少"
           },
           "close": "关闭仓位",
+          "share": "分享仓位",
           "add": "增加抵押品",
           "remove": "减少抵押品",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "取消",
           "confirm": "确认",
           "create": "创建"
+        },
+        "share-modal": {
+          "share-description": "保存图像并在社交媒体上分享"
         },
         "toasts": {
           "submit-close": {

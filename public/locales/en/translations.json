@@ -58,6 +58,7 @@
             "remove": "Remove"
           },
           "close": "Close position",
+          "share": "Share position",
           "add": "Add collateral",
           "remove": "Remove collateral",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "Cancel",
           "confirm": "Confirm",
           "create": "Create"
+        },
+        "share-modal": {
+          "share-description": "Save the image and share it on social media"
         },
         "toasts": {
           "submit-close": {

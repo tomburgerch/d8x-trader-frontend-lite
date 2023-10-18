@@ -58,6 +58,7 @@
             "remove": "Remover"
           },
           "close": "Cerrar Posición",
+          "share": "Compartir posición",
           "add": "Añadir Margen",
           "remove": "Remover Margen",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "Cancelar",
           "confirm": "Confirmar",
           "create": "Crear"
+        },
+        "share-modal": {
+          "share-description": "Guarda la imagen y compártela en las redes sociales"
         },
         "toasts": {
           "submit-close": {

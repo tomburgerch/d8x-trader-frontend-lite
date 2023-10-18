@@ -58,6 +58,7 @@
               "remove": "Retirer"
             },
             "close": "Fermer la position",
+            "share": "Partager la position",
             "add": "Ajouter du collatéral",
             "remove": "Retirer du collatéral",
             "pos-details": {
@@ -70,6 +71,9 @@
             "cancel": "Annuler",
             "confirm": "Confirmer",
             "create": "Créer"
+          },
+          "share-modal": {
+            "share-description": "Enregistrez l'image et partagez-la sur les réseaux sociaux"
           },
           "toasts": {
             "submit-close": {
