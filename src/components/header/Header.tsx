@@ -26,7 +26,7 @@ import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { Container } from '../container/Container';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
-import { InteractiveLogo } from './elements/interactive-logo/InteractiveLogo';
+import { InteractiveLogo } from '../../assets/interactive-logo/InteractiveLogo';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';

@@ -6,7 +6,7 @@ import { DownloadOutlined } from '@mui/icons-material';
 import { Button, DialogActions, DialogContent } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
-import { InteractiveLogo } from 'components/header/elements/interactive-logo/InteractiveLogo';
+import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';

@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
-import { InteractiveLogo } from './elements/interactive-logo/InteractiveLogo';
+import { InteractiveLogo } from '../../assets/interactive-logo/InteractiveLogo';
 
 export const EmptyHeader = () => (
   <Container className={styles.root}>
