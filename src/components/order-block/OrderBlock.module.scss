@@ -3,15 +3,11 @@
 .root {
   width: 100%;
   border-radius: $d8x-border-radius;
-  background-color: var(--d8x-background);
+  background-color: var(--d8x-color-background);
 }
 
 .bottomCard {
-  background-color: var(--d8x-background);
-}
-
-.actionIcon {
-  margin-bottom: 2.5px;
+  background-color: var(--d8x-color-background);
 }
 
 .selectors {
@@ -30,13 +26,6 @@
   .card {
     padding-top: $d8x-spacing * 2;
     padding-bottom: $d8x-spacing * 2;
-  }
-}
-
-@media screen and ($d8x-breakpoint-max-md) {
-
-  .actionIcon {
-    margin-bottom: 0;
   }
 }
 

@@ -1,11 +1,12 @@
 import { Box, Toolbar, Typography } from '@mui/material';
 
+import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
+
 import { Container } from '../container/Container';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
-import { InteractiveLogo } from './elements/interactive-logo/InteractiveLogo';
 
 export const EmptyHeader = () => (
   <Container className={styles.root}>

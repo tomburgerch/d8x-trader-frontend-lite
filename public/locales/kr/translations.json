@@ -58,6 +58,7 @@
             "remove": "출금"
           },
           "close": "Close position",
+          "share": "위치 공유",
           "add": "Add collateral",
           "remove": "Remove collateral",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "Cancel",
           "confirm": "Confirm",
           "create": "Create"
+        },
+        "share-modal": {
+          "share-description": "이미지를 저장하고 소셜 미디어에 공유하세요"
         },
         "toasts": {
           "submit-close": {

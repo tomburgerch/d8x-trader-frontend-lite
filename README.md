@@ -1,3 +1,5 @@
+# Development
+
 ## Quantena testnet deployments
 
 - Stable version: https://app.testnet.d8x.exchange/
@@ -48,8 +50,6 @@ Copy `.env.example` file and paste as `.env` file. Make changes if necessary.
 Note: for advance usage and better DX, setup automatic detection of `.nvmrc` config,
 e.g. explore this [post](https://stackoverflow.com/questions/23556330/run-nvm-use-automatically-every-time-theres-a-nvmrc-file-on-the-directory)
 
----
-
 ## Available Scripts
 
 In the project directory, you can run:
@@ -96,3 +96,63 @@ Note 2: In case the `.husky/pre-commit` hook was ignored because it's not set as
 ```
 chmod ug+x .husky/*
 ```
+
+---
+
+# Branding the Frontend
+
+## Logo
+
+### Header logo
+A default interactive logo is contained in `src/assets/interactive-logo`
+
+The interactive logo is used as **InteractiveLogo** in:  
+- `src/components/header/EmptyHeader.tsx`
+- `src/components/header/Header.tsx`
+- `src/components/position-table/elements/modals/share-modal/ShareModal.tsx`
+
+You can modify the interactive logo.
+
+You can also add an svg file in `assets/interactive-logo` and import it as ReactComponent in the three files mentioned above. 
+
+### Footer logo
+A default static logo is contained in `src/assets/logo.svg`
+
+You can update the svg file. 
+
+## Colors & Color scheme
+By default the FE supports a light and a dark color theme
+
+### How to modify existing themes
+Colors are defined in scss files in `src/styles`
+- colors.scss (default theme)
+- darkColors.scss (dark theme)
+
+### Colors for TradingView chart
+- Lightweight Trading view chart: `src/components/trading-view-chart/elements/chart-block/ChartBlock.tsx`
+- Pro Trading view chart: `public/charting-lib-styles`
+
+## Fonts
+Fonts can be specified in `src/styles/theme/index.scss`
+
+## Background
+By default the FE has a mobile, a tablet and a desktop background. The background is handled by `src/components/static-background/StaticBackground.tsx`
+
+### Mobile & Tablet background
+The **MobileBackground** component is by default used for both the mobile and the table version of the FE. You can update the svg in `assets/background/mobile-background.svg`
+
+You can also differentiate mobile from tablet background by:
+- adding a second svg into `assets/background`
+- importing that svg as a **TabletBackground** component into `StaticBackground.tsx`
+- replacing **MobileBackground** by **TabletBackground** in the `if (isTablet)` statement
+
+### Desktop Background
+For desktop, the background is handled by the imported styles from `./StaticBackground.module.scss`
+
+## PnL Poster
+Backgrounds of the  PnL poster are color scheme specific and are stored in `src/assets/pnl-poster`
+
+## Advanced styling options
+Global styles are defined in `src/styles/theme/theme.ts` and in `index.scss`
+
+Local styles are defined in corresponing components

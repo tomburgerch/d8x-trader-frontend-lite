@@ -8,10 +8,10 @@
   width: 100%;
   max-width: 280px;
   padding: $d8x-spacing * 8 $d8x-spacing * 8 $d8x-spacing * 8 0;
-  border-right: 1px solid var(--d8x-separator-border-color);
+  border-right: 1px solid var(--d8x-color-separator-border);
 
   .text {
-    color: var(--d8x-color-black-400);
+    color: var(--d8x-color-text-label-two);
     margin-top: $d8x-spacing * 4;
     margin-bottom: $d8x-spacing * 4;
   }
@@ -21,11 +21,11 @@
   display: block;
   text-align: right;
   margin-top: calc($d8x-spacing / 2);
-  color: var(--d8x-color-black-maintext);
+  color: var(--d8x-color-text-main);
 
   a {
     cursor: pointer;
-    color: var(--d8x-color-purple);
+    color: var(--d8x-color-action);
   }
 }
 
@@ -57,19 +57,9 @@
   height: 40px;
 }
 
-.label {
-  display: flex;
-  align-items: center;
-  padding-right: $d8x-spacing;
-  gap: 8px;
-  color: var(--d8x-color-black-maintext);
-}
-
 .withdrawLabel {
   display: flex;
-  align-items: center;
-  padding-right: $d8x-spacing;
-  gap: 8px;
+  justify-content: flex-start;
   margin-bottom: 3 * $d8x-spacing;
 }
 
@@ -92,7 +82,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: calc($d8x-spacing / 2);
-    color: var(--d8x-color-black-maintext);
+    color: var(--d8x-color-text-main);
   }
 }
 
@@ -100,16 +90,12 @@
   margin-top: $d8x-spacing * 6;
 }
 
-.actionIcon {
-  margin-bottom: 4px;
-}
-
 .inputHolder {
 
   :global(.MuiInputBase-root) {
 
     input {
-      -webkit-text-fill-color: var(--d8x-color-black-opac3);
+      -webkit-text-fill-color: var(--d8x-color-text-main);
     }
   }
 }
@@ -133,7 +119,9 @@
     align-items: stretch;
     height: auto;
 
-    .label {
+    .labelHolder {
+      display: flex;
+      justify-content: flex-start;
       margin-bottom: $d8x-spacing * 2;
     }
 

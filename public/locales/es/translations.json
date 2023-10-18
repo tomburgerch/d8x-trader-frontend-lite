@@ -30,9 +30,9 @@
           "size": "Tamaño",
           "side": "Dirección",
           "entry-price": "Precio de Entrada",
-          "liq-price": "Precio de Liquidación",
+          "liq-price": "Precio de Liq.",
           "margin": "Margen",
-          "pnl": "Ganancias sin Realizar",
+          "pnl": "PnL sin Realizar",
           "tp-sl": "TP/SL"
         },
         "table-content": {
@@ -58,6 +58,7 @@
             "remove": "Remover"
           },
           "close": "Cerrar Posición",
+          "share": "Compartir posición",
           "add": "Añadir Margen",
           "remove": "Remover Margen",
           "pos-details": {
@@ -70,6 +71,9 @@
           "cancel": "Cancelar",
           "confirm": "Confirmar",
           "create": "Crear"
+        },
+        "share-modal": {
+          "share-description": "Guarda la imagen y compártela en las redes sociales"
         },
         "toasts": {
           "submit-close": {
@@ -233,7 +237,7 @@
           "body2": "Si tu orden reduce una posicion ya existente ('cerrar parcialmente'), el apalcancamiento de tu orden no tiene ningun efecto."
         },
         "slippage": {
-          "title": "Configuración de deslizamiento",
+          "title": "Deslizamiento",
           "body": "Deslizamiento Maximo",
           "max": "Precio de entrada maximo:",
           "min": "Precio de entrada minimo:",

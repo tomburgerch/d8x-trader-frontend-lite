@@ -7,6 +7,7 @@ import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wa
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
+import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo } from 'network/network';
 import { authPages, pages } from 'routes/pages';
@@ -26,7 +27,6 @@ import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { Container } from '../container/Container';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
-import { InteractiveLogo } from './elements/interactive-logo/InteractiveLogo';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';
@@ -252,7 +252,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               '& .MuiDrawer-paper': {
                 boxSizing: 'border-box',
                 width: isMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
-                backgroundColor: 'var(--d8x-background)',
+                backgroundColor: 'var(--d8x-color-background)',
               },
             }}
           >

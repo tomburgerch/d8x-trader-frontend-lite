@@ -5,7 +5,7 @@ export const InteractiveLogo = () => {
     <svg
       width="110"
       height="21"
-      viewBox="0 0 221 50"
+      viewBox="0 0 260 50"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={styles.root}
@@ -30,7 +30,7 @@ export const InteractiveLogo = () => {
       />
       <path
         d="M24.229 49.2838C37.6104 49.2838 48.4581 38.4361 48.4581 25.0547C48.4581 11.6734 37.6104 0.825684 24.229 0.825684C10.8477 0.825684 0 11.6734 0 25.0547C0 38.4361 10.8477 49.2838 24.229 49.2838Z"
-        fill="var(--d8x-logo-second-color)"
+        fill="var(--d8x-color-logo-second)"
       />
     </svg>
   );
