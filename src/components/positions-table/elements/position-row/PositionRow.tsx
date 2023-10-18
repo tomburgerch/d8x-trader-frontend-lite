@@ -16,8 +16,8 @@ import styles from './PositionRow.module.scss';
 interface PositionRowPropsI {
   position: MarginAccountWithAdditionalDataI;
   handlePositionClose: (position: MarginAccountWithAdditionalDataI) => void;
-  handlePositionShare: (position: MarginAccountWithAdditionalDataI) => void;
   handlePositionModify: (position: MarginAccountWithAdditionalDataI) => void;
+  handlePositionShare: (position: MarginAccountWithAdditionalDataI) => void;
   handleTpSlModify: (position: MarginAccountWithAdditionalDataI) => void;
 }
 
@@ -25,8 +25,8 @@ export const PositionRow = memo(
   ({
     position,
     handlePositionClose,
-    handlePositionShare,
     handlePositionModify,
+    handlePositionShare,
     handleTpSlModify,
   }: PositionRowPropsI) => {
     const { t } = useTranslation();

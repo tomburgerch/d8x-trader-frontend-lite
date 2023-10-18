@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { DownloadOutlined } from '@mui/icons-material';
 import { Button, DialogActions, DialogContent } from '@mui/material';
 
-import { Dialog } from 'components/dialog/Dialog';
 import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
+import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';

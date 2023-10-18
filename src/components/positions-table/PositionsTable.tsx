@@ -301,8 +301,8 @@ export const PositionsTable = () => {
                     key={position.symbol}
                     position={position}
                     handlePositionClose={handlePositionClose}
-                    handlePositionShare={handlePositionShare}
                     handlePositionModify={handlePositionModify}
+                    handlePositionShare={handlePositionShare}
                     handleTpSlModify={handleTpSlModify}
                   />
                 ))}
@@ -330,6 +330,7 @@ export const PositionsTable = () => {
                 position={position}
                 handlePositionClose={handlePositionClose}
                 handlePositionModify={handlePositionModify}
+                handlePositionShare={handlePositionShare}
                 handleTpSlModify={handleTpSlModify}
               />
             ))}
