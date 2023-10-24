@@ -42,7 +42,7 @@ export const TableDataFetcher = memo(() => {
   }, [latestOrderSentTimestamp]);
 
   useEffect(() => {
-    if (ticker > 0 && chainId && traderAPI && address) {
+    if (ticker > 0 && chainId && address) {
       getOpenOrders(chainId, traderAPI, address as Address)
         .then(({ data: d }) => {
           clearOpenOrders();
