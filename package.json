@@ -49,7 +49,7 @@
     ]
   },
   "dependencies": {
-    "@d8x/perpetuals-sdk": "0.9.7",
+    "@d8x/perpetuals-sdk": "0.9.13",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.14.3",
@@ -61,7 +61,7 @@
     "buffer": "6.0.3",
     "classnames": "2.3.2",
     "core-js": "3.32.0",
-    "crypto-js": "4.1.1",
+    "crypto-js": "4.2.0",
     "cryptocurrency-icons": "0.18.1",
     "date-fns": "2.30.0",
     "geonames.js": "3.0.6",
