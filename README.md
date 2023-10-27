@@ -43,7 +43,7 @@ This package is configured entirely via environment variables. You must specify:
   - Then you would define
     `VITE_HTTP_RPC=1101::https://zkevm-rpc.com;1442::https://rpc.public.zkevm-test.net;default::https://pyth.testnet.yourdomain.com/api`
 
-- **VITE_GEONAMES_USERNAME**: A string with your geonames username. You need to set this parameter to prohibit impermissible access to citizens and residents of, or participants physically located in, any Prohibited Jurisdiction as defined in the D8X Terms of Services:
+- **VITE_GEONAMES_USERNAME**: A string with your geonames username. You need to set this parameter to prohibit impermissible access to citizens and residents of, or participants physically located in, any Prohibited Jurisdiction as defined in the D8X Terms of Service:
   - Go to https://www.geonames.org/export/web-services.html and follow the guidance to create a new user account, free of charge
   - Let’s assume you chose the username `myusername` , then you would define
     `VITE_GEONAMES_USERNAME=myusername`
