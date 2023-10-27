@@ -99,7 +99,7 @@ chmod ug+x .husky/*
 
 ---
 
-# Branding the Frontend
+# Branding the Frontend Kit
 
 ## Logo
 
@@ -156,4 +156,3 @@ Backgrounds of the  PnL poster are color scheme specific and are stored in `src/
 Global styles are defined in `src/styles/theme/theme.ts` and in `index.scss`
 
 Local styles are defined in corresponing components
-
