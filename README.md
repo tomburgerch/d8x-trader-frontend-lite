@@ -99,7 +99,7 @@ chmod ug+x .husky/*
 
 ---
 
-# Branding the Frontend Kit
+# Branding the Frontend
 
 ## Logo
 
