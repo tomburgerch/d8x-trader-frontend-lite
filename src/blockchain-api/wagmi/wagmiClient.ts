@@ -3,13 +3,13 @@ import {
   coinbaseWallet,
   metaMaskWallet,
   okxWallet,
+  phantomWallet,
   rabbyWallet,
   rainbowWallet,
   walletConnectWallet,
-  phantomWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { configureChains, createConfig } from 'wagmi';
-import { polygonZkEvmTestnet, polygonMumbai, polygonZkEvm } from 'wagmi/chains';
+import { polygonMumbai, polygonZkEvm, polygonZkEvmTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
