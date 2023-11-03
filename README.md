@@ -75,17 +75,15 @@ This package is configured entirely via environment variables. You must specify:
 
 ### Header logo
 
-A default interactive logo is contained in `src/assets/interactive-logo`
+A default logo with text is located under this path `src/assets/logoWithText.svg`
 
-The interactive logo is used as **InteractiveLogo** in:
+The logo with text is used in:
 
 - `src/components/header/EmptyHeader.tsx`
 - `src/components/header/Header.tsx`
 - `src/components/position-table/elements/modals/share-modal/ShareModal.tsx`
 
-You can modify the interactive logo.
-
-You can also add an svg file in `assets/interactive-logo` and import it as ReactComponent in the three files mentioned above.
+You can update the svg file.
 
 ### Footer logo
 

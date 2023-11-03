@@ -7,7 +7,7 @@ import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wa
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
-import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
+import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo } from 'network/network';
 import { authPages, pages } from 'routes/pages';
@@ -167,7 +167,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const drawer = (
     <>
       <Typography variant="h6" sx={{ my: 2, textAlign: 'center' }} onClick={handleDrawerToggle}>
-        <InteractiveLogo />
+        <LogoWithText width={86} height={20} />
       </Typography>
       <Divider />
       <nav className={styles.navMobileWrapper} onClick={handleDrawerToggle}>
@@ -206,7 +206,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             <Box className={styles.leftSide}>
               <Typography variant="h6" component="div">
                 <a href="/" className={styles.logoLink}>
-                  <InteractiveLogo />
+                  <LogoWithText width={86} height={20} />
                 </a>
               </Typography>
               {!isTabletScreen && (
