@@ -16,7 +16,7 @@ export const EmptyHeader = () => (
           <Box className={styles.leftSide}>
             <Typography variant="h6" component="div">
               <a href="/" className={styles.logoLink}>
-                <LogoWithText width={129} height={30} />
+                <LogoWithText width={86} height={20} />
               </a>
             </Typography>
           </Box>
