@@ -1,6 +1,6 @@
 import { Box, Toolbar, Typography } from '@mui/material';
 
-import { InteractiveLogo } from 'assets/interactive-logo/InteractiveLogo';
+import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
 
 import { Container } from '../container/Container';
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
@@ -16,7 +16,7 @@ export const EmptyHeader = () => (
           <Box className={styles.leftSide}>
             <Typography variant="h6" component="div">
               <a href="/" className={styles.logoLink}>
-                <InteractiveLogo />
+                <LogoWithText width={129} height={30} />
               </a>
             </Typography>
           </Box>
