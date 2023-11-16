@@ -542,6 +542,15 @@
   "common": {
     "change-language": "Cambiar Idioma",
     "wallet-connect": "Conectar",
+    "one-click": {
+      "disable": "Deshabilitar el comercio con un clic",
+      "enable": "Habilite el comercio con un solo clic"
+    },
+    "li-fi-widget": {
+      "button-title": "LI.FI widget",
+      "header-to": "Bridge in",
+      "header-from": "Bridge out"
+    },
     "pagination": {
       "per-page": "Por página"
     },
