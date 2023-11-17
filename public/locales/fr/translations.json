@@ -543,6 +543,15 @@
     "common": {
       "change-language": "Changer de langue",
       "wallet-connect": "Connecter",
+      "one-click": {
+        "disable": "Activer le trading en un clic",
+        "enable": "Désactiver le trading en un clic"
+      },
+      "li-fi-widget": {
+        "button-title": "LI.FI widget",
+        "header-to": "Bridge in",
+        "header-from": "Bridge out"
+      },
       "pagination": {
         "per-page": "Par page"
       },

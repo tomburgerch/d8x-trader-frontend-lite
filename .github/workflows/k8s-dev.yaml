@@ -13,13 +13,13 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: dev
 
       # render variables that exist on the secrets of the repository
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -28,7 +28,7 @@ jobs:
       #Login on ecr
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       #Building and pushing images
       - name: Build, tag, and push image to Amazon ECR
@@ -38,6 +38,7 @@ jobs:
           IMAGE_TAG: d8x-frontend-${{ github.sha }}
           # test:
           VITE_ENABLED_CHAINS: 1442
+          VITE_ACTIVATE_LIFI: false
           VITE_HTTP_RPC: 80001::${{ secrets.HTTP_RPC_MUMBAI }}
           VITE_PRICE_FEEDS:
           VITE_PROJECT_ID: ${{ secrets.WALLET_CONNECT_DEV_PROJECT_ID }}
@@ -48,7 +49,7 @@ jobs:
           VITE_WEBSOCKET_URL: default::wss://ws.zktest.quantena.tech/;80001::wss://ws.dev2.quantena.tech/;1442::wss://ws.zkdev6.d8x.xyz/
           VITE_CANDLES_WEBSOCKET_URL: default::wss://candles.zktest.quantena.tech;1442::wss://candles.zkdev6.d8x.xyz
         run: |
-          docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg VITE_ENABLED_CHAINS=$VITE_ENABLED_CHAINS --build-arg VITE_PROJECT_ID=$VITE_PROJECT_ID --build-arg VITE_GEONAMES_USERNAME=$VITE_GEONAMES_USERNAME --build-arg VITE_HTTP_RPC=$VITE_HTTP_RPC --build-arg VITE_PRICE_FEEDS=$VITE_PRICE_FEEDS --build-arg VITE_API_URL=$VITE_API_URL --build-arg VITE_HISTORY_URL=$VITE_HISTORY_URL --build-arg VITE_REFERRAL_URL=$VITE_REFERRAL_URL --build-arg VITE_CANDLES_WEBSOCKET_URL=$VITE_CANDLES_WEBSOCKET_URL --build-arg VITE_WEBSOCKET_URL=$VITE_WEBSOCKET_URL .
+          docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg VITE_ENABLED_CHAINS=$VITE_ENABLED_CHAINS --build-arg VITE_ACTIVATE_LIFI=$VITE_ACTIVATE_LIFI --build-arg VITE_PROJECT_ID=$VITE_PROJECT_ID --build-arg VITE_GEONAMES_USERNAME=$VITE_GEONAMES_USERNAME --build-arg VITE_HTTP_RPC=$VITE_HTTP_RPC --build-arg VITE_PRICE_FEEDS=$VITE_PRICE_FEEDS --build-arg VITE_API_URL=$VITE_API_URL --build-arg VITE_HISTORY_URL=$VITE_HISTORY_URL --build-arg VITE_REFERRAL_URL=$VITE_REFERRAL_URL --build-arg VITE_CANDLES_WEBSOCKET_URL=$VITE_CANDLES_WEBSOCKET_URL --build-arg VITE_WEBSOCKET_URL=$VITE_WEBSOCKET_URL .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   Version:
@@ -101,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout and pull tag version
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: dev
       #does not yet work here

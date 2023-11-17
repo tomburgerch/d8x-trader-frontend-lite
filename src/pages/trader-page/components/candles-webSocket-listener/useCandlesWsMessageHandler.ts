@@ -44,6 +44,10 @@ function isSubscribeErrorMessage(message: SubscribeWsErrorMessageI): message is 
   );
 }
 
+function isAlreadySubscribedErrorMessage(message: SubscribeWsErrorMessageI) {
+  return isSubscribeErrorMessage(message) && message.data.error === 'client already subscribed';
+}
+
 function isMarketsSubscribeMessage(message: MarketsSubscribeWsMessageI): message is MarketsSubscribeWsMessageI {
   return (
     message.type === MessageTypeE.Subscribe && message.topic === MessageTopicE.Markets && Array.isArray(message.data)
@@ -97,20 +101,21 @@ export function useCandlesWsMessageHandler() {
 
       if (isConnectMessage(parsedMessage)) {
         setCandlesDataReady(true);
-      } else if (isSubscribeErrorMessage(parsedMessage)) {
-        console.error(parsedMessage.data.error);
       } else if (isMarketsSubscribeErrorMessage(parsedMessage)) {
         console.error(parsedMessage.data.error);
-      } else if (isSubscribeMessage(parsedMessage) && selectedPerpetual) {
+      } else if (
+        selectedPerpetual &&
+        (isSubscribeMessage(parsedMessage) || isAlreadySubscribedErrorMessage(parsedMessage))
+      ) {
         const symbol = createPairWithPeriod(selectedPerpetual, selectedPeriod);
         const newData = parsedMessage.data;
-        if (parsedMessage.topic !== symbol || !newData) {
+        if (parsedMessage.topic !== symbol || !newData || !Array.isArray(newData)) {
           return;
         }
 
         setCandles((prevData) => {
           // TODO: VOV: Temporary work-around. Should be only 1 message from backend
-          if (prevData.length === newData.length && prevData[0].close === +newData[0].close) {
+          if (prevData.length === newData.length && prevData.length > 0 && prevData[0].close === +newData[0].close) {
             return prevData;
           }
 
@@ -142,6 +147,8 @@ export function useCandlesWsMessageHandler() {
           return candles;
         });
         setCandlesDataReady(true);
+      } else if (isSubscribeErrorMessage(parsedMessage)) {
+        console.error(parsedMessage.data.error);
       } else if (isMarketsSubscribeMessage(parsedMessage)) {
         setMarketsData(parsedMessage.data);
       } else if (isUpdateMessage(parsedMessage) && selectedPerpetual) {
