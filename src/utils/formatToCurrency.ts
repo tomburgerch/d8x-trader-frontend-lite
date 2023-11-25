@@ -30,7 +30,7 @@ export function valueToFractionDigits(value: number | undefined) {
   if (!value) {
     return 2;
   }
-  return Math.max(2, roundHalfDown(3.5 - Math.log10(Math.abs(value))));
+  return Math.max(2, 1 + roundHalfDown(2.5 - Math.log10(Math.abs(value))));
 }
 
 export function formatToCurrency(
