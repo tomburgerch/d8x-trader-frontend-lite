@@ -10,6 +10,7 @@ import { candlesAtom, candlesDataReadyAtom, newCandleAtom } from 'store/tv-chart
 import { ONE_MINUTE_SECONDS, ONE_MINUTE_TIME, TIMEZONE_OFFSET } from './constants';
 import { ChartBlock } from './elements/chart-block/ChartBlock';
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
+import { valueToFractionDigits } from 'utils/formatToCurrency';
 
 import styles from './TradingViewChart.module.scss';
 
@@ -59,9 +60,20 @@ export const TradingViewChart = memo(() => {
     }
   }, [candlesWithLocalTime]);
 
+  const precision = useMemo(() => {
+    let numberDigits;
+    if (candlesWithLocalTime.length > 0) {
+      const open = candlesWithLocalTime[0].open;
+      numberDigits = valueToFractionDigits(open);
+    } else {
+      numberDigits = 3;
+    }
+    return numberDigits;
+  }, [candlesWithLocalTime]);
+
   return (
     <Box className={styles.root} ref={ref}>
-      <ChartBlock width={width} candles={candlesWithLocalTime} seriesRef={seriesRef} />
+      <ChartBlock width={width} candles={candlesWithLocalTime} seriesRef={seriesRef} numberDigits={precision} />
       <Box className={styles.periodsHolder}>
         <PeriodSelector />
       </Box>

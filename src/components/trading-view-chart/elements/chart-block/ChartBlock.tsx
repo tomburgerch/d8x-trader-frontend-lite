@@ -13,6 +13,7 @@ interface CandlesSeriesPropsI {
   width?: number;
   candles: CandlestickData[];
   seriesRef: Ref<ISeriesApi<'Candlestick'>> | undefined;
+  numberDigits: number;
 }
 
 const MIN_CHART_HEIGHT = 300;
@@ -21,7 +22,7 @@ function timeFormatter(timestamp: number) {
   return new Date(timestamp * 1000 - TIMEZONE_OFFSET * ONE_MINUTE_TIME).toLocaleString();
 }
 
-export const ChartBlock = memo(({ width, candles, seriesRef }: CandlesSeriesPropsI) => {
+export const ChartBlock = memo(({ width, candles, seriesRef, numberDigits }: CandlesSeriesPropsI) => {
   const [dimensions] = useAtom(appDimensionsAtom);
   // A hack to make it rerender and update chart's layout
   const [,] = useAtom(enabledDarkModeAtom);
@@ -54,7 +55,13 @@ export const ChartBlock = memo(({ width, candles, seriesRef }: CandlesSeriesProp
         barSpacing: candles.length < 60 ? 22 : 8,
       }}
     >
-      <CandlestickSeries key={candles.length} data={candles} reactive={true} ref={seriesRef} />
+      <CandlestickSeries
+        key={candles.length}
+        data={candles}
+        reactive={true}
+        ref={seriesRef}
+        priceFormat={{ type: 'price', precision: numberDigits, minMove: 1 / Math.pow(10, numberDigits) }}
+      />
     </Chart>
   );
 });
