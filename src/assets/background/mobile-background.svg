@@ -1,16 +1,16 @@
 <svg width="837" height="2735" viewBox="30 0 790 2735" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
   <g clip-path="url(#clip0_502_589)">
     <g filter="url(#filter0_f_502_589)">
-      <ellipse cx="238.5" cy="187.134" rx="238.5" ry="187.134" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 674.783 2734.17)" fill="#664ADF" fill-opacity="0.6"/>
+      <ellipse cx="238.5" cy="187.134" rx="238.5" ry="187.134" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 674.783 2734.17)" fill="var(--d8x-color-action)" fill-opacity="0.6"/>
     </g>
     <g opacity="0.5" filter="url(#filter1_f_502_589)">
-      <ellipse cx="202" cy="148.249" rx="202" ry="148.249" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 528.73 1707.5)" fill="#664ADF" fill-opacity="0.6"/>
+      <ellipse cx="202" cy="148.249" rx="202" ry="148.249" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 528.73 1707.5)" fill="var(--d8x-color-action)" fill-opacity="0.6"/>
     </g>
     <g filter="url(#filter2_f_502_589)">
-      <ellipse cx="333" cy="244.246" rx="333" ry="244.246" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 833.149 669.862)" fill="#664ADF" fill-opacity="0.6"/>
+      <ellipse cx="333" cy="244.246" rx="333" ry="244.246" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 833.149 669.862)" fill="var(--d8x-color-action)" fill-opacity="0.6"/>
     </g>
     <g opacity="0.5" filter="url(#filter3_f_502_589)">
-      <ellipse cx="333" cy="244.246" rx="333" ry="244.246" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 501.792 1573.38)" fill="#664ADF" fill-opacity="0.6"/>
+      <ellipse cx="333" cy="244.246" rx="333" ry="244.246" transform="matrix(0.00450762 -0.99999 -0.99999 -0.00450762 501.792 1573.38)" fill="var(--d8x-color-action)" fill-opacity="0.6"/>
     </g>
   </g>
   <defs>
