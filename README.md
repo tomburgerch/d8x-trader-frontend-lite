@@ -3,6 +3,11 @@
 Usage of this repository is subject to the Terms of Service and the D8X Protocol Software Disclaimer as specified on [D8X Exchange](https://d8x.exchange/)
 
 ---
+# Pre-flight checklist
+
+- Go to [WalletConnect Cloud](https://cloud.walletconnect.com/), sign up and create a project ID
+- Go to [Geonames](https://www.geonames.org/export/web-services.html) and follow the guidance to create a new user account
+- Set up your backend using the [D8X CLI tool](https://github.com/D8-X/d8x-cli)
 
 # Configuring the Frontend Kit
 
