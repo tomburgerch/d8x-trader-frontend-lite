@@ -21,91 +21,31 @@ export const WelcomeModal = () => {
 
   return (
     <Dialog open={config.showChallengeModal && showModal} className={styles.dialog}>
-      <DialogTitle>Join the D8X UX Challenge!</DialogTitle>
+      <DialogTitle>Disclaimer</DialogTitle>
       <DialogContent className={styles.dialogContent}>
         <p>
-          Join us in shaping the future of D8X by participating in our D8X UX Challenge on zkEVM and Polygon PoS every
-          Saturday. Provide detailed and constructive feedback on our UI-kit and earn rewards - every week! More details
-          in{' '}
-          <a href="https://discord.com/invite/kUEZ5cvzKn" target="_blank" rel="noreferrer">
-            Discord
-          </a>
-          .
+          ALL FUNCTIONALITIES OF THE D8X PROTOCOL SOFTWARE ARE OF A PURELY TECHNICAL NATURE, ARE NOT ASSOCIATED WITH,
+          AND DO NOT CONVEY ANY LEGAL CLAIM TOWARD ANY ENTITY, INDIVIDUAL, OR GROUP OF INDIVIDUALS, CONTRIBUTORS, D8X
+          TOKEN HOLDERS OR ANY OTHER THIRD-PARTY.
         </p>
         <p>
-          <strong> Get your test tokens for zkEVM:</strong>
+          The User understands and acknowledges that D8X Protocol Software, in particular, and smart contracts,
+          blockchains, cryptographic tokens, and related systems and software, in general, are nascent, experimental,
+          inherently risky, and subject to change. In order to understand the risks associated with using the D8X
+          Protocol Software, as well as any other blockchain-based technology, users are strongly encouraged to get
+          acquainted with the underlying protocols as much as possible: DO YOUR OWN RESEARCH.
         </p>
-
         <p>
-          1. Get test ETH, for example from{' '}
-          <a href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">
-            Polygon's official faucet
-          </a>{' '}
-          or from{' '}
-          <a href="https://faucet.quicknode.com/polygon/zkevm-goerli" target="_blank" rel="noreferrer">
-            Quicknode's faucet
-          </a>
-          .
+          By accessing or using the Frontend, you represent and warrant that you do not reside in, are not located in,
+          are not a citizen of, are not incorporated in, do not have registered office in, or are not in any other way
+          subject to the jurisdiction of a Prohibited Jurisdiction including, but not limited to, the UNITED STATES OF
+          AMERICA, BELARUS, BURUNDI, BURMA (MYANMAR), CENTRAL AFRICAN REPUBLIC, CONGO, DEMOCRATIC REP., DEMOCRATIC
+          PEOPLES REPUBLIC OF KOREA (DPRK), GUINEA, GUINEA BISSAU, HAITI, IRAN, IRAQ, YEMEN, LEBANON, LIBYA, MALI,
+          NICARAGUA, SOMALIA, SUDAN, REPUBLIC OF SOUTH SUDAN, SYRIA, VENEZUELA, AND ZIMBABWE.
         </p>
-
         <p>
-          2. Get mockUSD from our swap contract,{' '}
-          <a
-            href="https://testnet-zkevm.polygonscan.com/address/0x89ec28cad509bfabea210b4900d62b90690f212e#writeContract#F3"
-            target="_blank"
-            rel="noreferrer"
-          >
-            swap 0.00015 zkEVM ETH for mockUSD
-          </a>
-          .
-        </p>
-
-        <p>
-          3. Get pragMATIC from our swap contract,{' '}
-          <a
-            href="https://testnet-zkevm.polygonscan.com/address/0xE610117b32fb1dECC19808468A9B1F1890ECd988#writeContract#F3"
-            target="_blank"
-            rel="noreferrer"
-          >
-            swap 0.00015 zkEVM ETH for pragMATIC
-          </a>
-          .
-        </p>
-
-        <p>
-          <strong> Get your test tokens for Polygon POS: </strong>
-        </p>
-
-        <p>
-          1. Get official testMATIC from any faucet, for example using{' '}
-          <a href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">
-            Polygon's official faucet
-          </a>
-          .
-        </p>
-
-        <p>
-          2. Get pragMATIC from our swap contract,{' '}
-          <a
-            href="https://mumbai.polygonscan.com/address/0x16a827aff251929c8009392A05162a8ec134283F#writeContract#F3"
-            target="_blank"
-            rel="noreferrer"
-          >
-            swap 0.00015 testMATIC for a lot of pragMATIC
-          </a>
-          .
-        </p>
-
-        <p>
-          3. Get mockUSD from our swap contract,{' '}
-          <a
-            href="https://mumbai.polygonscan.com/address/0x2c0157BbCBAAD9B6226a49BD0Ec7925Df3cA8087#writeContract#F3"
-            target="_blank"
-            rel="noreferrer"
-          >
-            swap 0.00015 testMATIC for a lot of mockUSD
-          </a>
-          .
+          IF YOU DO NOT AGREE TO THESE TERMS WITHOUT LIMITATION OR EXCLUSION OR TO ANY CHANGES TO THESE TERMS, YOU MUST
+          IMMEDIATELY EXIT THE WEBSITE AND STOP ACCESSING OR USING THE SERVICES.
         </p>
       </DialogContent>
       <DialogActions className={styles.dialogAction}>

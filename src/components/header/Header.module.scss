@@ -10,16 +10,17 @@
 
   :global(.MuiOutlinedInput-root) {
     width: 100%;
-    background-color: var(--d8x-color-background-items);
+    background-color: var(--d8x-color-background);
   }
 }
 
 .toolbar {
-  align-items: center;
+  display: flex;
+  justify-content: space-between;
   padding: 8px 32px 0;
   margin: -16px -32px 0;
   min-height: 80px;
-  background-color: var(--d8x-color-background-items);
+  background-color: var(--d8x-color-background);
 }
 
 .leftSide {
@@ -31,6 +32,33 @@
     display: flex;
     gap: 8 * $d8x-spacing;
   }
+}
+
+.titlebox {
+  position: absolute;
+  top: 50%; /* Align top edge to the middle of the Toolbar */
+  left: 50%; /* Align left edge to the middle of the Toolbar */
+  transform: translate(-50%, -50%); /* Offset the box by its own dimensions */
+  text-align: center;
+}
+
+.header {
+  margin-top: $d8x-spacing * 2;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--d8x-color-top-bar-main);
+  font-family: 'Monomaniac One', serif;
+}
+
+.subHeader {
+  font-size: 16px;
+  margin-top: $d8x-spacing * 2;
+  color: var(--d8x-color-top-bar-sub);
+}
+
+.center {
+  display: flex;
+  flex: 1;
 }
 
 .rightSide {
@@ -149,6 +177,14 @@
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
+
+  .header {
+    font-size: 16px;
+  }
+
+  .subHeader {
+    font-size: 10px;
+  }
 
   .root {
     margin-bottom: 0;

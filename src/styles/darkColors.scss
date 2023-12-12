@@ -1,5 +1,5 @@
 @mixin dark-colors {
-  --d8x-color-action: #7860E3;
+  --d8x-color-action: #29ABE2;
   --d8x-color-action-rgb: 102, 74, 223;
   --d8x-color-action-secondary: #7860E333;
   --d8x-color-text-main: #FFF;
@@ -7,16 +7,16 @@
   --d8x-color-text-secondary: #F3F2F2;
   --d8x-color-text-label-one: #AAA;
   --d8x-color-text-label-two: #A4A4A4;
-  --d8x-color-text-primarytab-inactive: #818181;
+  --d8x-color-text-primarytab-inactive: #403F3F;
   --d8x-color-text-buy: #089981;
   --d8x-color-text-sell: #F23645;
-  --d8x-color-background: #201B35;
+  --d8x-color-background: #1E005D;
   --d8x-color-background-page-rgb: 102, 74, 223;
-  --d8x-color-background-items: #111216;
-  --d8x-color-background-items-second: #7860E333;
+  --d8x-color-background-items: #2F0B7C;
+  --d8x-color-background-items-second: #2F0B7C;
   --d8x-color-background-items-selected: rgba(102, 74, 223, 0.1);
-  --d8x-color-background-items-inactive: #2E2E2E;
-  --d8x-color-background-table-row: #201D2D;
+  --d8x-color-background-items-inactive: #ED1E79;
+  --d8x-color-background-table-row: #1E005D;
   --d8x-color-background-table: transparent;
   --d8x-color-background-loader: rgba(102, 74, 223, 0.1);
   --d8x-color-background-buy-rgb: 8, 153, 129;
@@ -30,6 +30,8 @@
   --d8x-color-logo-second: white;
   --d8x-color-warning-main: #FFDA9F;
   --d8x-color-warning-secondary: #FFBDBD;
+  --d8x-color-top-bar-sub: #FBB03B;
+  --d8x-color-top-bar-main: #29ABE2;
 
   // Override colors for toastify
   --toastify-color-progress-success: #664ADF;
