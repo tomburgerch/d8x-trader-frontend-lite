@@ -76,21 +76,23 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         setProxyAddr(undefined);
         return;
       }
-      const pools = data.pools.map((pool) => {
-        let poolId = 0;
-        if (traderAPI) {
-          try {
-            poolId = traderAPI.getPoolIdFromSymbol(pool.poolSymbol);
-          } catch (error) {
-            console.log(error);
+      const pools = data.pools
+        .filter((pool) => pool.isRunning)
+        .map((pool) => {
+          let poolId = 0;
+          if (traderAPI) {
+            try {
+              poolId = traderAPI.getPoolIdFromSymbol(pool.poolSymbol);
+            } catch (error) {
+              console.log(error);
+            }
           }
-        }
 
-        return {
-          ...pool,
-          poolId,
-        };
-      });
+          return {
+            ...pool,
+            poolId,
+          };
+        });
       setPools(pools);
       setCollaterals(pools.map((pool) => pool.poolSymbol));
       const perpetuals: PerpetualDataI[] = [];
