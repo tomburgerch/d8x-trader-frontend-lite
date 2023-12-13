@@ -65,7 +65,7 @@ export const showChartForMobileAtom = atom(
 
 export const selectedPoolAtom = atom(
   (get) => {
-    const allPools = get(poolsAtom);
+    const allPools = get(poolsAtom).filter((pool) => pool.isRunning);
     if (allPools.length === 0) {
       return null;
     }
@@ -118,7 +118,7 @@ export const positionsAtom = atom(
     const perpetualsStats = get(perpetualsStatsAtom);
 
     const stats = get(allPerpetualStatisticsPrimitiveAtom);
-    const pools = get(poolsAtom);
+    const pools = get(poolsAtom).filter((pool) => pool.isRunning);
 
     return Object.values(perpetualsStats)
       .filter(({ side }) => side !== 'CLOSED')
