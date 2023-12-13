@@ -48,7 +48,7 @@ export const accountValueAtom = atom(0);
 export const fetchPortfolioAtom = atom(
   (get) => ({ isLoading: get(isLoadingAtom) }),
   async (get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
-    const pools = get(poolsAtom);
+    const pools = get(poolsAtom).filter((pool) => pool.isRunning);
     const traderAPI = get(traderAPIAtom);
     if (!traderAPI) {
       return;
