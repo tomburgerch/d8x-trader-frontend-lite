@@ -36,6 +36,7 @@ enum ValidityCheckWithdrawE {
   NoAddress = 'no-address',
   NoInitiation = 'no-initiation',
   NoFunds = 'no-funds',
+  GoodToGo = 'good-to-go',
 }
 
 export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
@@ -198,6 +199,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     if (!shareAmount || shareAmount === 0) {
       return ValidityCheckWithdrawE.NoInitiation;
     }
+    return ValidityCheckWithdrawE.GoodToGo;
   }, [address, userAmount, shareAmount]);
 
   const validityCheckWithdrawText = useMemo(() => {

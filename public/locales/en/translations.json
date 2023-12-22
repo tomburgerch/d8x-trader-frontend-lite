@@ -307,7 +307,12 @@
           "undefined": "Order undefined: take profit is incompatible with leverage",
           "good-to-go": "Good to go",
           "pass": "Passed",
-          "fail": "Failed"
+          "fail": "Failed",
+          "button-no-address": "Connect wallet",
+          "button-no-funds": "No collateral in wallet",
+          "button-no-amount": "Order size too small",
+          "button-no-limit": "Set limit price",
+          "button-no-trigger": "Set trigger price"
         },
         "order-types": {
           "market": "market",
