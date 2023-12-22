@@ -92,6 +92,17 @@ enum ValidityCheckE {
   GoodToGo = 'good-to-go',
 }
 
+enum ValidityCheckButtonE {
+  Empty = '-',
+  NoAddress = 'not-connected',
+  NoFunds = 'no-funds',
+  AmountBelowMinimum = 'amount-below-min',
+  GoodToGo = 'good-to-go',
+  NoAmount = 'no-amount',
+  NoLimitPrice = 'no-limit-price',
+  NoTriggerPrice = 'no-trigger-price',
+}
+
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
 
@@ -180,6 +191,42 @@ export const ActionBlock = memo(() => {
     }
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
   }, [orderInfo, address, selectedPerpetualStaticInfo?.lotSizeBC]);
+
+  const validityCheckButtonType = useMemo(() => {
+    if (!address || !orderInfo) {
+      return ValidityCheckButtonE.NoAddress;
+    }
+    if (poolTokenBalance === 0) {
+      console.log(poolTokenBalance);
+      return ValidityCheckButtonE.NoFunds;
+    }
+    if (orderInfo.size === 0) {
+      return ValidityCheckButtonE.NoAmount;
+    }
+    if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice <= 0)) {
+      return ValidityCheckButtonE.NoLimitPrice;
+    }
+    if (orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0)) {
+      return ValidityCheckButtonE.NoTriggerPrice;
+    }
+    return ValidityCheckButtonE.GoodToGo;
+  }, [orderInfo, address, poolTokenBalance]);
+
+  const validityCheckButtonText = useMemo(() => {
+    if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
+      return `${t('pages.trade.action-block.validity.button-no-address')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoFunds) {
+      return `${t('pages.trade.action-block.validity.button-no-funds')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoAmount) {
+      return `${t('pages.trade.action-block.validity.button-no-amount')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoLimitPrice) {
+      return `${t('pages.trade.action-block.validity.button-no-limit')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoTriggerPrice) {
+      return `${t('pages.trade.action-block.validity.button-no-trigger')}`;
+    }
+    return `${t(orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long])} ${` `} 
+            ${t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}`;
+  }, [t, validityCheckButtonType, orderInfo?.orderBlock, orderInfo?.orderType]);
 
   const parsedOrders = useMemo(() => {
     if (requestSentRef.current || requestSent) {
@@ -482,8 +529,7 @@ export const ActionBlock = memo(() => {
         onClick={openReviewOrderModal}
         className={styles.buyButton}
       >
-        {t(orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long])}{' '}
-        {t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}
+        {validityCheckButtonText}
       </Button>
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>

@@ -307,7 +307,12 @@
           "undefined": "Order undefined: take profit is incompatible with leverage",
           "good-to-go": "Good to go",
           "pass": "Passed",
-          "fail": "Failed"
+          "fail": "Failed",
+          "button-no-address": "Connect wallet",
+          "button-no-funds": "No collateral in wallet",
+          "button-no-amount": "Order size too small",
+          "button-no-limit": "Set limit price",
+          "button-no-trigger": "Set trigger price"
         },
         "order-types": {
           "market": "market",
@@ -469,7 +474,11 @@
         },
         "receive": "You receive d{{poolSymbol}}",
         "max": "Max:",
-        "button": "Add"
+        "button": "Add",
+        "validity-empty": "Connect wallet",
+        "validity-amount-too-big": "Insufficient funds" ,
+        "validity-amount-below-min": "Amount below min",
+        "validity-no-amount": "Enter amount"
       },
       "withdraw": {
         "title": "Withdraw Liquidity",
@@ -479,14 +488,23 @@
           "title": "1. Initiate withdrawal of {{poolSymbol}}",
           "info1": "Specify the amount of d{{poolSymbol}} you want to exchange for {{poolSymbol}}.",
           "info2": "After 48 hours, this amount can be converted to {{poolSymbol}} and can be withdrawn from the pool.",
-          "button": "Initiate withdrawal"
+          "button": "Initiate withdrawal",
+          "validity-no-address": "Connect wallet",
+          "validity-empty": "-",
+          "validity-no-funds": "No funds to withdraw",
+          "validity-amount-too-big": "Amount too large" ,
+          "validity-amount-below-min": "Amount below min",
+          "validity-no-amount": "Enter amount"
         },
         "action": {
           "title": "Withdraw {{poolSymbol}}",
           "info1": "This amount can be converted to {{poolSymbol}}, which can be withdrawn from the pool.",
           "date": "Can be withdrawn on:",
           "receive": "You receive:",
-          "button": "Withdraw"
+          "button": "Withdraw",
+          "validity-no-address": "Connect wallet",
+          "validity-no-funds": "No funds to withdraw",
+          "validity-no-initiation": "Initiate withdrawal and wait 48h"
         }
       },
       "na": "N/A",
