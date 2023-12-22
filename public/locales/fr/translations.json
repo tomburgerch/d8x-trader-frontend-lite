@@ -307,7 +307,12 @@
             "undefined": "Ordre indéfini: la prise de profit est incompatible avec l'effet de levier",
             "good-to-go": "Prêt à l'emploi",
             "pass": "Passé",
-            "fail": "Échoué"
+            "fail": "Échoué",
+            "button-no-address": "Connectez le portefeuille",
+            "button-no-funds": "Fonds insuffisants",
+            "button-no-amount": "Taille trop petite",
+            "button-no-limit": "Fixer prix limite",
+            "button-no-trigger": "Fixer prix déclencheur"
           },
           "order-types": {
             "market": "marché",

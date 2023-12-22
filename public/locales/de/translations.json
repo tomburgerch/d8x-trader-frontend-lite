@@ -307,7 +307,12 @@
           "undefined": "Order nicht definiert: Take Profit Einstellungen sind inkompatibel mit der Hebeleinstellung",
           "good-to-go": "Alles bereit",
           "pass": "Bestanden",
-          "fail": "Nicht bestanden"
+          "fail": "Nicht bestanden",
+          "button-no-address": "Brieftasche verbinden",
+          "button-no-funds": "Keine Margenwährung in Brieftasche",
+          "button-no-amount": "Order Grösse zu klein",
+          "button-no-limit": "Limit Preis setzen",
+          "button-no-trigger": "Trigger Preis setzen"
         },
         "order-types": {
           "market": "Market",

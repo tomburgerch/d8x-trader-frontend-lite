@@ -307,7 +307,12 @@
           "undefined": "El valor de tomar ganancias es incompatible con el apalancamiento",
           "good-to-go": "Todo Listo",
           "pass": "Pasó",
-          "fail": "No Pasó"
+          "fail": "No Pasó",
+          "button-no-address": "Conectar cartera",
+          "button-no-funds": "Cartera sin saldo",
+          "button-no-amount": "Orden menor que el mínimo",
+          "button-no-limit": "Ingrese precio limite",
+          "button-no-trigger": "Ingrese precio de parada"
         },
         "order-types": {
           "market": "mercado",

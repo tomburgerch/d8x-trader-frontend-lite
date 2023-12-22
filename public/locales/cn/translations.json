@@ -307,7 +307,12 @@
           "undefined": "止盈与杠杆不兼容，订单未执行",
           "good-to-go": "准备就绪",
           "pass": "通过",
-          "fail": "失败"
+          "fail": "失败",
+          "button-no-address": "Connect wallet",
+          "button-no-funds": "No collateral in wallet",
+          "button-no-amount": "Order size too small",
+          "button-no-limit": "Set limit price",
+          "button-no-trigger": "Set trigger price"
         },
         "order-types": {
           "market": "市价单",
