@@ -129,6 +129,7 @@
               "order-size": "Taille de l'Ordre",
               "limit-price": "Prix Limite",
               "stop-price": "Prix Stop",
+              "reduce-only": "Réd. Uniquement",
               "leverage": "Effet de Levier",
               "good-until": "Valable jusqu'à"
             },
@@ -141,7 +142,9 @@
               "cancel": "Annuler",
               "limit": "Limite",
               "market": "Marché",
-              "stop": "Stop"
+              "stop": "Stop",
+              "yes": "Oui",
+              "no": "Non"
             },
             "cancel-modal": {
               "title": "Annuler l'Ordre Ouvert",
