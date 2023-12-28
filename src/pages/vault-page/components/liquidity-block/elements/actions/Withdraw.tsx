@@ -1,8 +1,8 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useWaitForTransaction, useWalletClient, useNetwork } from 'wagmi';
+import { type Address, useAccount, useWaitForTransaction, useWalletClient, useNetwork, useContractRead } from 'wagmi';
 
 import { Box, Button, Typography } from '@mui/material';
 
@@ -17,6 +17,7 @@ import {
   triggerUserStatsUpdateAtom,
   triggerWithdrawalsUpdateAtom,
   userAmountAtom,
+  withdrawalOnChainAtom,
   withdrawalsAtom,
 } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -25,9 +26,17 @@ import { Initiate } from './Initiate';
 
 import styles from './Action.module.scss';
 import { getTxnLink } from 'helpers/getTxnLink';
+import { PROXY_ABI } from '@d8x/perpetuals-sdk';
 
 interface WithdrawPropsI {
   withdrawOn: string;
+}
+
+enum ValidityCheckWithdrawE {
+  NoAddress = 'no-address',
+  NoInitiation = 'no-initiation',
+  NoFunds = 'no-funds',
+  GoodToGo = 'good-to-go',
 }
 
 export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
@@ -39,14 +48,34 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const [withdrawals] = useAtom(withdrawalsAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
+  const [hasOpenRequestOnChain, setWithrawalOnChain] = useAtom(withdrawalOnChainAtom);
 
   const { chain } = useNetwork();
   const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
 
   const [requestSent, setRequestSent] = useState(false);
   const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
   const requestSentRef = useRef(false);
+
+  const { data: openRequests, refetch: refetchOnChainStatus } = useContractRead({
+    address: liqProvTool?.getProxyAddress() as Address,
+    abi: PROXY_ABI,
+    enabled: !!liqProvTool && !!selectedPool,
+    functionName: 'getWithdrawRequests',
+    args: [selectedPool?.poolId, 0, 256],
+  });
+
+  useEffect(() => {
+    if (!openRequests || !walletClient) {
+      return undefined;
+    }
+    const res = (openRequests as unknown[]).some(
+      (req) => (req as { lp: string }).lp.toLowerCase() === walletClient.account.address.toLowerCase()
+    );
+    setWithrawalOnChain(res);
+  }, [openRequests, walletClient, setWithrawalOnChain]);
 
   useWaitForTransaction({
     hash: txHash,
@@ -83,6 +112,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     onSettled() {
       setTxHash(undefined);
       setTriggerUserStatsUpdate((prevValue) => !prevValue);
+      refetchOnChainStatus();
     },
     enabled: !!txHash,
   });
@@ -159,6 +189,30 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
 
   const isButtonDisabled = !userAmount || !shareAmount || requestSent;
 
+  const validityCheckWithdrawType = useMemo(() => {
+    if (!address) {
+      return ValidityCheckWithdrawE.NoAddress;
+    }
+    if (!userAmount || userAmount === 0) {
+      return ValidityCheckWithdrawE.NoFunds;
+    }
+    if (!shareAmount || shareAmount === 0) {
+      return ValidityCheckWithdrawE.NoInitiation;
+    }
+    return ValidityCheckWithdrawE.GoodToGo;
+  }, [address, userAmount, shareAmount]);
+
+  const validityCheckWithdrawText = useMemo(() => {
+    if (validityCheckWithdrawType === ValidityCheckWithdrawE.NoAddress) {
+      return `${t('pages.vault.withdraw.action.validity-no-address')}`;
+    } else if (validityCheckWithdrawType === ValidityCheckWithdrawE.NoFunds) {
+      return `${t('pages.vault.withdraw.action.validity-no-funds')}`;
+    } else if (validityCheckWithdrawType === ValidityCheckWithdrawE.NoInitiation) {
+      return `${t('pages.vault.withdraw.action.validity-no-initiation')}`;
+    }
+    return t('pages.vault.withdraw.action.button');
+  }, [t, validityCheckWithdrawType]);
+
   return (
     <div className={styles.root}>
       <Box className={styles.infoBlock}>
@@ -173,7 +227,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
-        {!withdrawals.length && (
+        {!withdrawals.length && !hasOpenRequestOnChain && (
           <>
             <Initiate />
             <Separator className={styles.separator} />
@@ -215,7 +269,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             className={styles.actionButton}
             disabled={isButtonDisabled}
           >
-            {t('pages.vault.withdraw.action.button')}
+            {validityCheckWithdrawText}
           </Button>
         </Box>
       </Box>

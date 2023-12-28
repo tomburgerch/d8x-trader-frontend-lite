@@ -42,7 +42,8 @@
             "connect": "Veuillez connecter votre portefeuille",
             "no-open": "Aucune position ouverte",
             "multiple": "multiple",
-            "partial": "partiel"
+            "partial": "partiel",
+            "exceeded": "surpassant"
           },
           "position-block-mobile": {
             "symbol": "Symbole",
@@ -66,7 +67,8 @@
               "size": "Taille de la position:",
               "margin": "Marge:",
               "leverage": "Effet de levier:",
-              "liq-price": "Prix de liquidation:"
+              "liq-price": "Prix de liquidation:",
+              "close-tp-sl": "Fermer les TP/SL associés?"
             },
             "cancel": "Annuler",
             "confirm": "Confirmer",
@@ -127,6 +129,7 @@
               "order-size": "Taille de l'Ordre",
               "limit-price": "Prix Limite",
               "stop-price": "Prix Stop",
+              "reduce-only": "Réd. Uniquement",
               "leverage": "Effet de Levier",
               "good-until": "Valable jusqu'à"
             },
@@ -139,7 +142,9 @@
               "cancel": "Annuler",
               "limit": "Limite",
               "market": "Marché",
-              "stop": "Stop"
+              "stop": "Stop",
+              "yes": "Oui",
+              "no": "Non"
             },
             "cancel-modal": {
               "title": "Annuler l'Ordre Ouvert",
@@ -299,13 +304,19 @@
             "closed": "Les ordres ne seront pas exécutés avant l'ouverture du marché",
             "order-too-large": "L'ordre échouera: la taille de l'ordre est trop grande",
             "order-too-small": "L'ordre échouera: la taille de l'ordre est trop petite",
-            "position-too-small": "L'ordre échouera: la position résultante est trop petite",
+            "position-too-small": "L'ordre échouera: la position résultante est trop petite (min.: {{minAmount}})",
             "below-min-position": "Attention: taille de l'ordre en dessous de la taille de position minimale",
             "insufficient-balance": "L'ordre échouera: solde de portefeuille insuffisant",
             "undefined": "Ordre indéfini: la prise de profit est incompatible avec l'effet de levier",
+            "verify-tp-sl-orders": "Vérifiez vos TP/SL existantes - vous modifiez une position qui contient déjà des TP/SL",
             "good-to-go": "Prêt à l'emploi",
             "pass": "Passé",
-            "fail": "Échoué"
+            "fail": "Échoué",
+            "button-no-address": "Connectez le portefeuille",
+            "button-no-funds": "Fonds insuffisants",
+            "button-no-amount": "Taille trop petite",
+            "button-no-limit": "Fixer prix limite",
+            "button-no-trigger": "Fixer prix déclencheur"
           },
           "order-types": {
             "market": "marché",
@@ -467,7 +478,11 @@
           },
           "receive": "Vous recevez d{{poolSymbol}}",
           "max": "Max:",
-          "button": "Ajouter"
+          "button": "Ajouter",
+          "validity-empty": "Connectez le portefeuille",
+          "validity-amount-too-big": "Fonds insuffisants" ,
+          "validity-amount-below-min": "Montant inférieur au minimum",
+          "validity-no-amount": "Entrer un montant"
         },
         "withdraw": {
           "title": "Retirer la Liquidité",
@@ -477,14 +492,23 @@
             "title": "1. Initier le retrait de {{poolSymbol}}",
             "info1": "Indiquez le montant de d{{poolSymbol}} que vous souhaitez échanger contre {{poolSymbol}}.",
             "info2": "Après 48 heures, ce montant peut être converti en {{poolSymbol}} et peut être retiré du pool.",
-            "button": "Initier le retrait"
+            "button": "Initier le retrait",
+            "validity-no-address": "Connectez le portefeuille",
+            "validity-empty": "-",
+            "validity-no-funds": "Pas de fonds à retirer",
+            "validity-amount-too-big": "Montant trop large",
+            "validity-amount-below-min": "Montant inférieur au minimum",
+            "validity-no-amount": "Entrer un montant"
           },
           "action": {
             "title": "Retirer {{poolSymbol}}",
             "info1": "Ce montant peut être converti en {{poolSymbol}}, qui peut être retiré du pool.",
             "date": "Peut être retiré le:",
             "receive": "Vous recevez:",
-            "button": "Retirer"
+            "button": "Retirer",
+            "validity-no-address": "Connectez le portefeuille",
+            "validity-no-funds": "Pas de fonds à retirer",
+            "validity-no-initiation": "Initiez le retrait et attendez 48h"
           }
         },
         "na": "N/A", 

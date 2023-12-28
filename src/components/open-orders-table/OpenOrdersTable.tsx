@@ -267,6 +267,12 @@ export const OpenOrdersTable = memo(() => {
         fieldType: FieldTypeE.Number,
       },
       {
+        field: 'reduceOnly',
+        label: t('pages.trade.orders-table.table-header.reduce-only'),
+        align: AlignE.Left,
+        fieldType: FieldTypeE.Boolean,
+      },
+      {
         field: 'leverage',
         label: t('pages.trade.orders-table.table-header.leverage'),
         align: AlignE.Right,
@@ -350,13 +356,13 @@ export const OpenOrdersTable = memo(() => {
           )}
         </Box>
       )}
-      {address && openOrders.length > 5 && (
+      {address && filteredRows.length > 5 && (
         <Box className={styles.paginationHolder}>
           <TablePagination
             align="center"
             rowsPerPageOptions={[5, 10, 20]}
             component="div"
-            count={openOrders.length}
+            count={filteredRows.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={(_event, newPage) => setPage(newPage)}

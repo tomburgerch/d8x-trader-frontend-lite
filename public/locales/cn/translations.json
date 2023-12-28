@@ -42,7 +42,8 @@
           "connect": "请连接钱包",
           "no-open": "无持仓",
           "multiple": "多个",
-          "partial": "部分"
+          "partial": "部分",
+          "exceeded": "超过"
         },
         "position-block-mobile": {
           "symbol": "币对",
@@ -66,7 +67,8 @@
             "size": "仓位大小",
             "margin": "本金",
             "leverage": "杠杆",
-            "liq-price": "强平价"
+            "liq-price": "强平价",
+            "close-tp-sl": "关闭相关止盈/止损订单吗？"
           },
           "cancel": "取消",
           "confirm": "确认",
@@ -127,6 +129,7 @@
           "order-size": "仓位大小",
           "limit-price": "限价",
           "stop-price": "止盈止损价",
+          "reduce-only": "仅减少",
           "leverage": "杠杆",
           "good-until": "截至"
         },
@@ -139,7 +142,9 @@
           "cancel": "取消",
           "limit": "限价",
           "market": "市价",
-          "stop": "止盈止损"
+          "stop": "止盈止损",
+          "yes": "是的",
+          "no": "不"
         },
         "cancel-modal": {
           "title": "取消订单",
@@ -299,13 +304,19 @@
           "closed": "订单将在市场开盘时执行",
           "order-too-large": "订单过大，导致订单失败",
           "order-too-small": "订单过小，导致订单失败",
-          "position-too-small": "仓位过小，导致订单失败",
+          "position-too-small": "仓位过小，导致订单失败 (min.: {{minAmount}})",
           "below-min-position": "警告：订单小于仓位",
           "insufficient-balance": "钱包余额不足，导致订单失败",
           "undefined": "止盈与杠杆不兼容，订单未执行",
+          "verify-tp-sl-orders": "验证您现有的止盈/止损订单 - 您正在修改已有止盈/止损订单的仓位",
           "good-to-go": "准备就绪",
           "pass": "通过",
-          "fail": "失败"
+          "fail": "失败",
+          "button-no-address": "连接钱包",
+          "button-no-funds": "钱包内无抵押品",
+          "button-no-amount": "订单规模太小",
+          "button-no-limit": "设置限价",
+          "button-no-trigger": "设置触发价格"
         },
         "order-types": {
           "market": "市价单",
@@ -384,6 +395,7 @@
         "enter-code": "输入专属码",
         "code-taken": "专属码已被使用",
         "create-code": "创建专属码",
+        "add-partner": "增加",
         "instructions": "仅允许使用大写字符、数字、下划线(_) 和连字符 (-) 。",
         "cancel": "取消",
         "enter-addr": "输入地址",
@@ -466,7 +478,11 @@
         },
         "receive": "您会收到d{{poolSymbol}}",
         "max": "最大：",
-        "button": "添加"
+        "button": "添加",
+        "validity-empty": "连接钱包",
+        "validity-amount-too-big": "资金不足" ,
+        "validity-amount-below-min": "金额低于最小值",
+        "validity-no-amount": "输入金额"
       },
       "withdraw": {
         "title": "提取流动性",
@@ -476,14 +492,23 @@
           "title": "1. 发起{{poolSymbol}}的提现",
           "info1": "设置您想要兑换{{poolSymbol}}的d{{poolSymbol}}数量。",
           "info2": "48小时后，该金额可以转换为MATIC并从流动性池中提取。 ",
-          "button": "发起提现"
+          "button": "发起提现",
+          "validity-no-address": "连接钱包",
+          "validity-empty": "-",
+          "validity-no-funds": "无资金可提取",
+          "validity-amount-too-big": "金额太大" ,
+          "validity-amount-below-min": "金额低于最小",
+          "validity-no-amount": "输入金额"
         },
         "action": {
           "title": "提现{{poolSymbol}}",
           "info1": "该金额可转换为{{poolSymbol}}，可以从流动性池中提取。",
           "date": "可以提现：",
           "receive": "您将收到：",
-          "button": "提现"
+          "button": "提现",
+          "validity-no-address": "连接钱包",
+          "validity-no-funds": "没有资金可提取",
+          "validity-no-initiation": "启动提款并等待48小时"
         }
       },
       "na": "无",
