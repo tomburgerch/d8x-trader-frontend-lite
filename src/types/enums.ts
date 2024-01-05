@@ -16,6 +16,7 @@ export enum OrderValueTypeE {
   Multiple = 'multiple',
   Partial = 'partial',
   Full = 'full',
+  Exceeded = 'exceeded',
   None = 'none',
 }
 
@@ -132,4 +133,5 @@ export enum FieldTypeE {
   String,
   Number,
   Date,
+  Boolean,
 }

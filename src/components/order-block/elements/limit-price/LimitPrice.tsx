@@ -9,9 +9,9 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { limitPriceAtom, orderTypeAtom } from 'store/order-block.store';
 import { perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
-import { OrderTypeE } from 'types/enums';
 
 import styles from './LimitPrice.module.scss';
+import { OrderTypeE } from 'types/enums';
 
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();
@@ -37,7 +37,7 @@ export const LimitPrice = memo(() => {
         setInputValue(targetValue);
       } else {
         if (orderType === OrderTypeE.Limit) {
-          const initialLimit = perpetualStatistics?.midPrice === undefined ? -1 : perpetualStatistics?.midPrice;
+          const initialLimit = perpetualStatistics?.midPrice === undefined ? -1 : perpetualStatistics.midPrice;
           setLimitPrice(`${initialLimit}`);
           setInputValue('');
         } else if (orderType === OrderTypeE.Stop) {

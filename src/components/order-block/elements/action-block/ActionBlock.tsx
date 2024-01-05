@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletClient, useNetwork } from 'wagmi';
+import { type Address, useAccount, useChainId, useNetwork, useWaitForTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -13,6 +13,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
@@ -35,8 +36,11 @@ import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
+import { useMinPositionString } from '../../hooks/useMinPositionString';
+import { currencyMultiplierAtom, selectedCurrencyAtom } from '../order-size/store';
+import { hasTpSlOrdersAtom } from './store';
+
 import styles from './ActionBlock.module.scss';
-import { getTxnLink } from 'helpers/getTxnLink';
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -92,6 +96,17 @@ enum ValidityCheckE {
   GoodToGo = 'good-to-go',
 }
 
+enum ValidityCheckButtonE {
+  Empty = '-',
+  NoAddress = 'not-connected',
+  NoFunds = 'no-funds',
+  AmountBelowMinimum = 'amount-below-min',
+  GoodToGo = 'good-to-go',
+  NoAmount = 'no-amount',
+  NoLimitPrice = 'no-limit-price',
+  NoTriggerPrice = 'no-trigger-price',
+}
+
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
 
@@ -108,8 +123,10 @@ export const ActionBlock = memo(() => {
 
   const [orderInfo] = useAtom(orderInfoAtom);
   const [proxyAddr] = useAtom(proxyAddrAtom);
+  const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const [selectedCurrency] = useAtom(selectedCurrencyAtom);
   const [selectedPerpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [positions] = useAtom(positionsAtom);
@@ -118,7 +135,9 @@ export const ActionBlock = memo(() => {
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
   const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
   const [tradingClient] = useAtom(tradingClientAtom);
+  const [hasTpSlOrders] = useAtom(hasTpSlOrdersAtom);
   const [poolFee] = useAtom(poolFeeAtom);
+  const [currencyMultiplier] = useAtom(currencyMultiplierAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
 
@@ -130,6 +149,8 @@ export const ActionBlock = memo(() => {
 
   const requestSentRef = useRef(false);
   const validityCheckRef = useRef(false);
+
+  const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI || !poolFee) {
@@ -181,6 +202,41 @@ export const ActionBlock = memo(() => {
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
   }, [orderInfo, address, selectedPerpetualStaticInfo?.lotSizeBC]);
 
+  const validityCheckButtonType = useMemo(() => {
+    if (!address || !orderInfo) {
+      return ValidityCheckButtonE.NoAddress;
+    }
+    if (poolTokenBalance === 0) {
+      return ValidityCheckButtonE.NoFunds;
+    }
+    if (orderInfo.size === 0) {
+      return ValidityCheckButtonE.NoAmount;
+    }
+    if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice <= 0)) {
+      return ValidityCheckButtonE.NoLimitPrice;
+    }
+    if (orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0)) {
+      return ValidityCheckButtonE.NoTriggerPrice;
+    }
+    return ValidityCheckButtonE.GoodToGo;
+  }, [orderInfo, address, poolTokenBalance]);
+
+  const validityCheckButtonText = useMemo(() => {
+    if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
+      return `${t('pages.trade.action-block.validity.button-no-address')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoFunds) {
+      return `${t('pages.trade.action-block.validity.button-no-funds')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoAmount) {
+      return `${t('pages.trade.action-block.validity.button-no-amount')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoLimitPrice) {
+      return `${t('pages.trade.action-block.validity.button-no-limit')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoTriggerPrice) {
+      return `${t('pages.trade.action-block.validity.button-no-trigger')}`;
+    }
+    return `${t(orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long])} ${` `} 
+            ${t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}`;
+  }, [t, validityCheckButtonType, orderInfo?.orderBlock, orderInfo?.orderType]);
+
   const parsedOrders = useMemo(() => {
     if (requestSentRef.current || requestSent) {
       return;
@@ -210,7 +266,7 @@ export const ActionBlock = memo(() => {
         symbol: orderInfo.symbol,
         quantity: orderInfo.size,
         leverage: orderInfo.leverage,
-        reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+        reduceOnly: true,
         keepPositionLvg: orderInfo.keepPositionLeverage,
         executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
       });
@@ -228,7 +284,7 @@ export const ActionBlock = memo(() => {
         symbol: orderInfo.symbol,
         quantity: orderInfo.size,
         leverage: orderInfo.leverage,
-        reduceOnly: orderInfo.reduceOnly !== null ? orderInfo.reduceOnly : undefined,
+        reduceOnly: true,
         keepPositionLvg: orderInfo.keepPositionLeverage,
         executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
       });
@@ -412,7 +468,6 @@ export const ActionBlock = memo(() => {
     }
     if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
       return ValidityCheckE.InsufficientBalance;
-      // return `${t('pages.trade.action-block.validity.insufficient-balance')} {' '} ${poolTokenBalance}`;
     }
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
       return ValidityCheckE.Undefined;
@@ -440,14 +495,15 @@ export const ActionBlock = memo(() => {
       return '-';
     } else if (validityCheckType === ValidityCheckE.InsufficientBalance) {
       return `${t('pages.trade.action-block.validity.insufficient-balance')} ${poolTokenBalance}`;
+    } else if (validityCheckType === ValidityCheckE.PositionTooSmall) {
+      return `${t('pages.trade.action-block.validity.position-too-small', {
+        minAmount: `${minPositionString} ${selectedCurrency}`,
+      })}`;
     }
     return t(`pages.trade.action-block.validity.${validityCheckType}`);
-  }, [t, validityCheckType, poolTokenBalance]);
+  }, [t, validityCheckType, poolTokenBalance, minPositionString, selectedCurrency]);
 
-  const isOrderValid =
-    validityCheckType === ValidityCheckE.GoodToGo ||
-    validityCheckType === ValidityCheckE.Closed ||
-    validityCheckType === ValidityCheckE.BelowMinPosition;
+  const isOrderValid = validityCheckType === ValidityCheckE.GoodToGo || validityCheckType === ValidityCheckE.Closed;
 
   const isConfirmButtonDisabled = useMemo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
@@ -485,8 +541,7 @@ export const ActionBlock = memo(() => {
         onClick={openReviewOrderModal}
         className={styles.buyButton}
       >
-        {t(orderBlockMap[orderInfo?.orderBlock ?? OrderBlockE.Long])}{' '}
-        {t(orderTypeMap[orderInfo?.orderType ?? OrderTypeE.Market])}
+        {validityCheckButtonText}
       </Button>
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
@@ -724,6 +779,17 @@ export const ActionBlock = memo(() => {
               ''
             )}
           </DialogContent>
+          {hasTpSlOrders && (
+            <DialogContent>
+              <Typography
+                variant="bodySmallPopup"
+                className={styles.centered}
+                style={{ color: 'var(--d8x-color-warning-secondary)' }}
+              >
+                {t('pages.trade.action-block.validity.verify-tp-sl-orders')}
+              </Typography>
+            </DialogContent>
+          )}
           <DialogActions className={styles.dialogActions}>
             <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
               {t('pages.trade.action-block.review.cancel')}
