@@ -42,7 +42,8 @@
           "connect": "Por favor conecte su cartera",
           "no-open": "No hay posiciones abiertas",
           "multiple": "multiples",
-          "partial": "parcial"
+          "partial": "parcial",
+          "exceeded": "excedida"
         },
         "position-block-mobile": {
           "symbol": "Símbolo",
@@ -66,7 +67,8 @@
             "size": "Tamaño",
             "margin": "Margen:",
             "leverage": "Apalancamiento:",
-            "liq-price": "Precio de Liquidación"
+            "liq-price": "Precio de Liquidación",
+            "close-tp-sl": "¿Cerrar órdenes TP/SL asociadas?"
           },
           "cancel": "Cancelar",
           "confirm": "Confirmar",
@@ -127,6 +129,7 @@
           "order-size": "Tamaño",
           "limit-price": "Precio Límite",
           "stop-price": "Precio de Parada",
+          "reduce-only": "Sólo Reducir",
           "leverage": "Apalancamiento",
           "good-until": "Vencimiento"
         },
@@ -139,7 +142,9 @@
           "cancel": "Cancelar",
           "limit": "Límite",
           "market": "Mercado",
-          "stop": "Parada"
+          "stop": "Parada",
+          "yes": "Sí",
+          "no": "No"
         },
         "cancel-modal": {
           "title": "Cancelar Orden",
@@ -299,13 +304,19 @@
           "closed": "Órdenes son ejecutadas sólo cuando el mercado abra",
           "order-too-large": "El tamaño de la orden es muy grande",
           "order-too-small": "El tamaño de la orden es muy pequeno",
-          "position-too-small": "El tamaño de la posicion es muy pequeno",
+          "position-too-small": "El tamaño de la posicion es muy pequeno (min.: {{minAmount}})",
           "below-min-position": "Cuidado: El tamaño de la orden esta debajo del tamaño minimo para una posición",
           "insufficient-balance": "Insuficiente saldo en tu cartera",
           "undefined": "El valor de tomar ganancias es incompatible con el apalancamiento",
+          "verify-tp-sl-orders": "Verifique sus TP/SL existentes: está modificando una posición que tiene TP/SL",
           "good-to-go": "Todo Listo",
           "pass": "Pasó",
-          "fail": "No Pasó"
+          "fail": "No Pasó",
+          "button-no-address": "Conectar cartera",
+          "button-no-funds": "Cartera sin saldo",
+          "button-no-amount": "Orden menor que el mínimo",
+          "button-no-limit": "Ingrese precio limite",
+          "button-no-trigger": "Ingrese precio de parada"
         },
         "order-types": {
           "market": "mercado",
@@ -384,6 +395,7 @@
         "enter-code": "Ingresar un código",
         "code-taken": "Código ya esta en uso",
         "create-code": "Crear Código",
+        "add-partner": "Agregar",
         "instructions": "Sólo letras MAYUSCULAS, números, guiones bajos (_) y guiones (-) están permitidos.",
         "cancel": "Cancelar",
         "enter-addr": "Ingresa tu dirección",
@@ -466,7 +478,11 @@
         },
         "receive": "d{{poolSymbol}} que recibes",
         "max": "Max:",
-        "button": "Anadir"
+        "button": "Anadir",
+        "validity-empty": "Conectar cartera",
+        "validity-amount-too-big": "Fondos insuficientes" ,
+        "validity-amount-below-min": "Cantidad por debajo del mínimo",
+        "validity-no-amount": "Ingresar cantidad"
       },
       "withdraw": {
         "title": "Remover Liquidez",
@@ -476,14 +492,23 @@
           "title": "1. Iniciar retiro de {{poolSymbol}}",
           "info1": "Ingresa el monto de d{{poolSymbol}} que quieres intercambiar por {{poolSymbol}}.",
           "info2": "Despues de 48 horas, este monto puede ser convertido a {{poolSymbol}} y removido de las reservas.",
-          "button": "Iniciar Retiro"
+          "button": "Iniciar Retiro",
+          "validity-no-address": "Conectar cartera",
+          "validity-empty": "-",
+          "validity-no-funds": "No hay fondos para retirar",
+          "validity-amount-too-big": "Cantidad demasiado grande" ,
+          "validity-amount-below-min": "Cantidad por debajo del mínimo",
+          "validity-no-amount": "Ingresar cantidad"
         },
         "action": {
           "title": "Retirar {{poolSymbol}}",
           "info1": "Este monto puede convertirse a {{poolSymbol}} y removido de las reservas.",
           "date": "Puede retirarse en:",
           "receive": "Recibes:",
-          "button": "Retirar"
+          "button": "Retirar",
+          "validity-no-address": "Conectar cartera",
+          "validity-no-funds": "No hay fondos para retirar",
+          "validity-no-initiation": "Iniciar retiro y esperar 48h"
         }
       },
       "na": "N/A",

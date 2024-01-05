@@ -66,7 +66,8 @@
             "size": "포지션 크기:",
             "margin": "마진:",
             "leverage": "레버리지:",
-            "liq-price": "청산 가격:"
+            "liq-price": "청산 가격:",
+            "close-tp-sl": "Close related TP/SL orders?"
           },
           "cancel": "Cancel",
           "confirm": "Confirm",
@@ -127,6 +128,7 @@
           "order-size": "금액",
           "limit-price": "지정가",
           "stop-price": "Stop Price",
+          "reduce-only": "Reduce only",
           "leverage": "레버리지",
           "good-until": "Good Until"
         },
@@ -299,13 +301,19 @@
           "closed": "Orders won't be executed until market opens",
           "order-too-large": "Order will fail: order size is too large",
           "order-too-small": "Order will fail: order size is too small",
-          "position-too-small": "Order will fail: resulting position too small",
+          "position-too-small": "Order will fail: resulting position too small (min.: {{minAmount}})",
           "below-min-position": "Warning: order size below minimal position size",
           "insufficient-balance": "Order will fail: insufficient wallet balance",
           "undefined": "Order undefined: take profit is incompatible with leverage",
+          "verify-tp-sl-orders": "Verify your existing TP/SL orders - you are modifying an existing position that has TP/SL orders",
           "good-to-go": "Good to go",
           "pass": "Passed",
-          "fail": "Failed"
+          "fail": "Failed",
+          "button-no-address": "Connect wallet",
+          "button-no-funds": "No collateral in wallet",
+          "button-no-amount": "Order size too small",
+          "button-no-limit": "Set limit price",
+          "button-no-trigger": "Set trigger price"
         },
         "order-types": {
           "market": "시장",

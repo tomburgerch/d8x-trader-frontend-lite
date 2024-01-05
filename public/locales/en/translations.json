@@ -42,7 +42,8 @@
           "connect": "Please connect your wallet",
           "no-open": "No open positions",
           "multiple": "multiple",
-          "partial": "partial"
+          "partial": "partial",
+          "exceeded": "exceeding"
         },
         "position-block-mobile": {
           "symbol": "Symbol",
@@ -66,7 +67,8 @@
             "size": "Position size:",
             "margin": "Margin:",
             "leverage": "Leverage:",
-            "liq-price": "Liquidation price:"
+            "liq-price": "Liquidation price:",
+            "close-tp-sl": "Close related TP/SL orders?"
           },
           "cancel": "Cancel",
           "confirm": "Confirm",
@@ -127,6 +129,7 @@
           "order-size": "Order Size",
           "limit-price": "Limit Price",
           "stop-price": "Stop Price",
+          "reduce-only": "Reduce Only",
           "leverage": "Leverage",
           "good-until": "Good Until"
         },
@@ -139,7 +142,9 @@
           "cancel": "Cancel",
           "limit": "Limit",
           "market": "Market",
-          "stop": "Stop"
+          "stop": "Stop",
+          "yes": "Yes",
+          "no": "No"
         },
         "cancel-modal": {
           "title": "Cancel Open Order",
@@ -299,13 +304,19 @@
           "closed": "Orders won't be executed until market opens",
           "order-too-large": "Order will fail: order size is too large",
           "order-too-small": "Order will fail: order size is too small",
-          "position-too-small": "Order will fail: resulting position too small",
+          "position-too-small": "Order will fail: resulting position too small (min.: {{minAmount}})",
           "below-min-position": "Warning: order size below minimal position size",
           "insufficient-balance": "Order will fail: insufficient wallet balance",
           "undefined": "Order undefined: take profit is incompatible with leverage",
+          "verify-tp-sl-orders": "Verify your existing TP/SL orders - you modify a position that has TP/SL orders",
           "good-to-go": "Good to go",
           "pass": "Passed",
-          "fail": "Failed"
+          "fail": "Failed",
+          "button-no-address": "Connect wallet",
+          "button-no-funds": "No collateral in wallet",
+          "button-no-amount": "Order size too small",
+          "button-no-limit": "Set limit price",
+          "button-no-trigger": "Set trigger price"
         },
         "order-types": {
           "market": "market",
@@ -467,7 +478,11 @@
         },
         "receive": "You receive d{{poolSymbol}}",
         "max": "Max:",
-        "button": "Add"
+        "button": "Add",
+        "validity-empty": "Connect wallet",
+        "validity-amount-too-big": "Insufficient funds" ,
+        "validity-amount-below-min": "Amount below min",
+        "validity-no-amount": "Enter amount"
       },
       "withdraw": {
         "title": "Withdraw Liquidity",
@@ -477,14 +492,23 @@
           "title": "1. Initiate withdrawal of {{poolSymbol}}",
           "info1": "Specify the amount of d{{poolSymbol}} you want to exchange for {{poolSymbol}}.",
           "info2": "After 48 hours, this amount can be converted to {{poolSymbol}} and can be withdrawn from the pool.",
-          "button": "Initiate withdrawal"
+          "button": "Initiate withdrawal",
+          "validity-no-address": "Connect wallet",
+          "validity-empty": "-",
+          "validity-no-funds": "No funds to withdraw",
+          "validity-amount-too-big": "Amount too large" ,
+          "validity-amount-below-min": "Amount below min",
+          "validity-no-amount": "Enter amount"
         },
         "action": {
           "title": "Withdraw {{poolSymbol}}",
           "info1": "This amount can be converted to {{poolSymbol}}, which can be withdrawn from the pool.",
           "date": "Can be withdrawn on:",
           "receive": "You receive:",
-          "button": "Withdraw"
+          "button": "Withdraw",
+          "validity-no-address": "Connect wallet",
+          "validity-no-funds": "No funds to withdraw",
+          "validity-no-initiation": "Initiate withdrawal and wait 48h"
         }
       },
       "na": "N/A",
