@@ -1,15 +1,18 @@
 import { useAtom } from 'jotai';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useChainId, useFeeData } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
+import { getSymbolPrice } from 'network/network';
 import { orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
-import { poolTokenBalanceAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import { gasTokenSymbolAtom, poolTokenBalanceAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { orderSizeAtom } from '../order-size/store';
 import { leverageAtom } from '../leverage-selector/store';
+
 import styles from './InfoBlock.module.scss';
 
 export const InfoBlock = memo(() => {
@@ -19,9 +22,15 @@ export const InfoBlock = memo(() => {
   const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [poolTokenBalance] = useAtom(poolTokenBalanceAtom);
+  const [gasTokenSymbol] = useAtom(gasTokenSymbolAtom);
   const [leverage] = useAtom(leverageAtom);
   const [slippage] = useAtom(slippageSliderAtom);
   const [orderType] = useAtom(orderTypeAtom);
+
+  const { data: gasPriceETH } = useFeeData({ formatUnits: 'ether' });
+
+  const [gasPriceUSD, setGasPriceUSD] = useState(0);
+  const chainId = useChainId();
 
   const feeInCC = useMemo(() => {
     if (!orderInfo?.tradingFee || !selectedPerpetual?.collToQuoteIndexPrice || !selectedPerpetual?.indexPrice) {
@@ -40,6 +49,20 @@ export const InfoBlock = memo(() => {
     }
   }, [orderInfo]);
 
+  const gasFee = useMemo(() => {
+    if (orderInfo && gasPriceUSD) {
+      return (
+        gasPriceUSD * (600_000 + (orderInfo.stopLossPrice ? 400_000 : 0) + (orderInfo.takeProfitPrice ? 400_000 : 0))
+      );
+    }
+  }, [gasPriceUSD, orderInfo]);
+
+  const gasRebate = useMemo(() => {
+    if (gasFee) {
+      return gasFee * 0.77734375;
+    }
+  }, [gasFee]);
+
   const approxDepositFromWallet = useMemo(() => {
     if (!orderInfo?.tradingFee || !selectedPerpetual?.collToQuoteIndexPrice || !selectedPerpetual?.indexPrice) {
       return undefined;
@@ -48,6 +71,14 @@ export const InfoBlock = memo(() => {
     const buffer = (1.001 + leverage * (0.009 + orderInfo?.tradingFee / 10000 + slippagePct)) * 1.01;
     return (orderSize * buffer * selectedPerpetual.indexPrice) / (selectedPerpetual.collToQuoteIndexPrice * leverage);
   }, [leverage, orderInfo, slippage, orderType, orderSize, selectedPerpetual]);
+
+  useEffect(() => {
+    if (gasTokenSymbol && gasPriceETH?.formatted?.gasPrice) {
+      getSymbolPrice(gasTokenSymbol).then((res) => {
+        setGasPriceUSD(+res[0].price.price * 10 ** res[0].price.expo * +(gasPriceETH.formatted.gasPrice || 0));
+      });
+    }
+  }, [gasPriceETH, gasTokenSymbol]);
 
   return (
     <Box className={styles.root}>
@@ -85,6 +116,18 @@ export const InfoBlock = memo(() => {
           {')'}
         </Typography>
       </Box>
+      {chainId !== undefined && chainId === 1101 && (
+        <Box className={styles.row}>
+          <Typography variant="bodySmallPopup" className={styles.infoText}>
+            {t('pages.trade.order-block.info.gas')}
+          </Typography>
+          <Typography variant="bodySmallSB" className={styles.infoText}>
+            {formatToCurrency(gasFee, '$', undefined, 2)} {'('} {t('pages.trade.order-block.info.rebate')} {': '}
+            {formatToCurrency(gasRebate, '$', undefined, 2)}
+            {')'}
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 });

@@ -273,6 +273,8 @@
           "balance": "Wallet Guthaben",
           "order-size": "Ordergrösse",
           "fees": "Gebühren",
+          "gas": "Gasgebühr",
+          "rebate": "Rabatt",
           "approx-deposit": "Einzahlung aus der Wallet (circa)"
         },
         "review": {
@@ -306,6 +308,7 @@
           "order-too-small": "Order wird scheitern: Ordergrösse ist zu klein",
           "position-too-small": "Order wird scheitern: Die resultierende Position ist zu klein (min.: {{minAmount}})",
           "below-min-position": "Warnung: Ordergrösse ist kleiner als die minimale Positionsgrösse",
+          "slippage-too-large": "Warnung: Slippage ist größer als in Ihren Slippage-Einstellungen zulässig. Die Order wird wahrscheinlich fehlschlagen.",
           "insufficient-balance": "Order wird scheitern: Das Walletguthaben ist zu klein",
           "undefined": "Order nicht definiert: Take Profit Einstellungen sind inkompatibel mit der Hebeleinstellung",
           "verify-tp-sl-orders": "Überprüfen Sie Ihre TP/SL - Sie verändern eine Position mit existierenden TP/SL",
@@ -667,6 +670,17 @@
           "status": "Status"
         }
       }
+    },
+    "usdc-swap-widget": {
+      "title": "Mach dich bereit zum Handeln!",
+      "message": "Tausche deine alten USDC gegen neue USDC mit NULL Slippage!",
+      "item1": "Tausche deine alten",
+      "item2": "gegen neue",
+      "item3": "Dieses Widget baut auf",
+      "item4": "Polygon's NativeConverter auf",
+      "item5": "Du kannst in",
+      "item6": "Polygon's Ankündigung mehr erfahren",
+      "swap": "Tauschen"
     },
     "info-modal": {
       "close": "Schliessen"

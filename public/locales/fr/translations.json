@@ -273,6 +273,8 @@
             "balance": "Solde du portefeuille",
             "order-size": "Taille de l'ordre",
             "fees": "Frais",
+            "gas": "Frais de gaz",
+            "rebate": "Rabais",
             "approx-deposit": "Dépôt approximatif depuis le portefeuille"
           },
           "review": {
@@ -306,6 +308,7 @@
             "order-too-small": "L'ordre échouera: la taille de l'ordre est trop petite",
             "position-too-small": "L'ordre échouera: la position résultante est trop petite (min.: {{minAmount}})",
             "below-min-position": "Attention: taille de l'ordre en dessous de la taille de position minimale",
+            "slippage-too-large": "Attention: le glissement est supérieur à ce que vos paramètres de glissement autorisent. L'ordre échouera probablement.",
             "insufficient-balance": "L'ordre échouera: solde de portefeuille insuffisant",
             "undefined": "Ordre indéfini: la prise de profit est incompatible avec l'effet de levier",
             "verify-tp-sl-orders": "Vérifiez vos TP/SL existantes - vous modifiez une position qui contient déjà des TP/SL",
@@ -667,6 +670,17 @@
             "status": "Statut"
           }
         }
+      },
+      "usdc-swap-widget": {
+        "title": "Préparez-vous à échanger!",
+        "message": "Échangez vos ancien USDC contre noveaux USDC avec ZÉRO glissement!",
+        "item1": "Échangez votre ancien",
+        "item2": "contre un nouvel",
+        "item3": "Ce widget s'appuie sur",
+        "item4": "Polygon's NativeConverter",
+        "item5": "Vous pouvez en savoir plus dans",
+        "item6": "l'annonce de Polygon",
+        "swap": "Échangez"
       },
       "info-modal": {
         "close": "Fermer"
