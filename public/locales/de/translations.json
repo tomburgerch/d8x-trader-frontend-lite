@@ -64,10 +64,13 @@
           "remove": "Sicherheit entfernen",
           "pos-details": {
             "title": "Neue Position - Details",
+            "title-existing": "Existing position details",
             "size": "Positionsgrösse:",
             "margin": "Margin:",
             "leverage": "Hebel:",
             "liq-price": "Liq. Preis:",
+            "side": "Seite:",
+            "unrealized": "Nicht realisierter PnL",
             "close-tp-sl": "Verbundene TP/SL Orders schliessen?"
           },
           "cancel": "Abbrechen",
@@ -684,6 +687,10 @@
     },
     "info-modal": {
       "close": "Schliessen"
+    },
+    "public-beta": {
+      "info-text": "D8X befindet sich in der öffentlichen Betaphase – Mach deine eigene Recherche",
+      "beta-tag": "[beta]"
     },
     "refresh": "Aktualisieren",
     "filter": "Filter"

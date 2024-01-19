@@ -64,10 +64,13 @@
           "remove": "Remove collateral",
           "pos-details": {
             "title": "New position details",
+            "title-existing": "Existing position details",
             "size": "Position size:",
             "margin": "Margin:",
             "leverage": "Leverage:",
             "liq-price": "Liquidation price:",
+            "side": "Side:",
+            "unrealized": "Unrealized PnL:",
             "close-tp-sl": "Close related TP/SL orders?"
           },
           "cancel": "Cancel",
@@ -684,6 +687,10 @@
     },
     "info-modal": {
       "close": "Close"
+    },
+    "public-beta": {
+      "info-text": "D8X is in public beta - do your own research.",
+      "beta-tag": "[beta]"
     },
     "refresh": "Refresh",
     "filter": "Filter"

@@ -64,10 +64,13 @@
           "remove": "Remover Margen",
           "pos-details": {
             "title": "Detalles de su nueva posición",
+            "title-existing": "Existing position details",
             "size": "Tamaño",
             "margin": "Margen:",
             "leverage": "Apalancamiento:",
             "liq-price": "Precio de Liquidación",
+            "side": "Dirección:",
+            "unrealized": "PnL no realizado:",
             "close-tp-sl": "¿Cerrar órdenes TP/SL asociadas?"
           },
           "cancel": "Cancelar",
@@ -684,6 +687,10 @@
     },
     "info-modal": {
       "close": "Cerrar"
+    },
+    "public-beta": {
+      "info-text": "D8X está en versión beta pública: haz tu propia investigación",
+      "beta-tag": "[beta]"
     },
     "refresh": "Actualizar",
     "filter": "Filtrar"
