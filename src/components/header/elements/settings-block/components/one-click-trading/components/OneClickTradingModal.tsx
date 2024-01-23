@@ -155,10 +155,26 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
     setFundingModalOpen(true);
   };
 
-  const { data: delegateBalance } = useBalance({
+  const { data: delegateBalance, refetch } = useBalance({
     address: delegateAddress as Address,
     enabled: delegateAddress !== '',
   });
+
+  useEffect(() => {
+    let interval: number | undefined;
+
+    if (isOpen) {
+      interval = window.setInterval(() => {
+        refetch();
+      }, 2000); // 2000 milliseconds = 5 seconds
+    }
+
+    return () => {
+      if (interval !== undefined) {
+        clearInterval(interval);
+      }
+    };
+  }, [refetch, isOpen]);
 
   useEffect(() => {
     if (activatedOneClickTrading && delegateAddress !== '' && !!delegateBalance && delegateBalance.value < 10n) {
@@ -256,7 +272,9 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
                       <div className={styles.infoTitle}>
                         {t('common.settings.one-click-modal.manage-delegate.amount')}
                       </div>
-                      <div>{delegateBalance.formatted} ETH</div>
+                      <div>
+                        {delegateBalance.formatted} {delegateBalance?.symbol}
+                      </div>
                     </div>
                   )}
                 </div>
