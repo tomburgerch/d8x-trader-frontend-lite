@@ -1,16 +1,21 @@
+import classNames from 'classnames';
 import { useAtom, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
 
-import MenuIcon from '@mui/icons-material/Menu';
+import { Close, Menu } from '@mui/icons-material';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
+import { Container } from 'components/container/Container';
+import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
+import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo } from 'network/network';
 import { authPages, pages } from 'routes/pages';
+import { hideBetaTextAtom } from 'store/app.store';
 import {
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
@@ -25,15 +30,13 @@ import {
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
-import { Container } from '../container/Container';
-import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
-import { WalletConnectButton } from '../wallet-connect-button/WalletConnectButton';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
+import { Separator } from '../separator/Separator';
 
 interface HeaderPropsI {
   /**
@@ -55,7 +58,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   const chainId = useChainId();
   const { chain } = useNetwork();
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const setPools = useSetAtom(poolsAtom);
   const setCollaterals = useSetAtom(collateralsAtom);
@@ -68,6 +71,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const [triggerUserStatsUpdate] = useAtom(triggerUserStatsUpdateAtom);
   const [selectedPool] = useAtom(selectedPoolAtom);
   const [traderAPI] = useAtom(traderAPIAtom);
+  const [hideBetaText, setHideBetaText] = useAtom(hideBetaTextAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const requestRef = useRef(false);
@@ -180,8 +184,14 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }
   const drawer = (
     <>
-      <Typography variant="h6" sx={{ my: 2, textAlign: 'center' }} onClick={handleDrawerToggle}>
+      <Typography
+        variant="h6"
+        sx={{ my: 2, textAlign: 'center' }}
+        onClick={handleDrawerToggle}
+        className={styles.drawerLogoHolder}
+      >
         <LogoWithText width={40} height={20} />
+        <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
       </Typography>
       <Divider />
       <nav className={styles.navMobileWrapper} onClick={handleDrawerToggle}>
@@ -213,75 +223,94 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Container className={styles.root}>
-      <Box sx={{ display: 'flex' }}>
-        <PageAppBar position="static">
-          <Toolbar className={styles.toolbar}>
-            <Box className={styles.leftSide}>
-              <Typography variant="h6" component="div">
-                <a href="/" className={styles.logoLink}>
-                  <LogoWithText width={40} height={20} />
-                </a>
-              </Typography>
-              {!isTabletScreen && (
-                <nav className={styles.navWrapper}>
-                  {availablePages.map((page) => (
-                    <NavLink
-                      key={page.id}
-                      to={page.path}
-                      className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : styles.inactive}`}
-                    >
-                      {t(page.translationKey)}
-                    </NavLink>
-                  ))}
-                </nav>
+    <>
+      <div className={classNames(styles.betaInfoLine, { [styles.hideBetaText]: hideBetaText })}>
+        <div className={styles.textBlock}>{t('common.public-beta.info-text')}</div>
+        <div title={t('common.info-modal.close')} className={styles.closeButton} onClick={() => setHideBetaText(true)}>
+          <Close className={styles.closeIcon} />
+        </div>
+      </div>
+      <Container className={styles.root}>
+        <div className={styles.headerHolder}>
+          <PageAppBar position="static">
+            <Toolbar className={styles.toolbar}>
+              <Box className={styles.leftSide}>
+                <Typography variant="h6" component="div" className={styles.mainLogoHolder}>
+                  <a href="/" className={styles.logoLink}>
+                    <LogoWithText width={40} height={20} />
+                  </a>
+                  <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
+                </Typography>
+                {!isTabletScreen && (
+                  <nav className={styles.navWrapper}>
+                    {availablePages.map((page) => (
+                      <NavLink
+                        key={page.id}
+                        to={page.path}
+                        className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : styles.inactive}`}
+                      >
+                        {t(page.translationKey)}
+                      </NavLink>
+                    ))}
+                  </nav>
+                )}
+              </Box>
+              <Box className={styles.center}>
+                {!isTabletScreen && (
+                  <div className={styles.titlebox}>
+                    <div className={styles.header}>{'decentralized-perps.com'}</div>
+                    <div className={styles.subHeader}>{'hosted on ICP'}</div>
+                  </div>
+                )}
+              </Box>
+              {!isSmallScreen && (
+                <Typography id="header-side" variant="h6" component="div" className={styles.selectBoxes} />
               )}
-            </Box>
-            <Box className={styles.center}>
-              {!isTabletScreen && (
-                <div className={styles.titlebox}>
-                  <div className={styles.header}>{'decentralized-perps.com'}</div>
-                  <div className={styles.subHeader}>{'hosted on ICP'}</div>
+              {(!isMobileScreen || !isConnected) && (
+                <Typography variant="h6" component="div" className={styles.walletConnect}>
+                  <WalletConnectButton />
+                </Typography>
+              )}
+              {!isTabletScreen && <SettingsButton />}
+              {isTabletScreen && (
+                <Button onClick={handleDrawerToggle} variant="primary" className={styles.menuButton}>
+                  <Menu />
+                </Button>
+              )}
+            </Toolbar>
+            {isMobileScreen && isConnected && (
+              <div className={styles.mobileButtonsBlock}>
+                <Separator />
+                <div className={styles.mobileWalletButtons}>
+                  <WalletConnectButton />
                 </div>
-              )}
-            </Box>
-            {!isSmallScreen && (
-              <Typography id="header-side" variant="h6" component="div" className={styles.selectBoxes} />
+              </div>
             )}
-            <Typography variant="h6" component="div" className={styles.walletConnect}>
-              <WalletConnectButton />
-            </Typography>
-            {!isTabletScreen && <SettingsButton />}
-            {isTabletScreen && (
-              <Button onClick={handleDrawerToggle} variant="primary" className={styles.menuButton}>
-                <MenuIcon />
-              </Button>
-            )}
-          </Toolbar>
-        </PageAppBar>
-        <Box component="nav">
-          <Drawer
-            anchor="right"
-            container={container}
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
-            }}
-            sx={{
-              display: { sm: 'block', md: 'none' },
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: isMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
-                backgroundColor: 'var(--d8x-color-background)',
-              },
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Box>
-      </Box>
-    </Container>
+          </PageAppBar>
+          <Box component="nav">
+            <Drawer
+              anchor="right"
+              container={container}
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{
+                keepMounted: true, // Better open performance on mobile.
+              }}
+              sx={{
+                display: { sm: 'block', md: 'none' },
+                '& .MuiDrawer-paper': {
+                  boxSizing: 'border-box',
+                  width: isMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
+                  backgroundColor: 'var(--d8x-color-background)',
+                },
+              }}
+            >
+              {drawer}
+            </Drawer>
+          </Box>
+        </div>
+      </Container>
+    </>
   );
 });
