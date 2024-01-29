@@ -31,6 +31,9 @@
   --d8x-color-warning-main: #FFDA9F;
   --d8x-color-warning-secondary: #FFBDBD;
 
+  // Additional colors
+  --d8x-color-background-header: var(--d8x-color-background-items);
+
   // Override colors for toastify
   --toastify-color-progress-success: #664ADF;
   --toastify-color-progress-error: #FFBDBD;
