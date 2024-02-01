@@ -18,14 +18,17 @@ import zkMainIcon from 'assets/networks/zkEvmMain.svg';
 import zkTestIcon from 'assets/networks/zkEvmTest.svg';
 import { config } from 'config';
 import x1Icon from 'assets/networks/x1.png';
-import { x1 } from 'utils/chains';
+import { x1, cardona } from 'utils/chains';
 
 const defaultChains: Chain[] = [
   { ...polygonZkEvm, iconUrl: zkMainIcon, iconBackground: 'transparent' },
   { ...polygonMumbai, iconUrl: polygonTestIcon, iconBackground: 'transparent' },
   { ...polygonZkEvmTestnet, iconUrl: zkTestIcon, iconBackground: 'transparent' },
   { ...x1, iconUrl: x1Icon, iconBackground: 'transparent' },
-].filter(({ id }) => config.enabledChains.includes(id));
+  { ...cardona, iconUrl: zkTestIcon, iconBackground: 'transparent' },
+]
+  .filter(({ id }) => config.enabledChains.includes(id))
+  .sort(({ id: id1 }, { id: id2 }) => config.enabledChains.indexOf(id1) - config.enabledChains.indexOf(id2));
 
 const providers = [
   jsonRpcProvider({

@@ -50,7 +50,7 @@
     ]
   },
   "dependencies": {
-    "@d8x/perpetuals-sdk": "1.0.10",
+    "@d8x/perpetuals-sdk": "1.0.11",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@ethersproject/providers": "5.7.2",
@@ -116,7 +116,8 @@
     "typescript": "5.1.6",
     "vite": "4.5.2",
     "vite-bundle-visualizer": "0.10.0",
-    "vite-plugin-checker": "0.6.2",
+    "vite-plugin-checker": "0.6.4",
+    "vite-plugin-stylelint": "5.3.1",
     "vite-plugin-svgr": "3.2.0",
     "vite-tsconfig-paths": "4.2.0"
   }
