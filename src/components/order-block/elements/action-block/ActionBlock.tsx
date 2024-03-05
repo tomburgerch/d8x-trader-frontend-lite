@@ -41,6 +41,7 @@ import { currencyMultiplierAtom, selectedCurrencyAtom } from '../order-size/stor
 import { hasTpSlOrdersAtom } from './store';
 
 import styles from './ActionBlock.module.scss';
+import { orderSubmitted } from 'network/broker';
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -364,7 +365,10 @@ export const ActionBlock = memo(() => {
               postOrder(tradingClient, signatures, data.data)
                 .then((tx) => {
                   setShowReviewOrderModal(false);
-                  // success submitting order to the node
+                  // success submitting order to the node - inform backend
+                  orderSubmitted(walletClient.chain.id, data.data.orderIds)
+                    .then()
+                    .catch((error) => console.log(error));
                   // order was sent
                   clearInputsData();
                   toast.success(
