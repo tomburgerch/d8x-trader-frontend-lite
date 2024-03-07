@@ -500,7 +500,7 @@
         "max": "最大：",
         "button": "添加",
         "validity-empty": "连接钱包",
-        "validity-amount-too-big": "资金不足" ,
+        "validity-amount-too-big": "资金不足",
         "validity-amount-below-min": "金额低于最小值",
         "validity-no-amount": "输入金额"
       },
@@ -516,7 +516,7 @@
           "validity-no-address": "连接钱包",
           "validity-empty": "-",
           "validity-no-funds": "无资金可提取",
-          "validity-amount-too-big": "金额太大" ,
+          "validity-amount-too-big": "金额太大",
           "validity-amount-below-min": "金额低于最小",
           "validity-no-amount": "输入金额"
         },
@@ -594,6 +594,14 @@
     "one-click": {
       "disable": "禁用一键交易",
       "enable": "启用一键交易"
+    },
+    "maintenance-mode": {
+      "header": "维护模式",
+      "description": "<bold>{{chainName}}</bold> 上的期货交易所处于维护模式。",
+      "visit-text": {
+        "1": "点击",
+        "2": "f了解更多信息。"
+      }
     },
     "li-fi-widget": {
       "button-title": "LI.FI widget",
@@ -698,7 +706,7 @@
       "item5": "您可以在",
       "item6": "Polygon的公告中了解更多",
       "swap": "兑换"
-    },    
+    },
     "info-modal": {
       "close": "关闭"
     },

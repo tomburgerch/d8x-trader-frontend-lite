@@ -497,6 +497,7 @@
           "info1": "Indiquez le montant de {{poolSymbol}} que vous souhaitez ajouter au pool."
         },
         "receive": "Vous recevez d{{poolSymbol}}",
+        "max": "Max:",
         "button": "Ajouter",
         "validity-empty": "Connectez le portefeuille",
         "validity-amount-too-big": "Fonds insuffisants",
@@ -596,6 +597,14 @@
     "one-click": {
       "disable": "Activer le trading en un clic",
       "enable": "Désactiver le trading en un clic"
+    },
+    "maintenance-mode": {
+      "header": "Mode de Maintenance",
+      "description": "L'échange sur <bold>{{chainName}}</bold> est en mode maintenance.",
+      "visit-text": {
+        "1": "Visitez",
+        "2": "pour plus d'informations."
+      }
     },
     "li-fi-widget": {
       "button-title": "LI.FI widget",
@@ -715,3 +724,4 @@
     "wrong-network": "Chaine incorrecte"
   }
 }
+

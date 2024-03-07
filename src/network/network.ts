@@ -15,6 +15,7 @@ import type {
   PriceFeedResponseI,
   ValidatedResponseI,
 } from 'types/types';
+import { MaintenanceStatusI } from 'types/types';
 import { PumpStationResponseI } from 'types/types';
 
 function getApiUrlByChainId(chainId: number) {
@@ -29,6 +30,16 @@ const fetchUrl = async (url: string, chainId: number) => {
   }
   return data.json();
 };
+
+export async function getMaintenanceStatus(): Promise<MaintenanceStatusI[]> {
+  return fetch('https://drip.d8x.xyz/status', getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
 
 export async function getExchangeInfo(
   chainId: number,
