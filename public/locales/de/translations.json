@@ -320,7 +320,7 @@
           "pass": "Bestanden",
           "fail": "Nicht bestanden",
           "button-no-address": "Brieftasche verbinden",
-          "button-no-funds": "Keine Margenwährung in Brieftasche",
+          "button-no-funds": "Ablagerung",
           "button-no-amount": "Order Grösse zu klein",
           "button-no-limit": "Limit Preis setzen",
           "button-no-trigger": "Trigger Preis setzen"
@@ -372,8 +372,8 @@
       "pump-o-meter": {
         "title": "PUMP-METER",
         "modal-text": "Der PUMP-METER zeigt den Boost an, der auf deinen NÄCHSTEN Trade angewendet wird. Der Boost reicht von 1x bis 105x und besteht aus zwei Teilen:",
-        "modal-text2": "Volumen Boost - Deine Trades der letzen 7 Tage können dir einen Volumen Boost bescheren. Je mehr du handelst, desto höher dein Boost.",
-        "modal-text3": "Fortune Boost - Fortune Boost – Bei jedem Trade hast du die Chance, den Fortune Boost zu erhalten – einen Bonus, der vom 0-fachen auf das unglaubliche 100-fache ansteigen kann!"
+        "modal-text2": "Volumen Boost - Deine Trades der letzen 7 Tage können dir einen Volumen Boost bescheren, der von 1x bis 5x reicht. Je mehr du handelst, desto höher dein Boost.",
+        "modal-text3": "Fortune Boost - Bei jedem Trade hast du die Chance, den Fortune Boost zu erhalten – einen Bonus, der vom 0x auf einen unglaublichen 100x ansteigen kann!"
       },
       "last-pump": {
         "title": "Letzer PUMP",
@@ -501,7 +501,6 @@
           "info1": "Geben Sie die Menge an {{poolSymbol}} an, die Sie dem Pool hinzufügen möchten."
         },
         "receive": "Sie erhalten d{{poolSymbol}}",
-        "max": "Max:",
         "button": "Hinzufügen",
         "validity-empty": "Brieftasche verbinden",
         "validity-amount-too-big": "Zu wenig Mittel",
@@ -595,6 +594,13 @@
   "common": {
     "change-language": "Sprache wechseln",
     "wallet-connect": "Verbinden",
+    "account-button": "Konto",
+    "currency-label": "Währung",
+    "amount-label": "Anzahl",
+    "address-label": "Adresse",
+    "max": "Max:",
+    "copied": "Kopiert",
+    "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",
     "one-click": {
       "disable": "Deaktivieren Sie den One-Click-Handel",
       "enable": "Aktivieren Sie den One-Click-Handel"
@@ -713,6 +719,46 @@
     },
     "info-modal": {
       "close": "Schliessen"
+    },
+    "account-modal": {
+      "title": "Konto",
+      "deposit-button": "Einzahlen",
+      "withdraw-button": "Abheben",
+      "extract-pk-button": "PK extrahieren",
+      "notice-block": "Wichtiger Hinweis: Stellen Sie sicher, dass Sie ausreichend <bold>{{currencyName}}</bold> für Gas und mindestens ein Währung als Sicherheit haben."
+    },
+    "deposit-modal": {
+      "title": "Einzahlen",
+      "important-notice": {
+        "full": "Wichtiger Hinweis: Senden Sie nur <bold>{{currencyName}}</bold> (Token-Adresse: <bold>{{currencyContractAddress}}</bold) an diese Adresse. Senden Sie nur über <bold>{{chainName}}</bold>.",
+        "1": "Wichtiger Hinweis: Senden Sie nur <bold>{{currencyName}}</bold>",
+        "2": "(Token-Adresse: ",
+        "3": ")",
+        "4": "an diese Adresse. ",
+        "5": "Senden Sie nur über <bold>{{chainName}}</bold>."
+      },
+      "deposit-note": "Stellen Sie sicher, dass Sie ausreichend <bold>{{currencyName}}</bold> für Gas und mindestens eine Sicherheit hinterlegen.",
+      "done-button": "Gemacht"
+    },
+    "extract-pk-modal": {
+      "title": "Privaten Schlüssel extrahieren",
+      "important-notice": "Wichtiger Hinweis: Geben Sie Ihren privaten Schlüssel niemals an Dritte weiter. Geben Sie den Schlüssel nur preis, wenn Sie wissen, was Sie tun.",
+      "reveal-key-button": "Aufdecken"
+    },
+    "withdraw-modal": {
+      "title": "Abheben",
+      "withdraw-button": "Abheben",
+      "withdraw-address-error": "Bitte geben Sie eine gültige Adresse ein"
+    },
+    "connect-modal": {
+      "title": "Anmelden",
+      "description": "Melden Sie sich mit X oder einer Web3-Wallet an",
+      "sign-in-with-x-button": "Mit X anmelden",
+      "sign-in-with-wallet-button": "Mit einer Wallet anmelden",
+      "or-separator": "ooder",
+      "disconnect": "Abmelden",
+      "connected-title": "Willkommen!",
+      "connected-description": "Sie haben sich erfolgreich angemeldet."
     },
     "public-beta": {
       "info-text": "Dies ist eine öffentliche Betaphase – Mach deine eigene Recherche",

@@ -4,7 +4,7 @@ import { useAccount, useChainId } from 'wagmi';
 
 import { Typography } from '@mui/material';
 
-import { ReactComponent as D8XLogoWithText } from 'assets/logos/d8xLogoWithText.svg';
+import D8XLogoWithText from 'assets/logos/d8xLogoWithText.svg?react';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { getPumpStationData } from 'network/network';
 import { BoostI } from 'types/types';

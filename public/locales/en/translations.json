@@ -320,7 +320,7 @@
           "pass": "Passed",
           "fail": "Failed",
           "button-no-address": "Connect wallet",
-          "button-no-funds": "No collateral in wallet",
+          "button-no-funds": "Deposit",
           "button-no-amount": "Order size too small",
           "button-no-limit": "Set limit price",
           "button-no-trigger": "Set trigger price"
@@ -367,7 +367,7 @@
       "title": "Trade to PUMP your $D8X Airdrop Bag",
       "pumped-volume": {
         "title": "PUMPED Volume",
-        "modal-text": "The $D8X Airdrop is calculated based on PUMPED Volume. For every trade we compute trade volume x boost. PUMPED Volume is the sum of it."
+        "modal-text": "The $D8X Airdrop is calculated based on PUMPED Volume. For every trade we compute volume x boost. PUMPED Volume is the sum of it over all your trades."
       },
       "pump-o-meter": {
         "title": "PUMP-O-METER",
@@ -501,7 +501,6 @@
           "info1": "Specify the amount of {{poolSymbol}} you want to add to the pool."
         },
         "receive": "You receive d{{poolSymbol}}",
-        "max": "Max:",
         "button": "Add",
         "validity-empty": "Connect wallet",
         "validity-amount-too-big": "Insufficient funds",
@@ -595,6 +594,13 @@
   "common": {
     "change-language": "Change Language",
     "wallet-connect": "Connect",
+    "account-button": "Account",
+    "currency-label": "Currency",
+    "amount-label": "Amount",
+    "address-label": "Address",
+    "max": "Max:",
+    "copied": "Copied",
+    "copy-error": "An error appeared with copy to clipboard",
     "one-click": {
       "disable": "Disable one-click trading",
       "enable": "Enable one-click trading"
@@ -713,6 +719,46 @@
     },
     "info-modal": {
       "close": "Close"
+    },
+    "account-modal": {
+      "title": "Account",
+      "deposit-button": "Deposit",
+      "withdraw-button": "Withdraw",
+      "extract-pk-button": "Extract PK",
+      "notice-block": "Important notice: Make sure to have sufficient <bold>{{currencyName}}</bold> for gas and at least one collateral."
+    },
+    "deposit-modal": {
+      "title": "Deposit",
+      "important-notice": {
+        "full": "Important notice: send only <bold>{{currencyName}}</bold> (token address: <bold>{{currencyContractAddress}}</bold) to this address. Send over <bold>{{chainName}}</bold>.",
+        "1": "Important notice: send only <bold>{{currencyName}}</bold>",
+        "2": "(token address: ",
+        "3": ")",
+        "4": "to this address.",
+        "5": "Send over <bold>{{chainName}}</bold>."
+      },
+      "deposit-note": "Make sure to deposit sufficient <bold>{{currencyName}}</bold> for gas and at least one collateral.",
+      "done-button": "Done"
+    },
+    "extract-pk-modal": {
+      "title": "Extract Private Key",
+      "important-notice": "Important notice: never share your private key with anyone. Only reveal key if you know what you are doing.",
+      "reveal-key-button": "Reveal key"
+    },
+    "withdraw-modal": {
+      "title": "Withdraw",
+      "withdraw-button": "Withdraw",
+      "withdraw-address-error": "Please enter a valid address"
+    },
+    "connect-modal": {
+      "title": "Sign in",
+      "description": "Sign in with X or web3 wallet",
+      "sign-in-with-x-button": "Sign in with X",
+      "sign-in-with-wallet-button": "Sign in with wallet",
+      "or-separator": "or",
+      "disconnect": "Disconnect",
+      "connected-title": "Welcome!",
+      "connected-description": "You have successfully signed in."
     },
     "public-beta": {
       "info-text": "This is a public beta - do your own research.",

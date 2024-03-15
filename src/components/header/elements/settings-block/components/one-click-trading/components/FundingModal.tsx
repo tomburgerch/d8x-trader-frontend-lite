@@ -1,7 +1,8 @@
 import { Box, Button, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Address, useBalance, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { useBalance, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
+import { type Address } from 'viem';
 
 import { transferFunds } from 'blockchain-api/transferFunds';
 import { Dialog } from 'components/dialog/Dialog';
@@ -17,20 +18,21 @@ interface FundingModalPropsI {
 
 export const FundingModal = ({ isOpen, onClose, delegateAddress }: FundingModalPropsI) => {
   const { t } = useTranslation();
+
   const { data: walletClient } = useWalletClient();
   const [txHash, setTxHash] = useState<Address | undefined>(undefined);
 
-  useWaitForTransaction({
+  const { isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      onClose();
-    },
-    onSettled() {
+    query: { enabled: !!txHash },
+  });
+
+  useEffect(() => {
+    if (isFetched) {
       setTxHash(undefined);
       onClose();
-    },
-    enabled: !!txHash,
-  });
+    }
+  }, [isFetched, onClose]);
 
   const [inputValue, setInputValue] = useState('');
 
@@ -50,7 +52,7 @@ export const FundingModal = ({ isOpen, onClose, delegateAddress }: FundingModalP
           </Typography>
         </Box>
         <ResponsiveInput
-          id="fund amount"
+          id="fund-amount"
           className={styles.inputHolder}
           inputValue={inputValue}
           setInputValue={setInputValue}

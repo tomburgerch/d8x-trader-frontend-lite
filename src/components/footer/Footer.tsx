@@ -1,18 +1,18 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { GitHub, X } from '@mui/icons-material';
 import { Link, Typography } from '@mui/material';
 
-import { ReactComponent as Logo } from 'assets/logo.svg';
-import { ReactComponent as MediumLogo } from 'assets/social/medium.svg';
-import { ReactComponent as DiscordLogo } from 'assets/social/discord.svg';
-import { ReactComponent as GitbookLogo } from 'assets/social/gitbook.svg';
-import { ReactComponent as PythLogo } from 'assets/icons/pbp_pyth.svg';
+import Logo from 'assets/logo.svg?react';
+import MediumLogo from 'assets/social/medium.svg?react';
+import DiscordLogo from 'assets/social/discord.svg?react';
+import GitbookLogo from 'assets/social/gitbook.svg?react';
+import PythLogo from 'assets/icons/pbp_pyth.svg?react';
 
-import { Container } from '../container/Container';
+import { Container } from 'components/container/Container';
 
 import styles from './Footer.module.scss';
-import { useTranslation } from 'react-i18next';
 
 export const Footer = memo(() => {
   const { t } = useTranslation();

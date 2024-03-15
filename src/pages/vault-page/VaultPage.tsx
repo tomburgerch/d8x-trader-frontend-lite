@@ -2,7 +2,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { HeaderPortal } from 'components/header/HeaderPortal';
@@ -53,22 +53,22 @@ export const VaultPage = () => {
   return (
     <>
       <Helmet title={`${selectedPool?.poolSymbol} Vault | D8X App`} />
-      <Box className={styles.root}>
+      <div className={styles.root}>
         <MaintenanceWrapper>
           <HeaderPortal>
             <CollateralsSelect />
           </HeaderPortal>
           {isSmallScreen && (
-            <Box className={styles.mobileSelectBoxes}>
+            <div className={styles.mobileSelectBoxes}>
               <CollateralsSelect />
-            </Box>
+            </div>
           )}
           <Container className={styles.container}>
             <GlobalStats />
             <LiquidityBlock />
           </Container>
         </MaintenanceWrapper>
-      </Box>
+      </div>
     </>
   );
 };

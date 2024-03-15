@@ -320,7 +320,7 @@
           "pass": "Pasó",
           "fail": "No Pasó",
           "button-no-address": "Conectar cartera",
-          "button-no-funds": "Cartera sin saldo",
+          "button-no-funds": "Depósito",
           "button-no-amount": "Orden menor que el mínimo",
           "button-no-limit": "Ingrese precio limite",
           "button-no-trigger": "Ingrese precio de parada"
@@ -501,7 +501,6 @@
           "info1": "Especifica la cantidad de {{poolSymbol}} que quieres añadir a las reservas."
         },
         "receive": "d{{poolSymbol}} que recibes",
-        "max": "Max:",
         "button": "Anadir",
         "validity-empty": "Conectar cartera",
         "validity-amount-too-big": "Fondos insuficientes",
@@ -595,6 +594,13 @@
   "common": {
     "change-language": "Cambiar Idioma",
     "wallet-connect": "Conectar",
+    "account-button": "Cuenta",
+    "currency-label": "Divisa",
+    "amount-label": "Cantidad",
+    "address-label": "Direccion",
+    "max": "Max:",
+    "copied": "Copiado",
+    "copy-error": "Apareció un error al copiar al portapapeles.",
     "one-click": {
       "disable": "Deshabilitar el comercio con un clic",
       "enable": "Habilite el comercio con un solo clic"
@@ -713,6 +719,46 @@
     },
     "info-modal": {
       "close": "Cerrar"
+    },
+    "account-modal": {
+      "title": "Cuenta",
+      "deposit-button": "Depósito",
+      "withdraw-button": "Retirar",
+      "extract-pk-button": "Extraer PK",
+      "notice-block": "Aviso importante: asegúrese de tener suficiente <bold>{{currencyName}}</bold> para gasolina y al menos una garantía."
+    },
+    "deposit-modal": {
+      "title": "Depósito",
+      "important-notice": {
+        "full": "Aviso importante: envíe solo <bold>{{currencyName}}</bold> (dirección del token: <bold>{{currencyContractAddress}}</bold) a esta dirección. Envíe por <bold>{{chainName}}</bold>.",
+        "1": "Aviso importante: envíe solo <bold>{{currencyName}}</bold>",
+        "2": "(dirección del token: ",
+        "3": ")",
+        "4": "a esta dirección.",
+        "5": "Envíe por <bold>{{chainName}}</bold>."
+      },
+      "deposit-note": "Asegúrese de depositar suficiente <bold>{{currencyName}}</bold> para gasolina y al menos una garantía.",
+      "done-button": "Hecho"
+    },
+    "extract-pk-modal": {
+      "title": "Extraer clave privada",
+      "important-notice": "Aviso importante: nunca compartas tu clave privada con nadie. Sólo revela la clave si sabes lo que estás haciendo.",
+      "reveal-key-button": "Revelar clave"
+    },
+    "withdraw-modal": {
+      "title": "Retirar",
+      "withdraw-button": "Retirar",
+      "withdraw-address-error": "Por favor ingresar una dirección valida"
+    },
+    "connect-modal": {
+      "title": "Acceso",
+      "description": "Inicie sesión con X o billetera web3",
+      "sign-in-with-x-button": "Inicie sesión con X",
+      "sign-in-with-wallet-button": "Inicie sesión con billetera",
+      "or-separator": "o",
+      "disconnect": "Desconectar",
+      "connected-title": "Bienvenido!",
+      "connected-description": "Has iniciado sesión correctamente."
     },
     "public-beta": {
       "info-text": "Esta es una versión beta pública: haz tu propia investigación",

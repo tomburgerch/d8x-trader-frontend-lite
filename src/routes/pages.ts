@@ -1,6 +1,6 @@
 import { type FC, SVGProps } from 'react';
 
-import { ReactComponent as D8XLogo } from 'assets/logos/d8xLogo.svg';
+import D8XLogo from 'assets/logos/d8xLogo.svg?react';
 
 import { RoutesE } from './RoutesE';
 import { pagesConfig } from '../config';

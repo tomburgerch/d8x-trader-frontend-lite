@@ -2,7 +2,8 @@ import { useAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useChainId, useWaitForTransaction, useWalletClient, useNetwork } from 'wagmi';
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
+import { Address } from 'viem';
 
 import {
   Box,
@@ -24,6 +25,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
 import {
@@ -32,6 +34,7 @@ import {
   getRemoveCollateral,
   positionRiskOnCollateralAction,
 } from 'network/network';
+import { tradingClientAtom } from 'store/app.store';
 import {
   poolTokenDecimalsAtom,
   proxyAddrAtom,
@@ -46,8 +49,6 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { ModifyTypeE, ModifyTypeSelector } from '../../modify-type-selector/ModifyTypeSelector';
 
 import styles from '../Modal.module.scss';
-import { tradingClientAtom } from 'store/app.store';
-import { getTxnLink } from 'helpers/getTxnLink';
 
 interface ModifyModalPropsI {
   isOpen: boolean;
@@ -66,8 +67,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
   const [tradingClient] = useAtom(tradingClientAtom);
 
   const chainId = useChainId();
-  const { chain } = useNetwork();
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId: chainId });
 
   const [requestSent, setRequestSent] = useState(false);
@@ -85,101 +85,135 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
   const isAPIBusyRef = useRef(isAPIBusy);
   const requestSentRef = useRef(false);
 
-  useWaitForTransaction({
+  const {
+    isSuccess: isAddSucces,
+    isError: isAddError,
+    isFetched: isAddFetched,
+    error: addReason,
+  } = useWaitForTransactionReceipt({
     hash: txHashForAdd,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.collateral-added.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
-              value: symbolForTx,
-            },
-            {
-              label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
-              value: formatNumber(amountForAdd),
-            },
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHashForAdd)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHashForAdd}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError(reason) {
-      toast.error(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
-        />
-      );
-    },
-    onSettled() {
-      setTxHashForAdd(undefined);
-      setAmountForAdd(0);
-      setSymbolForTx('');
-    },
-    enabled: !!address && !!txHashForAdd,
+    query: { enabled: !!address && !!txHashForAdd },
   });
 
-  useWaitForTransaction({
-    hash: txHashForRemove,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
-              value: symbolForTx,
-            },
-            {
-              label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
-              value: formatNumber(amountForRemove),
-            },
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHashForRemove)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHashForRemove}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError(reason) {
-      toast.error(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
-        />
-      );
-    },
-    onSettled() {
-      setTxHashForRemove(undefined);
-      setAmountForRemove(0);
-      setSymbolForTx('');
-    },
-    enabled: !!address && !!txHashForRemove,
+  useEffect(() => {
+    if (!isAddFetched) {
+      return;
+    }
+    setTxHashForAdd(undefined);
+    setAmountForAdd(0);
+    setSymbolForTx('');
+  }, [isAddFetched]);
+
+  useEffect(() => {
+    if (!isAddError || !addReason) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+        bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: addReason.message }]}
+      />
+    );
   });
+
+  useEffect(() => {
+    if (!isAddSucces || !txHashForAdd) {
+      return;
+    }
+    toast.success(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.collateral-added.title')}
+        bodyLines={[
+          {
+            label: t('pages.trade.positions-table.toasts.collateral-added.body1'),
+            value: symbolForTx,
+          },
+          {
+            label: t('pages.trade.positions-table.toasts.collateral-added.body2'),
+            value: formatNumber(amountForAdd),
+          },
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHashForAdd)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHashForAdd}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+  }, [isAddSucces, txHashForAdd, amountForAdd, chain, symbolForTx, t]);
+
+  const {
+    isSuccess: isRemoveSuccess,
+    isError: isRemoveError,
+    isFetched: isRemoveFetched,
+    error: removeReason,
+  } = useWaitForTransactionReceipt({
+    hash: txHashForRemove,
+    query: { enabled: !!address && !!txHashForRemove },
+  });
+
+  useEffect(() => {
+    if (!isRemoveFetched) {
+      return;
+    }
+    setTxHashForRemove(undefined);
+    setAmountForRemove(0);
+    setSymbolForTx('');
+  }, [isRemoveFetched]);
+
+  useEffect(() => {
+    if (!isRemoveError || !removeReason) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+        bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: removeReason.message }]}
+      />
+    );
+  }, [isRemoveError, removeReason, t]);
+
+  useEffect(() => {
+    if (!isRemoveSuccess || !txHashForRemove) {
+      return;
+    }
+    toast.success(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.collateral-removed.title')}
+        bodyLines={[
+          {
+            label: t('pages.trade.positions-table.toasts.collateral-removed.body1'),
+            value: symbolForTx,
+          },
+          {
+            label: t('pages.trade.positions-table.toasts.collateral-removed.body2'),
+            value: formatNumber(amountForRemove),
+          },
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHashForRemove)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHashForRemove}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+  }, [isRemoveSuccess, txHashForRemove, amountForRemove, chain, symbolForTx, t]);
 
   const handleMaxCollateral = () => {
     if (maxCollateral) {
@@ -497,7 +531,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                   leftSide=" "
                   rightSide={
                     <Typography className={styles.helperText} variant="bodyTiny">
-                      Max: <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
+                      {t('common.max')} <Link onClick={handleMaxCollateral}>{formatNumber(maxCollateral)}</Link>
                     </Typography>
                   }
                 />

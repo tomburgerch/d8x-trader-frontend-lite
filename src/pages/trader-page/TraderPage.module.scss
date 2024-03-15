@@ -1,4 +1,4 @@
-@import '~styles/theme/_theme.scss';
+@import '~styles/theme/theme.scss';
 
 .root {
   display: flex;
@@ -67,7 +67,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
-
   .rightBlock {
     max-width: 400px;
     min-width: 400px;
@@ -75,7 +74,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
-
   .headerContainer {
     flex-direction: column-reverse;
     justify-content: space-between;
@@ -93,9 +91,7 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
-
   .headerContainer {
-
     .rightBlock {
       width: 100%;
       max-width: inherit;

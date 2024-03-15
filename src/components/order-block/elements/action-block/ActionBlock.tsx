@@ -2,9 +2,10 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useChainId, useNetwork, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
+import { type Address } from 'viem';
 
-import { Box, Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'app-constants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
@@ -15,8 +16,10 @@ import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
+import { orderSubmitted } from 'network/broker';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
+import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
@@ -41,7 +44,6 @@ import { currencyMultiplierAtom, selectedCurrencyAtom } from '../order-size/stor
 import { hasTpSlOrdersAtom } from './store';
 
 import styles from './ActionBlock.module.scss';
-import { orderSubmitted } from 'network/broker';
 
 function createMainOrder(orderInfo: OrderInfoI) {
   let orderType = orderInfo.orderType.toUpperCase();
@@ -112,15 +114,11 @@ enum ValidityCheckButtonE {
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
 
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const chainId = useChainId();
-  const { chain } = useNetwork();
 
   const { data: walletClient } = useWalletClient({
-    chainId: chainId,
-    onError(error) {
-      console.log(error);
-    },
+    chainId,
   });
 
   const orderInfo = useAtomValue(orderInfoAtom);
@@ -140,6 +138,7 @@ export const ActionBlock = memo(() => {
   const currencyMultiplier = useAtomValue(currencyMultiplierAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
+  const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
 
@@ -294,44 +293,56 @@ export const ActionBlock = memo(() => {
     return orders;
   }, [orderInfo, selectedPool, address, proxyAddr, requestSent, isBuySellButtonActive]);
 
-  useWaitForTransaction({
+  const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      setLatestOrderSentTimestamp(Date.now());
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.action-block.toasts.order-submitted.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.action-block.toasts.order-submitted.body'),
-              value: orderInfo?.symbol,
-            },
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHash}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError() {
-      toast.error(<ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />);
-    },
-    onSettled() {
-      setTxHash(undefined);
-      setLatestOrderSentTimestamp(Date.now());
-    },
-    enabled: !!address && !!orderInfo && !!txHash,
+    query: { enabled: !!address && !!orderInfo && !!txHash },
   });
+
+  useEffect(() => {
+    if (!isFetched || !txHash) {
+      return;
+    }
+    setTxHash(undefined);
+    setLatestOrderSentTimestamp(Date.now());
+  }, [isFetched, txHash, setLatestOrderSentTimestamp]);
+
+  useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    toast.error(<ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />);
+  }, [isError, t]);
+
+  useEffect(() => {
+    if (!isSuccess || !txHash) {
+      return;
+    }
+    setLatestOrderSentTimestamp(Date.now());
+    toast.success(
+      <ToastContent
+        title={t('pages.trade.action-block.toasts.order-submitted.title')}
+        bodyLines={[
+          {
+            label: t('pages.trade.action-block.toasts.order-submitted.body'),
+            value: orderInfo?.symbol,
+          },
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHash}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+  }, [isSuccess, txHash, chain, orderInfo?.symbol, setLatestOrderSentTimestamp, t]);
 
   const handleOrderConfirm = () => {
     if (
@@ -559,19 +570,26 @@ export const ActionBlock = memo(() => {
   }, [orderInfo]);
 
   return (
-    <Box className={styles.root}>
-      <Button
-        variant={orderInfo?.orderBlock === OrderBlockE.Short ? 'sell' : 'buy'}
-        disabled={!isBuySellButtonActive}
-        onClick={openReviewOrderModal}
-        className={styles.buyButton}
-      >
-        {validityCheckButtonText}
-      </Button>
+    <div className={styles.root}>
+      {validityCheckButtonType === ValidityCheckButtonE.NoFunds && (
+        <Button variant={'buy'} onClick={() => setDepositModalOpen(true)} className={styles.buyButton}>
+          {validityCheckButtonText}
+        </Button>
+      )}
+      {validityCheckButtonType !== ValidityCheckButtonE.NoFunds && (
+        <Button
+          variant={orderInfo?.orderBlock === OrderBlockE.Short ? 'sell' : 'buy'}
+          disabled={!isBuySellButtonActive}
+          onClick={openReviewOrderModal}
+          className={styles.buyButton}
+        >
+          {validityCheckButtonText}
+        </Button>
+      )}
       {orderInfo && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
           <DialogTitle className={styles.dialogTitle}> {t('pages.trade.action-block.review.title')} </DialogTitle>
-          <Box className={styles.emphasis}>
+          <div className={styles.emphasis}>
             <SidesRow
               leftSide={
                 <Typography variant="bodyLargePopup" className={styles.semibold}>
@@ -585,9 +603,9 @@ export const ActionBlock = memo(() => {
                 </Typography>
               }
             />
-          </Box>
+          </div>
           <DialogContent>
-            <Box className={styles.orderDetails}>
+            <div className={styles.orderDetails}>
               <SidesRow
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
@@ -694,16 +712,16 @@ export const ActionBlock = memo(() => {
                 }
                 rightSideStyles={styles.rightSide}
               />
-            </Box>
+            </div>
           </DialogContent>
           <Separator />
           <DialogContent>
-            <Box className={styles.newPositionHeader}>
+            <div className={styles.newPositionHeader}>
               <Typography variant="bodyMediumPopup" className={styles.bold}>
                 {t('pages.trade.action-block.review.details')}
               </Typography>
-            </Box>
-            <Box className={styles.newPositionDetails}>
+            </div>
+            <div className={styles.newPositionDetails}>
               <SidesRow
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
@@ -763,9 +781,9 @@ export const ActionBlock = memo(() => {
                 }
                 rightSideStyles={styles.rightSide}
               />
-            </Box>
+            </div>
           </DialogContent>
-          <Box className={styles.emphasis}>
+          <div className={styles.emphasis}>
             <SidesRow
               leftSide={
                 <Typography variant="bodyMediumPopup" className={styles.semibold}>
@@ -774,9 +792,9 @@ export const ActionBlock = memo(() => {
               }
               rightSide={
                 !isValidityCheckDone ? (
-                  <Box>
+                  <div>
                     <CircularProgress color="primary" />
-                  </Box>
+                  </div>
                 ) : (
                   <Typography variant="bodyMediumPopup" className={styles.bold} style={{ color: validityColor }}>
                     {validityCheckType !== ValidityCheckE.Empty
@@ -792,14 +810,14 @@ export const ActionBlock = memo(() => {
                 )
               }
             />
-          </Box>
+          </div>
           <DialogContent>
             {isValidityCheckDone ? (
-              <Box className={styles.goMessage}>
+              <div className={styles.goMessage}>
                 <Typography variant="bodySmallPopup" className={styles.centered} style={{ color: validityColor }}>
                   {validityCheckText}
                 </Typography>
-              </Box>
+              </div>
             ) : (
               ''
             )}
@@ -825,6 +843,6 @@ export const ActionBlock = memo(() => {
           </DialogActions>
         </Dialog>
       )}
-    </Box>
+    </div>
   );
 });

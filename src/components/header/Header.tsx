@@ -3,16 +3,20 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { type Address, useAccount, useBalance, useChainId, useNetwork } from 'wagmi';
+import { useAccount, useBalance, useChainId, useReadContracts } from 'wagmi';
+import { type Address, erc20Abi, formatUnits } from 'viem';
 
 import { Close, Menu } from '@mui/icons-material';
 import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
-import { ReactComponent as LogoWithText } from 'assets/logoWithText.svg';
+import LogoWithText from 'assets/logoWithText.svg?react';
 import { Container } from 'components/container/Container';
+import { DepositModal } from 'components/deposit-modal/DepositModal';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
 import { Separator } from 'components/separator/Separator';
 import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
+import { WalletConnectedButtons } from 'components/wallet-connect-button/WalletConnectedButtons';
+import { web3AuthConfig } from 'config';
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo, getPositionRisk } from 'network/network';
 import { authPages, pages } from 'routes/pages';
@@ -33,6 +37,7 @@ import {
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 
+import { ConnectModal } from './elements/connect-modal/ConnectModal';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';
@@ -59,8 +64,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const { t } = useTranslation();
 
   const chainId = useChainId();
-  const { chain } = useNetwork();
-  const { address, isConnected } = useAccount();
+  const { chain, address, isConnected, isReconnecting, isConnecting } = useAccount();
 
   const setPools = useSetAtom(poolsAtom);
   const setCollaterals = useSetAtom(collateralsAtom);
@@ -78,6 +82,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const [hideBetaText, setHideBetaText] = useAtom(hideBetaTextAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isConnectModalOpen, setConnectModalOpen] = useState(false);
 
   const exchangeRequestRef = useRef(false);
   const positionsRequestRef = useRef(false);
@@ -169,27 +174,48 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     data: poolTokenBalance,
     isError,
     refetch,
-  } = useBalance({
-    address,
-    token: selectedPool?.marginTokenAddr as Address,
-    chainId: chain?.id,
-    enabled: !exchangeRequestRef.current && address && chainId === chain?.id && !!selectedPool?.marginTokenAddr,
+  } = useReadContracts({
+    allowFailure: false,
+    contracts: [
+      {
+        address: selectedPool?.marginTokenAddr as Address,
+        abi: erc20Abi,
+        functionName: 'balanceOf',
+        args: [address as Address],
+      },
+      {
+        address: selectedPool?.marginTokenAddr as Address,
+        abi: erc20Abi,
+        functionName: 'decimals',
+      },
+    ],
+    query: {
+      enabled:
+        !exchangeRequestRef.current &&
+        address &&
+        traderAPI?.chainId === chain?.id &&
+        !!selectedPool?.marginTokenAddr &&
+        isConnected &&
+        !isReconnecting &&
+        !isConnecting,
+    },
   });
 
   const { data: gasTokenBalance, isError: isGasTokenFetchError } = useBalance({
     address,
+    query: { enabled: address && traderAPI?.chainId === chain?.id && isConnected && !isReconnecting && !isConnecting },
   });
 
   useEffect(() => {
-    if (address) {
+    if (address && chain) {
       refetch().then().catch(console.error);
     }
-  }, [address, refetch, triggerUserStatsUpdate]);
+  }, [address, chain, refetch, triggerUserStatsUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
-      setPoolTokenBalance(Number(poolTokenBalance.formatted));
-      setPoolTokenDecimals(poolTokenBalance.decimals);
+      setPoolTokenBalance(+formatUnits(poolTokenBalance[0], poolTokenBalance[1]));
+      setPoolTokenDecimals(poolTokenBalance[1]);
     }
   }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance, setPoolTokenDecimals]);
 
@@ -291,8 +317,21 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               )}
               {(!isMobileScreen || !isConnected) && (
                 <Typography variant="h6" component="div" className={styles.walletConnect}>
-                  <WalletConnectButton />
+                  {web3AuthConfig.isEnabled && !isConnected && (
+                    <Button onClick={() => setConnectModalOpen(true)} className={styles.modalButton} variant="primary">
+                      <span className={styles.modalButtonText}>{t('common.wallet-connect')}</span>
+                    </Button>
+                  )}
+                  {(!web3AuthConfig.isEnabled || isConnected) && (
+                    <>
+                      <WalletConnectButton />
+                      <WalletConnectedButtons />
+                    </>
+                  )}
                 </Typography>
+              )}
+              {web3AuthConfig.isEnabled && (
+                <ConnectModal isOpen={isConnectModalOpen} onClose={() => setConnectModalOpen(false)} />
               )}
               {!isTabletScreen && <SettingsButton />}
               {isSmallScreen && (
@@ -305,10 +344,11 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               <div className={styles.mobileButtonsBlock}>
                 <Separator />
                 <div className={styles.mobileWalletButtons}>
-                  <WalletConnectButton />
+                  <WalletConnectedButtons />
                 </div>
               </div>
             )}
+            {isConnected && <DepositModal />}
           </PageAppBar>
           <Box component="nav">
             <Drawer

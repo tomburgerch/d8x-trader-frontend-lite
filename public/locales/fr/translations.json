@@ -364,7 +364,7 @@
       }
     },
     "pump-station": {
-      "title": "Échangez pour POMPER votre Airdrop de $D8X",
+      "title": "Tradez pour POMPER votre Airdrop de $D8X",
       "pumped-volume": {
         "title": "Volume POMPÉ",
         "modal-text": "L'Airdrop $D8X est calculé en fonction du volume POMPÉ. Pour chaque transaction, nous calculons le volume des échanges x le boost. Le volume pompé est la somme de celui-ci."
@@ -501,7 +501,6 @@
           "info1": "Indiquez le montant de {{poolSymbol}} que vous souhaitez ajouter au pool."
         },
         "receive": "Vous recevez d{{poolSymbol}}",
-        "max": "Max:",
         "button": "Ajouter",
         "validity-empty": "Connectez le portefeuille",
         "validity-amount-too-big": "Fonds insuffisants",
@@ -595,9 +594,13 @@
   "common": {
     "change-language": "Changer de langue",
     "wallet-connect": "Connecter",
+    "account-button": "Compte",
+    "currency-label": "Devise",
+    "amount-label": "Montant",
+    "address-label": "Adresse",
     "max": "Max:",
     "copied": "Copié",
-    "copy-error": "An error appeared with copy to clipboard",
+    "copy-error": "Une erreur est apparue lors de la copie dans le presse-papiers",
     "one-click": {
       "disable": "Activer le trading en un clic",
       "enable": "Désactiver le trading en un clic"
@@ -717,6 +720,46 @@
     "info-modal": {
       "close": "Fermer"
     },
+    "account-modal": {
+      "title": "Compte",
+      "deposit-button": "Déposez",
+      "withdraw-button": "Retirer",
+      "extract-pk-button": "Extraire PK",
+      "notice-block": "Avis important : Assurez-vous d'avoir suffisamment de <bold>{{currencyName}}</bold> pour le gaz et au moins une garantie."
+    },
+    "deposit-modal": {
+      "title": "Déposez",
+      "important-notice": {
+        "full": "Avis important : envoyez uniquement <bold>{{currencyName}}</bold> (adresse du token: <bold>{{currencyContractAddress}}</bold) à cette adresse. Envoyez par <bold>{{chainName}}</bold>.",
+        "1": "Avis important : envoyez uniquement <bold>{{currencyName}}</bold>",
+        "2": "(adresse du token: ",
+        "3": ")",
+        "4": "à cette adresse.",
+        "5": "Envoyez par <bold>{{chainName}}</bold>."
+      },
+      "deposit-note": "Assurez-vous de déposer suffisamment de <bold>{{currencyName}}</bold> pour le gaz et au moins une devise comme collatéral.",
+      "done-button": "Complété"
+    },
+    "extract-pk-modal": {
+      "title": "Extraire la clé privée",
+      "important-notice": "Avis important : ne partagez jamais votre clé privée avec qui que ce soit. Ne révélez la clé que si vous savez ce que vous faites.",
+      "reveal-key-button": "Révéler la clé"
+    },
+    "withdraw-modal": {
+      "title": "Retirer",
+      "withdraw-button": "Retirer",
+      "withdraw-address-error": "Veuillez entrer une adresse valide"
+    },
+    "connect-modal": {
+      "title": "Connecter",
+      "description": "Connectez-vous avec X ou le portefeuille web3",
+      "sign-in-with-x-button": "Connectez-vous avec X",
+      "sign-in-with-wallet-button": "Connectez-vous avec un wallet",
+      "or-separator": "ou",
+      "disconnect": "Déconnecter",
+      "connected-title": "Bienvenu",
+      "connected-description": "Vous êtes connecté avec succès."
+    },
     "public-beta": {
       "info-text": "Ceci est une version bêta publique - faites vos propres recherches",
       "beta-tag": "[bêta]"
@@ -728,4 +771,3 @@
     "wrong-network": "Chaine incorrecte"
   }
 }
-
