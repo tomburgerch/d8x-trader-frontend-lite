@@ -65,6 +65,10 @@ const openloginAdapter = new OpenloginAdapter({
   privateKeyProvider,
   adapterSettings: {
     uxMode: 'redirect',
+    originData: {
+      ['https://dev.d8x-testnet.pages.dev']:
+        'MEQCIFh3Y9quJU21aHiv7RAq8c2olr4O6XjcigXzlo3PYIfnAiAvAtSfzO0hEQO-WdzIoN87iapBxVY9fFWDD65nmSA0ig',
+    },
     loginConfig: {
       jwt: {
         verifier,
@@ -170,10 +174,10 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
     if (!loggedIn || web3AuthIdToken === '' || isConnected) {
       return;
     }
-    console.log('connect', {
+    /*console.log('connect', {
       web3AuthStatus: web3AuthInstance?.status,
       web3AuthConnected: web3AuthInstance?.connected,
-    });
+    });*/
     connect({
       chainId,
       connector: Web3AuthConnector({
@@ -233,7 +237,7 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
 
   const signInWithTwitter = useCallback(async () => {
     if (!auth || signInRef.current) {
-      console.log('auth not defined');
+      //console.log('auth not defined');
       return;
     }
 
@@ -242,10 +246,10 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
     try {
       await disconnectAsync();
       const twitterProvider = new TwitterAuthProvider();
-      console.log('signInWithPopup', web3AuthInstance?.status, web3AuthInstance?.connected);
+      //console.log('signInWithPopup', web3AuthInstance?.status, web3AuthInstance?.connected);
       const loginRes = await signInWithPopup(auth, twitterProvider);
-      console.log('login details', loginRes);
-      console.log('getIdToken', web3AuthInstance.status, web3AuthInstance.connected);
+      //console.log('login details', loginRes);
+      //console.log('getIdToken', web3AuthInstance.status, web3AuthInstance.connected);
       const idToken = await loginRes.user.getIdToken(true);
       setWeb3AuthIdToken(idToken);
       await connectWeb3Auth(idToken);
