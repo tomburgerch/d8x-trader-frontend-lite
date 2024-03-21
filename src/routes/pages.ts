@@ -21,11 +21,11 @@ export const pages: PageI[] = [
     enabled: true,
   },
   {
-    id: 'pump-station',
+    id: 'boost-station',
     IconComponent: D8XLogo,
-    path: RoutesE.PumpStation,
-    translationKey: 'navigation.pump-station',
-    enabled: pagesConfig.enabledPumpStationPage,
+    path: RoutesE.BoostStation,
+    translationKey: 'navigation.boost-station',
+    enabled: pagesConfig.enabledBoostStationPage,
   },
   {
     id: 'refer',

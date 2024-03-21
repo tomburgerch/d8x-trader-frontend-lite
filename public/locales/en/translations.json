@@ -1,7 +1,7 @@
 {
   "navigation": {
     "trade": "Trade",
-    "pump-station": "PumpStation",
+    "boost-station": "BoostStation",
     "refer": "Refer",
     "vault": "Vault",
     "portfolio": "Portfolio"
@@ -363,25 +363,42 @@
         "clear": "Clear Filter"
       }
     },
-    "pump-station": {
-      "title": "Trade and provide liquidity to PUMP your $D8X Airdrop Bag",
-      "pumped-volume": {
-        "title": "PUMPED Volume",
-        "modal-text": "The $D8X Airdrop is calculated based on PUMPED Volume. For every trade or liquidity provision we compute volume x boost. PUMPED Volume is the sum of it over all your trades and liquidity provisions."
+    "boost-station": {
+      "title": "Trade and provide liquidity to BOOST your $D8X Airdrop",
+      "invite-friends": "Refer",
+      "boosted-volume": {
+        "title": "BOOSTED Volume",
+        "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
       },
-      "pump-o-meter": {
-        "title": "PUMP-O-METER",
-        "modal-text": "The PUMP-O-METER shows the boost that is applied to your NEXT trade / liquidity provision. The boost ranges from 1x to {{totalBoostMax}}x and has two parts:",
+      "trade-volume": {
+        "title": "BOOSTED Trade Volume",
+        "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
+      },
+      "trade-last-increase": {
+        "title": "Last change",
+        "modal-text": "The amount BOOSTED Trade Volume increased from your last trade. LFG!"
+      },
+      "trade-boost": {
+        "title": "Trade Boost",
+        "modal-text": "The Trade Boost is applied to your NEXT trade. The boost ranges from 1x to {{totalBoostMax}}x and has two parts:",
         "modal-text2": "Volume Boost - Your trades over the past 7 days could score you a Volume Boost ranging from 1x to {{volBoostMax}}x. The more you trade, the higher your potential boost!",
         "modal-text3": "Fortune Boost - Each trade gives you a chance to hit the Fortune Boost – a bonus that can skyrocket from 0x all the way up to an incredible {{rndBoostMax}}x!"
       },
       "boost": {
-        "volume": "Volume Boost:",
-        "random": "Fortune Boost:"
+        "volume": "Volume boost:",
+        "random": "Fortune boost:"
       },
-      "last-pump": {
-        "title": "Last PUMP",
-        "modal-text": "The amount PUMPED Volume increased from your last trade / your last liquidity provision. LFG!"
+      "liquidity-volume": {
+        "title": "BOOSTED Liquidity Volume",
+        "modal-text": "The longer you keep your liquidity in the pools, the higher your BOOSTED Liquidity volume. Over 24 hours your BOOSTED Liquidity volume can increase up to Liquidity x Liquidity Boost."
+      },
+      "trade-hourly-increase": {
+        "title": "Hourly change",
+        "modal-text": "Hourly increase of BOOSTED Liquidity"
+      },
+      "liquidity-boost": {
+        "title": "Liquidity Boost",
+        "modal-text": "The Liquidity Boost shows the boost that is applied to your liquidity provision. The boost can change over time."
       }
     },
     "refer": {
@@ -758,7 +775,7 @@
     },
     "connect-modal": {
       "title": "Sign in",
-      "description": "Sign in with X or web3 wallet",
+      "description": "Sign in with X, Google or web3 wallet",
       "sign-in-with-x-button": "Sign in with X",
       "sign-in-with-google-button": "Sign in with Google",
       "sign-in-with-wallet-button": "Sign in with wallet",

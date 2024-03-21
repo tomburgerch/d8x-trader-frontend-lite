@@ -1,7 +1,7 @@
 {
   "navigation": {
     "trade": "Handeln",
-    "pump-station": "PumpStation",
+    "boost-station": "BoostStation",
     "refer": "Empfehlen",
     "vault": "Liquidität",
     "portfolio": "Portfolio"
@@ -363,15 +363,24 @@
         "clear": "Filter Löschen"
       }
     },
-    "pump-station": {
-      "title": "Handle und füge Liquidität hinzu um deinen $D8X Airdrop Bag zu PUMPEN",
-      "pumped-volume": {
-        "title": "GEPUMPTES Volumen",
-        "modal-text": "Der $D8X Airdrop wird basierend auf dem GEPUMPTEN Volumen berechnet. Für jeden Trade und jede Liquiditätsbereitstellung berechnen wir Volumen x Boost. Das gepumpte Volumen ist die Summe davon."
+    "boost-station": {
+      "title": "Handle und füge Liquidität hinzu um deinen $D8X Airdrop Bag zu BOOSTEN",
+      "invite-friends": "Empfehlen",
+      "boosted-volume": {
+        "title": "GEBOOSTETES Volumen",
+        "modal-text": "Der $D8X Airdrop wird basierend auf dem GEBOOSTETEN Volumen berechnet. Geboostetes Volumen ist die Summe des geboosteten Handelsvolumen und des geboosteten Liquiditätsvolumen."
       },
-      "pump-o-meter": {
-        "title": "PUMP-METER",
-        "modal-text": "Der PUMP-METER zeigt den Boost an, der auf deinen NÄCHSTEN Trade angewendet wird. Der Boost reicht von 1x bis {{totalBoostMax}}x und besteht aus zwei Teilen:",
+      "trade-volume": {
+        "title": "GEBOOSTES Handelsvolumen",
+        "modal-text": "Für jeden Trade berechnen wir Handlesvolumen x Boost. Das geboostete Handelsvolumen ist die Summe davon."
+      },
+      "trade-last-increase": {
+        "title": "Letzer Anstieg",
+        "modal-text": "Der letze Anstieg des geboosteten Handelsvolumen. LFG!"
+      },
+      "trade-boost": {
+        "title": "Handels Boost",
+        "modal-text": "Der Handels Boost ist der Boost der auf deinen NÄCHSTEN Trade angewendet wird. Der Boost reicht von 1x bis {{totalBoostMax}}x und besteht aus zwei Teilen:",
         "modal-text2": "Volumen Boost - Deine Trades der letzen 7 Tage können dir einen Volumen Boost bescheren, der von 1x bis {{volBoostMax}}x reicht. Je mehr du handelst, desto höher dein Boost.",
         "modal-text3": "Fortune Boost - Bei jedem Trade hast du die Chance, den Fortune Boost zu erhalten – einen Bonus, der vom 0x auf einen unglaublichen {{rndBoostMax}}x ansteigen kann!"
       },
@@ -379,9 +388,17 @@
         "volume": "Volumen Boost:",
         "random": "Fortune Boost:"
       },
-      "last-pump": {
-        "title": "Letzer PUMP",
-        "modal-text": "Dein letzer Trade/deine letzte Liquiditätsbereitstellung hat GEPUMPES Volume um diesen Betrag erhöht. LFG!"
+      "liquidity-volume": {
+        "title": "GEBOOSTETES Liquiditätsvolumen",
+        "modal-text": "Je länger deine Liquidität in den Pools ist, desto höher ist dein GEBOOSTES Liquiditätsvolumen. Innerhalb von 24 Stunden kann sich dein GEBOOSTES Liquiditätsvolumen auf bis zu Liquidität x Liquiditätsschub erhöhen."
+      },
+      "trade-hourly-increase": {
+        "title": "Stündliche Erhöhung",
+        "modal-text": "Stündliche Erhöhung des GEBOOSTEN Liquiditätsvolumen"
+      },
+      "liquidity-boost": {
+        "title": "Liquiditäts Boost",
+        "modal-text": "Der Liquiditäts Boost zeigt den Boost, der auf deine Liquidität angewendet wird. Der Boost kann sich verändern."
       }
     },
     "refer": {
@@ -758,7 +775,7 @@
     },
     "connect-modal": {
       "title": "Anmelden",
-      "description": "Melden Sie sich mit X oder einer Web3-Wallet an",
+      "description": "Melden Sie sich mit X, Google oder einer Web3-Wallet an",
       "sign-in-with-x-button": "Mit X anmelden",
       "sign-in-with-google-button": "Mit Google anmelden",
       "sign-in-with-wallet-button": "Mit einer Wallet anmelden",
