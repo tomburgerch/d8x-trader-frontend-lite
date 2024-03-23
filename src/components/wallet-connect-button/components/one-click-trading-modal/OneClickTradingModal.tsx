@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -19,46 +19,37 @@ import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getDelegateKey } from 'helpers/getDelegateKey';
 import { activatedOneClickTradingAtom, delegateAddressAtom, tradingClientAtom } from 'store/app.store';
+import { oneClickModalOpenAtom } from 'store/global-modals.store';
 import { storageKeyAtom } from 'store/order-block.store';
 import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 
-import { FundingModal } from './FundingModal';
-import styles from '../OneClickTradingButton.module.scss';
+import { FundingModal } from '../funding-modal/FundingModal';
 
-interface OneClickTradingModalPropsI {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import styles from './OneClickTradingModal.module.scss';
 
-export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPropsI) => {
+export const OneClickTradingModal = () => {
   const { t } = useTranslation();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
 
   const [activatedOneClickTrading, setActivatedOneClickTrading] = useAtom(activatedOneClickTradingAtom);
   const [delegateAddress, setDelegateAddress] = useAtom(delegateAddressAtom);
-  const [proxyAddr] = useAtom(proxyAddrAtom);
+  const [isOneClickModalOpen, setOneClickModalOpen] = useAtom(oneClickModalOpenAtom);
   const [storageKey, setStorageKey] = useAtom(storageKeyAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
+  const proxyAddr = useAtomValue(proxyAddrAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
   const setTradingClient = useSetAtom(tradingClientAtom);
 
   const [isLoading, setLoading] = useState(false);
   const [isActionLoading, setActionLoading] = useState(false);
   const [isDelegated, setDelegated] = useState<boolean | null>(null);
+  const [isFundingModalOpen, setFundingModalOpen] = useState(false);
 
   const handleRemoveRef = useRef(false);
   const handleActivateRef = useRef(false);
   const handleCreateRef = useRef(false);
-
-  const { address, isDisconnected } = useAccount();
-
-  useEffect(() => {
-    if (isDisconnected) {
-      setActivatedOneClickTrading(false);
-      setStorageKey(null);
-    }
-  }, [isDisconnected, setActivatedOneClickTrading, setStorageKey]);
 
   useEffect(() => {
     if (!address || !traderAPI || traderAPI?.chainId !== publicClient?.chain.id) {
@@ -152,8 +143,6 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
     setActionLoading(false);
   };
 
-  const [isFundingModalOpen, setFundingModalOpen] = useState(false);
-
   const handleFund = async () => {
     setFundingModalOpen(true);
   };
@@ -166,7 +155,7 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
   useEffect(() => {
     let interval: number | undefined;
 
-    if (isOpen) {
+    if (isOneClickModalOpen) {
       interval = window.setInterval(() => {
         refetch();
       }, 2000); // 2000 milliseconds = 5 seconds
@@ -177,7 +166,7 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
         clearInterval(interval);
       }
     };
-  }, [refetch, isOpen]);
+  }, [refetch, isOneClickModalOpen]);
 
   useEffect(() => {
     if (activatedOneClickTrading && delegateAddress !== '' && !!delegateBalance && delegateBalance.value < 10n) {
@@ -228,9 +217,11 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
     }
   }, [address, walletClient, storageKey, activatedOneClickTrading, setTradingClient]);
 
+  const handleClose = () => setOneClickModalOpen(false);
+
   return (
     <>
-      <Dialog open={isOpen} onClose={onClose}>
+      <Dialog open={isOneClickModalOpen} onClose={handleClose}>
         <Box className={styles.dialogContent}>
           <Typography variant="h4" className={styles.title}>
             {t('common.settings.one-click-modal.title')}
@@ -289,7 +280,7 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
         </Box>
         <Box className={styles.dialogContent}>
           <Box className={styles.actionButtonsContainer}>
-            <GasDepositChecker>
+            <GasDepositChecker address={walletClient?.account.address}>
               {!isLoading && isDelegated === false && (
                 <Button
                   variant="primary"
@@ -347,7 +338,7 @@ export const OneClickTradingModal = ({ isOpen, onClose }: OneClickTradingModalPr
         <Separator />
         <Box className={styles.dialogContent}>
           <Box className={styles.closeButtonContainer}>
-            <Button variant="secondary" className={styles.cancelButton} onClick={onClose}>
+            <Button variant="secondary" className={styles.cancelButton} onClick={handleClose}>
               {t('common.info-modal.close')}
             </Button>
           </Box>
