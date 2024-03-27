@@ -17,10 +17,15 @@
     "trade": {
       "stats": {
         "mid-price": "Precio Medio",
+        "mid-price-tooltip": "El precio que pagas es el precio medio más/menos el impacto en el precio de su pedido.",
         "mark-price": "Precio de Marca",
+        "mark-price-tooltip": "El precio de marca es el precio al que se valorará el contrato perpetuo. Precio de marca = Precio de Índice + EMA de (Precio Medio - Precio de Índice)",
         "index-price": "Precio de Índice",
+        "index-price-tooltip": "El precio de Índice es el precio de consenso del mercado del indice subyacente.",
         "funding-rate": "Tasa de Financiación",
+        "funding-rate-tooltip": "La tasa de financiación se cotiza como una tasa de 8 horas, se acumula continuamente según el tamaño de la posición y se paga hacia/desde la cuenta de margen. Los pagos de financiación se realizan con cada operacion en el mercado.",
         "open-interest": "Interés Abierto",
+        "open-interest-tooltip": "Tamaño total de las posiciones activas en este contrato perpetuo.",
         "view-graph": "Ver grafico",
         "hide-graph": "Esconder grafico"
       },
@@ -34,7 +39,8 @@
           "liq-price": "Precio de Liq.",
           "margin": "Margen",
           "pnl": "PnL sin Realizar",
-          "tp-sl": "TP/SL"
+          "tp-sl": "TP/SL",
+          "tp-sl-tooltip": "SL para posiciones de COMPRA y TP para posiciones de VENTA (es decir, órdenes Stop-market) se ejecutan si el precio de marca alcanza el precio que se muestra en esta columna. TP para posiciones de COMPRA y órdenes SL para posiciones de VENTA (es decir, órdenes limitadas) se ejecutan si el precio medio más/menos el impacto en el precio de su orden alcanza el precio que se muestra en esta columna."
         },
         "table-content": {
           "buy": "COMPRA",
