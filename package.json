@@ -50,7 +50,7 @@
     ]
   },
   "dependencies": {
-    "@d8x/perpetuals-sdk": "1.1.6",
+    "@d8x/perpetuals-sdk": "1.1.11",
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.0",
     "@ethersproject/providers": "5.7.2",
@@ -123,7 +123,7 @@
     "stylelint-order": "6.0.4",
     "stylelint-scss": "6.2.1",
     "typescript": "5.3.3",
-    "vite": "4.5.2",
+    "vite": "4.5.3",
     "vite-bundle-visualizer": "1.1.0",
     "vite-plugin-checker": "0.6.4",
     "vite-plugin-node-polyfills": "0.21.0",

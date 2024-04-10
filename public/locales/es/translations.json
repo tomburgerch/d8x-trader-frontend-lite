@@ -4,6 +4,7 @@
     "boost-station": "Bomba",
     "refer": "Referir",
     "vault": "Bóveda",
+    "strategies": "Estrategias",
     "portfolio": "Cartera"
   },
   "pages": {
@@ -586,6 +587,57 @@
         }
       }
     },
+    "strategies": {
+      "connect": {
+        "title": "Conéctese a la página de estrategia",
+        "connect-button": "Conectar"
+      },
+      "overview": {
+        "title": "Estrategia de rendimiento con cobertura delta",
+        "synthetic-position": "Posición sintética en USD",
+        "your-yield": "Rendimiento",
+        "your-points": "+ puntos EigenLayer, ether.fi y D8X"
+      },
+      "info": {
+        "title": "Cómo funciona",
+        "text1": "Depositas weETH. La estrategia abre una posición venta perpetua equivalente a 1x ETH/USD, por lo que está cubierto por delta.",
+        "text2": "La estrategia genera rendimiento derivado de weETH (rendimiento haciendo staking de ETH, puntos EigenLayer, puntos ether.fi), así como pagos de tasas de financiación generados a partir de su posición venta en el ETH/USD perpetuo."
+      },
+      "enter": {
+        "title": "Iniciar la estrategia",
+        "amount-info": "La cantidad de weETH que pones en la estrategia. La estrategia abre una posición venta perpetua equivalente a 1x ETH/USD. Generar una posición sintética en USD que genere rendimiento.",
+        "deposit-button": "Iniciar",
+        "toasts": {
+          "tx-submitted": {
+            "title": "Entrando en la estrategia",
+            "body": "Cantidad"
+          },
+          "tx-failed": {
+            "title": "Transacción Fallida",
+            "body": "Razón"
+          }
+        }
+      },
+      "exit": {
+        "title": "Salir de la estrategia",
+        "note": "Saque sus fondos de la estrategia.",
+        "exit-button": "Salir de la estrategia",
+        "confirm-modal": {
+          "title": "Salir de la estrategia",
+          "text": "¿Estás seguro de que quieres salir?",
+          "confirm-button": "Salida"
+        },
+        "toasts": {
+          "tx-submitted": {
+            "title": "Salir de la estrategia"
+          },
+          "tx-failed": {
+            "title": "Transacción Fallida",
+            "body": "Razón"
+          }
+        }
+      }
+    },
     "portfolio": {
       "perpetuals": "Perpetuos",
       "vault": "Bóveda",
@@ -704,7 +756,17 @@
         "funding-modal": {
           "title": "Agregar fondos a la cuenta delegada",
           "description": "Agrega fodos a tu cuenta delegada para poder pagar por gas.",
-          "fund": "Agregar Fondos"
+          "fund": "Agregar Fondos",
+          "toasts": {
+            "tx-submitted": {
+              "title": "You have successfully sent funds to delegate wallet",
+              "body": "Amount"
+            },
+            "tx-failed": {
+              "title": "Transaction Failed",
+              "body": "Reason"
+            }
+          }
         }
       }
     },
@@ -777,7 +839,17 @@
     "withdraw-modal": {
       "title": "Retirar",
       "withdraw-button": "Retirar",
-      "withdraw-address-error": "Por favor ingresar una dirección valida"
+      "withdraw-address-error": "Por favor ingresar una dirección valida",
+      "toasts": {
+        "tx-submitted": {
+          "title": "You have successfully withdrawn your tokens",
+          "body": "Amount"
+        },
+        "tx-failed": {
+          "title": "Transaction Failed",
+          "body": "Reason"
+        }
+      }
     },
     "connect-modal": {
       "title": "Acceso",

@@ -1,6 +1,7 @@
 import { PROXY_ABI } from '@d8x/perpetuals-sdk';
-import { getBalance } from '@wagmi/core';
-import { PrivateKeyAccount, type Address, type WalletClient } from 'viem';
+import { type Config, getBalance } from '@wagmi/core';
+import { type SendTransactionMutateAsync } from '@wagmi/core/query';
+import { PrivateKeyAccount, type Address, type WalletClient, zeroAddress } from 'viem';
 import { estimateGas } from 'viem/actions';
 
 import { getGasPrice } from 'blockchain-api/getGasPrice';
@@ -9,7 +10,8 @@ import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 export async function removeDelegate(
   walletClient: WalletClient,
   delegateAccount: PrivateKeyAccount,
-  proxyAddr: Address
+  proxyAddr: Address,
+  sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
 ): Promise<{ hash: Address }> {
   const account = walletClient.account?.address;
   if (!account) {
@@ -17,15 +19,17 @@ export async function removeDelegate(
   }
   // remove delegate
   const gasPrice = await getGasPrice(walletClient.chain?.id);
+
   const tx = await walletClient.writeContract({
     chain: walletClient.chain,
     address: proxyAddr as Address,
     abi: PROXY_ABI,
-    functionName: 'removeDelegate',
-    args: [],
+    functionName: 'setDelegate',
+    args: [zeroAddress, 0],
     gasPrice: gasPrice,
     account: account,
   });
+
   // reclaim delegate funds
   if (account !== delegateAccount.address) {
     const { value: balance } = await getBalance(wagmiConfig, { address: delegateAccount.address });
@@ -35,14 +39,14 @@ export async function removeDelegate(
       account: delegateAccount,
       gasPrice,
     }).catch(() => undefined);
-    if (gasLimit && gasLimit * gasPrice < balance) {
-      await walletClient.sendTransaction({
-        to: account,
-        value: balance - gasLimit * gasPrice,
-        chain: walletClient.chain,
-        gas: gasLimit,
-        gasPrice,
+    if (gasLimit && 2n * gasLimit * gasPrice < balance) {
+      await sendTransactionAsync({
         account: delegateAccount,
+        to: account,
+        value: balance - 2n * gasLimit * gasPrice,
+        chainId: walletClient.chain?.id,
+        gas: gasLimit * 2n,
+        gasPrice,
       });
     }
   }

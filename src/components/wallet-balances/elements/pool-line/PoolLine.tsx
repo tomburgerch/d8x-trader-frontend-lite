@@ -30,7 +30,9 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
         functionName: 'decimals',
       },
     ],
-    query: { enabled: address && pool.marginTokenAddr !== undefined && !isPending && isConnected },
+    query: {
+      enabled: address && pool.marginTokenAddr !== undefined && !isPending && isConnected,
+    },
   });
 
   useEffect(() => {

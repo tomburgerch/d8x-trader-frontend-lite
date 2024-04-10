@@ -4,6 +4,7 @@
     "boost-station": "BoostStation",
     "refer": "Empfehlen",
     "vault": "Liquidität",
+    "strategies": "Strategien",
     "portfolio": "Portfolio"
   },
   "pages": {
@@ -586,6 +587,57 @@
         }
       }
     },
+    "strategies": {
+      "connect": {
+        "title": "Mit Strategie Konto verbinden",
+        "connect-button": "Anmelden"
+      },
+      "overview": {
+        "title": "Delta-gesicherte Renditestrategie",
+        "synthetic-position": "Synthetische USD-Position",
+        "your-yield": "Rendite",
+        "your-points": " + EigenLayer, ether.fi and D8X Punkte"
+      },
+      "info": {
+        "title": "Wie es funktioniert",
+        "text1": "Sie zahlen weETH ein. Die Strategie eröffnet eine äquivalente 1x ETH/USD Perpetual Short Position, sodass Sie Delta-abgesichert sind.",
+        "text2": "Die Strategie generiert Erträge aus weETH (Ethereum Staking Rendite, EigenLayer-Punkte, ether.fi-Punkte) sowie Fundingzahlungen, die aus Ihrer Short-Position im ETH/USD Perpetual generiert werden."
+      },
+      "enter": {
+        "title": "Strategie starten",
+        "amount-info": "Die Menge an weETH, die Sie in die Strategie stecken. Die Strategie eröffnet eine äquivalente 1x ETH/USD Perpetual Short Position. Dies generiert eine synthetische USD-Position, die Rendite erwirtschaftet.",
+        "deposit-button": "starten",
+        "toasts": {
+          "tx-submitted": {
+            "title": "Strategie wird gestartet",
+            "body": "Menge"
+          },
+          "tx-failed": {
+            "title": "Transaktion fehlgeschlagen",
+            "body": "Grund"
+          }
+        }
+      },
+      "exit": {
+        "title": "Strategie beenden",
+        "note": "Nehmen Sie Ihr Kapital aus der Strategie heraus.",
+        "exit-button": "Beenden",
+        "confirm-modal": {
+          "title": "Strategie beenden",
+          "text": "Sie sind sicher, dass Sie beenden wollen?",
+          "confirm-button": "beenden"
+        },
+        "toasts": {
+          "tx-submitted": {
+            "title": "Strategie wird beendet"
+          },
+          "tx-failed": {
+            "title": "Transaktion fehlgeschlagen",
+            "body": "Grund"
+          }
+        }
+      }
+    },
     "portfolio": {
       "perpetuals": "Perpetuals",
       "vault": "Liquiditätspools",
@@ -704,7 +756,17 @@
         "funding-modal": {
           "title": "Auf Delegiertenkonto einzahlen",
           "description": "Auf Delegiertenkonto einzahlen um gas zu bezahlen.",
-          "fund": "Einzahlen"
+          "fund": "Einzahlen",
+          "toasts": {
+            "tx-submitted": {
+              "title": "You have successfully sent funds to delegate wallet",
+              "body": "Amount"
+            },
+            "tx-failed": {
+              "title": "Transaction Failed",
+              "body": "Reason"
+            }
+          }
         }
       }
     },
@@ -777,7 +839,17 @@
     "withdraw-modal": {
       "title": "Abheben",
       "withdraw-button": "Abheben",
-      "withdraw-address-error": "Bitte geben Sie eine gültige Adresse ein"
+      "withdraw-address-error": "Bitte geben Sie eine gültige Adresse ein",
+      "toasts": {
+        "tx-submitted": {
+          "title": "You have successfully withdrawn your tokens",
+          "body": "Amount"
+        },
+        "tx-failed": {
+          "title": "Transaction Failed",
+          "body": "Reason"
+        }
+      }
     },
     "connect-modal": {
       "title": "Anmelden",

@@ -6,11 +6,15 @@ import { estimateContractGas } from 'viem/actions';
 export async function setDelegate(
   walletClient: WalletClient,
   proxyAddr: Address,
-  delegateAddr: Address
-): Promise<{ hash: Address }> {
-  const account = walletClient.account?.address;
+  delegateAddr: Address,
+  delegateIndex: number
+): Promise<Address> {
+  const account = walletClient.account;
   if (!account) {
     throw new Error('account not connected');
+  }
+  if (delegateIndex <= 0) {
+    throw new Error('cannot ');
   }
   const gasPrice = await getGasPrice(walletClient.chain?.id);
   const params = {
@@ -18,12 +22,13 @@ export async function setDelegate(
     address: proxyAddr as Address,
     abi: PROXY_ABI,
     functionName: 'setDelegate',
-    args: [delegateAddr],
+    args: [delegateAddr, delegateIndex],
     gasPrice: gasPrice,
-    account: account,
+    account,
   };
   const gasLimit = await estimateContractGas(walletClient, params)
     .then((gas) => (gas * 110n) / 100n)
     .catch(() => undefined);
-  return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => ({ hash: tx }));
+  await walletClient.writeContract({ ...params, gas: gasLimit });
+  return delegateAddr;
 }

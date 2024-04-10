@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
@@ -32,14 +32,16 @@ export const DepositModal = () => {
   const tradingClient = useAtomValue(tradingClientAtom);
   const activatedOneClickTrading = useAtomValue(activatedOneClickTradingAtom);
 
-  const tradingAddress = useMemo(() => {
+  const targetAddress = useMemo(() => {
     if (activatedOneClickTrading && selectedCurrency?.isGasToken === false) {
       return address;
     }
     return tradingClient?.account?.address;
   }, [tradingClient?.account?.address, address, activatedOneClickTrading, selectedCurrency]);
 
-  const handleOnClose = () => setDepositModalOpen(false);
+  const handleOnClose = useCallback(() => {
+    setDepositModalOpen(false);
+  }, [setDepositModalOpen]);
 
   const poolAddress = selectedCurrency?.contractAddress || '';
 
@@ -73,7 +75,7 @@ export const DepositModal = () => {
           </Typography>
         </div>
         <div className={styles.section}>
-          <CopyInput id="address" textToCopy={tradingAddress || ''} />
+          <CopyInput id="address" textToCopy={targetAddress || ''} />
         </div>
         <Separator />
         <div className={styles.section}>

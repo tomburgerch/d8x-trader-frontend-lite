@@ -3,22 +3,35 @@ import { writeContract } from '@wagmi/core';
 import { useAtom } from 'jotai';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type Address, erc20Abi, formatUnits, parseUnits } from 'viem';
-import { useAccount, useReadContracts, useWalletClient } from 'wagmi';
+import { toast } from 'react-toastify';
+import { type Address, erc20Abi, formatUnits, parseEther, parseUnits } from 'viem';
+import { type BaseError, useAccount, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
 
-import { Button, DialogActions, DialogContent, DialogTitle, Link, OutlinedInput, Typography } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Link,
+  OutlinedInput,
+  Typography,
+} from '@mui/material';
 
-import { transferFunds } from 'blockchain-api/transferFunds';
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { CurrencySelect } from 'components/currency-selector/CurrencySelect';
 import { CurrencyItemI } from 'components/currency-selector/types';
 import { Dialog } from 'components/dialog/Dialog';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { Separator } from 'components/separator/Separator';
+import { ToastContent } from 'components/toast-content/ToastContent';
 import { WalletBalances } from 'components/wallet-balances/WalletBalances';
 import { withdrawModalOpenAtom } from 'store/global-modals.store';
 import { isValidAddress } from 'utils/isValidAddress';
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import { useTransferGasToken } from './hooks/useTransferGasToken';
+import { useTransferTokens } from './hooks/useTransferTokens';
 
 import styles from './WithdrawModal.module.scss';
 
@@ -28,10 +41,14 @@ export const WithdrawModal = () => {
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyItemI>();
   const [amountValue, setAmountValue] = useState('');
   const [addressValue, setAddressValue] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const addressInputTouchedRef = useRef(false);
 
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useAtom(withdrawModalOpenAtom);
+
+  const { setTxHash: setTxHashForTokensTransfer } = useTransferTokens(amountValue, selectedCurrency?.name);
+  const { setTxHash: setTxHashForGasTransfer } = useTransferGasToken(amountValue, selectedCurrency?.name);
 
   useEffect(() => {
     setAmountValue('');
@@ -39,6 +56,25 @@ export const WithdrawModal = () => {
 
   const { data: walletClient } = useWalletClient();
   const { address, isConnected } = useAccount();
+  const { data: sendHash, error: sendError, isPending, sendTransaction } = useSendTransaction();
+
+  useEffect(() => {
+    setTxHashForGasTransfer(sendHash);
+  }, [sendHash, setTxHashForGasTransfer]);
+
+  useEffect(() => {
+    if (sendError) {
+      console.error(sendError);
+      toast.error(<ToastContent title={(sendError as BaseError).shortMessage || sendError.message} bodyLines={[]} />);
+    }
+  }, [sendError]);
+
+  useEffect(() => {
+    setLoading(isPending);
+    if (!isPending) {
+      setAmountValue('');
+    }
+  }, [isPending]);
 
   const { data: selectedTokenBalanceData } = useReadContracts({
     allowFailure: false,
@@ -77,22 +113,47 @@ export const WithdrawModal = () => {
 
   const handleOnClose = () => setWithdrawModalOpen(false);
 
-  const handleWithdraw = () => {
-    if (selectedCurrency && selectedTokenBalanceData && walletClient && isAddressValid) {
-      if (selectedCurrency.contractAddress) {
+  const handleWithdraw = useCallback(() => {
+    if (selectedCurrency && walletClient && isAddressValid && amountValue) {
+      if (selectedCurrency.contractAddress && selectedTokenBalanceData) {
+        setLoading(true);
         writeContract(wagmiConfig, {
           account: walletClient.account,
           abi: ERC20_ABI,
           address: selectedCurrency.contractAddress,
           functionName: 'transfer',
           args: [addressValue, parseUnits(amountValue, selectedTokenBalanceData[1])],
-        }).then();
-      } else {
+        })
+          .then((tx) => {
+            setTxHashForTokensTransfer(tx);
+            setAmountValue('');
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      } else if (!selectedCurrency.contractAddress) {
         // Transfer GAS token without contractAddress
-        transferFunds(walletClient, addressValue as Address, +amountValue).then();
+        sendTransaction({
+          account: walletClient.account,
+          to: addressValue as Address,
+          value: parseEther(amountValue),
+        });
       }
     }
-  };
+  }, [
+    selectedCurrency,
+    selectedTokenBalanceData,
+    walletClient,
+    isAddressValid,
+    addressValue,
+    amountValue,
+    setTxHashForTokensTransfer,
+    sendTransaction,
+  ]);
 
   return (
     <Dialog open={isWithdrawModalOpen} onClose={handleOnClose} className={styles.dialog}>
@@ -172,8 +233,9 @@ export const WithdrawModal = () => {
         <Button
           onClick={handleWithdraw}
           variant="primary"
-          disabled={!address || !amountValue || +amountValue <= 0 || !isAddressValid}
+          disabled={!address || !amountValue || +amountValue <= 0 || !isAddressValid || loading}
         >
+          {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
           {t('common.withdraw-modal.withdraw-button')}
         </Button>
       </DialogActions>

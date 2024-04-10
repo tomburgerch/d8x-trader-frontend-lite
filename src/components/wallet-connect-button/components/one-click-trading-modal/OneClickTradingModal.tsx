@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type Address, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { useAccount, useBalance, usePublicClient, useWalletClient } from 'wagmi';
+import { useAccount, useBalance, usePublicClient, useSendTransaction, useWalletClient } from 'wagmi';
 
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
@@ -27,12 +27,15 @@ import { FundingModal } from '../funding-modal/FundingModal';
 
 import styles from './OneClickTradingModal.module.scss';
 
+const DELEGATE_INDEX = 1; // to be emitted with setDelegate
+
 export const OneClickTradingModal = () => {
   const { t } = useTranslation();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
+  const { sendTransactionAsync } = useSendTransaction();
 
   const [activatedOneClickTrading, setActivatedOneClickTrading] = useAtom(activatedOneClickTradingAtom);
   const [delegateAddress, setDelegateAddress] = useAtom(delegateAddressAtom);
@@ -44,6 +47,8 @@ export const OneClickTradingModal = () => {
 
   const [isLoading, setLoading] = useState(false);
   const [isActionLoading, setActionLoading] = useState(false);
+  const [isRemoveActionLoading, setRemoveActionLoading] = useState(false);
+  const [isActivateActionLoading, setActivateActionLoading] = useState(false);
   const [isDelegated, setDelegated] = useState<boolean | null>(null);
   const [isFundingModalOpen, setFundingModalOpen] = useState(false);
 
@@ -61,7 +66,7 @@ export const OneClickTradingModal = () => {
     hasDelegate(publicClient, traderAPI.getProxyAddress() as Address, address)
       .then(setDelegated)
       .finally(() => setLoading(false));
-  }, [publicClient, address, traderAPI]);
+  }, [publicClient, address, traderAPI, isOneClickModalOpen]);
 
   useEffect(() => {
     if (!isDelegated || (address && address !== walletClient?.account?.address)) {
@@ -78,20 +83,35 @@ export const OneClickTradingModal = () => {
     handleCreateRef.current = true;
     setActionLoading(true);
 
-    const strgKey = await getStorageKey(walletClient);
-    setStorageKey(strgKey);
-    const delegateAddr = (await generateDelegate(walletClient, strgKey)).address;
-    await setDelegate(walletClient, proxyAddr as Address, delegateAddr);
-    setDelegated(true);
-    setActivatedOneClickTrading(true);
-    setDelegateAddress(delegateAddr);
+    getStorageKey(walletClient)
+      .then((strgKey) => {
+        setStorageKey(strgKey);
+        return generateDelegate(walletClient, strgKey);
+      })
+      .then((delegate) => {
+        const delegateAddr = delegate.address;
+        return setDelegate(walletClient, proxyAddr as Address, delegateAddr, DELEGATE_INDEX);
+      })
+      .then((delegateAddr) => {
+        setDelegated(true);
+        setActivatedOneClickTrading(true);
+        setDelegateAddress(delegateAddr);
 
-    toast.success(
-      <ToastContent title={t('common.settings.one-click-modal.create-delegate.create-success-result')} bodyLines={[]} />
-    );
-
-    handleCreateRef.current = false;
-    setActionLoading(false);
+        toast.success(
+          <ToastContent
+            title={t('common.settings.one-click-modal.create-delegate.create-success-result')}
+            bodyLines={[]}
+          />
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+      })
+      .finally(() => {
+        handleCreateRef.current = false;
+        setActionLoading(false);
+      });
   };
 
   const handleActivate = async () => {
@@ -107,6 +127,7 @@ export const OneClickTradingModal = () => {
 
     handleActivateRef.current = true;
     setActionLoading(true);
+    setActivateActionLoading(true);
 
     try {
       let strgKey = storageKey;
@@ -141,6 +162,7 @@ export const OneClickTradingModal = () => {
 
     handleActivateRef.current = false;
     setActionLoading(false);
+    setActivateActionLoading(false);
   };
 
   const handleFund = async () => {
@@ -180,10 +202,13 @@ export const OneClickTradingModal = () => {
     }
     handleRemoveRef.current = true;
     setActionLoading(true);
+    setRemoveActionLoading(true);
 
     getStorageKey(walletClient)
       .then((strgKey) => generateDelegate(walletClient, strgKey))
-      .then((delegateAccount) => removeDelegate(walletClient, delegateAccount, proxyAddr as Address))
+      .then((delegateAccount) =>
+        removeDelegate(walletClient, delegateAccount, proxyAddr as Address, sendTransactionAsync)
+      )
       .then((result) => {
         console.debug('Remove action hash: ', result.hash);
         setActivatedOneClickTrading(false);
@@ -195,9 +220,14 @@ export const OneClickTradingModal = () => {
           />
         );
       })
+      .catch((error) => {
+        console.error(error);
+        toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+      })
       .finally(() => {
         handleRemoveRef.current = false;
         setActionLoading(false);
+        setRemoveActionLoading(false);
       });
   };
 
@@ -280,59 +310,62 @@ export const OneClickTradingModal = () => {
         </Box>
         <Box className={styles.dialogContent}>
           <Box className={styles.actionButtonsContainer}>
-            <GasDepositChecker address={walletClient?.account.address} className={styles.actionButton}>
-              {!isLoading && isDelegated === false && (
+            {!isLoading && isDelegated === false && (
+              <GasDepositChecker address={walletClient?.account.address} className={styles.actionButton}>
                 <Button
                   variant="primary"
                   className={styles.actionButton}
                   onClick={handleCreate}
-                  disabled={isActionLoading}
+                  disabled={!proxyAddr || isActionLoading}
                 >
+                  {isActionLoading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
                   {t(`common.settings.one-click-modal.create-delegate.create`)}
                 </Button>
-              )}
-              {!isLoading && isDelegated === true && (
-                <>
-                  {activatedOneClickTrading ? (
-                    <Button
-                      variant="primary"
-                      className={styles.actionButton}
-                      onClick={() => setActivatedOneClickTrading(false)}
-                      disabled={isActionLoading}
-                    >
-                      {t(`common.settings.one-click-modal.manage-delegate.deactivate`)}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      className={styles.actionButton}
-                      onClick={handleActivate}
-                      disabled={isActionLoading}
-                    >
-                      {t(`common.settings.one-click-modal.manage-delegate.activate`)}
-                    </Button>
-                  )}
+              </GasDepositChecker>
+            )}
+            {!isLoading && isDelegated === true && (
+              <>
+                {activatedOneClickTrading ? (
                   <Button
                     variant="primary"
                     className={styles.actionButton}
-                    onClick={handleRemove}
+                    onClick={() => setActivatedOneClickTrading(false)}
                     disabled={isActionLoading}
                   >
-                    {t(`common.settings.one-click-modal.manage-delegate.remove`)}
+                    {t(`common.settings.one-click-modal.manage-delegate.deactivate`)}
                   </Button>
-                  {activatedOneClickTrading && (
-                    <Button
-                      variant="primary"
-                      className={styles.actionButton}
-                      onClick={handleFund}
-                      disabled={isActionLoading}
-                    >
-                      {t(`common.settings.one-click-modal.manage-delegate.fund`)}
-                    </Button>
-                  )}
-                </>
-              )}
-            </GasDepositChecker>
+                ) : (
+                  <Button
+                    variant="primary"
+                    className={styles.actionButton}
+                    onClick={handleActivate}
+                    disabled={!proxyAddr || isActionLoading}
+                  >
+                    {isActivateActionLoading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+                    {t(`common.settings.one-click-modal.manage-delegate.activate`)}
+                  </Button>
+                )}
+                <Button
+                  variant="primary"
+                  className={styles.actionButton}
+                  onClick={handleRemove}
+                  disabled={!proxyAddr || isActionLoading}
+                >
+                  {isRemoveActionLoading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+                  {t(`common.settings.one-click-modal.manage-delegate.remove`)}
+                </Button>
+                {activatedOneClickTrading && (
+                  <Button
+                    variant="primary"
+                    className={styles.actionButton}
+                    onClick={handleFund}
+                    disabled={isActionLoading}
+                  >
+                    {t(`common.settings.one-click-modal.manage-delegate.fund`)}
+                  </Button>
+                )}
+              </>
+            )}
           </Box>
         </Box>
         <Separator />

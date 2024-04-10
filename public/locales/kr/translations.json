@@ -4,6 +4,7 @@
     "boost-station": "BoostStation",
     "refer": "추천",
     "vault": "Vault",
+    "strategies": "Strategies",
     "portfolio": "포트폴리오"
   },
   "pages": {
@@ -565,6 +566,56 @@
         }
       }
     },
+    "strategies": {
+      "connect": {
+        "title": "Connect to Strategy Vault",
+        "connect-button": "Connect"
+      },
+      "overview": {
+        "title": "Delta-hedged yield strategy",
+        "synthetic-position": "Synthetic USD position",
+        "your-yield": "Your yield"
+      },
+      "info": {
+        "title": "How it works",
+        "text1": "You deposit weETH. The strategy opens an equivalent 1x ETH/USD perpetual short position, so you are delta-hedged.",
+        "text2": "The strategy generates yield derived from weETH (staked Ethereum yield, EigenLayer points, ether.fi points), as well as funding rate payments generated from your short position in the ETH/USD perpetual."
+      },
+      "enter": {
+        "title": "Enter strategy",
+        "amount-info": "Amount Info",
+        "deposit-button": "Deposit",
+        "toasts": {
+          "tx-submitted": {
+            "title": "You have successfully entered the strategy",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        }
+      },
+      "exit": {
+        "title": "Exit strategy",
+        "note": "Take your funds out of the strategy.",
+        "exit-button": "Exit strategy",
+        "confirm-modal": {
+          "title": "Exit strategy",
+          "text": "Are you sure you want to exit?",
+          "confirm-button": "Exit"
+        },
+        "toasts": {
+          "tx-submitted": {
+            "title": "You have successfully exit from the strategy"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        }
+      }
+    },
     "portfolio": {
       "perpetuals": "퍼페추얼",
       "vault": "볼트",
@@ -683,7 +734,17 @@
         "funding-modal": {
           "title": "Fund delegate wallet",
           "description": "Fund your delegate wallet to pay for gas.",
-          "fund": "Fund"
+          "fund": "Fund",
+          "toasts": {
+            "tx-submitted": {
+              "title": "You have successfully sent funds to delegate wallet",
+              "body": "Amount"
+            },
+            "tx-failed": {
+              "title": "Transaction Failed",
+              "body": "Reason"
+            }
+          }
         }
       }
     },
@@ -745,7 +806,17 @@
     "withdraw-modal": {
       "title": "Withdraw",
       "withdraw-button": "Withdraw",
-      "withdraw-address-error": "Please enter a valid address"
+      "withdraw-address-error": "Please enter a valid address",
+      "toasts": {
+        "tx-submitted": {
+          "title": "You have successfully withdrawn your tokens",
+          "body": "Amount"
+        },
+        "tx-failed": {
+          "title": "Transaction Failed",
+          "body": "Reason"
+        }
+      }
     },
     "connect-modal": {
       "title": "Sign in",

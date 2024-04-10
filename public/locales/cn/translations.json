@@ -4,6 +4,7 @@
     "boost-station": "加速站",
     "refer": "邀请返佣",
     "vault": "金库",
+    "strategies": "策略",
     "portfolio": "投资组合"
   },
   "pages": {
@@ -586,6 +587,57 @@
         }
       }
     },
+    "strategies": {
+      "connect": {
+        "title": "连接到策略页面",
+        "connect-button": "连接"
+      },
+      "overview": {
+        "title": "Delta 对冲收益率策略",
+        "synthetic-position": "合成美元头寸",
+        "your-yield": "产量",
+        "your-points": " + EigenLayer、ether.fi 和 D8X 积分"
+      },
+      "info": {
+        "title": "如何赚取",
+        "text1": "您存入 weETH。该策略开设等值 1 倍 ETH/美元的永久空头头寸，因此您可以进行 Delta 对冲。",
+        "text2": "该策略产生来自 weETH 的收益（质押的以太坊收益、EigenLayer 积分、ether.fi 积分），以及您在 ETH/USD 永续合约空头头寸中产生的资金利率支付。"
+      },
+      "enter": {
+        "title": "开始策略",
+        "amount-info": "您投入策略的 weETH 金额。该策略开设等值 1 倍 ETH/美元的永久空头头寸。生成可赚取收益的合成美元头寸。",
+        "deposit-button": "启动",
+        "toasts": {
+          "tx-submitted": {
+            "title": "开始策略",
+            "body": "数量"
+          },
+          "tx-failed": {
+            "title": "交易失败",
+            "body": "原因"
+          }
+        }
+      },
+      "exit": {
+        "title": "退出策略",
+        "note": "将您的资金从策略中取出。",
+        "exit-button": "退出策略",
+        "confirm-modal": {
+          "title": "退出策略",
+          "text": "你确定要离开？",
+          "confirm-button": "退出"
+        },
+        "toasts": {
+          "tx-submitted": {
+            "title": "退出策略"
+          },
+          "tx-failed": {
+            "title": "交易失败",
+            "body": "原因"
+          }
+        }
+      }
+    },
     "portfolio": {
       "perpetuals": "永续合约",
       "vault": "金库",
@@ -704,7 +756,17 @@
         "funding-modal": {
           "title": "存入资金至委托钱包",
           "description": "向委托钱包存入资金用于支付gas费",
-          "fund": "存入资金"
+          "fund": "存入资金",
+          "toasts": {
+            "tx-submitted": {
+              "title": "You have successfully sent funds to delegate wallet",
+              "body": "Amount"
+            },
+            "tx-failed": {
+              "title": "Transaction Failed",
+              "body": "Reason"
+            }
+          }
         }
       }
     },
@@ -777,7 +839,17 @@
     "withdraw-modal": {
       "title": "提款",
       "withdraw-button": "提款",
-      "withdraw-address-error": "请输入有效地址"
+      "withdraw-address-error": "请输入有效地址",
+      "toasts": {
+        "tx-submitted": {
+          "title": "You have successfully withdrawn your tokens",
+          "body": "Amount"
+        },
+        "tx-failed": {
+          "title": "Transaction Failed",
+          "body": "Reason"
+        }
+      }
     },
     "connect-modal": {
       "title": "登录",
