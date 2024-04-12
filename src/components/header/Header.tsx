@@ -94,29 +94,25 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   const setExchangeInfo = useCallback(
     (data: ExchangeInfoI | null) => {
+      if (!traderAPI) {
+        return;
+      }
+
       if (!data) {
         setProxyAddr(undefined);
         return;
       }
+
       const pools = data.pools
         .filter((pool) => pool.isRunning)
-        .map((pool) => {
-          let poolId = 0;
-          if (traderAPI) {
-            try {
-              poolId = traderAPI.getPoolIdFromSymbol(pool.poolSymbol);
-            } catch (error) {
-              console.log(error);
-            }
-          }
-
-          return {
-            ...pool,
-            poolId,
-          };
-        });
+        .map((pool) => ({
+          ...pool,
+          poolId: traderAPI.getPoolIdFromSymbol(pool.poolSymbol),
+        }));
       setPools(pools);
+
       setCollaterals(pools.map((pool) => pool.poolSymbol));
+
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
         perpetuals.push(
@@ -145,9 +141,9 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       return;
     }
 
-    if (chainId && (!traderAPI || traderAPI.chainId === chainId) && address) {
+    if (chainId && address) {
       positionsRequestRef.current = true;
-      getPositionRisk(chainId, traderAPI, address, Date.now())
+      getPositionRisk(chainId, null, address, Date.now())
         .then(({ data }) => {
           if (data && data.length > 0) {
             data.map(setPositions);
@@ -158,21 +154,25 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           positionsRequestRef.current = false;
         });
     }
-  }, [triggerPositionsUpdate, setPositions, chainId, traderAPI, address]);
+  }, [triggerPositionsUpdate, setPositions, chainId, address]);
 
   useEffect(() => {
-    if (!exchangeRequestRef.current && chainId && (!traderAPI || traderAPI.chainId === chainId)) {
-      exchangeRequestRef.current = true;
-      setExchangeInfo(null);
-      getExchangeInfo(chainId, traderAPI)
-        .then(({ data }) => {
-          setExchangeInfo(data);
-        })
-        .catch(console.error)
-        .finally(() => {
-          exchangeRequestRef.current = false;
-        });
+    // traderAPI added based on `setExchangeInfo` requirement
+    if (exchangeRequestRef.current || !chainId || !traderAPI) {
+      return;
     }
+
+    exchangeRequestRef.current = true;
+
+    setExchangeInfo(null);
+    getExchangeInfo(chainId, null)
+      .then(({ data }) => {
+        setExchangeInfo(data);
+      })
+      .catch(console.error)
+      .finally(() => {
+        exchangeRequestRef.current = false;
+      });
   }, [chainId, setExchangeInfo, traderAPI]);
 
   const {
