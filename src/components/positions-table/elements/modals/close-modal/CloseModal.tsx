@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -18,39 +18,40 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { orderDigest } from 'network/network';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { orderSubmitted } from 'network/broker';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { poolTokenDecimalsAtom, proxyAddrAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE, OrderTypeE } from 'types/enums';
-import type { MarginAccountWithAdditionalDataI, OrderI } from 'types/types';
-import { OrderWithIdI } from 'types/types';
+import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
+import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
 
 import modalStyles from '../Modal.module.scss';
 import styles from './CloseModal.module.scss';
-import { orderSubmitted } from 'network/broker';
 
 interface CloseModalPropsI {
   isOpen: boolean;
   selectedPosition?: MarginAccountWithAdditionalDataI | null;
+  poolByPosition?: PoolWithIdI | null;
   closeModal: () => void;
 }
 
-export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseModalPropsI) => {
+export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, closeModal }: CloseModalPropsI) => {
   const { t } = useTranslation();
 
-  const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const proxyAddr = useAtomValue(proxyAddrAtom);
+  const tradingClient = useAtomValue(tradingClientAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
-  const [tradingClient] = useAtom(tradingClientAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
 
   const chainId = useChainId();
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId: chainId });
+
+  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   const [requestSent, setRequestSent] = useState(false);
   const [txHash, setTxHash] = useState<Address | undefined>(undefined);
@@ -128,7 +129,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
     if (
       !selectedPosition ||
       !address ||
-      !selectedPool ||
+      !poolByPosition ||
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
@@ -153,7 +154,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
     orderDigest(chainId, [closeOrder], address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
+          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(tradingClient, signatures, data.data)
               .then((tx) => {

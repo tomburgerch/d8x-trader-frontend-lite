@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
-import { Address } from 'viem';
+import { type Address } from 'viem';
 
 import {
   Button,
@@ -28,6 +28,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
+import { useDebouncedEffect } from 'helpers/useDebouncedEffect';
 import {
   getAddCollateral,
   getAvailableMargin,
@@ -35,19 +36,12 @@ import {
   positionRiskOnCollateralAction,
 } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
-import {
-  poolTokenBalanceAtom,
-  poolTokenDecimalsAtom,
-  proxyAddrAtom,
-  selectedPoolAtom,
-  traderAPIAtom,
-  traderAPIBusyAtom,
-  triggerBalancesUpdateAtom,
-} from 'store/pools.store';
-import type { MarginAccountI } from 'types/types';
+import { proxyAddrAtom, traderAPIAtom, traderAPIBusyAtom, triggerBalancesUpdateAtom } from 'store/pools.store';
+import type { MarginAccountI, PoolWithIdI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
+import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
 import { ModifyTypeE, ModifyTypeSelector } from '../../modify-type-selector/ModifyTypeSelector';
 
 import styles from '../Modal.module.scss';
@@ -55,17 +49,15 @@ import styles from '../Modal.module.scss';
 interface ModifyModalPropsI {
   isOpen: boolean;
   selectedPosition?: MarginAccountI | null;
+  poolByPosition?: PoolWithIdI | null;
   closeModal: () => void;
 }
 
-export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: ModifyModalPropsI) => {
+export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, closeModal }: ModifyModalPropsI) => {
   const { t } = useTranslation();
 
   const proxyAddr = useAtomValue(proxyAddrAtom);
-  const selectedPool = useAtomValue(selectedPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
-  const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
-  const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
   const setTriggerBalancesUpdate = useSetAtom(triggerBalancesUpdateAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
@@ -88,6 +80,8 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
 
   const isAPIBusyRef = useRef(isAPIBusy);
   const requestSentRef = useRef(false);
+
+  const { poolTokenBalance, poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   const {
     isSuccess: isAddSuccess,
@@ -276,9 +270,13 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
     traderAPI,
   ]);
 
-  useEffect(() => {
-    handleRefreshPositionRisk();
-  }, [debouncedAddCollateral, debouncedRemoveCollateral, handleRefreshPositionRisk]);
+  useDebouncedEffect(
+    () => {
+      handleRefreshPositionRisk();
+    },
+    [debouncedAddCollateral, debouncedRemoveCollateral, handleRefreshPositionRisk],
+    1000
+  );
 
   useEffect(() => {
     setAddCollateral(0);
@@ -388,7 +386,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
     if (
       !selectedPosition ||
       !address ||
-      !selectedPool ||
+      !poolByPosition ||
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
@@ -404,7 +402,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
         .then(({ data }) => {
           approveMarginToken(
             walletClient,
-            selectedPool.marginTokenAddr,
+            poolByPosition.marginTokenAddr,
             proxyAddr,
             addCollateral,
             poolTokenDecimals
@@ -507,7 +505,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                     id="add-collateral"
                     endAdornment={
                       <InputAdornment position="end">
-                        <Typography variant="adornment">{selectedPool?.poolSymbol}</Typography>
+                        <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
@@ -540,7 +538,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, closeModal }: Modif
                       id="remove-collateral"
                       endAdornment={
                         <InputAdornment position="end">
-                          <Typography variant="adornment">{selectedPool?.poolSymbol}</Typography>
+                          <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
                         </InputAdornment>
                       }
                       type="number"

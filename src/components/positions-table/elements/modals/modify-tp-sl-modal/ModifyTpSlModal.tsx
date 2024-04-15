@@ -1,10 +1,10 @@
 import classnames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, erc20Abi } from 'viem';
-import { useAccount, useChainId, useReadContracts, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
+import { type Address } from 'viem';
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
@@ -17,15 +17,16 @@ import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { getTradingFee, orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { poolFeeAtom, poolsAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
+import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OpenOrderTypeE, OrderSideE, OrderTypeE } from 'types/enums';
-import { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
+import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
+import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
 import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
@@ -34,6 +35,7 @@ import styles from '../Modal.module.scss';
 interface ModifyModalPropsI {
   isOpen: boolean;
   selectedPosition?: MarginAccountWithAdditionalDataI | null;
+  poolByPosition?: PoolWithIdI | null;
   closeModal: () => void;
 }
 
@@ -55,20 +57,18 @@ function createMainOrder(position: MarginAccountWithAdditionalDataI) {
   };
 }
 
-export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: ModifyModalPropsI) => {
+export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition, closeModal }: ModifyModalPropsI) => {
   const { t } = useTranslation();
 
-  const { address, chain, isConnected } = useAccount();
+  const { address, chain } = useAccount();
   const chainId = useChainId();
   const { data: walletClient } = useWalletClient({
     chainId,
   });
 
-  const pools = useAtomValue(poolsAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
-  const poolFee = useAtomValue(poolFeeAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
 
   const [collateralDeposit, setCollateralDeposit] = useState<number | null>(null);
@@ -76,10 +76,13 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
   const [stopLossPrice, setStopLossPrice] = useState<number | null | undefined>(undefined);
   const [requestSent, setRequestSent] = useState(false);
   const [txHash, setTxHash] = useState<Address | undefined>(undefined);
-  const [selectedPool, setSelectedPool] = useState<PoolWithIdI>();
+  const [poolFee, setPoolFee] = useState<number>();
 
   const validityCheckRef = useRef(false);
   const requestSentRef = useRef(false);
+  const fetchFeeRef = useRef(false);
+
+  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   useEffect(() => {
     if (validityCheckRef.current) {
@@ -103,33 +106,29 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       });
   }, [selectedPosition, address, traderAPI, chainId, poolFee]);
 
-  useEffect(() => {
-    if (selectedPosition && pools.length > 0) {
-      const parsedSymbol = parseSymbol(selectedPosition.symbol);
-      const foundPool = pools.find(({ poolSymbol }) => poolSymbol === parsedSymbol?.poolSymbol);
-      setSelectedPool(foundPool);
-    } else {
-      setSelectedPool(undefined);
+  const fetchPoolFee = useCallback((_chainId: number, _poolSymbol: string, _address: Address) => {
+    if (fetchFeeRef.current) {
+      return;
     }
-  }, [selectedPosition, pools]);
 
-  const { data: poolTokenBalance } = useReadContracts({
-    allowFailure: false,
-    contracts: [
-      {
-        address: selectedPool?.marginTokenAddr as Address,
-        abi: erc20Abi,
-        functionName: 'balanceOf',
-        args: [address as Address],
-      },
-      {
-        address: selectedPool?.marginTokenAddr as Address,
-        abi: erc20Abi,
-        functionName: 'decimals',
-      },
-    ],
-    query: { enabled: address && chainId === chain?.id && !!selectedPool?.marginTokenAddr && isConnected },
-  });
+    fetchFeeRef.current = true;
+
+    getTradingFee(_chainId, _poolSymbol, _address)
+      .then((data) => {
+        setPoolFee(data.data);
+      })
+      .catch(console.error)
+      .finally(() => {
+        fetchFeeRef.current = false;
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!chainId || !poolByPosition?.poolSymbol || !address) {
+      return;
+    }
+    fetchPoolFee(chainId, poolByPosition.poolSymbol, address);
+  }, [chainId, poolByPosition?.poolSymbol, address, fetchPoolFee]);
 
   const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
@@ -189,7 +188,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
 
   const handleModifyPositionConfirm = async () => {
     if (
-      !selectedPool ||
+      !poolByPosition ||
       !selectedPosition ||
       requestSentRef.current ||
       !tradingClient ||
@@ -197,8 +196,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       !proxyAddr ||
       !walletClient ||
       collateralDeposit === null ||
-      !poolTokenBalance ||
-      !poolTokenBalance[1]
+      !poolTokenDecimals
     ) {
       return;
     }
@@ -273,10 +271,10 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
               // hide modal now that metamask popup shows up
               approveMarginToken(
                 walletClient,
-                selectedPool.marginTokenAddr,
+                poolByPosition.marginTokenAddr,
                 proxyAddr,
                 collateralDeposit,
-                poolTokenBalance[1]
+                poolTokenDecimals
               )
                 .then(() => {
                   // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
@@ -321,7 +319,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
   };
 
   const isDisabledCreateButton =
-    !selectedPool ||
+    !poolByPosition ||
     requestSent ||
     collateralDeposit === null ||
     (takeProfitPrice === selectedPosition.takeProfit.fullValue &&
