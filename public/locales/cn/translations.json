@@ -855,7 +855,25 @@
         "5": "通过 <bold>{{chainName}}</bold>发送。"
       },
       "deposit-note": "确保存入足够的<bold>{{currencyName}}</bold>作为燃料费，并至少有一份抵押品。",
-      "done-button": "完成"
+      "done-button": "完成",
+      "convert": {
+        "text": "将您的 <bold>{{fromCurrency}}</bold> 转换为 <bold>{{toCurrency}}</bold>，无滑点：",
+        "button": "转变",
+        "toasts": {
+          "success-wrap": {
+            "title": "Tokens successfully wrapped",
+            "body": "Amount"
+          },
+          "success-unwrap": {
+            "title": "Tokens successfully unwrapped",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        }
+      }
     },
     "extract-pk-modal": {
       "title": "提取私钥",

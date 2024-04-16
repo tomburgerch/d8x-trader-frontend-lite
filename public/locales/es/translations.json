@@ -855,7 +855,25 @@
         "5": "Envíe por <bold>{{chainName}}</bold>."
       },
       "deposit-note": "Asegúrese de depositar suficiente <bold>{{currencyName}}</bold> para gasolina y al menos una garantía.",
-      "done-button": "Hecho"
+      "done-button": "Hecho",
+      "convert": {
+        "text": "Convierta su <bold>{{fromCurrency}}</bold> a <bold>{{toCurrency}}</bold> sin deslizamiento:",
+        "button": "Convierta",
+        "toasts": {
+          "success-wrap": {
+            "title": "Tokens successfully wrapped",
+            "body": "Amount"
+          },
+          "success-unwrap": {
+            "title": "Tokens successfully unwrapped",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        }
+      }
     },
     "extract-pk-modal": {
       "title": "Extraer clave privada",
