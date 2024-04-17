@@ -1,4 +1,4 @@
-@import '~styles/theme/_theme.scss';
+@import '~styles/theme/theme.scss';
 
 .root {
   border: 1px solid var(--d8x-color-border);
@@ -32,4 +32,12 @@
 
 .dataValue {
   color: var(--d8x-color-text-highlight);
+}
+
+.green {
+  color: var(--d8x-color-buy-rgba);
+}
+
+.red {
+  color: var(--d8x-color-sell-rgba);
 }

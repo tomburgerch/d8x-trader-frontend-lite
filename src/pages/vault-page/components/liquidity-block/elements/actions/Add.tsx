@@ -1,17 +1,20 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useWaitForTransaction, useWalletClient, useNetwork } from 'wagmi';
+import { Address } from 'viem';
+import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
-import { Box, Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
+import { Button, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
-import { ReactComponent as SwitchIcon } from 'assets/icons/switchSeparator.svg';
+import SwitchIcon from 'assets/icons/switchSeparator.svg?react';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { addLiquidity } from 'blockchain-api/contract-interactions/addLiquidity';
+import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { getTxnLink } from 'helpers/getTxnLink';
 import {
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
@@ -23,7 +26,6 @@ import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom } from
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from './Action.module.scss';
-import { getTxnLink } from 'helpers/getTxnLink';
 
 enum ValidityCheckAddE {
   Empty = '-',
@@ -36,28 +38,23 @@ enum ValidityCheckAddE {
 
 export const Add = memo(() => {
   const { t } = useTranslation();
-  const { address } = useAccount();
-  const { chain } = useNetwork();
-  const { data: walletClient } = useWalletClient({
-    onError(error) {
-      console.log(error);
-    },
-  });
 
-  const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [liqProvTool] = useAtom(traderAPIAtom);
-  const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
-  const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
-  const [isSDKConnected] = useAtom(sdkConnectedAtom);
-  const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const { address, chain } = useAccount();
+  const { data: walletClient } = useWalletClient();
+
+  const proxyAddr = useAtomValue(proxyAddrAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const liqProvTool = useAtomValue(traderAPIAtom);
+  const dCurrencyPrice = useAtomValue(dCurrencyPriceAtom);
+  const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
+  const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
 
   const [addAmount, setAddAmount] = useState(0);
   const [requestSent, setRequestSent] = useState(false);
-
   const [inputValue, setInputValue] = useState(`${addAmount}`);
-  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address>();
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
@@ -80,44 +77,61 @@ export const Add = memo(() => {
     inputValueChangedRef.current = false;
   }, [addAmount]);
 
-  useWaitForTransaction({
+  const {
+    isSuccess,
+    isError,
+    isFetched,
+    error: reason,
+  } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.vault.toast.added')}
-          bodyLines={[
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHash}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError(reason) {
-      toast.error(
-        <ToastContent
-          title={t('pages.vault.toast.error.title')}
-          bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
-        />
-      );
-    },
-    onSettled() {
-      setTxHash(undefined);
-      setTriggerUserStatsUpdate((prevValue) => !prevValue);
-    },
-    enabled: !!txHash,
+    query: { enabled: !!txHash },
   });
+
+  useEffect(() => {
+    if (!isFetched) {
+      return;
+    }
+    setTxHash(undefined);
+    setTriggerUserStatsUpdate((prevValue) => !prevValue);
+  }, [isFetched, setTriggerUserStatsUpdate]);
+
+  useEffect(() => {
+    if (!isError || !reason) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.vault.toast.error.title')}
+        bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
+      />
+    );
+  }, [isError, reason, t]);
+
+  useEffect(() => {
+    if (!isSuccess || !txHash) {
+      return;
+    }
+    toast.success(
+      <ToastContent
+        title={t('pages.vault.toast.added')}
+        bodyLines={[
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHash}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+  }, [isSuccess, txHash, chain, t]);
 
   const handleAddLiquidity = () => {
     if (requestSentRef.current) {
@@ -210,7 +224,7 @@ export const Add = memo(() => {
 
   return (
     <div className={styles.root}>
-      <Box className={styles.infoBlock}>
+      <div className={styles.infoBlock}>
         <Typography variant="h5" color={'var(--d8x-color-text-main)'}>
           {t('pages.vault.add.title')}
         </Typography>
@@ -220,15 +234,15 @@ export const Add = memo(() => {
         <Typography variant="body2" className={styles.text}>
           {t('pages.vault.add.info2', { poolSymbol: selectedPool?.poolSymbol })}
         </Typography>
-      </Box>
-      <Box className={styles.contentBlock}>
-        <Box className={styles.inputLine}>
-          <Box className={styles.labelHolder}>
+      </div>
+      <div className={styles.contentBlock}>
+        <div className={styles.inputLine}>
+          <div className={styles.labelHolder}>
             <InfoLabelBlock
               title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.poolSymbol })}
               content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.poolSymbol })}
             />
-          </Box>
+          </div>
           <ResponsiveInput
             id="add-amount-size"
             className={styles.inputHolder}
@@ -239,10 +253,10 @@ export const Add = memo(() => {
             min={0}
             max={poolTokenBalance || 999999}
           />
-        </Box>
+        </div>
         {poolTokenBalance ? (
           <Typography className={styles.helperText} variant="bodyTiny">
-            {t('pages.vault.add.max')} {/* //TODO: Link? To where? */}
+            {t('common.max')}{' '}
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
@@ -254,14 +268,14 @@ export const Add = memo(() => {
             </Link>
           </Typography>
         ) : null}
-        <Box className={styles.iconSeparator}>
+        <div className={styles.iconSeparator}>
           <SwitchIcon />
-        </Box>
-        <Box className={styles.inputLine}>
-          <Box className={styles.labelHolder}>
+        </div>
+        <div className={styles.inputLine}>
+          <div className={styles.labelHolder}>
             {t('pages.vault.add.receive', { poolSymbol: selectedPool?.poolSymbol })}
-          </Box>
-          <Box className={styles.inputHolder}>
+          </div>
+          <div className={styles.inputHolder}>
             <OutlinedInput
               id="expected-amount"
               endAdornment={
@@ -275,19 +289,21 @@ export const Add = memo(() => {
               value={formatToCurrency(predictedAmount, '')}
               disabled
             />
-          </Box>
-        </Box>
-        <Box className={styles.buttonHolder}>
-          <Button
-            variant="primary"
-            disabled={isButtonDisabled}
-            onClick={handleAddLiquidity}
-            className={styles.actionButton}
-          >
-            {validityCheckAddText}
-          </Button>
-        </Box>
-      </Box>
+          </div>
+        </div>
+        <div className={styles.buttonHolder}>
+          <GasDepositChecker className={styles.actionButton}>
+            <Button
+              variant="primary"
+              disabled={isButtonDisabled}
+              onClick={handleAddLiquidity}
+              className={styles.actionButton}
+            >
+              {validityCheckAddText}
+            </Button>
+          </GasDepositChecker>
+        </div>
+      </div>
     </div>
   );
 });

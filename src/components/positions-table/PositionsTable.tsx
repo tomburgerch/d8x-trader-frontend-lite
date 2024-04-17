@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
@@ -12,12 +12,14 @@ import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { useFilter } from 'components/table/filter-modal/useFilter';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { createSymbol } from 'helpers/createSymbol';
+import { parseSymbol } from 'helpers/parseSymbol';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getPositionRisk } from 'network/network';
 import {
+  clearPositionsAtom,
   openOrdersAtom,
+  poolsAtom,
   positionsAtom,
-  removePositionAtom,
   selectedPerpetualAtom,
   selectedPoolAtom,
   traderAPIAtom,
@@ -44,23 +46,21 @@ const MIN_WIDTH_FOR_TABLE = 788;
 export const PositionsTable = () => {
   const { t } = useTranslation();
 
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [openOrders] = useAtom(openOrdersAtom);
-  const [positions, setPositions] = useAtom(positionsAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
-  const removePosition = useSetAtom(removePositionAtom);
-  const [isSDKConnected] = useAtom(sdkConnectedAtom);
-  const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
-  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
-  const setHasTpSlOrders = useSetAtom(hasTpSlOrdersAtom);
-
-  const isAPIBusyRef = useRef(isAPIBusy);
-  const isSelectedPositionSetRef = useRef(false);
-
   const chainId = useChainId();
   const { address, isConnected, isDisconnected } = useAccount();
   const { width, ref } = useResizeDetector();
+
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const pools = useAtomValue(poolsAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const openOrders = useAtomValue(openOrdersAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const [positions, setPositions] = useAtom(positionsAtom);
+  const setAPIBusy = useSetAtom(traderAPIBusyAtom);
+  const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
+  const setHasTpSlOrders = useSetAtom(hasTpSlOrdersAtom);
+  const clearPositions = useSetAtom(clearPositionsAtom);
 
   const [isTpSlChangeModalOpen, setTpSlChangeModalOpen] = useState(false);
   const [isModifyModalOpen, setModifyModalOpen] = useState(false);
@@ -71,6 +71,9 @@ export const PositionsTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Asc);
   const [orderBy, setOrderBy] = useState<keyof MarginAccountWithAdditionalDataI>('symbol');
+
+  const isAPIBusyRef = useRef(false);
+  const isSelectedPositionSetRef = useRef(false);
 
   const handleTpSlModify = useCallback((position: MarginAccountWithAdditionalDataI) => {
     setTpSlChangeModalOpen(true);
@@ -114,39 +117,42 @@ export const PositionsTable = () => {
     isSelectedPositionSetRef.current = true;
   }, []);
 
-  const clearPositions = useCallback(() => {
-    if (selectedPool?.perpetuals) {
-      selectedPool.perpetuals.forEach(({ baseCurrency, quoteCurrency }) => {
-        const symbol = createSymbol({
-          baseCurrency,
-          quoteCurrency,
-          poolSymbol: selectedPool.poolSymbol,
-        });
-        removePosition(symbol);
-      });
+  const poolByPosition = useMemo(() => {
+    if (!selectedPosition?.symbol || pools.length === 0) {
+      return null;
     }
-  }, [selectedPool, removePosition]);
+
+    const parsedSymbol = parseSymbol(selectedPosition.symbol);
+    const foundPool = pools.find(({ poolSymbol }) => poolSymbol === parsedSymbol?.poolSymbol);
+    return foundPool || null;
+  }, [pools, selectedPosition?.symbol]);
 
   useEffect(() => {
-    if (isDisconnected || traderAPI?.chainId !== chainId) {
+    if (isDisconnected || !traderAPI || traderAPI.chainId !== chainId) {
       clearPositions();
     }
   }, [isDisconnected, chainId, clearPositions, traderAPI]);
 
   const refreshPositions = useCallback(async () => {
-    if (address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== traderAPI?.chainId) {
+    if (address && traderAPI && isConnected && chainId && isSDKConnected) {
+      if (isAPIBusyRef.current || chainId !== traderAPI.chainId) {
         return;
       }
+
       setAPIBusy(true);
+      isAPIBusyRef.current = true;
+
       try {
         const { data } = await getPositionRisk(chainId, traderAPI, address, Date.now());
         clearPositions();
-        data.map(setPositions);
+        if (data && data.length > 0) {
+          data.map(setPositions);
+        }
       } catch (err) {
         console.error(err);
       } finally {
         setAPIBusy(false);
+        isAPIBusyRef.current = false;
       }
     }
   }, [chainId, address, isConnected, isSDKConnected, setAPIBusy, setPositions, clearPositions, traderAPI]);
@@ -202,6 +208,7 @@ export const PositionsTable = () => {
       {
         numeric: true,
         label: t('pages.trade.positions-table.table-header.tp-sl'),
+        tooltip: t('pages.trade.positions-table.table-header.tp-sl-tooltip'),
         align: AlignE.Right,
       },
       {
@@ -312,7 +319,7 @@ export const PositionsTable = () => {
           } else if (stopLossOrders[0].reduceOnly) {
             // if 1 SL order exists for an order size that is > position.size, but the order is reduceOnly, show stopPrice
             stopLossValueType = OrderValueTypeE.Full;
-            stopLossFullValue = takeProfitOrders[0].stopPrice;
+            stopLossFullValue = stopLossOrders[0].stopPrice;
           } else {
             // if 1 TP order exists for an order size that is > position.size, show stopPrice of that order for SL
             stopLossValueType = OrderValueTypeE.Exceeded;
@@ -374,6 +381,12 @@ export const PositionsTable = () => {
       isSelectedPositionSetRef.current = false;
     }
   }, [filteredRows, selectedPosition]);
+
+  useEffect(() => {
+    if (filteredRows.length > 0 && filteredRows.length <= page * rowsPerPage) {
+      setPage((prevPage) => Math.max(0, prevPage - 1));
+    }
+  }, [filteredRows.length, page, rowsPerPage]);
 
   return (
     <div className={styles.root} ref={ref}>
@@ -476,9 +489,24 @@ export const PositionsTable = () => {
           isSelectedPositionSetRef.current = true;
         }}
       />
-      <ModifyTpSlModal isOpen={isTpSlChangeModalOpen} selectedPosition={selectedPosition} closeModal={closeTpSlModal} />
-      <ModifyModal isOpen={isModifyModalOpen} selectedPosition={selectedPosition} closeModal={closeModifyModal} />
-      <CloseModal isOpen={isCloseModalOpen} selectedPosition={selectedPosition} closeModal={closeCloseModal} />
+      <ModifyTpSlModal
+        isOpen={isTpSlChangeModalOpen}
+        selectedPosition={selectedPosition}
+        poolByPosition={poolByPosition}
+        closeModal={closeTpSlModal}
+      />
+      <ModifyModal
+        isOpen={isModifyModalOpen}
+        selectedPosition={selectedPosition}
+        poolByPosition={poolByPosition}
+        closeModal={closeModifyModal}
+      />
+      <CloseModal
+        isOpen={isCloseModalOpen}
+        selectedPosition={selectedPosition}
+        poolByPosition={poolByPosition}
+        closeModal={closeCloseModal}
+      />
     </div>
   );
 };

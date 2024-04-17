@@ -2,12 +2,12 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
-import { HeaderPortal } from 'components/header/HeaderPortal';
 import { CollateralsSelect } from 'components/header/elements/collaterals-select/CollateralsSelect';
 import { Helmet } from 'components/helmet/Helmet';
+import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
 import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
@@ -52,20 +52,26 @@ export const VaultPage = () => {
   return (
     <>
       <Helmet title={`${selectedPool?.poolSymbol} Vault | D8X App`} />
-      <Box className={styles.root}>
-        <HeaderPortal>
-          <CollateralsSelect />
-        </HeaderPortal>
-        {isSmallScreen && (
-          <Box className={styles.mobileSelectBoxes}>
-            <CollateralsSelect />
-          </Box>
-        )}
-        <Container className={styles.container}>
-          <GlobalStats />
-          <LiquidityBlock />
-        </Container>
-      </Box>
+      <div className={styles.root}>
+        <MaintenanceWrapper>
+          {isSmallScreen && (
+            <div className={styles.mobileSelectBoxes}>
+              <CollateralsSelect />
+            </div>
+          )}
+          <Container className={styles.container}>
+            <div className={styles.statsHolder}>
+              {!isSmallScreen && (
+                <div className={styles.selectHolder}>
+                  <CollateralsSelect />
+                </div>
+              )}
+              <GlobalStats />
+            </div>
+            <LiquidityBlock />
+          </Container>
+        </MaintenanceWrapper>
+      </div>
     </>
   );
 };

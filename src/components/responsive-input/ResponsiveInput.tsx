@@ -3,8 +3,8 @@ import { type ChangeEvent, memo, type ReactNode } from 'react';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
-import { ReactComponent as DecreaseIcon } from 'assets/icons/decreaseIcon.svg';
-import { ReactComponent as IncreaseIcon } from 'assets/icons/increaseIcon.svg';
+import DecreaseIcon from 'assets/icons/decreaseIcon.svg?react';
+import IncreaseIcon from 'assets/icons/increaseIcon.svg?react';
 
 import styles from './ResponsiveInput.module.scss';
 
@@ -15,6 +15,7 @@ interface ResponsiveInputPropsI {
   inputValue: string | number | null;
   setInputValue: (newValue: string) => void;
   handleInputBlur?: () => void;
+  handleInputFocus?: () => void;
   currency: ReactNode | undefined;
   placeholder?: string;
   step?: string;
@@ -32,6 +33,7 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
     inputValue,
     setInputValue,
     handleInputBlur,
+    handleInputFocus,
     currency,
     placeholder,
     step = '1',
@@ -117,6 +119,7 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
         placeholder={placeholder}
         onChange={handleValueChange}
         onBlur={handleInputBlur}
+        onFocus={handleInputFocus}
         value={inputNumeric === null ? '' : inputValue}
         disabled={disabled}
       />

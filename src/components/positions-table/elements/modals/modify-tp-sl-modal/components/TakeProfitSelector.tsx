@@ -24,9 +24,10 @@ import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 interface TakeProfitSelectorPropsI {
   setTakeProfitPrice: Dispatch<SetStateAction<number | null | undefined>>;
   position: MarginAccountWithAdditionalDataI;
+  disabled?: boolean;
 }
 
-export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakeProfitSelectorPropsI) => {
+export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled }: TakeProfitSelectorPropsI) => {
   const { t } = useTranslation();
 
   const [takeProfit, setTakeProfit] = useState<TakeProfitE | null>(null);
@@ -67,8 +68,14 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakePr
   const stepSize = useMemo(() => calculateStepSize(position.entryPrice), [position.entryPrice]);
 
   const validateTakeProfitPrice = useCallback(() => {
-    if (takeProfitInputPrice == null) {
+    if (takeProfitInputPrice === null) {
       setTakeProfitPrice(takeProfitInputPrice);
+      return;
+    }
+
+    if (takeProfitInputPrice === undefined) {
+      setTakeProfitPrice(position.takeProfit.fullValue);
+      setTakeProfitInputPrice(position.takeProfit.fullValue);
       return;
     }
 
@@ -86,7 +93,7 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakePr
     }
 
     setTakeProfitPrice(takeProfitInputPrice);
-  }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfitPrice]);
+  }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfitPrice, position.takeProfit.fullValue]);
 
   useEffect(() => {
     if (takeProfit && takeProfit !== TakeProfitE.None) {
@@ -108,11 +115,11 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakePr
     if (position.takeProfit.valueType === OrderValueTypeE.Full && position.takeProfit.fullValue) {
       setTakeProfitInputPrice(position.takeProfit.fullValue);
     }
-  }, [position]);
+  }, [position.takeProfit.valueType, position.takeProfit.fullValue]);
 
   const translationMap: Record<TakeProfitE, string> = {
     [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
-    [TakeProfitE['25%']]: '35%',
+    [TakeProfitE['1%']]: '1%',
     [TakeProfitE['50%']]: '50%',
     [TakeProfitE['100%']]: '100%',
     [TakeProfitE['500%']]: '500%',
@@ -138,10 +145,11 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position }: TakePr
       handlePriceChange={handleTakeProfitChange}
       handleInputPriceChange={handleTakeProfitPriceChange}
       validateInputPrice={validateTakeProfitPrice}
-      selectedInputPrice={takeProfitInputPrice}
+      selectedInputPrice={takeProfit !== TakeProfitE.None ? takeProfitInputPrice : null}
       selectedPrice={takeProfit}
       currency={parsedSymbol?.quoteCurrency}
       stepSize={stepSize}
+      disabled={disabled}
     />
   );
 });

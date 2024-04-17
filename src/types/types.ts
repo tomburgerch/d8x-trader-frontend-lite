@@ -1,5 +1,8 @@
-import { type SmartContractOrder } from '@d8x/perpetuals-sdk';
+import { TraderInterface, type SmartContractOrder } from '@d8x/perpetuals-sdk';
 import type { ReactElement, ReactNode } from 'react';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type TemporaryAnyT = any;
 
 import type {
   AlignE,
@@ -11,6 +14,7 @@ import type {
   StopLossE,
   TakeProfitE,
 } from './enums';
+import type { Address, WalletClient } from 'viem';
 
 export interface LanguageMetaI {
   id: LanguageE;
@@ -88,6 +92,11 @@ export interface ValidatedResponseI<T> extends ReferralResponseI<T> {
   msg: string;
 }
 
+export interface MaintenanceStatusI {
+  chainId: number;
+  isMaintenance: boolean;
+}
+
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
@@ -161,6 +170,7 @@ export interface OrderInfoI {
   size: number;
   midPrice: number;
   tradingFee: number | null;
+  baseFee: number | null;
   collateral: number;
   maxMinEntryPrice: number | null;
   keepPositionLeverage: boolean;
@@ -203,6 +213,8 @@ export interface OrderDigestI {
   OrderBookAddr: string;
   abi: string | string[];
   SCOrders: SmartContractOrder[];
+  error?: string;
+  usage?: string;
 }
 
 export interface CancelOrderResponseI {
@@ -247,8 +259,36 @@ export interface PriceFeedResponseI {
   };
 }
 
+export interface BoostI {
+  chainId: number;
+  nxtBoost: number;
+  nxtRndBoost: number;
+}
+
+export interface PoolVolBoostI {
+  token: string;
+  boost: number;
+}
+
+export interface BoostStationResponseI {
+  addr: string;
+  boostedLpVol: number;
+  boostedTraderVol: number;
+  boosts: BoostI[];
+  crossChainScore: number;
+  hourlyLPBVolIncrease: number;
+  lastBoostedVol: number;
+  poolVolBoost: PoolVolBoostI[];
+}
+
+export interface BoostStationParamResponseI {
+  rndBoostMax: number;
+  volBoostMax: number;
+}
+
 export interface TableHeaderI<T> {
   label: ReactElement | string;
+  tooltip?: string;
   align: AlignE;
   field?: keyof T;
   fieldType?: FieldTypeE;
@@ -411,4 +451,29 @@ export interface IpGeolocationDataI {
     is_known_attacker: boolean;
     is_cloud_provider: boolean;
   };
+}
+
+export interface HedgeConfigI {
+  chainId: number; //42161 | 421614;
+  symbol: string; // 'ETH-USD-WEETH';
+  walletClient: WalletClient;
+  traderAPI: TraderInterface;
+  amount?: number; // only used to open
+  feeRate?: number; // only used to open
+  indexPrice?: number; // only used to open - defaults to mark price
+  limitPrice?: number; // defaults to mark price to open, undefined to close (market w/o slippage protection)
+  strategyAddress?: Address; // strategy address, if already known
+}
+
+export interface StrategyAddressI {
+  userAddress: Address;
+  strategyAddress: Address;
+}
+
+export interface WrapOKBConfigI {
+  walletClient: WalletClient;
+  wrappedTokenAddress: Address;
+  wrappedTokenDecimals: number;
+  amountWrap?: number;
+  amountUnwrap?: number;
 }

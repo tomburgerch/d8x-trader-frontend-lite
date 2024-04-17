@@ -1,15 +1,16 @@
 import { LOB_ABI, PROXY_ABI } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { toast } from 'react-toastify';
 import { type Address, decodeEventLog, encodeEventTopics } from 'viem';
-import { useAccount, useChainId, useNetwork, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useWaitForTransactionReceipt } from 'wagmi';
 
 import {
   Button,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -21,9 +22,10 @@ import {
   TableRow,
 } from '@mui/material';
 
-import { HashZero } from 'app-constants';
+import { HashZero } from 'appConstants';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { useFilter } from 'components/table/filter-modal/useFilter';
@@ -38,7 +40,7 @@ import { clearOpenOrdersAtom, openOrdersAtom, traderAPIAtom, traderAPIBusyAtom }
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
-import { type OrderWithIdI, type TableHeaderI } from 'types/types';
+import { type OrderWithIdI, type TableHeaderI, type TemporaryAnyT } from 'types/types';
 
 import { OpenOrderRow } from './elements/OpenOrderRow';
 import { OpenOrderBlock } from './elements/open-order-block/OpenOrderBlock';
@@ -52,18 +54,16 @@ const TOPIC_CANCEL_FAIL = encodeEventTopics({ abi: LOB_ABI, eventName: 'Executio
 export const OpenOrdersTable = memo(() => {
   const { t } = useTranslation();
 
-  const { address, isDisconnected, isConnected } = useAccount();
   const chainId = useChainId();
-  const { chain } = useNetwork();
-  const { data: walletClient } = useWalletClient({ chainId: chainId });
+  const { chain, address, isDisconnected, isConnected } = useAccount();
   const { width, ref } = useResizeDetector();
 
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const tradingClient = useAtomValue(tradingClientAtom);
   const clearOpenOrders = useSetAtom(clearOpenOrdersAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
-  const [isSDKConnected] = useAtom(sdkConnectedAtom);
-  const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
-  const [tradingClient] = useAtom(tradingClientAtom);
+  const setAPIBusy = useSetAtom(traderAPIBusyAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
 
@@ -74,12 +74,13 @@ export const OpenOrdersTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
   const [orderBy, setOrderBy] = useState<keyof OrderWithIdI>('executionTimestamp');
-  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address>();
+  const [loading, setLoading] = useState(false);
 
-  const isAPIBusyRef = useRef(isAPIBusy);
+  const isAPIBusyRef = useRef(false);
 
   useEffect(() => {
-    if (isDisconnected || traderAPI?.chainId !== chainId) {
+    if (isDisconnected || !traderAPI || traderAPI.chainId !== chainId) {
       clearOpenOrders();
     }
   }, [isDisconnected, chainId, clearOpenOrders, traderAPI]);
@@ -95,95 +96,113 @@ export const OpenOrdersTable = memo(() => {
   };
 
   const refreshOpenOrders = useCallback(async () => {
-    if (address && isConnected && chainId && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== traderAPI?.chainId) {
+    if (address && traderAPI && isConnected && chainId && isSDKConnected) {
+      if (isAPIBusyRef.current || traderAPI.chainId !== chainId) {
         return;
       }
+
       setAPIBusy(true);
+      isAPIBusyRef.current = true;
+
       await getOpenOrders(chainId, traderAPI, address, Date.now())
         .then(({ data }) => {
-          setAPIBusy(false);
           clearOpenOrders();
           if (data?.length > 0) {
             data.map(setOpenOrders);
           }
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(console.error)
+        .finally(() => {
+          isAPIBusyRef.current = false;
           setAPIBusy(false);
         });
     }
   }, [chainId, address, isConnected, isSDKConnected, setAPIBusy, setOpenOrders, clearOpenOrders, traderAPI]);
 
-  useWaitForTransaction({
+  const {
+    data: receipt,
+    isSuccess,
+    isError,
+    error,
+    isFetched,
+  } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess(receipt) {
-      const cancelEventIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_SUCCESS);
-      if (cancelEventIdx >= 0) {
-        const { args } = decodeEventLog({
-          abi: PROXY_ABI,
-          data: receipt.logs[cancelEventIdx].data,
-          topics: receipt.logs[cancelEventIdx].topics,
-        });
-        toast.success(
-          <ToastContent
-            title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
-            bodyLines={[
-              {
-                label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
-                value: traderAPI?.getSymbolFromPerpId((args as { perpetualId: number }).perpetualId),
-              },
-              {
-                label: '',
-                value: (
-                  <a
-                    href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.shareLink}
-                  >
-                    {txHash}
-                  </a>
-                ),
-              },
-            ]}
-          />
-        );
-      } else {
-        const execFailedIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_FAIL);
-        const { args } = decodeEventLog({
-          abi: LOB_ABI,
-          data: receipt.logs[execFailedIdx].data,
-          topics: receipt.logs[execFailedIdx].topics,
-        });
-        toast.error(
-          <ToastContent
-            title={t('pages.trade.orders-table.toasts.tx-failed.title')}
-            bodyLines={[
-              {
-                label: t('pages.trade.orders-table.toasts.tx-failed.body'),
-                value: (args as { reason: string }).reason,
-              },
-            ]}
-          />
-        );
-      }
-    },
-    onError(reason) {
+    query: { enabled: !!address && !!txHash },
+  });
+
+  useEffect(() => {
+    if (!isFetched) {
+      return;
+    }
+    setTxHash(undefined);
+    setLoading(false);
+    refreshOpenOrders().then();
+    setLatestOrderSentTimestamp(Date.now());
+  }, [isFetched, setTxHash, refreshOpenOrders, setLatestOrderSentTimestamp]);
+
+  useEffect(() => {
+    if (!error || !isError) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.trade.orders-table.toasts.tx-failed.title')}
+        bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: error.message }]}
+      />
+    );
+  }, [error, isError, t]);
+
+  useEffect(() => {
+    if (!receipt || !isSuccess) {
+      return;
+    }
+
+    const cancelEventIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_SUCCESS);
+    if (cancelEventIdx >= 0) {
+      toast.success(
+        <ToastContent
+          title={t('pages.trade.orders-table.toasts.order-cancelled.title')}
+          bodyLines={[
+            {
+              label: t('pages.trade.orders-table.toasts.order-cancelled.body'),
+              value: '',
+            },
+            {
+              label: '',
+              value: (
+                <a
+                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.shareLink}
+                >
+                  {txHash}
+                </a>
+              ),
+            },
+          ]}
+        />
+      );
+    } else {
+      const execFailedIdx = receipt.logs.findIndex((log) => log.topics[0] === TOPIC_CANCEL_FAIL);
+      const { args } = decodeEventLog({
+        abi: LOB_ABI as readonly string[],
+        data: receipt.logs[execFailedIdx].data,
+        topics: receipt.logs[execFailedIdx].topics,
+      });
       toast.error(
         <ToastContent
           title={t('pages.trade.orders-table.toasts.tx-failed.title')}
-          bodyLines={[{ label: t('pages.trade.orders-table.toasts.tx-failed.body'), value: reason.message }]}
+          bodyLines={[
+            {
+              label: t('pages.trade.orders-table.toasts.tx-failed.body'),
+              value: (args as unknown as { reason: string }).reason,
+            },
+          ]}
         />
       );
-    },
-    onSettled() {
-      setTxHash(undefined);
-      refreshOpenOrders().then();
-      setLatestOrderSentTimestamp(Date.now());
-    },
-    enabled: !!address && !!txHash,
-  });
+    }
+  }, [receipt, isSuccess, t, chain, txHash]);
 
   const handleCancelOrderConfirm = () => {
     if (!selectedOrder) {
@@ -194,33 +213,39 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
-    if (isDisconnected || !walletClient || !tradingClient) {
+    if (isDisconnected || !tradingClient || !traderAPI) {
       return;
     }
 
+    setLoading(true);
     setRequestSent(true);
     getCancelOrder(chainId, traderAPI, selectedOrder.symbol, selectedOrder.id)
       .then((data) => {
         if (data.data.digest) {
           cancelOrder(tradingClient, HashZero, data.data, selectedOrder.id)
-            .then((tx) => {
+            .then(({ hash }) => {
               setCancelModalOpen(false);
               setSelectedOrder(null);
               setRequestSent(false);
               toast.success(
                 <ToastContent title={t('pages.trade.orders-table.toasts.cancel-order.title')} bodyLines={[]} />
               );
-              setTxHash(tx.hash);
+              setTxHash(hash);
             })
-            .catch((error) => {
-              console.error(error);
+            .catch((e) => {
+              console.error(e);
               setRequestSent(false);
+              setLoading(false);
             });
+        } else {
+          setLoading(false);
+          setRequestSent(false);
         }
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((e) => {
+        console.error(e);
         setRequestSent(false);
+        setLoading(false);
       });
   };
 
@@ -292,14 +317,19 @@ export const OpenOrdersTable = memo(() => {
 
   const visibleRows = useMemo(
     () =>
-      // FIXME: VOV: Get rid from `<any>` later
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stableSort(filteredRows, getComparator<any>(order, orderBy)).slice(
+      // FIXME: VOV: Get rid from `<TemporaryAnyT>` later
+      stableSort(filteredRows, getComparator<TemporaryAnyT>(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
     [filteredRows, order, orderBy, page, rowsPerPage]
   );
+
+  useEffect(() => {
+    if (filteredRows.length > 0 && filteredRows.length <= page * rowsPerPage) {
+      setPage((prevPage) => Math.max(0, prevPage - 1));
+    }
+  }, [filteredRows.length, page, rowsPerPage]);
 
   return (
     <div className={styles.root} ref={ref}>
@@ -378,9 +408,7 @@ export const OpenOrdersTable = memo(() => {
           />
         </div>
       )}
-      <div
-        className={classnames(styles.footer, { [styles.withBackground]: width && width >= MIN_WIDTH_FOR_TABLE })}
-      ></div>
+      <div className={classnames(styles.footer, { [styles.withBackground]: width && width >= MIN_WIDTH_FOR_TABLE })} />
 
       <FilterModal headers={openOrdersHeaders} filter={filter} setFilter={setFilter} />
       <Dialog open={isCancelModalOpen} className={styles.dialog}>
@@ -392,9 +420,12 @@ export const OpenOrdersTable = memo(() => {
           <Button onClick={closeCancelModal} variant="secondary" size="small">
             {t('pages.trade.orders-table.cancel-modal.back')}
           </Button>
-          <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={requestSent}>
-            {t('pages.trade.orders-table.cancel-modal.confirm')}
-          </Button>
+          <GasDepositChecker>
+            <Button onClick={handleCancelOrderConfirm} variant="primary" size="small" disabled={loading || requestSent}>
+              {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+              {t('pages.trade.orders-table.cancel-modal.confirm')}
+            </Button>
+          </GasDepositChecker>
         </DialogActions>
       </Dialog>
     </div>
