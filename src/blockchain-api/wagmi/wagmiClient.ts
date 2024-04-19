@@ -12,8 +12,7 @@ import { polygonMumbai, polygonZkEvm, polygonZkEvmTestnet, arbitrumSepolia, arbi
 import { createConfig, http } from 'wagmi';
 import { createClient } from 'viem';
 
-import polygonTestIcon from 'assets/networks/polygon.webp';
-import zkEvmIcon from 'assets/networks/polygonZkEvm.png';
+import polygonIcon from 'assets/networks/polygon.webp';
 import arbitrumIcon from 'assets/networks/arbitrum.png';
 import x1Icon from 'assets/networks/x1.png';
 import berachainIcon from 'assets/networks/berachain.png';
@@ -21,12 +20,12 @@ import { config } from 'config';
 import { x1, cardona, artio, xlayer } from 'utils/chains';
 
 const chains = [
-  { ...polygonZkEvm, iconUrl: zkEvmIcon, iconBackground: 'transparent' } as Chain,
-  { ...polygonMumbai, iconUrl: polygonTestIcon, iconBackground: 'transparent' },
-  { ...polygonZkEvmTestnet, iconUrl: zkEvmIcon, iconBackground: 'transparent' },
+  { ...polygonZkEvm, iconUrl: polygonIcon, iconBackground: 'transparent' } as Chain,
+  { ...polygonMumbai, iconUrl: polygonIcon, iconBackground: 'transparent' },
+  { ...polygonZkEvmTestnet, iconUrl: polygonIcon, iconBackground: 'transparent' },
   { ...x1, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...xlayer, iconUrl: x1Icon, iconBackground: 'transparent' },
-  { ...cardona, iconUrl: zkEvmIcon, iconBackground: 'transparent' },
+  { ...cardona, iconUrl: polygonIcon, iconBackground: 'transparent' },
   { ...artio, iconUrl: berachainIcon, iconBackground: 'transparent' },
   {
     ...arbitrumSepolia,
