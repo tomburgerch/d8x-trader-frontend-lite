@@ -539,12 +539,12 @@
       },
       "withdraw": {
         "title": "Retirer la Liquidité",
-        "info1": "Pour retirer la liquidité, vous devez d'abord initier votre retrait. Gardez à l'esprit que cela prend 48 heures pour traiter votre demande et vous ne pouvez avoir qu'une demande de retrait à la fois.",
-        "info2": "Après 48 heures, un montant retirable de d{{poolSymbol}} peut être échangé contre {{poolSymbol}} au prix de d{{poolSymbol}}.",
+        "info1": "Pour retirer la liquidité, vous devez d'abord initier votre retrait. Gardez à l'esprit que cela prend 24 heures pour traiter votre demande et vous ne pouvez avoir qu'une demande de retrait à la fois.",
+        "info2": "Après 24 heures, un montant retirable de d{{poolSymbol}} peut être échangé contre {{poolSymbol}} au prix de d{{poolSymbol}}.",
         "initiate": {
           "title": "1. Initier le retrait de {{poolSymbol}}",
           "info1": "Indiquez le montant de d{{poolSymbol}} que vous souhaitez échanger contre {{poolSymbol}}.",
-          "info2": "Après 48 heures, ce montant peut être converti en {{poolSymbol}} et peut être retiré du pool.",
+          "info2": "Après 24 heures, ce montant peut être converti en {{poolSymbol}} et peut être retiré du pool.",
           "button": "Initier le retrait",
           "validity-empty": "-",
           "validity-no-address": "Connectez le portefeuille",
@@ -562,7 +562,7 @@
           "button": "Retirer",
           "validity-no-address": "Connectez le portefeuille",
           "validity-no-funds": "Pas de fonds à retirer",
-          "validity-no-initiation": "Initiez le retrait et attendez 48h"
+          "validity-no-initiation": "Initiez le retrait et attendez 24h"
         }
       },
       "na": "N/A",
