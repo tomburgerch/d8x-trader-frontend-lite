@@ -539,12 +539,12 @@
       },
       "withdraw": {
         "title": "提取流动性",
-        "info1": "要提取流动性，您首先要发起提现。请记住，处理请求需要48小时，并且您一次只能发起一项提现请求。",
-        "info2": "48小时后，可提取的d{{poolSymbol}}以d{{poolSymbol}}价格兑换为{{poolSymbol}}。",
+        "info1": "要提取流动性，您首先要发起提现。请记住，处理请求需要24小时，并且您一次只能发起一项提现请求。",
+        "info2": "24小时后，可提取的d{{poolSymbol}}以d{{poolSymbol}}价格兑换为{{poolSymbol}}。",
         "initiate": {
           "title": "1. 发起{{poolSymbol}}的提现",
           "info1": "设置您想要兑换{{poolSymbol}}的d{{poolSymbol}}数量。",
-          "info2": "48小时后，该金额可以转换为MATIC并从流动性池中提取。 ",
+          "info2": "24小时后，该金额可以转换为MATIC并从流动性池中提取。 ",
           "button": "发起提现",
           "validity-no-address": "连接钱包",
           "validity-empty": "-",
@@ -562,7 +562,7 @@
           "button": "提现",
           "validity-no-address": "连接钱包",
           "validity-no-funds": "没有资金可提取",
-          "validity-no-initiation": "启动提款并等待48小时"
+          "validity-no-initiation": "启动提款并等待24小时"
         }
       },
       "na": "无",
