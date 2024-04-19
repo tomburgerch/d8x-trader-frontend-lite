@@ -539,12 +539,12 @@
       },
       "withdraw": {
         "title": "Remover Liquidez",
-        "info1": "Para remover liquidez primero tienes que iniciar un retiro. Ten en mente que tu retiro solo se puede ejecutar 48 horas despues de ser iniciado, y no puedes tener más que una solicitud de retiro abierta al mismo tiempo.",
-        "info2": "Despues de 48 horas, el monto de d{{poolSymbol}} que hayas ingresado podra ser intercambiado por {{poolSymbol}} al precio de d{{poolSymbol}} en ese momento.",
+        "info1": "Para remover liquidez primero tienes que iniciar un retiro. Ten en mente que tu retiro solo se puede ejecutar 24 horas despues de ser iniciado, y no puedes tener más que una solicitud de retiro abierta al mismo tiempo.",
+        "info2": "Despues de 24 horas, el monto de d{{poolSymbol}} que hayas ingresado podra ser intercambiado por {{poolSymbol}} al precio de d{{poolSymbol}} en ese momento.",
         "initiate": {
           "title": "1. Iniciar retiro de {{poolSymbol}}",
           "info1": "Ingresa el monto de d{{poolSymbol}} que quieres intercambiar por {{poolSymbol}}.",
-          "info2": "Despues de 48 horas, este monto puede ser convertido a {{poolSymbol}} y removido de las reservas.",
+          "info2": "Despues de 24 horas, este monto puede ser convertido a {{poolSymbol}} y removido de las reservas.",
           "button": "Iniciar Retiro",
           "validity-empty": "-",
           "validity-no-address": "Conectar cartera",
@@ -562,7 +562,7 @@
           "button": "Retirar",
           "validity-no-address": "Conectar cartera",
           "validity-no-funds": "No hay fondos para retirar",
-          "validity-no-initiation": "Iniciar retiro y esperar 48h"
+          "validity-no-initiation": "Iniciar retiro y esperar 24h"
         }
       },
       "na": "N/A",
