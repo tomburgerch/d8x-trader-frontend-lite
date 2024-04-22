@@ -8,6 +8,8 @@ import { HedgeConfigI } from 'types/types';
 
 import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
+import { getGasLimit } from 'blockchain-api/getGasLimit';
+import { MethodE } from 'types/enums';
 
 const GAS_TARGET = 1_000_000n;
 
@@ -68,7 +70,7 @@ export async function claimStrategyFunds(
     //console.log('estimateGas: erc20');
     const gasLimit = await estimateGas(hedgeClient, params)
       .then((gas) => (gas * 150n) / 100n)
-      .catch(() => 4_000_000n);
+      .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
     const { value: balance } = await getBalance(wagmiConfig, { address: hedgeClient.account.address });
     if (!gasLimit || balance < gasPrice * gasLimit) {
       //console.log('sending funds to strategy acct');
@@ -104,7 +106,7 @@ export async function claimStrategyFunds(
     gasPrice,
   })
     .then((gas) => (gas * 150n) / 100n)
-    .catch(() => 4_000_000n);
+    .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
   const { value: balance } = await getBalance(wagmiConfig, { address: hedgeClient.account.address });
   if (gasLimit && gasLimit * gasPrice < balance) {
     //console.log('sendTransactionAsync');

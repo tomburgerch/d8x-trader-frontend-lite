@@ -3,6 +3,9 @@ import { getGasPrice } from 'blockchain-api/getGasPrice';
 import type { Account, Address, Chain, Transport, WalletClient } from 'viem';
 import { estimateContractGas } from 'viem/actions';
 
+import { getGasLimit } from 'blockchain-api/getGasLimit';
+import { MethodE } from 'types/enums';
+
 export async function executeLiquidityWithdrawal(
   walletClient: WalletClient<Transport, Chain, Account>,
   traderAPI: TraderInterface,
@@ -26,6 +29,6 @@ export async function executeLiquidityWithdrawal(
   };
   const gasLimit = await estimateContractGas(walletClient, params)
     .then((gas) => (gas * 130n) / 100n)
-    .catch(() => 5_000_000n);
+    .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
   return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => ({ hash: tx }));
 }
