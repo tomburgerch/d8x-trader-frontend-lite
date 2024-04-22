@@ -6,6 +6,8 @@ import { estimateGas } from 'viem/actions';
 
 import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
+import { getGasLimit } from 'blockchain-api/getGasLimit';
+import { MethodE } from 'types/enums';
 
 export async function removeDelegate(
   walletClient: WalletClient,
@@ -38,7 +40,7 @@ export async function removeDelegate(
       value: 1n,
       account: delegateAccount,
       gasPrice,
-    }).catch(() => 4_000_000n);
+    }).catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
 
     if (gasLimit && 2n * gasLimit * gasPrice < balance) {
       await sendTransactionAsync({
