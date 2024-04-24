@@ -8,7 +8,7 @@ import { useAccount, useWaitForTransactionReceipt, useWalletClient, useReadContr
 
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-import { PERIOD_OF_2_DAYS } from 'appConstants';
+import { PERIOD_OF_1_DAY } from 'appConstants';
 import { executeLiquidityWithdrawal } from 'blockchain-api/contract-interactions/executeLiquidityWithdrawal';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
@@ -187,7 +187,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     const latestWithdrawal = withdrawals[withdrawals.length - 1];
     const latestWithdrawalTimeElapsed = latestWithdrawal.timeElapsedSec * 1000;
 
-    const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
+    const withdrawalTime = currentTime + PERIOD_OF_1_DAY - latestWithdrawalTimeElapsed;
     if (currentTime < withdrawalTime) {
       return 0;
     } else {
