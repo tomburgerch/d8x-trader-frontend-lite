@@ -711,6 +711,10 @@
     "max": "Max:",
     "copied": "Copié",
     "copy-error": "Une erreur est apparue lors de la copie dans le presse-papiers",
+    "page-reload": {
+      "text1": "L'application a été mise à jour.",
+      "text2": "Veuillez attendre que la page soit rechargée."
+    },
     "one-click": {
       "disable": "Activer le trading en un clic",
       "enable": "Désactiver le trading en un clic"

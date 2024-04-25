@@ -711,6 +711,10 @@
     "max": "Max:",
     "copied": "Kopiert",
     "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",
+    "page-reload": {
+      "text1": "Die App wurde aktualisiert.",
+      "text2": "Warten Sie, bis die Seite neu geladen wird."
+    },
     "one-click": {
       "disable": "Deaktivieren Sie den One-Click-Handel",
       "enable": "Aktivieren Sie den One-Click-Handel"
