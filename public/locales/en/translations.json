@@ -1,8 +1,10 @@
 {
   "navigation": {
     "trade": "Trade",
+    "boost-station": "BoostStation",
     "refer": "Refer",
     "vault": "Vault",
+    "strategies": "Strategies",
     "portfolio": "Portfolio"
   },
   "pages": {
@@ -16,10 +18,15 @@
     "trade": {
       "stats": {
         "mid-price": "Mid Price",
+        "mid-price-tooltip": "You pay the mid price plus/minus the price impact of your order.",
         "mark-price": "Mark Price",
+        "mark-price-tooltip": "The mark price is the price at which the perpetual contract will be valued. Mark Price = Index price + EMA of (Mid Price - Index Price)",
         "index-price": "Index Price",
+        "index-price-tooltip": "The index price is the market consensus spot price of the underlying.",
         "funding-rate": "Funding Rate",
+        "funding-rate-tooltip": "The funding rate is quoted as an 8h rate, accrued continuously on the position size, and paid to/from the margin account in collateral currency at spot. Funding payments are realized when a trader trades.",
         "open-interest": "Open Interest",
+        "open-interest-tooltip": "Total size of active positions in this perpetual contract.",
         "view-graph": "View Graph",
         "hide-graph": "Hide Graph"
       },
@@ -33,7 +40,8 @@
           "liq-price": "Liq. Price",
           "margin": "Margin",
           "pnl": "Unr. PnL",
-          "tp-sl": "TP/SL"
+          "tp-sl": "TP/SL",
+          "tp-sl-tooltip": "SL for BUY positions and TP for SELL positions (i.e., Stop-market orders) are executed if the mark price reaches the price shown in this column. TP for BUY positions and SL orders for SELL positions (i.e., Limit orders) are executed if the mid price plus/minus the price impact of your order reaches the price shown in this column."
         },
         "table-content": {
           "buy": "BUY",
@@ -275,7 +283,8 @@
         "info": {
           "balance": "Wallet balance",
           "order-size": "Order size",
-          "fees": "Fees",
+          "execution-fees": "Execution fees",
+          "fees": "Trading fees",
           "gas": "Gas fees",
           "rebate": "Rebate",
           "approx-deposit": "Approx. deposit from wallet"
@@ -319,7 +328,7 @@
           "pass": "Passed",
           "fail": "Failed",
           "button-no-address": "Connect wallet",
-          "button-no-funds": "No collateral in wallet",
+          "button-no-funds": "Deposit",
           "button-no-amount": "Order size too small",
           "button-no-limit": "Set limit price",
           "button-no-trigger": "Set trigger price"
@@ -360,6 +369,44 @@
         "value": "Value:",
         "value-placeholder": "value to filter",
         "clear": "Clear Filter"
+      }
+    },
+    "boost-station": {
+      "title": "Trade and provide liquidity to BOOST your $D8X Airdrop",
+      "invite-friends": "Refer",
+      "boosted-volume": {
+        "title": "BOOSTED Volume",
+        "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
+      },
+      "trade-volume": {
+        "title": "BOOSTED Trade Volume",
+        "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
+      },
+      "trade-last-increase": {
+        "title": "Last change",
+        "modal-text": "The amount BOOSTED Trade Volume increased from your last trade. LFG!"
+      },
+      "trade-boost": {
+        "title": "Trade Boost",
+        "modal-text": "The Trade Boost is applied to your NEXT trade. The boost ranges from 1x to {{totalBoostMax}}x and has two parts:",
+        "modal-text2": "Volume Boost - Your trades over the past 7 days could score you a Volume Boost ranging from 1x to {{volBoostMax}}x. The more you trade, the higher your potential boost!",
+        "modal-text3": "Fortune Boost - Each trade gives you a chance to hit the Fortune Boost – a bonus that can skyrocket from 0x all the way up to an incredible {{rndBoostMax}}x!"
+      },
+      "boost": {
+        "volume": "Volume boost:",
+        "random": "Fortune boost:"
+      },
+      "liquidity-volume": {
+        "title": "BOOSTED Liquidity Volume",
+        "modal-text": "The longer you keep your liquidity in the pools, the higher your BOOSTED Liquidity volume. Over 24 hours your BOOSTED Liquidity volume can increase up to Liquidity x Liquidity Boost."
+      },
+      "trade-hourly-increase": {
+        "title": "Hourly change",
+        "modal-text": "Hourly increase of BOOSTED Liquidity"
+      },
+      "liquidity-boost": {
+        "title": "Liquidity Boost",
+        "modal-text": "The Liquidity Boost shows the boost that is applied to your liquidity provision. The boost can change over time."
       }
     },
     "refer": {
@@ -483,28 +530,30 @@
           "info1": "Specify the amount of {{poolSymbol}} you want to add to the pool."
         },
         "receive": "You receive d{{poolSymbol}}",
-        "max": "Max:",
         "button": "Add",
-        "validity-empty": "Connect wallet",
-        "validity-amount-too-big": "Insufficient funds" ,
-        "validity-amount-below-min": "Amount below min",
-        "validity-no-amount": "Enter amount"
+        "validity-empty": "-",
+        "validity-no-address": "Connect wallet",
+        "validity-no-funds": "Deposit",
+        "validity-no-amount": "Enter amount",
+        "validity-amount-too-big": "Insufficient funds",
+        "validity-amount-below-min": "Amount below min"
       },
       "withdraw": {
         "title": "Withdraw Liquidity",
-        "info1": "To withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 48 hours to process your request and you can only have one withdrawal request at a time.",
-        "info2": "After 48 hours, a withdrawable amount of d{{poolSymbol}} can be exchanged for {{poolSymbol}} at the d{{poolSymbol}} Price.",
+        "info1": "To withdraw liquidity you first initiate your withdrawal. Keep in mind that it takes 24 hours to process your request and you can only have one withdrawal request at a time.",
+        "info2": "After 24 hours, a withdrawable amount of d{{poolSymbol}} can be exchanged for {{poolSymbol}} at the d{{poolSymbol}} Price.",
         "initiate": {
           "title": "1. Initiate withdrawal of {{poolSymbol}}",
           "info1": "Specify the amount of d{{poolSymbol}} you want to exchange for {{poolSymbol}}.",
-          "info2": "After 48 hours, this amount can be converted to {{poolSymbol}} and can be withdrawn from the pool.",
+          "info2": "After 24 hours, this amount can be converted to {{poolSymbol}} and can be withdrawn from the pool.",
           "button": "Initiate withdrawal",
-          "validity-no-address": "Connect wallet",
           "validity-empty": "-",
+          "validity-no-address": "Connect wallet",
           "validity-no-funds": "No funds to withdraw",
-          "validity-amount-too-big": "Amount too large" ,
-          "validity-amount-below-min": "Amount below min",
-          "validity-no-amount": "Enter amount"
+          "validity-no-gas": "No gas to proceed",
+          "validity-no-amount": "Enter amount",
+          "validity-amount-too-big": "Amount too large",
+          "validity-amount-below-min": "Amount below min"
         },
         "action": {
           "title": "Withdraw {{poolSymbol}}",
@@ -514,7 +563,7 @@
           "button": "Withdraw",
           "validity-no-address": "Connect wallet",
           "validity-no-funds": "No funds to withdraw",
-          "validity-no-initiation": "Initiate withdrawal and wait 48h"
+          "validity-no-initiation": "Initiate withdrawal and wait 24h"
         }
       },
       "na": "N/A",
@@ -538,6 +587,79 @@
         "error-initiating": {
           "title": "Error initiating withdrawal",
           "body": "Reason"
+        }
+      }
+    },
+    "strategies": {
+      "connect": {
+        "title": "Connect to Strategy Vault",
+        "connect-button": "Connect"
+      },
+      "overview": {
+        "title": "The Synthetic US Dollar Trade",
+        "synthetic-position": "Synthetic USD position",
+        "your-yield": "Your yield",
+        "your-points": " + EigenLayer, ether.fi and D8X points"
+      },
+      "info": {
+        "title": "Strategy Mechanics",
+        "text1": "When you deposit weETH (wrapper EtherFi ETH), the strategy is to automatically open an equivalent 1x ETH/USD perpetual short position to hedge your deposit.",
+        "text2": "You earn yield derived from weETH i.e. staked ETH yield, EigenLayer points, ether.fi points, as well as funding rate payments generated from the equivalent 1x ETH/USD perpetual short position and D8X points. Welcome to the onchain Synthetic USD Trade"
+      },
+      "enter": {
+        "title": "Enter strategy",
+        "amount-info": "The amount of weETH you put into the strategy. The strategy opens an equivalent 1x ETH/USD perpetual short position. Generating a synthetic USD position that earns yield.",
+        "deposit-button": "Enter",
+        "toasts": {
+          "tx-submitted": {
+            "title": "Entering the strategy",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        },
+        "phases": {
+          "funding": "Funding strategy account",
+          "posting": "Posting short order",
+          "waiting": "Waiting for order execution"
+        }
+      },
+      "exit": {
+        "title": "Exit strategy",
+        "note": "Take your funds out of the strategy.",
+        "exit-button": "Exit strategy",
+        "confirm-modal": {
+          "title": "Exit strategy",
+          "text": "Are you sure you want to exit?",
+          "confirm-button": "Exit"
+        },
+        "toasts": {
+          "tx-submitted": {
+            "title": "Exiting the strategy"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        },
+        "phases": {
+          "posting": "Posting order to close position",
+          "waiting": "Waiting for order execution",
+          "sending": "Sending funds to main wallet"
+        }
+      },
+      "claim-funds": {
+        "toasts": {
+          "tx-submitted": {
+            "title": "Your funds are successfully claimed",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
         }
       }
     },
@@ -566,6 +688,10 @@
             "assets-pool": "Assets in pools",
             "earnings-pool": "Earnings per pool",
             "total": "..of which estim. earnings"
+          },
+          "strategies": {
+            "title": "Strategies",
+            "usd-position": "Synthetic USD position"
           }
         }
       }
@@ -577,9 +703,31 @@
   "common": {
     "change-language": "Change Language",
     "wallet-connect": "Connect",
+    "account-button": "Account",
+    "close-button": "Close",
+    "cancel-button": "Cancel",
+    "currency-label": "Currency",
+    "amount-label": "Amount",
+    "address-label": "Address",
+    "deposit-gas": "Deposit gas",
+    "max": "Max:",
+    "copied": "Copied",
+    "copy-error": "An error appeared with copy to clipboard",
+    "page-reload": {
+      "text1": "The app has been updated.",
+      "text2": "Please wait until page reloads."
+    },
     "one-click": {
       "disable": "Disable one-click trading",
       "enable": "Enable one-click trading"
+    },
+    "maintenance-mode": {
+      "header": "Maintenance mode",
+      "description": "The exchange on <bold>{{chainName}}</bold> is in maintenance mode.",
+      "visit-text": {
+        "1": "Visit",
+        "2": "for more information."
+      }
     },
     "li-fi-widget": {
       "button-title": "LI.FI widget",
@@ -643,7 +791,17 @@
         "funding-modal": {
           "title": "Fund delegate wallet",
           "description": "Fund your delegate wallet to pay for gas.",
-          "fund": "Fund"
+          "fund": "Fund",
+          "toasts": {
+            "tx-submitted": {
+              "title": "You have successfully sent funds to delegate wallet",
+              "body": "Amount"
+            },
+            "tx-failed": {
+              "title": "Transaction Failed",
+              "body": "Reason"
+            }
+          }
         }
       }
     },
@@ -687,6 +845,75 @@
     },
     "info-modal": {
       "close": "Close"
+    },
+    "account-modal": {
+      "title": "Account",
+      "deposit-button": "Deposit",
+      "withdraw-button": "Withdraw",
+      "extract-pk-button": "Extract PK",
+      "notice-block": "Important notice: Make sure to have sufficient <bold>{{currencyName}}</bold> for gas and at least one collateral."
+    },
+    "deposit-modal": {
+      "title": "Deposit",
+      "important-notice": {
+        "full": "Important notice: send only <bold>{{currencyName}}</bold> (token address: <bold>{{currencyContractAddress}}</bold) to this address. Send over <bold>{{chainName}}</bold>.",
+        "1": "Important notice: send only <bold>{{currencyName}}</bold>",
+        "2": "(token address: ",
+        "3": ")",
+        "4": "to this address.",
+        "5": "Send over <bold>{{chainName}}</bold>."
+      },
+      "deposit-note": "Make sure to deposit sufficient <bold>{{currencyName}}</bold> for gas and at least one collateral.",
+      "done-button": "Done",
+      "convert": {
+        "text": "Convert your <bold>{{fromCurrency}}</bold> to <bold>{{toCurrency}}</bold> without slippage:",
+        "button": "Convert",
+        "toasts": {
+          "success-wrap": {
+            "title": "Tokens successfully wrapped",
+            "body": "Amount"
+          },
+          "success-unwrap": {
+            "title": "Tokens successfully unwrapped",
+            "body": "Amount"
+          },
+          "tx-failed": {
+            "title": "Transaction Failed",
+            "body": "Reason"
+          }
+        }
+      }
+    },
+    "extract-pk-modal": {
+      "title": "Extract Private Key",
+      "important-notice": "Important notice: never share your private key with anyone. Only reveal key if you know what you are doing.",
+      "reveal-key-button": "Reveal key"
+    },
+    "withdraw-modal": {
+      "title": "Withdraw",
+      "withdraw-button": "Withdraw",
+      "withdraw-address-error": "Please enter a valid address",
+      "toasts": {
+        "tx-submitted": {
+          "title": "You have successfully withdrawn your tokens",
+          "body": "Amount"
+        },
+        "tx-failed": {
+          "title": "Transaction Failed",
+          "body": "Reason"
+        }
+      }
+    },
+    "connect-modal": {
+      "title": "Sign in",
+      "description": "Sign in with X, Google or web3 wallet",
+      "sign-in-with-x-button": "Sign in with X",
+      "sign-in-with-google-button": "Sign in with Google",
+      "sign-in-with-wallet-button": "Sign in with wallet",
+      "or-separator": "or",
+      "disconnect": "Disconnect",
+      "connected-title": "Welcome!",
+      "connected-description": "You have successfully signed in."
     },
     "public-beta": {
       "info-text": "This is a public beta - do your own research.",

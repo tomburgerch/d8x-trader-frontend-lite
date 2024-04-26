@@ -1,29 +1,32 @@
 import classnames from 'classnames';
-import { useAtom, useSetAtom } from 'jotai';
-import { memo, useEffect, useRef, useState } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { Address, useAccount, useBalance, useChainId, useNetwork, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { type Address } from 'viem';
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
-import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, CircularProgress, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'app-constants';
+import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { getTradingFee, orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { poolFeeAtom, poolsAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
+import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OpenOrderTypeE, OrderSideE, OrderTypeE } from 'types/enums';
-import { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
+import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
+import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
 import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
@@ -32,6 +35,7 @@ import styles from '../Modal.module.scss';
 interface ModifyModalPropsI {
   isOpen: boolean;
   selectedPosition?: MarginAccountWithAdditionalDataI | null;
+  poolByPosition?: PoolWithIdI | null;
   closeModal: () => void;
 }
 
@@ -53,36 +57,33 @@ function createMainOrder(position: MarginAccountWithAdditionalDataI) {
   };
 }
 
-export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: ModifyModalPropsI) => {
+export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition, closeModal }: ModifyModalPropsI) => {
   const { t } = useTranslation();
 
-  const { address } = useAccount();
-  const { chain } = useNetwork();
+  const { address, chain } = useAccount();
   const chainId = useChainId();
-
   const { data: walletClient } = useWalletClient({
     chainId,
-    onError(error) {
-      console.log(error);
-    },
   });
 
-  const [pools] = useAtom(poolsAtom);
-  const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
-  const [tradingClient] = useAtom(tradingClientAtom);
-  const [poolFee] = useAtom(poolFeeAtom);
+  const proxyAddr = useAtomValue(proxyAddrAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const tradingClient = useAtomValue(tradingClientAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
 
   const [collateralDeposit, setCollateralDeposit] = useState<number | null>(null);
   const [takeProfitPrice, setTakeProfitPrice] = useState<number | null | undefined>(undefined);
   const [stopLossPrice, setStopLossPrice] = useState<number | null | undefined>(undefined);
   const [requestSent, setRequestSent] = useState(false);
-  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
-  const [selectedPool, setSelectedPool] = useState<PoolWithIdI>();
+  const [txHash, setTxHash] = useState<Address>();
+  const [poolFee, setPoolFee] = useState<number>();
+  const [loading, setLoading] = useState(false);
 
   const validityCheckRef = useRef(false);
   const requestSentRef = useRef(false);
+  const fetchFeeRef = useRef(false);
+
+  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   useEffect(() => {
     if (validityCheckRef.current) {
@@ -106,61 +107,81 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       });
   }, [selectedPosition, address, traderAPI, chainId, poolFee]);
 
-  useEffect(() => {
-    if (selectedPosition && pools.length > 0) {
-      const parsedSymbol = parseSymbol(selectedPosition.symbol);
-      const foundPool = pools.find(({ poolSymbol }) => poolSymbol === parsedSymbol?.poolSymbol);
-      setSelectedPool(foundPool);
-    } else {
-      setSelectedPool(undefined);
+  const fetchPoolFee = useCallback((_chainId: number, _poolSymbol: string, _address: Address) => {
+    if (fetchFeeRef.current) {
+      return;
     }
-  }, [selectedPosition, pools]);
 
-  const { data: poolTokenBalance } = useBalance({
-    address,
-    token: selectedPool?.marginTokenAddr as Address,
-    chainId: chain?.id,
-    enabled: address && chainId === chain?.id && !!selectedPool?.marginTokenAddr,
-  });
+    fetchFeeRef.current = true;
 
-  useWaitForTransaction({
+    getTradingFee(_chainId, _poolSymbol, _address)
+      .then((data) => {
+        setPoolFee(data.data);
+      })
+      .catch(console.error)
+      .finally(() => {
+        fetchFeeRef.current = false;
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!chainId || !poolByPosition?.poolSymbol || !address) {
+      return;
+    }
+    fetchPoolFee(chainId, poolByPosition.poolSymbol, address);
+  }, [chainId, poolByPosition?.poolSymbol, address, fetchPoolFee]);
+
+  const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      setLatestOrderSentTimestamp(Date.now());
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.action-block.toasts.order-submitted.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.action-block.toasts.order-submitted.body'),
-              value: selectedPosition?.symbol,
-            },
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHash}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError() {
-      toast.error(<ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />);
-    },
-    onSettled() {
-      setTxHash(undefined);
-      setLatestOrderSentTimestamp(Date.now());
-    },
-    enabled: !!address && !!selectedPosition?.symbol && !!txHash,
+    query: { enabled: !!address && !!selectedPosition?.symbol && !!txHash },
   });
+
+  useEffect(() => {
+    if (!isFetched) {
+      return;
+    }
+    setTxHash(undefined);
+    setLoading(false);
+  }, [isFetched, setLatestOrderSentTimestamp]);
+
+  useEffect(() => {
+    if (!isError) {
+      return;
+    }
+    toast.error(<ToastContent title={t('pages.trade.action-block.toasts.error.title')} bodyLines={[]} />);
+  }, [isError, t]);
+
+  useEffect(() => {
+    if (!isSuccess || !txHash) {
+      return;
+    }
+    setLatestOrderSentTimestamp(Date.now());
+    toast.success(
+      <ToastContent
+        title={t('pages.trade.action-block.toasts.order-submitted.title')}
+        bodyLines={[
+          {
+            label: t('pages.trade.action-block.toasts.order-submitted.body'),
+            value: selectedPosition?.symbol,
+          },
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHash}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+    closeModal();
+  }, [isSuccess, txHash, chain, selectedPosition?.symbol, setLatestOrderSentTimestamp, closeModal, t]);
 
   if (!selectedPosition) {
     return null;
@@ -170,7 +191,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
 
   const handleModifyPositionConfirm = async () => {
     if (
-      !selectedPool ||
+      !poolByPosition ||
       !selectedPosition ||
       requestSentRef.current ||
       !tradingClient ||
@@ -178,14 +199,14 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       !proxyAddr ||
       !walletClient ||
       collateralDeposit === null ||
-      !poolTokenBalance ||
-      !poolTokenBalance.decimals
+      !poolTokenDecimals
     ) {
       return;
     }
 
     requestSentRef.current = true;
     setRequestSent(true);
+    setLoading(true);
 
     const ordersToCancel: OrderWithIdI[] = [];
     if (takeProfitPrice !== selectedPosition.takeProfit.fullValue && selectedPosition.takeProfit.orders.length > 0) {
@@ -202,6 +223,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       traderAPI,
       tradingClient,
       toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),
+      nonceShift: 0,
       callback: () => {
         setLatestOrderSentTimestamp(Date.now());
       },
@@ -245,60 +267,71 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
     }
 
     if (parsedOrders.length > 0) {
-      orderDigest(chainId, parsedOrders, address)
-        .then((data) => {
-          if (data.data.digests.length > 0) {
-            // hide modal now that metamask popup shows up
-            approveMarginToken(
-              walletClient,
-              selectedPool.marginTokenAddr,
-              proxyAddr,
-              collateralDeposit,
-              poolTokenBalance.decimals
-            )
-              .then(() => {
-                // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
-                const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
-                postOrder(tradingClient, signatures, data.data, false)
-                  .then((tx) => {
-                    // success submitting order to the node
-                    // order was sent
-                    setTakeProfitPrice(null);
-                    setStopLossPrice(null);
-                    toast.success(
-                      <ToastContent
-                        title={t('pages.trade.action-block.toasts.processed.title')}
-                        bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
-                      />
-                    );
-                    setTxHash(tx.hash);
-                    setLatestOrderSentTimestamp(Date.now());
-                  })
-                  .finally(() => {
-                    // ensure we can trade again - but modal is left open if user rejects txn
-                    requestSentRef.current = false;
-                    setRequestSent(false);
-                  });
-              })
-              .catch((error) => {
-                // not a transaction error, but probably metamask or network -> no toast
-                console.error(error);
-              });
-          }
-        })
-        .catch((error) => {
-          // not a transaction error, but probably metamask or network -> no toast
-          console.error(error);
-        });
+      // Execute orderDigest with delay to minimize RPC errors
+      setTimeout(() => {
+        orderDigest(chainId, parsedOrders, address)
+          .then((data) => {
+            if (data.data.digests.length > 0) {
+              // hide modal now that metamask popup shows up
+              approveMarginToken(
+                walletClient,
+                poolByPosition.marginTokenAddr,
+                proxyAddr,
+                collateralDeposit,
+                poolTokenDecimals
+              )
+                .then(() => {
+                  // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
+                  const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
+                  postOrder(tradingClient, signatures, data.data, false)
+                    .then(({ hash }) => {
+                      // success submitting order to the node
+                      // order was sent
+                      setTakeProfitPrice(null);
+                      setStopLossPrice(null);
+                      toast.success(
+                        <ToastContent
+                          title={t('pages.trade.action-block.toasts.processed.title')}
+                          bodyLines={[{ label: 'Symbol', value: parsedOrders[0].symbol }]}
+                        />
+                      );
+                      setTxHash(hash);
+                      setLatestOrderSentTimestamp(Date.now());
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      setLoading(false);
+                    })
+                    .finally(() => {
+                      // ensure we can trade again - but modal is left open if user rejects txn
+                      requestSentRef.current = false;
+                      setRequestSent(false);
+                    });
+                })
+                .catch((error) => {
+                  // not a transaction error, but probably metamask or network -> no toast
+                  console.error(error);
+                  setLoading(false);
+                });
+            }
+          })
+          .catch((error) => {
+            // not a transaction error, but probably metamask or network -> no toast
+            console.error(error);
+            setLoading(false);
+          });
+      }, 1_000);
+    } else {
+      requestSentRef.current = false;
+      setRequestSent(false);
+      setLoading(false);
+      closeModal();
     }
-
-    requestSentRef.current = false;
-    setRequestSent(false);
-    closeModal();
   };
 
   const isDisabledCreateButton =
-    !selectedPool ||
+    !poolByPosition ||
+    loading ||
     requestSent ||
     collateralDeposit === null ||
     (takeProfitPrice === selectedPosition.takeProfit.fullValue &&
@@ -314,17 +347,25 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, closeModal }: M
       </DialogContent>
       <Separator />
       <DialogContent className={styles.selectors}>
-        <TakeProfitSelector setTakeProfitPrice={setTakeProfitPrice} position={selectedPosition} />
-        <StopLossSelector setStopLossPrice={setStopLossPrice} position={selectedPosition} />
+        <TakeProfitSelector setTakeProfitPrice={setTakeProfitPrice} position={selectedPosition} disabled={loading} />
+        <StopLossSelector setStopLossPrice={setStopLossPrice} position={selectedPosition} disabled={loading} />
       </DialogContent>
       <Separator />
       <DialogActions>
         <Button onClick={closeModal} variant="secondary" size="small">
           {t('pages.trade.positions-table.modify-modal.cancel')}
         </Button>
-        <Button onClick={handleModifyPositionConfirm} variant="primary" size="small" disabled={isDisabledCreateButton}>
-          {t('pages.trade.positions-table.modify-modal.create')}
-        </Button>
+        <GasDepositChecker multiplier={4n}>
+          <Button
+            onClick={handleModifyPositionConfirm}
+            variant="primary"
+            size="small"
+            disabled={isDisabledCreateButton}
+          >
+            {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+            {t('pages.trade.positions-table.modify-modal.create')}
+          </Button>
+        </GasDepositChecker>
       </DialogActions>
     </Dialog>
   );

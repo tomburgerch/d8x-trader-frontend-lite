@@ -1,16 +1,20 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { PROXY_ABI } from '@d8x/perpetuals-sdk';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useWaitForTransaction, useWalletClient, useNetwork, useContractRead } from 'wagmi';
+import { type Address } from 'viem';
+import { useAccount, useWaitForTransactionReceipt, useWalletClient, useReadContract } from 'wagmi';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-import { PERIOD_OF_2_DAYS } from 'app-constants';
+import { PERIOD_OF_1_DAY } from 'appConstants';
 import { executeLiquidityWithdrawal } from 'blockchain-api/contract-interactions/executeLiquidityWithdrawal';
+import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { getTxnLink } from 'helpers/getTxnLink';
 import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
@@ -25,8 +29,6 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { Initiate } from './Initiate';
 
 import styles from './Action.module.scss';
-import { getTxnLink } from 'helpers/getTxnLink';
-import { PROXY_ABI } from '@d8x/perpetuals-sdk';
 
 interface WithdrawPropsI {
   withdrawOn: string;
@@ -41,30 +43,31 @@ enum ValidityCheckWithdrawE {
 
 export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const { t } = useTranslation();
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [liqProvTool] = useAtom(traderAPIAtom);
-  const [dCurrencyPrice] = useAtom(dCurrencyPriceAtom);
-  const [userAmount] = useAtom(userAmountAtom);
-  const [withdrawals] = useAtom(withdrawalsAtom);
+
+  const { data: walletClient } = useWalletClient();
+  const { address, chain } = useAccount();
+
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const liqProvTool = useAtomValue(traderAPIAtom);
+  const dCurrencyPrice = useAtomValue(dCurrencyPriceAtom);
+  const userAmount = useAtomValue(userAmountAtom);
+  const withdrawals = useAtomValue(withdrawalsAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const [hasOpenRequestOnChain, setWithrawalOnChain] = useAtom(withdrawalOnChainAtom);
 
-  const { chain } = useNetwork();
-  const { data: walletClient } = useWalletClient();
-  const { address } = useAccount();
-
   const [requestSent, setRequestSent] = useState(false);
-  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address>();
+  const [loading, setLoading] = useState(false);
 
   const requestSentRef = useRef(false);
 
-  const { data: openRequests, refetch: refetchOnChainStatus } = useContractRead({
+  const { data: openRequests, refetch: refetchOnChainStatus } = useReadContract({
     address: liqProvTool?.getProxyAddress() as Address,
     abi: PROXY_ABI,
-    enabled: !!liqProvTool && !!selectedPool,
+    query: { enabled: !!liqProvTool && !!selectedPool?.poolId },
     functionName: 'getWithdrawRequests',
-    args: [selectedPool?.poolId, 0, 256],
+    args: [selectedPool?.poolId as number, 0, 256],
   });
 
   useEffect(() => {
@@ -77,45 +80,63 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     setWithrawalOnChain(res);
   }, [openRequests, walletClient, setWithrawalOnChain]);
 
-  useWaitForTransaction({
+  const {
+    isSuccess,
+    isError,
+    isFetched,
+    error: reason,
+  } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.vault.toast.withdrawn')}
-          bodyLines={[
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.shareLink}
-                >
-                  {txHash}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError(reason) {
-      toast.error(
-        <ToastContent
-          title={t('pages.vault.toast.error.title')}
-          bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
-        />
-      );
-    },
-    onSettled() {
-      setTxHash(undefined);
-      setTriggerUserStatsUpdate((prevValue) => !prevValue);
-      refetchOnChainStatus();
-    },
-    enabled: !!txHash,
+    query: { enabled: !!txHash },
   });
+
+  useEffect(() => {
+    if (!isFetched || !txHash) {
+      return;
+    }
+    setTxHash(undefined);
+    setLoading(false);
+    setTriggerUserStatsUpdate((prevValue) => !prevValue);
+    refetchOnChainStatus();
+  }, [isFetched, txHash, refetchOnChainStatus, setTriggerUserStatsUpdate]);
+
+  useEffect(() => {
+    if (!isError || !reason || !txHash) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.vault.toast.error.title')}
+        bodyLines={[{ label: t('pages.vault.toast.error.body'), value: reason.message }]}
+      />
+    );
+  }, [isError, txHash, reason, t]);
+
+  useEffect(() => {
+    if (!isSuccess || !txHash) {
+      return;
+    }
+    toast.success(
+      <ToastContent
+        title={t('pages.vault.toast.withdrawn')}
+        bodyLines={[
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.shareLink}
+              >
+                {txHash}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+  }, [isSuccess, txHash, chain, t]);
 
   const handleWithdrawLiquidity = () => {
     if (requestSentRef.current) {
@@ -128,6 +149,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
 
     requestSentRef.current = true;
     setRequestSent(true);
+    setLoading(true);
 
     executeLiquidityWithdrawal(walletClient, liqProvTool, selectedPool.poolSymbol)
       .then((tx) => {
@@ -144,6 +166,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             bodyLines={[{ label: t('pages.vault.toast.error-withdrawing.body'), value: msg }]}
           />
         );
+        setLoading(false);
       })
       .finally(() => {
         setTriggerUserStatsUpdate((prevValue) => !prevValue);
@@ -164,7 +187,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     const latestWithdrawal = withdrawals[withdrawals.length - 1];
     const latestWithdrawalTimeElapsed = latestWithdrawal.timeElapsedSec * 1000;
 
-    const withdrawalTime = currentTime + PERIOD_OF_2_DAYS - latestWithdrawalTimeElapsed;
+    const withdrawalTime = currentTime + PERIOD_OF_1_DAY - latestWithdrawalTimeElapsed;
     if (currentTime < withdrawalTime) {
       return 0;
     } else {
@@ -263,14 +286,17 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           </Box>
         </Box>
         <Box>
-          <Button
-            variant="primary"
-            onClick={handleWithdrawLiquidity}
-            className={styles.actionButton}
-            disabled={isButtonDisabled}
-          >
-            {validityCheckWithdrawText}
-          </Button>
+          <GasDepositChecker className={styles.actionButton}>
+            <Button
+              variant="primary"
+              onClick={handleWithdrawLiquidity}
+              className={styles.actionButton}
+              disabled={isButtonDisabled}
+            >
+              {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+              {validityCheckWithdrawText}
+            </Button>
+          </GasDepositChecker>
         </Box>
       </Box>
     </div>

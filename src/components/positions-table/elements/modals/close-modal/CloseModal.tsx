@@ -1,30 +1,42 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, useAccount, useChainId, useNetwork, useWaitForTransaction, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
+import { type Address } from 'viem';
 
-import { Box, Button, Checkbox, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 
-import { HashZero } from 'app-constants';
+import { HashZero } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { orderDigest } from 'network/network';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { orderSubmitted } from 'network/broker';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { poolTokenDecimalsAtom, proxyAddrAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE, OrderTypeE } from 'types/enums';
-import type { MarginAccountWithAdditionalDataI, OrderI } from 'types/types';
-import { OrderWithIdI } from 'types/types';
+import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
+import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
 
 import modalStyles from '../Modal.module.scss';
 import styles from './CloseModal.module.scss';
@@ -32,74 +44,94 @@ import styles from './CloseModal.module.scss';
 interface CloseModalPropsI {
   isOpen: boolean;
   selectedPosition?: MarginAccountWithAdditionalDataI | null;
+  poolByPosition?: PoolWithIdI | null;
   closeModal: () => void;
 }
 
-export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseModalPropsI) => {
+export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, closeModal }: CloseModalPropsI) => {
   const { t } = useTranslation();
 
-  const [proxyAddr] = useAtom(proxyAddrAtom);
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [poolTokenDecimals] = useAtom(poolTokenDecimalsAtom);
+  const proxyAddr = useAtomValue(proxyAddrAtom);
+  const tradingClient = useAtomValue(tradingClientAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
-  const [tradingClient] = useAtom(tradingClientAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
 
   const chainId = useChainId();
-  const { chain } = useNetwork();
-  const { address } = useAccount();
+  const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId: chainId });
 
+  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+
   const [requestSent, setRequestSent] = useState(false);
-  const [txHash, setTxHash] = useState<Address | undefined>(undefined);
+  const [txHash, setTxHash] = useState<Address>();
   const [symbolForTx, setSymbolForTx] = useState('');
   const [closeOpenOrders, setCloseOpenOrders] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const requestSentRef = useRef(false);
 
-  useWaitForTransaction({
+  const {
+    isSuccess,
+    isError,
+    isFetched,
+    error: reason,
+  } = useWaitForTransactionReceipt({
     hash: txHash,
-    onSuccess() {
-      toast.success(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.submitted.title')}
-          bodyLines={[
-            {
-              label: t('pages.trade.positions-table.toasts.submitted.body'),
-              value: symbolForTx,
-            },
-            {
-              label: '',
-              value: (
-                <a
-                  href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={modalStyles.shareLink}
-                >
-                  {txHash}
-                </a>
-              ),
-            },
-          ]}
-        />
-      );
-    },
-    onError(reason) {
-      toast.error(
-        <ToastContent
-          title={t('pages.trade.positions-table.toasts.tx-failed.title')}
-          bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
-        />
-      );
-    },
-    onSettled() {
-      setTxHash(undefined);
-      setSymbolForTx('');
-      setLatestOrderSentTimestamp(Date.now());
-    },
-    enabled: !!address && !!txHash,
+    query: { enabled: !!address && !!txHash },
   });
+
+  useEffect(() => {
+    if (!isFetched || !txHash) {
+      return;
+    }
+    setTxHash(undefined);
+    setSymbolForTx('');
+    setLatestOrderSentTimestamp(Date.now());
+    setLoading(false);
+  }, [isFetched, txHash, setLatestOrderSentTimestamp]);
+
+  useEffect(() => {
+    if (!isError || !reason) {
+      return;
+    }
+    toast.error(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.tx-failed.title')}
+        bodyLines={[{ label: t('pages.trade.positions-table.toasts.tx-failed.body'), value: reason.message }]}
+      />
+    );
+  }, [isError, reason, t]);
+
+  useEffect(() => {
+    if (!isSuccess || !txHash) {
+      return;
+    }
+    toast.success(
+      <ToastContent
+        title={t('pages.trade.positions-table.toasts.submitted.title')}
+        bodyLines={[
+          {
+            label: t('pages.trade.positions-table.toasts.submitted.body'),
+            value: symbolForTx,
+          },
+          {
+            label: '',
+            value: (
+              <a
+                href={getTxnLink(chain?.blockExplorers?.default?.url, txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className={modalStyles.shareLink}
+              >
+                {txHash}
+              </a>
+            ),
+          },
+        ]}
+      />
+    );
+    closeModal();
+  }, [isSuccess, txHash, chain, symbolForTx, closeModal, t]);
 
   const handleClosePositionConfirm = async () => {
     if (requestSentRef.current) {
@@ -109,7 +141,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
     if (
       !selectedPosition ||
       !address ||
-      !selectedPool ||
+      !poolByPosition ||
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
@@ -120,6 +152,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
 
     requestSentRef.current = true;
     setRequestSent(true);
+    setLoading(true);
 
     const closeOrder: OrderI = {
       symbol: selectedPosition.symbol,
@@ -134,18 +167,20 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
     orderDigest(chainId, [closeOrder], address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
+          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(tradingClient, signatures, data.data)
-              .then((tx) => {
-                setTxHash(tx.hash);
+              .then(({ hash }) => {
+                setTxHash(hash);
                 setSymbolForTx(selectedPosition.symbol);
+                orderSubmitted(walletClient.chain.id, data.data.orderIds).then().catch(console.error);
                 toast.success(
                   <ToastContent title={t('pages.trade.positions-table.toasts.submit-close.title')} bodyLines={[]} />
                 );
               })
               .catch((error) => {
                 console.error(error);
+                setLoading(false);
                 let msg = (error?.message ?? error) as string;
                 msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
                 toast.error(
@@ -158,7 +193,6 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
               .finally(() => {
                 setRequestSent(false);
                 requestSentRef.current = false;
-                closeModal();
               });
           });
         }
@@ -167,6 +201,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
         console.error(error);
         setRequestSent(false);
         requestSentRef.current = false;
+        setLoading(false);
       });
 
     if (closeOpenOrders) {
@@ -185,6 +220,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
         traderAPI,
         tradingClient,
         toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),
+        nonceShift: 1,
         callback: () => {
           setLatestOrderSentTimestamp(Date.now());
         },
@@ -265,9 +301,12 @@ export const CloseModal = memo(({ isOpen, selectedPosition, closeModal }: CloseM
         <Button onClick={closeModal} variant="secondary" size="small">
           {t('pages.trade.positions-table.modify-modal.cancel')}
         </Button>
-        <Button onClick={handleClosePositionConfirm} variant="primary" size="small" disabled={requestSent}>
-          {t('pages.trade.positions-table.modify-modal.confirm')}
-        </Button>
+        <GasDepositChecker multiplier={3n}>
+          <Button onClick={handleClosePositionConfirm} variant="primary" size="small" disabled={loading || requestSent}>
+            {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+            {t('pages.trade.positions-table.modify-modal.confirm')}
+          </Button>
+        </GasDepositChecker>
       </DialogActions>
     </Dialog>
   );

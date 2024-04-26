@@ -1,10 +1,11 @@
-import { useAtom, useSetAtom } from 'jotai';
+import classnames from 'classnames';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 import { useAccount, useChainId } from 'wagmi';
 
-import { Box, Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
+import { Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { useFilter } from 'components/table/filter-modal/useFilter';
@@ -29,8 +30,8 @@ export const FundingTable = memo(() => {
   const { t } = useTranslation();
 
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
-  const [perpetuals] = useAtom(perpetualsAtom);
-  const [positions] = useAtom(positionsAtom);
+  const perpetuals = useAtomValue(perpetualsAtom);
+  const positions = useAtomValue(positionsAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
   const updateTradesHistoryRef = useRef(false);
@@ -98,6 +99,7 @@ export const FundingTable = memo(() => {
 
       return {
         ...funding,
+        amount: -funding.amount,
         symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
         perpetual: perpetual ?? null,
       };
@@ -120,7 +122,7 @@ export const FundingTable = memo(() => {
   return (
     <div className={styles.root} ref={ref}>
       {width && width >= MIN_WIDTH_FOR_TABLE && (
-        <TableContainer className={styles.tableHolder}>
+        <TableContainer className={classnames(styles.tableHolder, styles.withBackground)}>
           <MuiTable>
             <TableHead className={styles.tableHead}>
               <TableRow>
@@ -157,7 +159,7 @@ export const FundingTable = memo(() => {
         </TableContainer>
       )}
       {(!width || width < MIN_WIDTH_FOR_TABLE) && (
-        <Box>
+        <div className={styles.blocksHolder}>
           {address &&
             visibleRows.map((funding) => (
               <FundingBlock
@@ -167,16 +169,20 @@ export const FundingTable = memo(() => {
               />
             ))}
           {(!address || fundingList.length === 0) && (
-            <Box className={styles.noData}>
+            <div className={styles.noData}>
               {!address
                 ? t('pages.trade.funding-table.table-content.connect')
                 : t('pages.trade.funding-table.table-content.no-open')}
-            </Box>
+            </div>
           )}
-        </Box>
+        </div>
       )}
       {address && fundingList.length > 5 && (
-        <Box className={styles.paginationHolder}>
+        <div
+          className={classnames(styles.paginationHolder, {
+            [styles.withBackground]: width && width >= MIN_WIDTH_FOR_TABLE,
+          })}
+        >
           <TablePagination
             align="center"
             rowsPerPageOptions={[5, 10, 20]}
@@ -191,8 +197,12 @@ export const FundingTable = memo(() => {
             }}
             labelRowsPerPage={t('common.pagination.per-page')}
           />
-        </Box>
+        </div>
       )}
+      <div
+        className={classnames(styles.footer, { [styles.withBackground]: width && width >= MIN_WIDTH_FOR_TABLE })}
+      ></div>
+
       <FilterModal headers={fundingListHeaders} filter={filter} setFilter={setFilter} />
     </div>
   );

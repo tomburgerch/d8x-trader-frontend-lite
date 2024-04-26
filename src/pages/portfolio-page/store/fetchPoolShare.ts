@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Address } from 'viem';
+import { type Address } from 'viem';
 
 import { poolsAtom, traderAPIAtom } from 'store/pools.store';
 
@@ -10,14 +10,18 @@ interface TokenPoolSharePercentI {
   balance: number;
   percent: number;
 }
+
 export const poolShareTokensShareAtom = atom<TokenPoolSharePercentI[]>([]);
 export const poolShareTokensUSDBalanceAtom = atom(0);
 
 export const fetchPoolShareAtom = atom(null, async (get, set, userAddress: Address) => {
+  const traderAPI = get(traderAPIAtom);
+  if (!traderAPI) {
+    return;
+  }
+
   const pools = get(poolsAtom);
   const poolUsdPrice = get(poolUsdPriceAtom);
-  const traderAPI = get(traderAPIAtom);
-  if (!traderAPI) return;
 
   const dCurrencyPriceMap: Record<string, number> = {};
   const poolShareTokenBalances: { symbol: string; balance: number }[] = [];
