@@ -1,8 +1,8 @@
-import { ComponentType, lazy, LazyExoticComponent, ReactComponentElement, ReactNode } from 'react';
+import { type ComponentType, lazy, type LazyExoticComponent, type ReactElement, type ReactNode } from 'react';
 
 import { TemporaryAnyT } from 'types/types';
 
-const importedLogos: Record<string, ReactComponentElement<TemporaryAnyT>> = {};
+const importedLogos: Record<string, ReactElement<TemporaryAnyT>> = {};
 
 export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentType<ReactNode>> =>
   lazy(async () => {
@@ -29,11 +29,20 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
         default: localLogo,
       };
     } catch {
-      const defaultLogo = (await import(`../../node_modules/cryptocurrency-icons/svg/color/generic.svg`))
-        .default as TemporaryAnyT;
-      importedLogos[symbol] = defaultLogo;
+      /* continue regardless of error */
+    }
+
+    try {
+      const genericLogo = (await import('assets/crypto-icons/generic.svg')).default as TemporaryAnyT;
+      importedLogos[symbol] = genericLogo;
       return {
-        default: defaultLogo,
+        default: genericLogo,
+      };
+    } catch {
+      // We need to reload page, because app has been updated
+      window.location.reload();
+      return {
+        default: null,
       };
     }
   });

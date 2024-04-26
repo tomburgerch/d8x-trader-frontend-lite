@@ -711,6 +711,10 @@
     "max": "最大：",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",
+    "page-reload": {
+      "text1": "应用程序已更新。",
+      "text2": "请等到页面重新加载。"
+    },
     "one-click": {
       "disable": "禁用一键交易",
       "enable": "启用一键交易"
