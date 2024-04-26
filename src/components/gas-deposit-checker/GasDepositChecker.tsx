@@ -1,5 +1,5 @@
 import { useSetAtom } from 'jotai';
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Address } from 'viem';
 import { useBalance } from 'wagmi';
@@ -19,8 +19,9 @@ interface GasDepositCheckerPropsI extends PropsWithChildren {
 export const GasDepositChecker = ({ children, multiplier = 1n, address, className }: GasDepositCheckerPropsI) => {
   const { t } = useTranslation();
 
-  const { hasEnoughGasForFee, calculateGasForFee, isConnected } = useUserWallet();
   const { data: gasTokenBalance } = useBalance({ address });
+
+  const { hasEnoughGasForFee, isMultisigAddress, calculateGasForFee, isConnected } = useUserWallet();
 
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
 
@@ -28,7 +29,7 @@ export const GasDepositChecker = ({ children, multiplier = 1n, address, classNam
     ? gasTokenBalance.value > calculateGasForFee(MethodE.Interact, multiplier)
     : hasEnoughGasForFee(MethodE.Interact, multiplier);
 
-  if (!isConnected || hasGas) {
+  if (!isConnected || hasGas || isMultisigAddress) {
     return children;
   }
 

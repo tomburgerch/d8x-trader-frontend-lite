@@ -713,6 +713,10 @@
     "max": "Max:",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",
+    "page-reload": {
+      "text1": "The app has been updated.",
+      "text2": "Please wait until page reloads."
+    },
     "one-click": {
       "disable": "Disable one-click trading",
       "enable": "Enable one-click trading"

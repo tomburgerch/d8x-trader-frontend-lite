@@ -711,6 +711,10 @@
     "max": "Max:",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",
+    "page-reload": {
+      "text1": "La aplicación se ha actualizado.",
+      "text2": "Espere hasta que la página vuelva a cargar."
+    },
     "one-click": {
       "disable": "Deshabilitar el comercio con un clic",
       "enable": "Habilite el comercio con un solo clic"
