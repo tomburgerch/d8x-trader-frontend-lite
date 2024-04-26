@@ -1,8 +1,9 @@
-@import '~styles/theme/_theme.scss';
+@import '~styles/theme/theme.scss';
 
 .root {
   display: flex;
   border-radius: $d8x-border-radius;
+  background-color: var(--d8x-color-background-items);
 }
 
 .divider {
@@ -11,7 +12,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
-
   .root {
     flex-direction: column;
   }

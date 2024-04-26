@@ -1,4 +1,4 @@
-@import '~styles/theme/_theme.scss';
+@import '~styles/theme/theme.scss';
 
 .root {
   margin-top: 4 * $d8x-spacing;
@@ -38,7 +38,7 @@
   display: flex;
   align-items: center;
   padding: 8px 32px;
-  background-color: var(--d8x-color-background-items-second);
+  background-color: var(--d8x-color-background-items-inactive);
 
   &.hideBetaText {
     display: none;
@@ -67,13 +67,14 @@
   padding: 8px 32px 0;
   margin: -16px -32px 0;
   min-height: 80px;
-  background-color: var(--d8x-color-background);
+  background-color: var(--d8x-color-background-header);
 }
 
 .leftSide {
   display: flex;
   flex: 1;
   gap: 8 * $d8x-spacing;
+  align-items: center;
 
   .navWrapper {
     display: flex;
@@ -123,6 +124,11 @@
   gap: $d8x-spacing * 6;
 }
 
+.pageIcon {
+  margin-bottom: -$d8x-spacing;
+  margin-right: $d8x-spacing * 2;
+}
+
 .navMobileItem,
 .navItem {
   font-weight: 500;
@@ -143,20 +149,12 @@
   &.active {
     color: var(--d8x-color-action);
     position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -$d8x-spacing;
-      width: 100%;
-      border-bottom: 1px solid var(--d8x-color-action);
-    }
+    text-decoration: underline;
+    text-underline-offset: $d8x-spacing * 2.5;
   }
 }
 
 .navMobileItem {
-
   &.inactive {
     padding: 12px;
     margin: -8px;
@@ -164,7 +162,7 @@
 
   &.active {
     text-decoration: underline;
-    text-underline-offset: 8px;
+    text-underline-offset: $d8x-spacing * 2;
     padding: 12px;
     margin: -8px;
 
@@ -202,12 +200,6 @@
   line-height: 1;
 }
 
-.selectBoxes {
-  display: flex;
-  gap: $d8x-spacing * 6;
-  margin-right: $d8x-spacing * 6;
-}
-
 .walletConnect {
   justify-content: right;
   display: flex;
@@ -221,8 +213,12 @@
   height: 48px;
 }
 
-@media screen and ($d8x-breakpoint-max-lg) {
+.modalButton {
+  min-width: 195px;
+  height: 48px;
+}
 
+@media screen and ($d8x-breakpoint-max-lg) {
   .betaInfoLine {
     padding: 8px 16px;
   }
@@ -232,13 +228,18 @@
   }
 
   .toolbar {
-    padding: 8px 16px 0;
+    padding: 0 16px;
     margin: -16px -16px 0;
+  }
+
+  .modalButton {
+    padding-left: 20px;
+    padding-right: 20px;
+    min-width: 48px;
   }
 }
 
 @media screen and ($d8x-breakpoint-max-md) {
-
   .header {
     font-size: 16px;
   }
@@ -275,7 +276,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-sm) {
-
   .betaInfoLine {
     padding: 4px 24px;
   }
@@ -289,7 +289,7 @@
   .mobileButtonsBlock {
     background-color: var(--d8x-color-background-items);
     padding: 0 4 * $d8x-spacing;
-    margin: 0 -4 * $d8x-spacing;
+    margin: 0 (-3 * $d8x-spacing);
   }
 
   .mobileWalletButtons {
@@ -298,7 +298,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
-
   .root {
     padding: 0 12px;
 

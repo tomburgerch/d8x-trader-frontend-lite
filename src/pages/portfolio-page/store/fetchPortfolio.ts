@@ -1,6 +1,6 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
-import { Address } from 'viem';
+import { type Address } from 'viem';
 
 import { poolsAtom, traderAPIAtom } from 'store/pools.store';
 import { OpenTraderRebateI, PoolWithIdI } from 'types/types';
@@ -10,6 +10,7 @@ import { fetchPoolShareAtom } from './fetchPoolShare';
 import { fetchPoolTokensUSDBalanceAtom } from './fetchPoolTokensUSDBalance';
 import { fetchRealizedPnLAtom } from './fetchRealizedPnL';
 import { fetchUnrealizedPnLAtom } from './fetchUnrealizedPnL';
+import { fetchStrategySyntheticPosition } from './fetchStrategySyntheticPosition';
 
 const getPoolUsdPrice = async (traderAPI: TraderInterface, pool: PoolWithIdI) => {
   const info = await traderAPI.getPriceInUSD(
@@ -40,21 +41,20 @@ interface PoolUsdPriceI {
   quote: number;
   bases: Record<string, number>;
 }
+
 export const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
-const isLoadingAtom = atom(true);
-export const totalOpenRewardsAtom = atom<number>(0);
+export const totalOpenRewardsAtom = atom(0);
 export const accountValueAtom = atom(0);
 
 export const fetchPortfolioAtom = atom(
-  (get) => ({ isLoading: get(isLoadingAtom) }),
+  null,
   async (get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
-    const pools = get(poolsAtom).filter((pool) => pool.isRunning);
     const traderAPI = get(traderAPIAtom);
     if (!traderAPI) {
       return;
     }
 
-    set(isLoadingAtom, false);
+    const pools = get(poolsAtom).filter((pool) => pool.isRunning);
 
     let totalReferralRewards = 0;
 
@@ -78,13 +78,15 @@ export const fetchPortfolioAtom = atom(
 
     set(totalOpenRewardsAtom, totalReferralRewards);
 
-    const [unrealizedPnL, , poolTokensUSDBalance, , poolShareTokensUSDBalance] = await Promise.all([
-      set(fetchUnrealizedPnLAtom, userAddress, chainId),
-      set(fetchRealizedPnLAtom, userAddress, chainId),
-      set(fetchPoolTokensUSDBalanceAtom, userAddress),
-      set(fetchEarningsAtom, userAddress, chainId),
-      set(fetchPoolShareAtom, userAddress),
-    ]);
+    const [unrealizedPnL, , strategySyntheticPositionUSD, poolTokensUSDBalance, , poolShareTokensUSDBalance] =
+      await Promise.all([
+        set(fetchUnrealizedPnLAtom, userAddress, chainId),
+        set(fetchRealizedPnLAtom, userAddress, chainId),
+        set(fetchStrategySyntheticPosition, userAddress, chainId),
+        set(fetchPoolTokensUSDBalanceAtom, userAddress),
+        set(fetchEarningsAtom, userAddress, chainId),
+        set(fetchPoolShareAtom, userAddress),
+      ]);
 
     let totalCollateralCC = 0;
     let totalUnrealizedPnl = 0;
@@ -98,6 +100,7 @@ export const fetchPortfolioAtom = atom(
       totalCollateralCC +
       totalUnrealizedPnl +
       (poolShareTokensUSDBalance || 0) +
+      (strategySyntheticPositionUSD || 0) +
       totalReferralRewards;
 
     set(accountValueAtom, accountValue);
