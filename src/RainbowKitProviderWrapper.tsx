@@ -1,14 +1,14 @@
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
 
 import { Disclaimer } from 'components/disclaimer/disclaimer';
-import { enabledDarkModeAtom } from 'store/app.store';
 
 import '@rainbow-me/rainbowkit/styles.css';
+import { enabledDarkModeAtom } from 'store/app.store';
 
 export const RainbowKitProviderWrapper = ({ children }: { children: ReactNode }) => {
-  const enabledDarkMode = useAtomValue(enabledDarkModeAtom);
+  const [enabledDarkMode] = useAtom(enabledDarkModeAtom);
 
   return (
     <RainbowKitProvider
