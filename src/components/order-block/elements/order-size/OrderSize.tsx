@@ -159,7 +159,7 @@ export const OrderSize = memo(() => {
       } else {
         maxAmount = data.data.sell;
       }
-      return maxAmount < _lotSizeBC ? maxAmount : +roundToLotString(maxAmount, _lotSizeBC);
+      return maxAmount < _lotSizeBC ? undefined : +roundToLotString(maxAmount, _lotSizeBC);
     },
     [traderAPI]
   );
@@ -204,12 +204,17 @@ export const OrderSize = memo(() => {
 
       refetchMaxOrderSize();
       maxOrderSizeRetriesCountRef.current++;
+      console.log(maxOrderSizeRetriesCountRef.current);
     }, INTERVAL_FOR_DATA_REFETCH);
 
     return () => {
       clearInterval(intervalId);
     };
   }, [refetchMaxOrderSize, triggerBalancesUpdate]);
+
+  useEffect(() => {
+    maxOrderSizeRetriesCountRef.current = 0;
+  }, [address, chainId, selectedPerpetual]);
 
   const handleCurrencyChangeToggle = () => {
     setOpenCurrencySelector((prevOpen) => !prevOpen);

@@ -278,6 +278,10 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }, [refetchPoolTokenBalance, triggerUserStatsUpdate, triggerBalancesUpdate]);
 
   useEffect(() => {
+    poolTokenBalanceRetriesCountRef.current = 0;
+  }, [address, chainId, triggerBalancesUpdate, triggerUserStatsUpdate]);
+
+  useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
       poolTokenBalanceDefinedRef.current = true;
       setPoolTokenBalance(+formatUnits(poolTokenBalance[0], poolTokenBalance[1]));
