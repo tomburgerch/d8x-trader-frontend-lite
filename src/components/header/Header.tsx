@@ -274,12 +274,9 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
     return () => {
       clearInterval(intervalId);
+      poolTokenBalanceRetriesCountRef.current = 0;
     };
   }, [refetchPoolTokenBalance, triggerUserStatsUpdate, triggerBalancesUpdate]);
-
-  useEffect(() => {
-    poolTokenBalanceRetriesCountRef.current = 0;
-  }, [address, chainId, triggerBalancesUpdate, triggerUserStatsUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
