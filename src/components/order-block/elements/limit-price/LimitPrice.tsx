@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,11 +16,11 @@ import styles from './LimitPrice.module.scss';
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();
 
-  const [orderType] = useAtom(orderTypeAtom);
-  const [orderBlock] = useAtom(orderBlockAtom);
+  const orderType = useAtomValue(orderTypeAtom);
+  const orderBlock = useAtomValue(orderBlockAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const [limitPrice, setLimitPrice] = useAtom(limitPriceAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
 
   const [inputValue, setInputValue] = useState(limitPrice != null ? `${limitPrice}` : '');
 

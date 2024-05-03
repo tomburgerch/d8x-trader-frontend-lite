@@ -43,8 +43,14 @@ const roundMaxOrderSize = (value: number) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
+const INTERVAL_FOR_DATA_REFETCH = 1000;
+const POOL_BALANCE_MAX_RETRIES = 120;
+
 export const OrderSize = memo(() => {
   const { t } = useTranslation();
+
+  const { address } = useAccount();
+  const chainId = useChainId();
 
   const [orderSize, setOrderSizeDirect] = useAtom(orderSizeAtom);
   const [inputValue, setInputValue] = useAtom(inputValueAtom);
@@ -64,11 +70,10 @@ export const OrderSize = memo(() => {
 
   const [openCurrencySelector, setOpenCurrencySelector] = useState(false);
 
-  const { address } = useAccount();
-  const chainId = useChainId();
-
   const fetchedMaxSizes = useRef(false);
   const anchorRef = useRef<HTMLDivElement>(null);
+  const maxOrderSizeDefinedRef = useRef(false);
+  const maxOrderSizeRetriesCountRef = useRef(0);
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
@@ -130,29 +135,36 @@ export const OrderSize = memo(() => {
 
   const fetchMaxOrderSize = useCallback(
     async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
-      if (traderAPI && !fetchedMaxSizes.current) {
-        const symbol = traderAPI.getSymbolFromPerpId(_perpId);
-        if (!symbol) {
-          return;
-        }
-        fetchedMaxSizes.current = true;
-        const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
-          console.error(err);
-        });
-        fetchedMaxSizes.current = false;
-        let maxAmount: number | undefined;
-        if (_isLong) {
-          maxAmount = data?.data?.buy;
-        } else {
-          maxAmount = data?.data?.sell;
-        }
-        return maxAmount === undefined || maxAmount < _lotSizeBC ? undefined : +roundToLotString(maxAmount, _lotSizeBC);
+      if (!traderAPI || fetchedMaxSizes.current) {
+        return;
       }
+
+      const symbol = traderAPI.getSymbolFromPerpId(_perpId);
+      if (!symbol) {
+        return;
+      }
+
+      fetchedMaxSizes.current = true;
+      const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
+        console.error(err);
+      });
+      if (!data?.data) {
+        return;
+      }
+
+      fetchedMaxSizes.current = false;
+      let maxAmount: number | undefined;
+      if (_isLong) {
+        maxAmount = data.data.buy;
+      } else {
+        maxAmount = data.data.sell;
+      }
+      return maxAmount < _lotSizeBC ? maxAmount : +roundToLotString(maxAmount, _lotSizeBC);
     },
     [traderAPI]
   );
 
-  useEffect(() => {
+  const refetchMaxOrderSize = useCallback(() => {
     if (perpetualStaticInfo && address && isSDKConnected) {
       fetchMaxOrderSize(
         chainId,
@@ -160,20 +172,44 @@ export const OrderSize = memo(() => {
         perpetualStaticInfo.lotSizeBC,
         perpetualStaticInfo.id,
         orderBlock === OrderBlockE.Long
-      ).then((result) => {
-        setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
-      });
+      )
+        .then((result) => {
+          setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
+          maxOrderSizeDefinedRef.current = result !== undefined;
+        })
+        .catch((error) => {
+          console.error(error);
+          maxOrderSizeDefinedRef.current = false;
+        });
     }
-  }, [
-    isSDKConnected,
-    chainId,
-    address,
-    perpetualStaticInfo,
-    orderBlock,
-    fetchMaxOrderSize,
-    setMaxOrderSize,
-    triggerBalancesUpdate,
-  ]);
+  }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]);
+
+  useEffect(() => {
+    maxOrderSizeDefinedRef.current = false;
+    refetchMaxOrderSize();
+
+    const intervalId = setInterval(() => {
+      if (maxOrderSizeDefinedRef.current) {
+        maxOrderSizeRetriesCountRef.current = 0;
+        clearInterval(intervalId);
+        return;
+      }
+
+      if (POOL_BALANCE_MAX_RETRIES <= maxOrderSizeRetriesCountRef.current) {
+        clearInterval(intervalId);
+        console.error(`After ${POOL_BALANCE_MAX_RETRIES} retries we failed to get pool token balance.`);
+        maxOrderSizeRetriesCountRef.current = 0;
+        return;
+      }
+
+      refetchMaxOrderSize();
+      maxOrderSizeRetriesCountRef.current++;
+    }, INTERVAL_FOR_DATA_REFETCH);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [refetchMaxOrderSize, triggerBalancesUpdate]);
 
   const handleCurrencyChangeToggle = () => {
     setOpenCurrencySelector((prevOpen) => !prevOpen);

@@ -55,6 +55,8 @@ interface HeaderPropsI {
   window?: () => Window;
 }
 
+const INTERVAL_FOR_DATA_REFETCH = 1000;
+const POOL_BALANCE_MAX_RETRIES = 120;
 const DRAWER_WIDTH_FOR_TABLETS = 340;
 const MAX_RETRIES = 3;
 
@@ -93,6 +95,8 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const exchangeRequestRef = useRef(false);
   const positionsRequestRef = useRef(false);
   const traderAPIRef = useRef(traderAPI);
+  const poolTokenBalanceDefinedRef = useRef(false);
+  const poolTokenBalanceRetriesCountRef = useRef(0);
 
   const setExchangeInfo = useCallback(
     (data: ExchangeInfoI | null) => {
@@ -240,17 +244,46 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     },
   });
 
-  useEffect(() => {
+  const refetchPoolTokenBalance = useCallback(() => {
     if (address && chain) {
       refetch().then().catch(console.error);
     }
-  }, [address, chain, refetch, triggerUserStatsUpdate, triggerBalancesUpdate]);
+  }, [address, chain, refetch]);
+
+  useEffect(() => {
+    poolTokenBalanceDefinedRef.current = false;
+    refetchPoolTokenBalance();
+
+    const intervalId = setInterval(() => {
+      if (poolTokenBalanceDefinedRef.current) {
+        poolTokenBalanceRetriesCountRef.current = 0;
+        clearInterval(intervalId);
+        return;
+      }
+
+      if (POOL_BALANCE_MAX_RETRIES <= poolTokenBalanceRetriesCountRef.current) {
+        clearInterval(intervalId);
+        console.error(`After ${POOL_BALANCE_MAX_RETRIES} retries we failed to get pool token balance.`);
+        poolTokenBalanceRetriesCountRef.current = 0;
+        return;
+      }
+
+      refetchPoolTokenBalance();
+      poolTokenBalanceRetriesCountRef.current++;
+    }, INTERVAL_FOR_DATA_REFETCH);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [refetchPoolTokenBalance, triggerUserStatsUpdate, triggerBalancesUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
+      poolTokenBalanceDefinedRef.current = true;
       setPoolTokenBalance(+formatUnits(poolTokenBalance[0], poolTokenBalance[1]));
       setPoolTokenDecimals(poolTokenBalance[1]);
     } else {
+      poolTokenBalanceDefinedRef.current = false;
       setPoolTokenBalance(undefined);
       setPoolTokenDecimals(undefined);
     }

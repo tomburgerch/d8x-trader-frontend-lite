@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,10 +15,10 @@ import { valueToFractionDigits } from 'utils/formatToCurrency';
 export const TakeProfitSelector = memo(() => {
   const { t } = useTranslation();
 
-  const [orderInfo] = useAtom(orderInfoAtom);
-  const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const orderInfo = useAtomValue(orderInfoAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
+  const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
 
   const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
