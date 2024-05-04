@@ -216,6 +216,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const {
     data: poolTokenBalance,
     isError,
+    isRefetching,
     refetch,
   } = useReadContracts({
     allowFailure: false,
@@ -244,15 +245,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     },
   });
 
-  const refetchPoolTokenBalance = useCallback(() => {
-    if (address && chain) {
-      refetch().then().catch(console.error);
-    }
-  }, [address, chain, refetch]);
-
   useEffect(() => {
+    if (!address || !chain) {
+      return;
+    }
+
     poolTokenBalanceDefinedRef.current = false;
-    refetchPoolTokenBalance();
+    refetch().then().catch(console.error);
 
     const intervalId = setInterval(() => {
       if (poolTokenBalanceDefinedRef.current) {
@@ -263,12 +262,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
       if (POOL_BALANCE_MAX_RETRIES <= poolTokenBalanceRetriesCountRef.current) {
         clearInterval(intervalId);
-        console.error(`After ${POOL_BALANCE_MAX_RETRIES} retries we failed to get pool token balance.`);
+        console.warn(`Pool token balance fetch failed after ${POOL_BALANCE_MAX_RETRIES}.`);
         poolTokenBalanceRetriesCountRef.current = 0;
         return;
       }
 
-      refetchPoolTokenBalance();
+      refetch().then().catch(console.error);
       poolTokenBalanceRetriesCountRef.current++;
     }, INTERVAL_FOR_DATA_REFETCH);
 
@@ -276,7 +275,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       clearInterval(intervalId);
       poolTokenBalanceRetriesCountRef.current = 0;
     };
-  }, [refetchPoolTokenBalance, triggerUserStatsUpdate, triggerBalancesUpdate]);
+  }, [address, chain, refetch, triggerUserStatsUpdate, triggerBalancesUpdate]);
 
   useEffect(() => {
     if (poolTokenBalance && selectedPool && chain && !isError) {
@@ -288,7 +287,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       setPoolTokenBalance(undefined);
       setPoolTokenDecimals(undefined);
     }
-  }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance, setPoolTokenDecimals]);
+  }, [selectedPool, chain, poolTokenBalance, isError, setPoolTokenBalance, setPoolTokenDecimals, isRefetching]);
 
   useEffect(() => {
     if (gasTokenBalance && !isGasTokenFetchError) {

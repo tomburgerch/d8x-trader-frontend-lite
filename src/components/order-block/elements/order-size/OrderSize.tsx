@@ -2,6 +2,7 @@ import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { type Address } from 'viem';
 import { useAccount, useChainId } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
@@ -44,7 +45,7 @@ const roundMaxOrderSize = (value: number) => {
 };
 
 const INTERVAL_FOR_DATA_REFETCH = 1000;
-const POOL_BALANCE_MAX_RETRIES = 120;
+const MAX_ORDER_SIZE_RETRIES = 120;
 
 export const OrderSize = memo(() => {
   const { t } = useTranslation();
@@ -164,29 +165,36 @@ export const OrderSize = memo(() => {
     [traderAPI]
   );
 
-  const refetchMaxOrderSize = useCallback(() => {
-    if (perpetualStaticInfo && address && isSDKConnected) {
-      fetchMaxOrderSize(
-        chainId,
-        address,
-        perpetualStaticInfo.lotSizeBC,
-        perpetualStaticInfo.id,
-        orderBlock === OrderBlockE.Long
-      )
-        .then((result) => {
-          setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
-          maxOrderSizeDefinedRef.current = result !== undefined;
-        })
-        .catch((error) => {
-          console.error(error);
-          maxOrderSizeDefinedRef.current = false;
-        });
-    }
-  }, [isSDKConnected, chainId, address, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]);
+  const refetchMaxOrderSize = useCallback(
+    (userAddress: Address) => {
+      if (perpetualStaticInfo && isSDKConnected) {
+        fetchMaxOrderSize(
+          chainId,
+          userAddress,
+          perpetualStaticInfo.lotSizeBC,
+          perpetualStaticInfo.id,
+          orderBlock === OrderBlockE.Long
+        )
+          .then((result) => {
+            setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
+            maxOrderSizeDefinedRef.current = result !== undefined;
+          })
+          .catch((error) => {
+            console.error(error);
+            maxOrderSizeDefinedRef.current = false;
+          });
+      }
+    },
+    [isSDKConnected, chainId, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]
+  );
 
   useEffect(() => {
+    if (!address) {
+      return;
+    }
+
     maxOrderSizeDefinedRef.current = false;
-    refetchMaxOrderSize();
+    refetchMaxOrderSize(address);
 
     const intervalId = setInterval(() => {
       if (maxOrderSizeDefinedRef.current) {
@@ -195,23 +203,22 @@ export const OrderSize = memo(() => {
         return;
       }
 
-      if (POOL_BALANCE_MAX_RETRIES <= maxOrderSizeRetriesCountRef.current) {
+      if (MAX_ORDER_SIZE_RETRIES <= maxOrderSizeRetriesCountRef.current) {
         clearInterval(intervalId);
-        console.error(`After ${POOL_BALANCE_MAX_RETRIES} retries we failed to get pool token balance.`);
+        console.warn(`Max order size fetch failed after ${MAX_ORDER_SIZE_RETRIES}.`);
         maxOrderSizeRetriesCountRef.current = 0;
         return;
       }
 
-      refetchMaxOrderSize();
+      refetchMaxOrderSize(address);
       maxOrderSizeRetriesCountRef.current++;
-      console.log(maxOrderSizeRetriesCountRef.current);
     }, INTERVAL_FOR_DATA_REFETCH);
 
     return () => {
       clearInterval(intervalId);
       maxOrderSizeRetriesCountRef.current = 0;
     };
-  }, [refetchMaxOrderSize, triggerBalancesUpdate]);
+  }, [refetchMaxOrderSize, address, triggerBalancesUpdate]);
 
   const handleCurrencyChangeToggle = () => {
     setOpenCurrencySelector((prevOpen) => !prevOpen);
