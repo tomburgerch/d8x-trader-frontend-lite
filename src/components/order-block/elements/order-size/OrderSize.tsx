@@ -148,11 +148,11 @@ export const OrderSize = memo(() => {
       const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
         console.error(err);
       });
+      fetchedMaxSizes.current = false;
       if (!data?.data) {
         return;
       }
 
-      fetchedMaxSizes.current = false;
       let maxAmount: number | undefined;
       if (_isLong) {
         maxAmount = data.data.buy;
