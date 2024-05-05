@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useRef } from 'react';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import {
@@ -78,8 +78,8 @@ const debounceLatestMessageTime = debounceLeading((callback: () => void) => {
 }, 1000);
 
 export function useCandlesWsMessageHandler() {
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [selectedPeriod] = useAtom(selectedPeriodAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const selectedPeriod = useAtomValue(selectedPeriodAtom);
   const setCandles = useSetAtom(candlesAtom);
   const setNewCandle = useSetAtom(newCandleAtom);
   const setMarketsData = useSetAtom(marketsDataAtom);

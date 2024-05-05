@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,10 +15,10 @@ import { valueToFractionDigits } from 'utils/formatToCurrency';
 export const StopLossSelector = memo(() => {
   const { t } = useTranslation();
 
-  const [orderInfo] = useAtom(orderInfoAtom);
-  const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
+  const orderInfo = useAtomValue(orderInfoAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setStopLossPrice = useSetAtom(stopLossPriceAtom);
+  const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
 
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
