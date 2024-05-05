@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,10 +22,9 @@ function valueLabelFormat(value: number) {
 export const LeverageSelector = memo(() => {
   const { t } = useTranslation();
 
-  const [leverage] = useAtom(leverageAtom);
-  const [perpetualStaticInfo] = useAtom(perpetualStaticInfoAtom);
-
-  const [inputValue] = useAtom(inputValueAtom);
+  const leverage = useAtomValue(leverageAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const inputValue = useAtomValue(inputValueAtom);
   const setLeverage = useSetAtom(setLeverageAtom);
 
   const maxLeverage = useMemo(() => {

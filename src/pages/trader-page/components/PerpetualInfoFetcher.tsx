@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { useChainId } from 'wagmi';
 
@@ -9,10 +9,10 @@ import { perpetualStaticInfoAtom, selectedPerpetualAtom, selectedPoolAtom, trade
 export const PerpetualInfoFetcher = () => {
   const chainId = useChainId();
 
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [selectedPool] = useAtom(selectedPoolAtom);
   const setPerpetualStaticInfo = useSetAtom(perpetualStaticInfoAtom);
-  const [traderAPI] = useAtom(traderAPIAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
 
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {

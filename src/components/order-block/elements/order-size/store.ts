@@ -28,7 +28,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderInfo = get(orderInfoAtom);
   const slippage = orderType === 'Market' ? get(slippageSliderAtom) / 100 : 0.01;
 
-  if (!poolTokenBalance || !selectedPool || !selectedPerpetual || !maxTraderOrderSize) {
+  if (!poolTokenBalance || !selectedPool || !selectedPerpetual || maxTraderOrderSize === undefined) {
     return;
   }
 
@@ -36,7 +36,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlock = get(orderBlockAtom);
   const orderFeeBps = orderInfo?.tradingFee || 0;
 
-  const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
+  const { collToQuoteIndexPrice, indexPrice, markPrice } = selectedPerpetual;
   let collateralCC = 0;
 
   const positions = get(positionsAtom);
@@ -50,9 +50,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);
   const buffer =
-    indexPrice * (orderFeeBps / 10_000) +
-    selectedPerpetual.markPrice / leverage +
-    Math.max(direction * (limitPrice - selectedPerpetual.markPrice), 0);
+    indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0);
   const personalMax = (((poolTokenBalance + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
@@ -69,9 +67,9 @@ export const currencyMultiplierAtom = atom((get) => {
   const selectedCurrency = get(selectedCurrencyPrimitiveAtom);
 
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
-  if (selectedCurrency === selectedPerpetual.quoteCurrency) {
-    currencyMultiplier = selectedPerpetual.indexPrice;
-  } else if (selectedCurrency === selectedPool.poolSymbol) {
+  if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
+    currencyMultiplier = indexPrice;
+  } else if (selectedCurrency === selectedPool.poolSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
     currencyMultiplier = indexPrice / collToQuoteIndexPrice;
   }
   return currencyMultiplier;
