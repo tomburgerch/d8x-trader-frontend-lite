@@ -115,7 +115,7 @@ export const CreateReferrerCodeDialog = ({ isOpen, onClose }: CreateReferrerCode
           <OutlinedInput
             type="text"
             value={kickbackRateInputValue}
-            inputProps={{ min: 0.01, max: commissionRate }}
+            inputProps={{ min: 0, max: commissionRate }}
             onChange={handleKickbackRateChange}
             className={styles.kickbackInput}
             endAdornment="%"
