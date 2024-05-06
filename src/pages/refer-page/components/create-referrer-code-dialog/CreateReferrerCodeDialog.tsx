@@ -55,8 +55,8 @@ export const CreateReferrerCodeDialog = ({ isOpen, onClose }: CreateReferrerCode
 
     const filteredValue = replaceSymbols(value);
 
-    if (+filteredValue > commissionRate) {
-      setKickbackRateInputValue(commissionRate.toFixed(2));
+    if (+filteredValue > commissionRate - 0.01) {
+      setKickbackRateInputValue((commissionRate - 0.01).toFixed(2));
       return;
     }
     setKickbackRateInputValue(filteredValue);
