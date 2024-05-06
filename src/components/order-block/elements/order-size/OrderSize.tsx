@@ -78,17 +78,32 @@ export const OrderSize = memo(() => {
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
+  const maxOrderSizeCurrent = useMemo(() => {
+    if (maxOrderSize !== undefined) {
+      return maxOrderSize * currencyMultiplier;
+    }
+  }, [maxOrderSize, currencyMultiplier]);
+
   const onInputChange = useCallback(
     (value: string) => {
       if (value) {
-        setOrderSize(Number(value) / currencyMultiplier);
+        let max;
+        if (maxOrderSizeCurrent === undefined || maxOrderSizeCurrent === null) {
+          max = Number(value) / currencyMultiplier;
+        } else {
+          max =
+            Number(value) / currencyMultiplier > maxOrderSizeCurrent
+              ? maxOrderSizeCurrent
+              : Number(value) / currencyMultiplier;
+        }
+        setOrderSize(max);
         setInputValue(value);
       } else {
         setOrderSizeDirect(0);
         setInputValue('');
       }
     },
-    [setOrderSizeDirect, setOrderSize, setInputValue, currencyMultiplier]
+    [setOrderSizeDirect, setOrderSize, setInputValue, currencyMultiplier, maxOrderSizeCurrent]
   );
 
   useEffect(() => {
@@ -176,8 +191,8 @@ export const OrderSize = memo(() => {
           orderBlock === OrderBlockE.Long
         )
           .then((result) => {
-            setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
-            maxOrderSizeDefinedRef.current = result !== undefined;
+            setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
+            maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
           })
           .catch((error) => {
             console.error(error);
@@ -239,12 +254,6 @@ export const OrderSize = memo(() => {
     setSelectedCurrency(currency);
     setOpenCurrencySelector(false);
   };
-
-  const maxOrderSizeCurrent = useMemo(() => {
-    if (maxOrderSize !== undefined) {
-      return maxOrderSize * currencyMultiplier;
-    }
-  }, [maxOrderSize, currencyMultiplier]);
 
   return (
     <>

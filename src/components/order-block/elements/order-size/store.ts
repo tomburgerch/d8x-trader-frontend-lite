@@ -28,7 +28,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderInfo = get(orderInfoAtom);
   const slippage = orderType === 'Market' ? get(slippageSliderAtom) / 100 : 0.01;
 
-  if (!poolTokenBalance || !selectedPool || !selectedPerpetual || maxTraderOrderSize === undefined) {
+  if (!selectedPool || !selectedPerpetual || maxTraderOrderSize === undefined) {
     return;
   }
 
@@ -51,7 +51,12 @@ export const maxOrderSizeAtom = atom((get) => {
   const limitPrice = indexPrice * (1 + direction * slippage);
   const buffer =
     indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0);
-  const personalMax = (((poolTokenBalance + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
+
+  const poolTokenBalanceOrDefault =
+    poolTokenBalance !== null && poolTokenBalance !== undefined ? poolTokenBalance : 10000;
+  // default of 1000 to make initial load faster
+
+  const personalMax = (((poolTokenBalanceOrDefault + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 
@@ -91,11 +96,9 @@ export const setInputFromOrderSizeAtom = atom(null, (get, set, orderSize: number
 export const setOrderSizeAtom = atom(null, (get, set, value: number) => {
   const perpetualStaticInfo = get(perpetualStaticInfoAtom);
 
-  if (!perpetualStaticInfo) {
-    return 0;
-  }
+  const lotSizeBC = perpetualStaticInfo ? perpetualStaticInfo.lotSizeBC : 0.000025; // default only while initializing
 
-  const roundedValueBase = Number(roundToLotString(value, perpetualStaticInfo.lotSizeBC));
+  const roundedValueBase = Number(roundToLotString(value, lotSizeBC));
   set(orderSizeAtom, roundedValueBase);
   return roundedValueBase;
 });
@@ -112,23 +115,20 @@ export const selectedCurrencyAtom = atom(
 
 export const orderSizeSliderAtom = atom(
   (get) => {
-    const max = get(maxOrderSizeAtom);
-    if (!max) {
-      return 0;
-    }
-
+    const actualMax = get(maxOrderSizeAtom);
+    const max = actualMax !== null && actualMax !== undefined ? actualMax : 10000;
     const orderSize = get(orderSizeAtom);
-    return (orderSize * 100) / max;
+    if (max === 0) {
+      return 0;
+    } else {
+      return (orderSize * 100) / max;
+    }
   },
   (get, set, percent: number) => {
-    const max = get(maxOrderSizeAtom);
-    if (!max) {
-      return;
-    }
-
+    const actualMax = get(maxOrderSizeAtom);
+    const max = actualMax !== null && actualMax !== undefined ? actualMax : 10000;
     const orderSize = (max * percent) / 100;
     const roundedValueBase = set(setOrderSizeAtom, orderSize);
-
     set(setInputFromOrderSizeAtom, roundedValueBase);
   }
 );
