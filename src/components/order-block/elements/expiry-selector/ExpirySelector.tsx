@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { ChangeEvent, memo, useState } from 'react';
 
 import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ const MIN_EXPIRE = 1;
 const MAX_EXPIRE = 365;
 
 export const ExpirySelector = memo(() => {
-  const [orderType] = useAtom(orderTypeAtom);
+  const orderType = useAtomValue(orderTypeAtom);
   const [expireDays, setExpireDays] = useAtom(expireDaysAtom);
 
   const [inputValue, setInputValue] = useState(`${expireDays}`);

@@ -84,11 +84,10 @@ const debounceLatestMessageTime = debounceLeading((callback: () => void) => {
 
 export function useWsMessageHandler() {
   const { t } = useTranslation();
+
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const [selectedPool] = useAtom(selectedPoolAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
   const setWebSocketReady = useSetAtom(webSocketReadyAtom);
   const setMainWsLatestMessageTime = useSetAtom(mainWsLatestMessageTimeAtom);
   const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
@@ -98,6 +97,8 @@ export function useWsMessageHandler() {
   const setAllPerpetualStatistics = useSetAtom(allPerpetualStatisticsAtom);
   const setTriggerPositionsUpdate = useSetAtom(triggerPositionsUpdateAtom);
   const setTriggerBalancesUpdate = useSetAtom(triggerBalancesUpdateAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const [executedOrders, setOrderExecuted] = useAtom(executeOrderAtom);
   const [failedOrderIds, setOrderIdFailed] = useAtom(failOrderIdAtom);

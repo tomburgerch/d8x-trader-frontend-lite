@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,10 +16,10 @@ import styles from './TriggerPrice.module.scss';
 export const TriggerPrice = memo(() => {
   const { t } = useTranslation();
 
-  const [orderType] = useAtom(orderTypeAtom);
+  const orderType = useAtomValue(orderTypeAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const [triggerPrice, setTriggerPrice] = useAtom(triggerPriceAtom);
-  const [selectedPerpetual] = useAtom(selectedPerpetualAtom);
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
 
   const [inputValue, setInputValue] = useState(`${triggerPrice}`);
 

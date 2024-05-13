@@ -28,7 +28,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderInfo = get(orderInfoAtom);
   const slippage = orderType === 'Market' ? get(slippageSliderAtom) / 100 : 0.01;
 
-  if (!poolTokenBalance || !selectedPool || !selectedPerpetual || !maxTraderOrderSize) {
+  if (!selectedPool || !selectedPerpetual || maxTraderOrderSize === undefined) {
     return;
   }
 
@@ -36,7 +36,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlock = get(orderBlockAtom);
   const orderFeeBps = orderInfo?.tradingFee || 0;
 
-  const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
+  const { collToQuoteIndexPrice, indexPrice, markPrice } = selectedPerpetual;
   let collateralCC = 0;
 
   const positions = get(positionsAtom);
@@ -50,10 +50,13 @@ export const maxOrderSizeAtom = atom((get) => {
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);
   const buffer =
-    indexPrice * (orderFeeBps / 10_000) +
-    selectedPerpetual.markPrice / leverage +
-    Math.max(direction * (limitPrice - selectedPerpetual.markPrice), 0);
-  const personalMax = (((poolTokenBalance + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
+    indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0);
+
+  const poolTokenBalanceOrDefault =
+    poolTokenBalance !== null && poolTokenBalance !== undefined ? poolTokenBalance : 10000;
+  // default of 1000 to make initial load faster
+
+  const personalMax = (((poolTokenBalanceOrDefault + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 
@@ -69,9 +72,9 @@ export const currencyMultiplierAtom = atom((get) => {
   const selectedCurrency = get(selectedCurrencyPrimitiveAtom);
 
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
-  if (selectedCurrency === selectedPerpetual.quoteCurrency) {
-    currencyMultiplier = selectedPerpetual.indexPrice;
-  } else if (selectedCurrency === selectedPool.poolSymbol) {
+  if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
+    currencyMultiplier = indexPrice;
+  } else if (selectedCurrency === selectedPool.poolSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
     currencyMultiplier = indexPrice / collToQuoteIndexPrice;
   }
   return currencyMultiplier;
@@ -93,11 +96,9 @@ export const setInputFromOrderSizeAtom = atom(null, (get, set, orderSize: number
 export const setOrderSizeAtom = atom(null, (get, set, value: number) => {
   const perpetualStaticInfo = get(perpetualStaticInfoAtom);
 
-  if (!perpetualStaticInfo) {
-    return 0;
-  }
+  const lotSizeBC = perpetualStaticInfo ? perpetualStaticInfo.lotSizeBC : 0.000025; // default only while initializing
 
-  const roundedValueBase = Number(roundToLotString(value, perpetualStaticInfo.lotSizeBC));
+  const roundedValueBase = Number(roundToLotString(value, lotSizeBC));
   set(orderSizeAtom, roundedValueBase);
   return roundedValueBase;
 });
@@ -114,23 +115,20 @@ export const selectedCurrencyAtom = atom(
 
 export const orderSizeSliderAtom = atom(
   (get) => {
-    const max = get(maxOrderSizeAtom);
-    if (!max) {
-      return 0;
-    }
-
+    const actualMax = get(maxOrderSizeAtom);
+    const max = actualMax !== null && actualMax !== undefined ? actualMax : 10000;
     const orderSize = get(orderSizeAtom);
-    return (orderSize * 100) / max;
+    if (max === 0) {
+      return 0;
+    } else {
+      return (orderSize * 100) / max;
+    }
   },
   (get, set, percent: number) => {
-    const max = get(maxOrderSizeAtom);
-    if (!max) {
-      return;
-    }
-
+    const actualMax = get(maxOrderSizeAtom);
+    const max = actualMax !== null && actualMax !== undefined ? actualMax : 10000;
     const orderSize = (max * percent) / 100;
     const roundedValueBase = set(setOrderSizeAtom, orderSize);
-
     set(setInputFromOrderSizeAtom, roundedValueBase);
   }
 );
