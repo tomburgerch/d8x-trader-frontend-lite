@@ -2,6 +2,7 @@ import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { type Address } from 'viem';
 import { useAccount, useChainId } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
@@ -43,8 +44,14 @@ const roundMaxOrderSize = (value: number) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
+const INTERVAL_FOR_DATA_REFETCH = 1000;
+const MAX_ORDER_SIZE_RETRIES = 120;
+
 export const OrderSize = memo(() => {
   const { t } = useTranslation();
+
+  const { address } = useAccount();
+  const chainId = useChainId();
 
   const [orderSize, setOrderSizeDirect] = useAtom(orderSizeAtom);
   const [inputValue, setInputValue] = useAtom(inputValueAtom);
@@ -64,25 +71,39 @@ export const OrderSize = memo(() => {
 
   const [openCurrencySelector, setOpenCurrencySelector] = useState(false);
 
-  const { address } = useAccount();
-  const chainId = useChainId();
-
   const fetchedMaxSizes = useRef(false);
   const anchorRef = useRef<HTMLDivElement>(null);
+  const maxOrderSizeDefinedRef = useRef(false);
+  const maxOrderSizeRetriesCountRef = useRef(0);
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
+
+  const maxOrderSizeCurrent = useMemo(() => {
+    if (maxOrderSize !== undefined) {
+      return maxOrderSize * currencyMultiplier;
+    }
+  }, [maxOrderSize, currencyMultiplier]);
 
   const onInputChange = useCallback(
     (value: string) => {
       if (value) {
-        setOrderSize(Number(value) / currencyMultiplier);
+        let max;
+        if (maxOrderSizeCurrent === undefined || maxOrderSizeCurrent === null) {
+          max = Number(value) / currencyMultiplier;
+        } else {
+          max =
+            Number(value) / currencyMultiplier > maxOrderSizeCurrent
+              ? maxOrderSizeCurrent
+              : Number(value) / currencyMultiplier;
+        }
+        setOrderSize(max);
         setInputValue(value);
       } else {
         setOrderSizeDirect(0);
         setInputValue('');
       }
     },
-    [setOrderSizeDirect, setOrderSize, setInputValue, currencyMultiplier]
+    [setOrderSizeDirect, setOrderSize, setInputValue, currencyMultiplier, maxOrderSizeCurrent]
   );
 
   useEffect(() => {
@@ -130,50 +151,89 @@ export const OrderSize = memo(() => {
 
   const fetchMaxOrderSize = useCallback(
     async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
-      if (traderAPI && !fetchedMaxSizes.current) {
-        const symbol = traderAPI.getSymbolFromPerpId(_perpId);
-        if (!symbol) {
-          return;
-        }
-        fetchedMaxSizes.current = true;
-        const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
-          console.error(err);
-        });
-        fetchedMaxSizes.current = false;
-        let maxAmount: number | undefined;
-        if (_isLong) {
-          maxAmount = data?.data?.buy;
-        } else {
-          maxAmount = data?.data?.sell;
-        }
-        return maxAmount === undefined || maxAmount < _lotSizeBC ? undefined : +roundToLotString(maxAmount, _lotSizeBC);
+      if (!traderAPI || fetchedMaxSizes.current) {
+        return;
       }
+
+      const symbol = traderAPI.getSymbolFromPerpId(_perpId);
+      if (!symbol) {
+        return;
+      }
+
+      fetchedMaxSizes.current = true;
+      const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
+        console.error(err);
+      });
+      fetchedMaxSizes.current = false;
+      if (!data?.data) {
+        return;
+      }
+
+      let maxAmount: number | undefined;
+      if (_isLong) {
+        maxAmount = data.data.buy;
+      } else {
+        maxAmount = data.data.sell;
+      }
+      return maxAmount < _lotSizeBC ? 0 : +roundToLotString(maxAmount, _lotSizeBC);
     },
     [traderAPI]
   );
 
+  const refetchMaxOrderSize = useCallback(
+    (userAddress: Address) => {
+      if (perpetualStaticInfo && isSDKConnected) {
+        fetchMaxOrderSize(
+          chainId,
+          userAddress,
+          perpetualStaticInfo.lotSizeBC,
+          perpetualStaticInfo.id,
+          orderBlock === OrderBlockE.Long
+        )
+          .then((result) => {
+            setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
+            maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
+          })
+          .catch((error) => {
+            console.error(error);
+            maxOrderSizeDefinedRef.current = false;
+          });
+      }
+    },
+    [isSDKConnected, chainId, perpetualStaticInfo, orderBlock, fetchMaxOrderSize, setMaxOrderSize]
+  );
+
   useEffect(() => {
-    if (perpetualStaticInfo && address && isSDKConnected) {
-      fetchMaxOrderSize(
-        chainId,
-        address,
-        perpetualStaticInfo.lotSizeBC,
-        perpetualStaticInfo.id,
-        orderBlock === OrderBlockE.Long
-      ).then((result) => {
-        setMaxOrderSize(result !== undefined ? result * 0.995 : 0);
-      });
+    if (!address) {
+      return;
     }
-  }, [
-    isSDKConnected,
-    chainId,
-    address,
-    perpetualStaticInfo,
-    orderBlock,
-    fetchMaxOrderSize,
-    setMaxOrderSize,
-    triggerBalancesUpdate,
-  ]);
+
+    maxOrderSizeDefinedRef.current = false;
+    refetchMaxOrderSize(address);
+
+    const intervalId = setInterval(() => {
+      if (maxOrderSizeDefinedRef.current) {
+        maxOrderSizeRetriesCountRef.current = 0;
+        clearInterval(intervalId);
+        return;
+      }
+
+      if (MAX_ORDER_SIZE_RETRIES <= maxOrderSizeRetriesCountRef.current) {
+        clearInterval(intervalId);
+        console.warn(`Max order size fetch failed after ${MAX_ORDER_SIZE_RETRIES}.`);
+        maxOrderSizeRetriesCountRef.current = 0;
+        return;
+      }
+
+      refetchMaxOrderSize(address);
+      maxOrderSizeRetriesCountRef.current++;
+    }, INTERVAL_FOR_DATA_REFETCH);
+
+    return () => {
+      clearInterval(intervalId);
+      maxOrderSizeRetriesCountRef.current = 0;
+    };
+  }, [refetchMaxOrderSize, address, triggerBalancesUpdate]);
 
   const handleCurrencyChangeToggle = () => {
     setOpenCurrencySelector((prevOpen) => !prevOpen);
@@ -194,12 +254,6 @@ export const OrderSize = memo(() => {
     setSelectedCurrency(currency);
     setOpenCurrencySelector(false);
   };
-
-  const maxOrderSizeCurrent = useMemo(() => {
-    if (maxOrderSize !== undefined) {
-      return maxOrderSize * currencyMultiplier;
-    }
-  }, [maxOrderSize, currencyMultiplier]);
 
   return (
     <>
