@@ -24,12 +24,11 @@ This package is configured entirely via environment variables. You must specify:
   - This entry should then take the form:
     `VITE_ENABLED_CHAINS=1101;1442`
 
-- **VITE_ACTIVATE_LIFI**: This is an optional variable that allow to disable LIFI widget. It could be required when app
-  is tested with testnet. The LIFI widget doesn't work with testnet.
+- **VITE_ENABLED_LIFI_BY_CHAINS**: This is an optional variable that enables the LiFi widget by chains.
 
-  - By default, this variable is set to `true`.
-  - If it is required to be disabled then it should take the form:
-    `VITE_ACTIVATE_LIFI=false`
+  - By default, the LiFi widget is not shown.
+  - If it is required to be enabled for specific chains then it should take the form:
+    `VITE_ENABLED_LIFI_BY_CHAINS=1101;1442`
 
 - **VITE_ENABLED_REFER_PAGE**: This is an optional variable that allow to disable Refer page.
 
@@ -152,7 +151,7 @@ This package is configured entirely via environment variables. You must specify:
   - Enable it as follows:
     `VITE_WELCOME_MODAL=true`
 
-- **VITE_DEFAULT_THEME**: This is an optional variable that allows to define the default color theme. You can 
+- **VITE_DEFAULT_THEME**: This is an optional variable that allows to define the default color theme. You can
   use `light` or `dark`.
 
   - By default, this variable is set to `light`.

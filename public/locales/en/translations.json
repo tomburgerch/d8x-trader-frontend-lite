@@ -3,7 +3,7 @@
     "trade": "Trade",
     "boost-station": "BoostStation",
     "refer": "Refer",
-    "vault": "Vault",
+    "vault": "Earn",
     "strategies": "Strategies",
     "portfolio": "Portfolio"
   },
@@ -665,7 +665,7 @@
     },
     "portfolio": {
       "perpetuals": "Perpetuals",
-      "vault": "Vault",
+      "vault": "Earn",
       "account-value": {
         "main-title": "Your account",
         "title": "Account Value",
@@ -683,7 +683,7 @@
             "referral": "Referral earnings"
           },
           "vault": {
-            "title": "Vault details",
+            "title": "Earn details",
             "assets": "Assets",
             "assets-pool": "Assets in pools",
             "earnings-pool": "Earnings per pool",
