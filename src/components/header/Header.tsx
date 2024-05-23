@@ -3,18 +3,18 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { useAccount, useChainId, useReadContracts } from 'wagmi';
 import { type Address, erc20Abi, formatUnits } from 'viem';
+import { useAccount, useReadContracts } from 'wagmi';
 
 import { Close, Menu } from '@mui/icons-material';
-import { Box, Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Container } from 'components/container/Container';
 import { DepositModal } from 'components/deposit-modal/DepositModal';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
 import { Separator } from 'components/separator/Separator';
-import { WalletConnectButton } from 'components/wallet-connect-button/WalletConnectButton';
+import { WalletConnectButtonHolder } from 'components/wallet-connect-button/WalletConnectButtonHolder';
 import { WalletConnectedButtons } from 'components/wallet-connect-button/WalletConnectedButtons';
 import { web3AuthConfig } from 'config';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -22,6 +22,7 @@ import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo, getPositionRisk } from 'network/network';
 import { authPages, pages } from 'routes/pages';
 import { hideBetaTextAtom } from 'store/app.store';
+import { connectModalOpenAtom } from 'store/global-modals.store';
 import {
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
@@ -38,8 +39,9 @@ import {
 } from 'store/pools.store';
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
+import { getEnabledChainId } from 'utils/getEnabledChainId';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
-import { ConnectModal } from './elements/connect-modal/ConnectModal';
 import { collateralsAtom } from './elements/market-select/collaterals.store';
 import { SettingsBlock } from './elements/settings-block/SettingsBlock';
 import { SettingsButton } from './elements/settings-button/SettingsButton';
@@ -68,8 +70,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   const { t } = useTranslation();
 
-  const chainId = useChainId();
-  const { chain, address, isConnected, isReconnecting, isConnecting } = useAccount();
+  const { chain, chainId, address, isConnected, isReconnecting, isConnecting } = useAccount();
 
   const { gasTokenBalance, isGasTokenFetchError } = useUserWallet();
 
@@ -82,6 +83,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const setPoolTokenBalance = useSetAtom(poolTokenBalanceAtom);
   const setGasTokenSymbol = useSetAtom(gasTokenSymbolAtom);
   const setPoolTokenDecimals = useSetAtom(poolTokenDecimalsAtom);
+  const setConnectModalOpen = useSetAtom(connectModalOpenAtom);
   const triggerBalancesUpdate = useAtomValue(triggerBalancesUpdateAtom);
   const triggerPositionsUpdate = useAtomValue(triggerPositionsUpdateAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
@@ -90,7 +92,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const [hideBetaText, setHideBetaText] = useAtom(hideBetaTextAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isConnectModalOpen, setConnectModalOpen] = useState(false);
 
   const exchangeRequestRef = useRef(false);
   const positionsRequestRef = useRef(false);
@@ -154,7 +155,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       return;
     }
 
-    if (chainId && address) {
+    if (address && isEnabledChain(chainId)) {
       positionsRequestRef.current = true;
       getPositionRisk(chainId, null, address, Date.now())
         .then(({ data }) => {
@@ -170,13 +171,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }, [triggerPositionsUpdate, setPositions, chainId, address]);
 
   useEffect(() => {
-    if (traderAPI && traderAPI.chainId === chainId) {
+    if (traderAPI && traderAPI.chainId === getEnabledChainId(chainId)) {
       traderAPIRef.current = traderAPI;
     }
   }, [traderAPI, chainId]);
 
   useEffect(() => {
-    if (exchangeRequestRef.current || !chainId) {
+    if (exchangeRequestRef.current) {
       return;
     }
 
@@ -189,10 +190,11 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       while (retries < MAX_RETRIES) {
         try {
           let currentTraderAPI = null;
-          if (retries > 0 && traderAPIRef.current && traderAPIRef.current?.chainId === chainId) {
+          const enabledChainId = getEnabledChainId(chainId);
+          if (retries > 0 && traderAPIRef.current && traderAPIRef.current?.chainId === enabledChainId) {
             currentTraderAPI = traderAPIRef.current;
           }
-          const data = await getExchangeInfo(chainId, currentTraderAPI);
+          const data = await getExchangeInfo(enabledChainId, currentTraderAPI);
           setExchangeInfo(data.data);
           retries = MAX_RETRIES;
         } catch (error) {
@@ -237,7 +239,8 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       enabled:
         !exchangeRequestRef.current &&
         address &&
-        traderAPI?.chainId === chain?.id &&
+        traderAPI?.chainId === chainId &&
+        isEnabledChain(chainId) &&
         !!selectedPool?.marginTokenAddr &&
         isConnected &&
         !isReconnecting &&
@@ -300,11 +303,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   };
 
   const availablePages = [...pages.filter((page) => page.enabled)];
-  if (address) {
+  if (address && isEnabledChain(chainId)) {
     availablePages.push(
       ...authPages.filter((page) => page.enabled && (!page.enabledByChains || page.enabledByChains.includes(chainId)))
     );
   }
+
   const drawer = (
     <>
       <Typography
@@ -332,19 +336,19 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       {isTabletScreen && (
         <>
           <Divider />
-          <Box className={styles.settings}>
+          <div className={styles.settings}>
             <SettingsBlock />
-          </Box>
-          <Box className={styles.languageSwitcher}>
+          </div>
+          <div className={styles.languageSwitcher}>
             <LanguageSwitcher />
-          </Box>
+          </div>
         </>
       )}
-      <Box className={styles.closeAction}>
+      <div className={styles.closeAction}>
         <Button onClick={handleDrawerToggle} variant="secondary" size="small">
           {t('common.info-modal.close')}
         </Button>
-      </Box>
+      </div>
     </>
   );
 
@@ -362,7 +366,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         <div className={styles.headerHolder}>
           <PageAppBar position="static">
             <Toolbar className={styles.toolbar}>
-              <Box className={styles.leftSide}>
+              <div className={styles.leftSide}>
                 <Typography variant="h6" component="div" className={styles.mainLogoHolder}>
                   <a href="/" className={styles.logoLink}>
                     <LogoWithText width={86} height={20} />
@@ -383,7 +387,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                     ))}
                   </nav>
                 )}
-              </Box>
+              </div>
               {(!isMobileScreen || !isConnected) && (
                 <Typography variant="h6" component="div" className={styles.walletConnect}>
                   {web3AuthConfig.isEnabled && !isConnected && (
@@ -393,14 +397,11 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                   )}
                   {(!web3AuthConfig.isEnabled || isConnected) && (
                     <>
-                      <WalletConnectButton />
+                      <WalletConnectButtonHolder />
                       <WalletConnectedButtons />
                     </>
                   )}
                 </Typography>
-              )}
-              {web3AuthConfig.isEnabled && (
-                <ConnectModal isOpen={isConnectModalOpen} onClose={() => setConnectModalOpen(false)} />
               )}
               {!isTabletScreen && <SettingsButton />}
               {isSmallScreen && (
@@ -413,14 +414,14 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               <div className={styles.mobileButtonsBlock}>
                 <Separator />
                 <div className={styles.mobileWalletButtons}>
-                  <WalletConnectButton />
+                  <WalletConnectButtonHolder />
                   <WalletConnectedButtons />
                 </div>
               </div>
             )}
             {isConnected && <DepositModal />}
           </PageAppBar>
-          <Box component="nav">
+          <nav>
             <Drawer
               anchor="right"
               container={container}
@@ -441,7 +442,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             >
               {drawer}
             </Drawer>
-          </Box>
+          </nav>
         </div>
       </Container>
     </>

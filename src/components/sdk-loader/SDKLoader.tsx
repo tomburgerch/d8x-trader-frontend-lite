@@ -2,16 +2,16 @@ import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { type Client } from 'viem';
-import { useAccount, useChainId, usePublicClient, useWalletClient } from 'wagmi';
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 
 import { config } from 'config';
 import { traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 export const SDKLoader = memo(() => {
-  const { isConnected } = useAccount();
-  const chainId = useChainId();
+  const { isConnected, chainId } = useAccount();
 
   const publicClient = usePublicClient();
   const { data: walletClient, isSuccess } = useWalletClient();
@@ -34,14 +34,11 @@ export const SDKLoader = memo(() => {
 
   const loadSDK = useCallback(
     async (_publicClient: Client, _chainId: number) => {
-      if (loadingAPIRef.current) {
-        return;
-      }
-      loadingAPIRef.current = true;
       setTraderAPI(null);
       setSDKConnected(false);
-      setAPIBusy(true);
+
       const configSDK = PerpetualDataHandler.readSDKConfig(_chainId);
+
       if (config.priceFeedEndpoint[_chainId] && config.priceFeedEndpoint[_chainId] !== '') {
         const pythPriceServiceIdx = configSDK.priceFeedEndpoints?.findIndex(({ type }) => type === 'pyth');
         if (pythPriceServiceIdx !== undefined && pythPriceServiceIdx >= 0) {
@@ -52,11 +49,13 @@ export const SDKLoader = memo(() => {
           configSDK.priceFeedEndpoints = [{ type: 'pyth', endpoints: [config.priceFeedEndpoint[_chainId]] }];
         }
       }
+
       if (config.httpRPC[_chainId] && config.httpRPC[_chainId] !== '') {
         configSDK.nodeURL = config.httpRPC[_chainId];
       }
+
       const newTraderAPI = new TraderInterface(configSDK);
-      newTraderAPI
+      return newTraderAPI
         .createProxyInstance()
         .then(() => {
           setSDKConnected(true);
@@ -64,13 +63,9 @@ export const SDKLoader = memo(() => {
         })
         .catch((e) => {
           console.log('error loading SDK', e);
-        })
-        .finally(() => {
-          setAPIBusy(false);
-          loadingAPIRef.current = false;
         });
     },
-    [setTraderAPI, setSDKConnected, setAPIBusy]
+    [setTraderAPI, setSDKConnected]
   );
 
   const unloadSDK = useCallback(() => {
@@ -79,21 +74,31 @@ export const SDKLoader = memo(() => {
     setTraderAPI(null);
   }, [setTraderAPI, setSDKConnected, setAPIBusy]);
 
-  // disconnect SDK on wallet disconnected
-  useEffect(() => {
-    if (!isConnected) {
-      unloadSDK();
-    }
-  }, [isConnected, unloadSDK]);
-
   // connect SDK on change of provider/chain/wallet
   useEffect(() => {
-    if (loadingAPIRef.current || !publicClient || !chainId) {
+    if (loadingAPIRef.current || !publicClient) {
       return;
     }
     unloadSDK();
-    loadSDK(publicClient, chainId).then().catch(console.error);
-  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK]);
+
+    setAPIBusy(true);
+    loadingAPIRef.current = true;
+
+    let chainIdForSDK: number;
+    if (!isEnabledChain(chainId)) {
+      chainIdForSDK = config.enabledChains[0];
+    } else {
+      chainIdForSDK = chainId;
+    }
+
+    loadSDK(publicClient, chainIdForSDK)
+      .then()
+      .catch(console.error)
+      .finally(() => {
+        loadingAPIRef.current = false;
+        setAPIBusy(false);
+      });
+  }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
 
   return null;
 });
