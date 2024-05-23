@@ -161,7 +161,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       quantity: selectedPosition.positionNotionalBaseCCY,
       executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
       reduceOnly: true,
-      leverage: selectedPosition.leverage,
+      leverage: 0,
     };
 
     orderDigest(chainId, [closeOrder], address)
