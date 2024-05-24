@@ -6,7 +6,7 @@ import { type Address } from 'viem';
 import { useAccount } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
-import { Box, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
+import { ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
@@ -262,8 +262,8 @@ export const OrderSize = memo(() => {
 
   return (
     <>
-      <Box className={styles.root}>
-        <Box className={styles.labelHolder}>
+      <div className={styles.root}>
+        <div className={styles.labelHolder}>
           <InfoLabelBlock
             title={t('pages.trade.order-block.order-size.title')}
             content={
@@ -274,12 +274,12 @@ export const OrderSize = memo(() => {
                   {formatToCurrency(maxOrderSizeCurrent, selectedCurrency)}.{' '}
                   {t('pages.trade.order-block.order-size.body3')} {minPositionString} {selectedCurrency}.{' '}
                   {t('pages.trade.order-block.order-size.body4')}{' '}
-                  {formatToCurrency(+orderSizeStep, selectedCurrency, false, 4)}.
+                  {formatToCurrency(+orderSizeStep, selectedCurrency, false, valueToFractionDigits(+orderSizeStep))}.
                 </Typography>
               </>
             }
           />
-        </Box>
+        </div>
         <ResponsiveInput
           id="order-size"
           inputValue={inputValue}
@@ -343,7 +343,7 @@ export const OrderSize = memo(() => {
             </div>
           }
         />
-      </Box>
+      </div>
       <OrderSizeSlider />
     </>
   );
