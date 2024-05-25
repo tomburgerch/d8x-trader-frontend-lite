@@ -21,22 +21,6 @@ export const Overview = () => {
     }
   }, [strategyPosition]);
 
-  const pnlUSD = useMemo(() => {
-    if (strategyPosition && strategyPerpetualStats) {
-      return (
-        Math.max(
-          0,
-          strategyPosition.collateralCC *
-            (strategyPosition.collToQuoteConversion /
-              (strategyPerpetualStats.indexPrice + (strategyPosition.markPrice - strategyPerpetualStats.markPrice))) *
-            strategyPosition.markPrice -
-            strategyPosition.positionNotionalBaseCCY * strategyPosition.markPrice
-        ) +
-        strategyPosition.unrealizedFundingCollateralCCY * strategyPosition.collToQuoteConversion
-      );
-    }
-  }, [strategyPosition, strategyPerpetualStats]);
-
   return (
     <div className={styles.root}>
       <Typography variant="h4" className={styles.title}>
@@ -56,14 +40,44 @@ export const Overview = () => {
             {t('pages.strategies.overview.your-yield')}
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
-            {pnlUSD !== null && pnlUSD !== undefined && syntheticPositionUSD ? (
+            {strategyPosition && strategyPerpetualStats && syntheticPositionUSD ? (
               <>
-                {formatToCurrency(100 * (pnlUSD / syntheticPositionUSD), '%')}
-                <span>{t('pages.strategies.overview.your-points')}</span>
+                <span>{t('pages.strategies.overview.eth-apr')}</span>
+                {formatToCurrency(
+                  (strategyPosition?.collateralCC * 3.4 * strategyPerpetualStats.indexPrice) / syntheticPositionUSD,
+                  '%',
+                  false,
+                  2
+                )}
               </>
             ) : (
               '-'
             )}
+          </Typography>
+          <Typography variant="bodyMedium" className={styles.dataValue}>
+            {strategyPerpetualStats && syntheticPositionUSD ? (
+              <>
+                <span>{t('pages.strategies.overview.d8x-apr')}</span>
+                {formatToCurrency((strategyPerpetualStats.currentFundingRateBps / 100 / 8) * 365 * 24, '%')}
+              </>
+            ) : (
+              '-'
+            )}
+          </Typography>
+          <Typography variant="bodyMedium" className={styles.dataValue}>
+            <>
+              <span>{t('pages.strategies.overview.your-points')}</span>
+            </>
+          </Typography>
+          <Typography variant="bodyMedium" className={styles.dataValue}>
+            <>
+              <span>{t('pages.strategies.overview.your-points-2')}</span>
+            </>
+          </Typography>
+          <Typography variant="bodyMedium" className={styles.dataValue}>
+            <>
+              <span>{t('pages.strategies.overview.your-points-3')}</span>
+            </>
           </Typography>
         </div>
       </div>

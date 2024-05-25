@@ -598,8 +598,12 @@
       "overview": {
         "title": "Delta-gesicherte Renditestrategie",
         "synthetic-position": "Synthetische USD-Position",
-        "your-yield": "Rendite",
-        "your-points": " + EigenLayer, ether.fi and D8X Punkte"
+        "your-yield": "Dein Ertrag",
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer Punkte",
+        "your-points-2": "ether.fi Punkte",
+        "your-points-3": "D8X Punkte"
       },
       "info": {
         "title": "Wie es funktioniert",

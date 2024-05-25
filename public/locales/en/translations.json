@@ -598,8 +598,12 @@
       "overview": {
         "title": "The Synthetic US Dollar Trade",
         "synthetic-position": "Synthetic USD position",
-        "your-yield": "Your yield",
-        "your-points": " + EigenLayer, ether.fi and D8X points"
+        "your-yield": "Your reward",
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer points",
+        "your-points-2": "ether.fi points",
+        "your-points-3": "D8X points"
       },
       "info": {
         "title": "Strategy Mechanics",

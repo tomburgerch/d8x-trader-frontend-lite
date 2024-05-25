@@ -599,7 +599,11 @@
         "title": "Delta 对冲收益率策略",
         "synthetic-position": "合成美元头寸",
         "your-yield": "产量",
-        "your-points": " + EigenLayer、ether.fi 和 D8X 积分"
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer 积分",
+        "your-points-2": "ether.fi 积分",
+        "your-points-3": "D8X 积分"
       },
       "info": {
         "title": "如何赚取",

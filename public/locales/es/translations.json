@@ -599,7 +599,11 @@
         "title": "Estrategia de rendimiento con cobertura delta",
         "synthetic-position": "Posición sintética en USD",
         "your-yield": "Rendimiento",
-        "your-points": "+ puntos EigenLayer, ether.fi y D8X"
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": "Puntos EigenLayer",
+        "your-points-2": "Puntos ether.fi",
+        "your-points-3": "Puntos D8X"
       },
       "info": {
         "title": "Cómo funciona",
