@@ -102,8 +102,8 @@ export interface MaintenanceStatusI {
   isMaintenance: boolean;
 }
 
-export interface EtherfiApyI {
-  etherfiApy: number;
+export interface EtherFiApyI {
+  etherfiApy: string;
 }
 
 export interface ExchangeInfoI {

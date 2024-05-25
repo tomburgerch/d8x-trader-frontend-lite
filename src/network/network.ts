@@ -7,7 +7,7 @@ import type {
   BoostStationParamResponseI,
   CancelOrderResponseI,
   CollateralChangeResponseI,
-  EtherfiApyI,
+  EtherFiApyI,
   ExchangeInfoI,
   MaintenanceStatusI,
   MarginAccountI,
@@ -47,7 +47,7 @@ export async function getMaintenanceStatus(): Promise<MaintenanceStatusI[]> {
   });
 }
 
-export async function getEtherfiAPY(): Promise<EtherfiApyI[]> {
+export async function getEtherFiAPY(): Promise<EtherFiApyI> {
   return fetch('https://etherfi.d8x.xyz/etherfi-apy', getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });

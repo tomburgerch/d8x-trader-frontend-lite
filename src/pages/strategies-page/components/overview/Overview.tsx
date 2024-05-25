@@ -1,26 +1,24 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAccount } from 'wagmi';
 
 import { Typography } from '@mui/material';
 
-import { getEtherfiAPY } from 'network/network';
-import type { EtherfiApyI } from 'types/types';
+import { getEtherFiAPY } from 'network/network';
 import { strategyPerpetualStatsAtom, strategyPositionAtom } from 'store/strategies.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './Overview.module.scss';
 
 export const Overview = () => {
   const { t } = useTranslation();
-  const [apy, setApy] = useState<EtherfiApyI[]>([]);
-  const isDataRequestSent = useRef(false);
-  const { chainId } = useAccount();
 
   const strategyPosition = useAtomValue(strategyPositionAtom);
   const strategyPerpetualStats = useAtomValue(strategyPerpetualStatsAtom);
+
+  const [apy, setApy] = useState<string>();
+
+  const isDataRequestSent = useRef(false);
 
   const syntheticPositionUSD = useMemo(() => {
     if (strategyPosition) {
@@ -29,26 +27,24 @@ export const Overview = () => {
   }, [strategyPosition]);
 
   const fetchData = useCallback(() => {
-    if (!isEnabledChain(chainId)) {
+    if (isDataRequestSent.current) {
       return;
     }
 
     isDataRequestSent.current = true;
 
-    getEtherfiAPY()
-      .then((response) => {
-        setApy(response.etherfiApy);
+    getEtherFiAPY()
+      .then(({ etherfiApy }) => {
+        setApy(etherfiApy);
       })
       .finally(() => {
         isDataRequestSent.current = false;
       });
-  }, [chainId]);
+  }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  console.log(apy);
 
   return (
     <div className={styles.root}>
@@ -70,10 +66,11 @@ export const Overview = () => {
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
             <span>{t('pages.strategies.overview.eth-apr')}</span>
-            {strategyPosition && strategyPerpetualStats && syntheticPositionUSD ? (
+            {strategyPosition && strategyPerpetualStats && syntheticPositionUSD && apy ? (
               <>
                 {formatToCurrency(
-                  (strategyPosition?.collateralCC * apy * strategyPerpetualStats.indexPrice) / syntheticPositionUSD,
+                  (strategyPosition?.collateralCC * Number(apy) * strategyPerpetualStats.indexPrice) /
+                    syntheticPositionUSD,
                   '%',
                   false,
                   2
