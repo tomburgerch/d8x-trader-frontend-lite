@@ -7,6 +7,7 @@ import type {
   BoostStationParamResponseI,
   CancelOrderResponseI,
   CollateralChangeResponseI,
+  EtherfiApyI,
   ExchangeInfoI,
   MaintenanceStatusI,
   MarginAccountI,
@@ -38,6 +39,16 @@ const fetchUrl = async (url: string, chainId: number) => {
 
 export async function getMaintenanceStatus(): Promise<MaintenanceStatusI[]> {
   return fetch('https://drip.d8x.xyz/status', getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
+export async function getEtherfiAPY(): Promise<EtherfiApyI[]> {
+  return fetch('https://etherfi.d8x.xyz/etherfi-apy', getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);

@@ -1,16 +1,23 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAccount } from 'wagmi';
 
 import { Typography } from '@mui/material';
 
+import { getEtherfiAPY } from 'network/network';
+import type { EtherfiApyI } from 'types/types';
 import { strategyPerpetualStatsAtom, strategyPositionAtom } from 'store/strategies.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './Overview.module.scss';
 
 export const Overview = () => {
   const { t } = useTranslation();
+  const [apy, setApy] = useState<EtherfiApyI[]>([]);
+  const isDataRequestSent = useRef(false);
+  const { chainId } = useAccount();
 
   const strategyPosition = useAtomValue(strategyPositionAtom);
   const strategyPerpetualStats = useAtomValue(strategyPerpetualStatsAtom);
@@ -20,6 +27,28 @@ export const Overview = () => {
       return strategyPosition.positionNotionalBaseCCY * strategyPosition.entryPrice;
     }
   }, [strategyPosition]);
+
+  const fetchData = useCallback(() => {
+    if (!isEnabledChain(chainId)) {
+      return;
+    }
+
+    isDataRequestSent.current = true;
+
+    getEtherfiAPY()
+      .then((response) => {
+        setApy(response.etherfiApy);
+      })
+      .finally(() => {
+        isDataRequestSent.current = false;
+      });
+  }, [chainId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  console.log(apy);
 
   return (
     <div className={styles.root}>
@@ -40,11 +69,11 @@ export const Overview = () => {
             {t('pages.strategies.overview.your-yield')}
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
+            <span>{t('pages.strategies.overview.eth-apr')}</span>
             {strategyPosition && strategyPerpetualStats && syntheticPositionUSD ? (
               <>
-                <span>{t('pages.strategies.overview.eth-apr')}</span>
                 {formatToCurrency(
-                  (strategyPosition?.collateralCC * 3.4 * strategyPerpetualStats.indexPrice) / syntheticPositionUSD,
+                  (strategyPosition?.collateralCC * apy * strategyPerpetualStats.indexPrice) / syntheticPositionUSD,
                   '%',
                   false,
                   2
@@ -55,11 +84,9 @@ export const Overview = () => {
             )}
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
+            <span>{t('pages.strategies.overview.d8x-apr')}</span>
             {strategyPerpetualStats && syntheticPositionUSD ? (
-              <>
-                <span>{t('pages.strategies.overview.d8x-apr')}</span>
-                {formatToCurrency((strategyPerpetualStats.currentFundingRateBps / 100 / 8) * 365 * 24, '%')}
-              </>
+              <>{formatToCurrency((strategyPerpetualStats.currentFundingRateBps / 100 / 8) * 365 * 24, '%')}</>
             ) : (
               '-'
             )}
