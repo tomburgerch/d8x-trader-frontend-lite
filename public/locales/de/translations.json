@@ -918,10 +918,6 @@
       "connected-title": "Willkommen!",
       "connected-description": "Sie haben sich erfolgreich angemeldet."
     },
-    "public-beta": {
-      "info-text": "Dies ist eine öffentliche Betaphase – Mach deine eigene Recherche",
-      "beta-tag": "[beta]"
-    },
     "refresh": "Aktualisieren",
     "filter": "Filter"
   },

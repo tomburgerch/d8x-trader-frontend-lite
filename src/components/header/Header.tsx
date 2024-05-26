@@ -1,12 +1,11 @@
-import classnames from 'classnames';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { type Address, erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContracts } from 'wagmi';
 
-import { Close, Menu } from '@mui/icons-material';
+import { Menu } from '@mui/icons-material';
 import { Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import LogoWithText from 'assets/logoWithText.svg?react';
@@ -21,7 +20,6 @@ import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { getExchangeInfo, getPositionRisk } from 'network/network';
 import { authPages, pages } from 'routes/pages';
-import { hideBetaTextAtom } from 'store/app.store';
 import { connectModalOpenAtom } from 'store/global-modals.store';
 import {
   gasTokenSymbolAtom,
@@ -89,7 +87,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
-  const [hideBetaText, setHideBetaText] = useAtom(hideBetaTextAtom);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -318,7 +315,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         className={styles.drawerLogoHolder}
       >
         <LogoWithText width={86} height={20} />
-        <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
       </Typography>
       <Divider />
       <nav className={styles.navMobileWrapper} onClick={handleDrawerToggle}>
@@ -356,12 +352,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   return (
     <>
-      <div className={classnames(styles.betaInfoLine, { [styles.hideBetaText]: hideBetaText })}>
-        <div className={styles.textBlock}>{t('common.public-beta.info-text')}</div>
-        <div title={t('common.info-modal.close')} className={styles.closeButton} onClick={() => setHideBetaText(true)}>
-          <Close className={styles.closeIcon} />
-        </div>
-      </div>
       <Container className={styles.root}>
         <div className={styles.headerHolder}>
           <PageAppBar position="static">
@@ -371,7 +361,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                   <a href="/" className={styles.logoLink}>
                     <LogoWithText width={86} height={20} />
                   </a>
-                  <span className={styles.betaTag}>{t('common.public-beta.beta-tag')}</span>
                 </Typography>
                 {!isSmallScreen && (
                   <nav className={styles.navWrapper}>

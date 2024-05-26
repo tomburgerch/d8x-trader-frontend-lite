@@ -918,10 +918,6 @@
       "connected-title": "Bienvenido!",
       "connected-description": "Has iniciado sesión correctamente."
     },
-    "public-beta": {
-      "info-text": "Esta es una versión beta pública: haz tu propia investigación",
-      "beta-tag": "[beta]"
-    },
     "refresh": "Actualizar",
     "filter": "Filtrar"
   },
