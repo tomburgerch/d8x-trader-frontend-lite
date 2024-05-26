@@ -142,7 +142,8 @@
           "stop-price": "止盈止损价",
           "reduce-only": "仅减少",
           "leverage": "杠杆",
-          "good-until": "截至"
+          "good-until": "截至",
+          "limit-price-tooltip": "如果中间价加上或减去影响您订单的价格(滑点)达到此栏显示的价格，限价单将会执行。"
         },
         "table-content": {
           "buy": "买入",

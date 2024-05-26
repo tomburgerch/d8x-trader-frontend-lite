@@ -142,7 +142,8 @@
           "stop-price": "Prix Stop",
           "reduce-only": "Réd. Uniquement",
           "leverage": "Effet de Levier",
-          "good-until": "Valable jusqu'à"
+          "good-until": "Valable jusqu'à",
+          "limit-price-tooltip": "Les ordres avec un prix limite sont exécutés si le prix moyen plus/moins l'impact sur le prix de votre ordre atteint le prix indiqué dans cette colonne."
         },
         "table-content": {
           "buy": "ACHETER",

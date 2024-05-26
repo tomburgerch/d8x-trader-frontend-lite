@@ -276,6 +276,7 @@ export const OpenOrdersTable = memo(() => {
       {
         field: 'limitPrice',
         label: t('pages.trade.orders-table.table-header.limit-price'),
+        tooltip: t('pages.trade.orders-table.table-header.limit-price-tooltip'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
       },

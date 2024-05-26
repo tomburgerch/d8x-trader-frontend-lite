@@ -142,7 +142,8 @@
           "stop-price": "Stop Price",
           "reduce-only": "Reduce Only",
           "leverage": "Leverage",
-          "good-until": "Good Until"
+          "good-until": "Good Until",
+          "limit-price-tooltip": "Orders with a limit price are only executed if the mid price plus/minus the price impact of your order reaches the price shown in this column."
         },
         "table-content": {
           "buy": "BUY",

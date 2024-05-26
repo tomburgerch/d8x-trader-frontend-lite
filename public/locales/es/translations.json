@@ -142,7 +142,8 @@
           "stop-price": "Precio de Parada",
           "reduce-only": "Sólo Reducir",
           "leverage": "Apalancamiento",
-          "good-until": "Vencimiento"
+          "good-until": "Vencimiento",
+          "limit-price-tooltip": "Las órdenes con un precio límite sólo se ejecutan si el precio medio más/menos el impacto en el precio de su orden alcanza el precio que se muestra en esta columna."
         },
         "table-content": {
           "buy": "COMPRAR",
