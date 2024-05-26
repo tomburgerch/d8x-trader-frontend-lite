@@ -918,10 +918,6 @@
       "connected-title": "欢迎！",
       "connected-description": "您已成功登录。"
     },
-    "public-beta": {
-      "info-text": "测试版 - 请自行研究",
-      "beta-tag": "[测试版]"
-    },
     "refresh": "刷新",
     "filter": "筛选"
   },
