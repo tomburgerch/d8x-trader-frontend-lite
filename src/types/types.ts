@@ -102,6 +102,10 @@ export interface MaintenanceStatusI {
   isMaintenance: boolean;
 }
 
+export interface EtherFiApyI {
+  etherfiApy: string;
+}
+
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;

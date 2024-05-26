@@ -179,7 +179,12 @@ export const ActionBlock = memo(() => {
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
+        console.log('maxLong', maxLong);
         if (perpetualStaticInfo && data.data.newPositionRisk.leverage > 1 / perpetualStaticInfo.initialMarginRate) {
+          console.log('data.data.newPositionRisk.leverage', data.data.newPositionRisk.leverage);
+          console.log('1 / perpetualStaticInfo.initialMarginRate', 1 / perpetualStaticInfo.initialMarginRate);
+          console.log('data.data.newPositionRisk', data.data.newPositionRisk);
+
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
@@ -480,6 +485,8 @@ export const ActionBlock = memo(() => {
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
+      console.log('size', orderInfo.size);
+      console.log('maxOrderSize.maxBuy', maxOrderSize.maxBuy);
       isTooLarge = orderInfo.size > maxOrderSize.maxBuy;
     } else {
       isTooLarge = orderInfo.size > maxOrderSize.maxSell;
