@@ -54,8 +54,8 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
   const minStopLossPrice = useMemo(() => {
     if (position.entryPrice && position.side === OrderSideE.Sell) {
       return position.entryPrice;
-    } else if (position.leverage) {
-      return Math.max(0.000000001, position.entryPrice - position.entryPrice / position.leverage);
+    } else if (position.side === OrderSideE.Buy) {
+      return Math.max(0.000000001, position.liqPrice);
     }
     return 0.000000001;
   }, [position]);
@@ -63,8 +63,8 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
   const maxStopLossPrice = useMemo(() => {
     if (position.entryPrice && position.side === OrderSideE.Buy) {
       return position.entryPrice;
-    } else if (position.leverage) {
-      return position.entryPrice + position.entryPrice / position.leverage;
+    } else if (position.side === OrderSideE.Sell) {
+      return position.liqPrice;
     }
   }, [position]);
 
@@ -102,9 +102,15 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
     if (stopLoss && stopLoss !== StopLossE.None) {
       let stopPrice;
       if (position.side === OrderSideE.Buy) {
-        stopPrice = position.entryPrice * (1 - Math.abs(mapStopLossToNumber(stopLoss) / position.leverage));
+        stopPrice = Math.max(
+          position.liqPrice,
+          position.entryPrice * (1 - Math.abs(mapStopLossToNumber(stopLoss) / position.leverage))
+        );
       } else {
-        stopPrice = position.entryPrice * (1 + Math.abs(mapStopLossToNumber(stopLoss) / position.leverage));
+        stopPrice = Math.min(
+          position.liqPrice,
+          position.entryPrice * (1 + Math.abs(mapStopLossToNumber(stopLoss) / position.leverage))
+        );
       }
       setStopLossInputPrice(Math.max(0.000000001, +stopPrice.toFixed(valueToFractionDigits(+stopPrice))));
     }

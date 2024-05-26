@@ -142,7 +142,8 @@
           "stop-price": "Precio de Parada",
           "reduce-only": "Sólo Reducir",
           "leverage": "Apalancamiento",
-          "good-until": "Vencimiento"
+          "good-until": "Vencimiento",
+          "limit-price-tooltip": "Las órdenes con un precio límite sólo se ejecutan si el precio medio más/menos el impacto en el precio de su orden alcanza el precio que se muestra en esta columna."
         },
         "table-content": {
           "buy": "COMPRAR",
@@ -599,7 +600,11 @@
         "title": "Estrategia de rendimiento con cobertura delta",
         "synthetic-position": "Posición sintética en USD",
         "your-yield": "Rendimiento",
-        "your-points": "+ puntos EigenLayer, ether.fi y D8X"
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": "Puntos EigenLayer",
+        "your-points-2": "Puntos ether.fi",
+        "your-points-3": "Puntos D8X"
       },
       "info": {
         "title": "Cómo funciona",
@@ -912,10 +917,6 @@
       "disconnect": "Desconectar",
       "connected-title": "Bienvenido!",
       "connected-description": "Has iniciado sesión correctamente."
-    },
-    "public-beta": {
-      "info-text": "Esta es una versión beta pública: haz tu propia investigación",
-      "beta-tag": "[beta]"
     },
     "refresh": "Actualizar",
     "filter": "Filtrar"

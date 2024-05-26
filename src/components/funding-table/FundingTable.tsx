@@ -3,7 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
@@ -16,6 +16,7 @@ import { getFundingRatePayments } from 'network/history';
 import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { FundingBlock } from './elements/funding-block/FundingBlock';
 import { FundingRow } from './elements/FundingRow';
@@ -36,8 +37,7 @@ export const FundingTable = memo(() => {
 
   const updateTradesHistoryRef = useRef(false);
 
-  const chainId = useChainId();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
 
   const [page, setPage] = useState(0);
@@ -46,7 +46,11 @@ export const FundingTable = memo(() => {
   const [orderBy, setOrderBy] = useState<keyof FundingWithSymbolDataI>('timestamp');
 
   const refreshFundingList = useCallback(() => {
-    if (updateTradesHistoryRef.current || !address || !isConnected) {
+    if (updateTradesHistoryRef.current) {
+      return;
+    }
+    if (!address || !isConnected || !isEnabledChain(chainId)) {
+      setFundingList([]);
       return;
     }
 
