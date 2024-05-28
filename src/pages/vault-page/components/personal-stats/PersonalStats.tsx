@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { Box, Typography } from '@mui/material';
 
@@ -16,6 +16,7 @@ import {
   withdrawalsAtom,
 } from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './PersonalStats.module.scss';
 
@@ -26,8 +27,7 @@ interface PersonalStatsPropsI {
 export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const { t } = useTranslation();
 
-  const chainId = useChainId();
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const selectedPool = useAtomValue(selectedPoolAtom);
   const withdrawals = useAtomValue(withdrawalsAtom);
@@ -37,22 +37,22 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const hasOpenRequestOnChain = useAtomValue(withdrawalOnChainAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
 
-  const [estimatedEarnings, setEstimatedEarnings] = useState<number>();
+  const [estimatedEarnings, setEstimatedEarnings] = useState<number | null>(null);
 
   const earningsRequestSentRef = useRef(false);
 
   useEffect(() => {
     setUserAmount(null);
-    if (selectedPool?.poolSymbol && traderAPI && isSDKConnected && address) {
+    if (selectedPool?.poolSymbol && traderAPI && isSDKConnected && address && isEnabledChain(chainId)) {
       traderAPI.getPoolShareTokenBalance(address, selectedPool.poolSymbol).then((amount) => {
         setUserAmount(amount);
       });
     }
-  }, [selectedPool?.poolSymbol, traderAPI, isSDKConnected, address, triggerUserStatsUpdate, setUserAmount]);
+  }, [selectedPool?.poolSymbol, traderAPI, isSDKConnected, address, chainId, triggerUserStatsUpdate, setUserAmount]);
 
   useEffect(() => {
-    if (!chainId || !selectedPool?.poolSymbol || !address) {
-      setEstimatedEarnings(undefined);
+    if (!selectedPool?.poolSymbol || !address || !isEnabledChain(chainId)) {
+      setEstimatedEarnings(null);
       return;
     }
 
@@ -64,7 +64,10 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
     getEarnings(chainId, address, selectedPool.poolSymbol)
       .then(({ earnings }) => setEstimatedEarnings(earnings))
-      .catch(console.error)
+      .catch((error) => {
+        console.error(error);
+        setEstimatedEarnings(null);
+      })
       .finally(() => {
         earningsRequestSentRef.current = false;
       });
@@ -81,14 +84,13 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.amount.title')}
             content={
               <Typography>
-                {' '}
-                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.poolSymbol })}{' '}
+                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
             }
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {userAmount !== undefined ? formatToCurrency(userAmount, `d${selectedPool?.poolSymbol}`, true) : '--'}
+          {userAmount !== null ? formatToCurrency(userAmount, `d${selectedPool?.poolSymbol}`, true) : '--'}
         </Typography>
       </Box>
       <Box key="estimatedEarnings" className={styles.statContainer}>
@@ -97,7 +99,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.earnings.title')}
             content={
               <>
-                <Typography> {t('pages.vault.personal-stats.earnings.info1')} </Typography>
+                <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
                 <Typography>
                   {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.poolSymbol })}
                 </Typography>
@@ -106,7 +108,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {estimatedEarnings !== undefined
+          {estimatedEarnings !== null
             ? formatToCurrency(
                 estimatedEarnings < -0.0000000001 ? estimatedEarnings : Math.max(estimatedEarnings, 0),
                 selectedPool?.poolSymbol,
@@ -122,7 +124,6 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.initiated.title')}
             content={
               <Typography>
-                {' '}
                 {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.poolSymbol })}
               </Typography>
             }
@@ -139,10 +140,9 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             content={
               <>
                 <Typography>
-                  {' '}
                   {t('pages.vault.personal-stats.withdrawal-amount.info1', {
                     poolSymbol: selectedPool?.poolSymbol,
-                  })}{' '}
+                  })}
                 </Typography>
                 <Typography>
                   {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.poolSymbol })}
@@ -163,7 +163,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.date.title')}
             content={
               <>
-                <Typography> {t('pages.vault.personal-stats.date.info1')} </Typography>
+                <Typography>{t('pages.vault.personal-stats.date.info1')}</Typography>
                 <Typography>{t('pages.vault.personal-stats.date.info2')}</Typography>
               </>
             }

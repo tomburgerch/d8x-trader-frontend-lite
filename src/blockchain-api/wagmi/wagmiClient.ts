@@ -8,7 +8,30 @@ import {
   rainbowWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
-import { polygonMumbai, polygonZkEvm, polygonZkEvmTestnet, arbitrumSepolia, arbitrum } from 'wagmi/chains';
+import {
+  polygon,
+  polygonMumbai,
+  polygonZkEvm,
+  arbitrumSepolia,
+  arbitrum,
+  mainnet,
+  optimism,
+  bsc,
+  base,
+  zkSync,
+  avalanche,
+  aurora,
+  linea,
+  gnosis,
+  fantom,
+  moonriver,
+  moonbeam,
+  fuse,
+  boba,
+  metis,
+  mode,
+  scroll,
+} from 'wagmi/chains';
 import { createConfig, http } from 'wagmi';
 import { createClient } from 'viem';
 
@@ -22,7 +45,6 @@ import { x1, cardona, artio, xlayer } from 'utils/chains';
 const chains = [
   { ...polygonZkEvm, iconUrl: polygonIcon, iconBackground: 'transparent' } as Chain,
   { ...polygonMumbai, iconUrl: polygonIcon, iconBackground: 'transparent' },
-  { ...polygonZkEvmTestnet, iconUrl: polygonIcon, iconBackground: 'transparent' },
   { ...x1, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...xlayer, iconUrl: x1Icon, iconBackground: 'transparent' },
   { ...cardona, iconUrl: polygonIcon, iconBackground: 'transparent' },
@@ -49,12 +71,43 @@ const chains = [
       },
     },
   },
-]
-  .filter(({ id }) => config.enabledChains.includes(id))
-  .sort(({ id: id1 }, { id: id2 }) => config.enabledChains.indexOf(id1) - config.enabledChains.indexOf(id2)) as [
-  Chain,
-  ...Chain[],
-];
+  // LiFi specific chains
+  { ...mainnet },
+  { ...optimism },
+  { ...polygon },
+  { ...bsc },
+  { ...zkSync },
+  { ...base },
+  { ...avalanche },
+  { ...aurora },
+  { ...linea },
+  { ...gnosis },
+  { ...fantom },
+  { ...moonriver },
+  { ...moonbeam },
+  { ...fuse },
+  { ...boba },
+  { ...metis },
+  { ...mode },
+  { ...scroll },
+].sort(({ id: id1 }, { id: id2 }) => {
+  const index1 = config.enabledChains.indexOf(id1);
+  const index2 = config.enabledChains.indexOf(id2);
+
+  if (index1 !== -1 && index2 !== -1) {
+    // Both ids are in enabledChains, sort by their order in enabledChains
+    return index1 - index2;
+  } else if (index1 !== -1) {
+    // Only id1 is in enabledChains, it should come first
+    return -1;
+  } else if (index2 !== -1) {
+    // Only id2 is in enabledChains, it should come first
+    return 1;
+  } else {
+    // Neither id is in enabledChains, maintain original order
+    return 0;
+  }
+}) as [Chain, ...Chain[]];
 
 const projectId = config.projectId;
 

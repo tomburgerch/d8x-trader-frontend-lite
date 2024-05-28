@@ -3,22 +3,29 @@ import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
 import { RequestMethodE } from 'types/enums';
 import type {
+  BoostStationResponseI,
+  BoostStationParamResponseI,
   CancelOrderResponseI,
   CollateralChangeResponseI,
+  EtherFiApyI,
   ExchangeInfoI,
+  MaintenanceStatusI,
   MarginAccountI,
   MaxOrderSizeResponseI,
   OrderDigestI,
   OrderI,
   PerpetualOpenOrdersI,
   PerpetualStaticInfoI,
-  PriceFeedResponseI,
   ValidatedResponseI,
 } from 'types/types';
-import { MaintenanceStatusI, BoostStationResponseI, BoostStationParamResponseI } from 'types/types';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 function getApiUrlByChainId(chainId: number) {
-  return config.apiUrl[chainId] || config.apiUrl.default;
+  const urlByFirstEnabledChainId = config.apiUrl[config.enabledChains[0]];
+  if (!isEnabledChain(chainId)) {
+    return urlByFirstEnabledChainId || config.apiUrl.default;
+  }
+  return config.apiUrl[chainId] || urlByFirstEnabledChainId || config.apiUrl.default;
 }
 
 const fetchUrl = async (url: string, chainId: number) => {
@@ -32,6 +39,16 @@ const fetchUrl = async (url: string, chainId: number) => {
 
 export async function getMaintenanceStatus(): Promise<MaintenanceStatusI[]> {
   return fetch('https://drip.d8x.xyz/status', getRequestOptions()).then((data) => {
+    if (!data.ok) {
+      console.error({ data });
+      throw new Error(data.statusText);
+    }
+    return data.json();
+  });
+}
+
+export async function getEtherFiAPY(): Promise<EtherFiApyI> {
+  return fetch('https://etherfi.d8x.xyz/etherfi-apy', getRequestOptions()).then((data) => {
     if (!data.ok) {
       console.error({ data });
       throw new Error(data.statusText);
@@ -394,22 +411,6 @@ export async function getRemoveCollateral(
 export async function getPythID(symbol: string): Promise<{ id: string }[]> {
   const data = await fetch(
     `https://benchmarks.pyth.network/v1/price_feeds/?query=crypto.${symbol}/usd&asset_type=crypto`,
-    getRequestOptions()
-  );
-  if (!data.ok) {
-    console.error({ data });
-    throw new Error(data.statusText);
-  }
-  return data.json();
-}
-
-export async function getSymbolPrice(symbol: string): Promise<PriceFeedResponseI[]> {
-  const res = await getPythID(symbol);
-  if (res.length < 1) {
-    throw new Error(`Pyth Id not found for symbol ${symbol}`);
-  }
-  const data = await fetch(
-    `https://hermes.pyth.network/api/latest_price_feeds?ids[]=${res[0].id}`,
     getRequestOptions()
   );
   if (!data.ok) {

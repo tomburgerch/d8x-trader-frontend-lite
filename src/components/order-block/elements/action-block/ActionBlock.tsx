@@ -2,8 +2,8 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAccount, useChainId, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 import { type Address } from 'viem';
+import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
 import { Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
@@ -39,6 +39,7 @@ import { MethodE, OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } 
 import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useMinPositionString } from '../../hooks/useMinPositionString';
 import { currencyMultiplierAtom, selectedCurrencyAtom } from '../order-size/store';
@@ -103,6 +104,7 @@ enum ValidityCheckE {
 
 enum ValidityCheckButtonE {
   Empty = '-',
+  WrongNetwork = 'wrong-network',
   NoAddress = 'not-connected',
   NoEnoughGas = 'no-enough-gas',
   NoFunds = 'no-funds',
@@ -116,8 +118,7 @@ enum ValidityCheckButtonE {
 export const ActionBlock = memo(() => {
   const { t } = useTranslation();
 
-  const { address, chain } = useAccount();
-  const chainId = useChainId();
+  const { address, chain, chainId } = useAccount();
   const { data: walletClient } = useWalletClient({
     chainId,
   });
@@ -126,11 +127,10 @@ export const ActionBlock = memo(() => {
 
   const orderInfo = useAtomValue(orderInfoAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
-  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
-  const selectedPerpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const positions = useAtomValue(positionsAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
@@ -157,13 +157,15 @@ export const ActionBlock = memo(() => {
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
   const openReviewOrderModal = async () => {
-    if (!orderInfo || !address || !traderAPI || !poolFee) {
+    if (!orderInfo || !address || !traderAPI || !poolFee || !isEnabledChain(chainId)) {
       return;
     }
+
     validityCheckRef.current = true;
     setShowReviewOrderModal(true);
     setNewPositionRisk(null);
     setMaxOrderSize(undefined);
+
     const mainOrder = createMainOrder(orderInfo);
     await positionRiskOnTrade(
       chainId,
@@ -177,10 +179,7 @@ export const ActionBlock = memo(() => {
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
-        if (
-          selectedPerpetualStaticInfo &&
-          data.data.newPositionRisk.leverage > 1 / selectedPerpetualStaticInfo.initialMarginRate
-        ) {
+        if (perpetualStaticInfo && data.data.newPositionRisk.leverage > 1 / perpetualStaticInfo.initialMarginRate) {
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
@@ -201,25 +200,24 @@ export const ActionBlock = memo(() => {
   };
 
   const isBuySellButtonActive = useMemo(() => {
-    if (!orderInfo || !address) {
+    if (!orderInfo || !address || !isEnabledChain(chainId)) {
       return false;
     }
-    if (
-      !orderInfo.size ||
-      !selectedPerpetualStaticInfo?.lotSizeBC ||
-      orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC
-    ) {
+    if (!orderInfo.size || !perpetualStaticInfo?.lotSizeBC || orderInfo.size < perpetualStaticInfo.lotSizeBC) {
       return false;
     }
     if (orderInfo.orderType === OrderTypeE.Limit && (orderInfo.limitPrice === null || orderInfo.limitPrice <= 0)) {
       return false;
     }
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
-  }, [orderInfo, address, selectedPerpetualStaticInfo?.lotSizeBC]);
+  }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC]);
 
   const validityCheckButtonType = useMemo(() => {
     if (!address || !orderInfo) {
       return ValidityCheckButtonE.NoAddress;
+    }
+    if (!isEnabledChain(chainId)) {
+      return ValidityCheckButtonE.WrongNetwork;
     }
     if (poolTokenBalance === 0) {
       return ValidityCheckButtonE.NoFunds;
@@ -237,11 +235,13 @@ export const ActionBlock = memo(() => {
       return ValidityCheckButtonE.NoTriggerPrice;
     }
     return ValidityCheckButtonE.GoodToGo;
-  }, [orderInfo, address, poolTokenBalance, hasEnoughGasForFee]);
+  }, [orderInfo, address, chainId, poolTokenBalance, hasEnoughGasForFee]);
 
   const validityCheckButtonText = useMemo(() => {
     if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
       return `${t('pages.trade.action-block.validity.button-no-address')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.WrongNetwork) {
+      return `${t('error.wrong-network')}`;
     } else if (validityCheckButtonType === ValidityCheckButtonE.NoFunds) {
       return `${t('pages.trade.action-block.validity.button-no-funds')}`;
     } else if (validityCheckButtonType === ValidityCheckButtonE.NoEnoughGas) {
@@ -371,13 +371,16 @@ export const ActionBlock = memo(() => {
       !parsedOrders ||
       !selectedPool ||
       !proxyAddr ||
-      !poolTokenDecimals
+      !poolTokenDecimals ||
+      !isEnabledChain(chainId)
     ) {
       return;
     }
+
     setRequestSent(true);
     setIsValidityCheckDone(false);
     requestSentRef.current = true;
+
     orderDigest(chainId, parsedOrders, address)
       .then((data) => {
         if (data.data.digests.length > 0) {
@@ -471,7 +474,7 @@ export const ActionBlock = memo(() => {
       validityCheckRef.current ||
       !maxOrderSize ||
       !orderInfo?.orderBlock ||
-      !selectedPerpetualStaticInfo?.lotSizeBC
+      !perpetualStaticInfo?.lotSizeBC
     ) {
       return ValidityCheckE.Empty;
     }
@@ -484,19 +487,16 @@ export const ActionBlock = memo(() => {
     if (isTooLarge) {
       return ValidityCheckE.OrderTooLarge;
     }
-    const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < selectedPerpetualStaticInfo.lotSizeBC;
+    const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < perpetualStaticInfo.lotSizeBC;
     if (isOrderTooSmall) {
       return ValidityCheckE.OrderTooSmall;
     }
     const isPositionTooSmall =
       (!positionToModify || positionToModify.positionNotionalBaseCCY === 0) &&
-      orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC;
+      orderInfo.size < 10 * perpetualStaticInfo.lotSizeBC;
     if (isPositionTooSmall && orderInfo.orderType === OrderTypeE.Market) {
       return ValidityCheckE.PositionTooSmall;
-    } else if (
-      orderInfo.size < 10 * selectedPerpetualStaticInfo.lotSizeBC &&
-      orderInfo.orderType !== OrderTypeE.Market
-    ) {
+    } else if (orderInfo.size < 10 * perpetualStaticInfo.lotSizeBC && orderInfo.orderType !== OrderTypeE.Market) {
       return ValidityCheckE.BelowMinPosition;
     }
     if (poolTokenBalance === undefined || poolTokenBalance < collateralDeposit) {
@@ -532,7 +532,7 @@ export const ActionBlock = memo(() => {
     orderInfo?.takeProfitPrice,
     orderInfo?.maxMinEntryPrice,
     selectedPerpetual,
-    selectedPerpetualStaticInfo?.lotSizeBC,
+    perpetualStaticInfo?.lotSizeBC,
     poolTokenBalance,
     isMarketClosed,
     collateralDeposit,
@@ -578,6 +578,10 @@ export const ActionBlock = memo(() => {
     return;
   }, [validityCheckType]);
 
+  useEffect(() => {
+    clearInputsData();
+  }, [clearInputsData, chainId]);
+
   const feePct = useMemo(() => {
     if (orderInfo?.tradingFee) {
       return (
@@ -603,7 +607,7 @@ export const ActionBlock = memo(() => {
           {validityCheckButtonText}
         </Button>
       )}
-      {orderInfo && (
+      {orderInfo && isEnabledChain(chainId) && (
         <Dialog open={showReviewOrderModal} className={styles.dialog}>
           <DialogTitle className={styles.dialogTitle}> {t('pages.trade.action-block.review.title')} </DialogTitle>
           <div className={styles.emphasis}>

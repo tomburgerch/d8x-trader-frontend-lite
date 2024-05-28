@@ -142,7 +142,8 @@
           "stop-price": "止盈止损价",
           "reduce-only": "仅减少",
           "leverage": "杠杆",
-          "good-until": "截至"
+          "good-until": "截至",
+          "limit-price-tooltip": "如果中间价加上或减去影响您订单的价格(滑点)达到此栏显示的价格，限价单将会执行。"
         },
         "table-content": {
           "buy": "买入",
@@ -599,7 +600,11 @@
         "title": "Delta 对冲收益率策略",
         "synthetic-position": "合成美元头寸",
         "your-yield": "产量",
-        "your-points": " + EigenLayer、ether.fi 和 D8X 积分"
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer 积分",
+        "your-points-2": "ether.fi 积分",
+        "your-points-3": "D8X 积分"
       },
       "info": {
         "title": "如何赚取",
@@ -810,7 +815,7 @@
         "label2": "流动性池：",
         "headers": {
           "collateral": "抵押品",
-          "num-of-perps": "永续人数"
+          "num-of-perps": "交易对数量"
         }
       },
       "market": {
@@ -912,10 +917,6 @@
       "disconnect": "断开连接",
       "connected-title": "欢迎！",
       "connected-description": "您已成功登录。"
-    },
-    "public-beta": {
-      "info-text": "测试版 - 请自行研究",
-      "beta-tag": "[测试版]"
     },
     "refresh": "刷新",
     "filter": "筛选"

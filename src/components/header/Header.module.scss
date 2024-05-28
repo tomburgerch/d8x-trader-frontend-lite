@@ -92,7 +92,7 @@
 
 .header {
   margin-top: $d8x-spacing * 2;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   color: var(--d8x-color-top-bar-main);
   font-family: 'Monomaniac One', serif;
@@ -106,7 +106,6 @@
 
 .center {
   display: flex;
-  flex: 1;
 }
 
 .rightSide {
