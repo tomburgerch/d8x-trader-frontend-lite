@@ -3,7 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 import { Table as MuiTable, TableBody, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
@@ -28,8 +28,8 @@ import {
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { AlignE, FieldTypeE, OpenOrderTypeE, OrderSideE, OrderValueTypeE, SortOrderE, TableTypeE } from 'types/enums';
-import type { TableHeaderI } from 'types/types';
-import { MarginAccountWithAdditionalDataI } from 'types/types';
+import type { MarginAccountWithAdditionalDataI, TableHeaderI } from 'types/types';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { hasTpSlOrdersAtom } from '../order-block/elements/action-block/store';
 import { CloseModal } from './elements/modals/close-modal/CloseModal';
@@ -46,8 +46,7 @@ const MIN_WIDTH_FOR_TABLE = 788;
 export const PositionsTable = () => {
   const { t } = useTranslation();
 
-  const chainId = useChainId();
-  const { address, isConnected, isDisconnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
 
   const selectedPool = useAtomValue(selectedPoolAtom);
@@ -127,14 +126,8 @@ export const PositionsTable = () => {
     return foundPool || null;
   }, [pools, selectedPosition?.symbol]);
 
-  useEffect(() => {
-    if (isDisconnected || !traderAPI || traderAPI.chainId !== chainId) {
-      clearPositions();
-    }
-  }, [isDisconnected, chainId, clearPositions, traderAPI]);
-
   const refreshPositions = useCallback(async () => {
-    if (address && traderAPI && isConnected && chainId && isSDKConnected) {
+    if (address && traderAPI && isConnected && isEnabledChain(chainId) && isSDKConnected) {
       if (isAPIBusyRef.current || chainId !== traderAPI.chainId) {
         return;
       }

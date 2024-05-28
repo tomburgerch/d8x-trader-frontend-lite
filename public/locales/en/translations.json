@@ -3,7 +3,7 @@
     "trade": "Trade",
     "boost-station": "BoostStation",
     "refer": "Refer",
-    "vault": "Vault",
+    "vault": "Earn",
     "strategies": "Strategies",
     "portfolio": "Portfolio"
   },
@@ -142,7 +142,8 @@
           "stop-price": "Stop Price",
           "reduce-only": "Reduce Only",
           "leverage": "Leverage",
-          "good-until": "Good Until"
+          "good-until": "Good Until",
+          "limit-price-tooltip": "Orders with a limit price are only executed if the mid price plus/minus the price impact of your order reaches the price shown in this column."
         },
         "table-content": {
           "buy": "BUY",
@@ -598,8 +599,12 @@
       "overview": {
         "title": "The Synthetic US Dollar Trade",
         "synthetic-position": "Synthetic USD position",
-        "your-yield": "Your yield",
-        "your-points": " + EigenLayer, ether.fi and D8X points"
+        "your-yield": "Your reward",
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer points",
+        "your-points-2": "ether.fi points",
+        "your-points-3": "D8X points"
       },
       "info": {
         "title": "Strategy Mechanics",
@@ -665,7 +670,7 @@
     },
     "portfolio": {
       "perpetuals": "Perpetuals",
-      "vault": "Vault",
+      "vault": "Earn",
       "account-value": {
         "main-title": "Your account",
         "title": "Account Value",
@@ -683,7 +688,7 @@
             "referral": "Referral earnings"
           },
           "vault": {
-            "title": "Vault details",
+            "title": "Earn details",
             "assets": "Assets",
             "assets-pool": "Assets in pools",
             "earnings-pool": "Earnings per pool",
@@ -734,6 +739,7 @@
       "header-to": "Bridge in",
       "header-from": "Bridge out"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "Per page"
     },
@@ -914,10 +920,6 @@
       "disconnect": "Disconnect",
       "connected-title": "Welcome!",
       "connected-description": "You have successfully signed in."
-    },
-    "public-beta": {
-      "info-text": "This is a public beta - do your own research.",
-      "beta-tag": "[beta]"
     },
     "refresh": "Refresh",
     "filter": "Filter"

@@ -142,7 +142,8 @@
           "stop-price": "Stop Preis",
           "reduce-only": "Nur reduzieren",
           "leverage": "Hebel",
-          "good-until": "Gut bis"
+          "good-until": "Gut bis",
+          "limit-price-tooltip": "Orders mit einem Limit Preis werden nur ausgeführt, wenn der Mid-Preis, plus/minus der Preisauswirkung Ihrer Order, den in dieser Spalte angezeigten Preis erreicht."
         },
         "table-content": {
           "buy": "KAUFEN",
@@ -598,8 +599,12 @@
       "overview": {
         "title": "Delta-gesicherte Renditestrategie",
         "synthetic-position": "Synthetische USD-Position",
-        "your-yield": "Rendite",
-        "your-points": " + EigenLayer, ether.fi and D8X Punkte"
+        "your-yield": "Dein Ertrag",
+        "eth-apr": "weETH APR: ",
+        "d8x-apr": "Funding APR: ",
+        "your-points": " EigenLayer Punkte",
+        "your-points-2": "ether.fi Punkte",
+        "your-points-3": "D8X Punkte"
       },
       "info": {
         "title": "Wie es funktioniert",
@@ -912,10 +917,6 @@
       "disconnect": "Abmelden",
       "connected-title": "Willkommen!",
       "connected-description": "Sie haben sich erfolgreich angemeldet."
-    },
-    "public-beta": {
-      "info-text": "Dies ist eine öffentliche Betaphase – Mach deine eigene Recherche",
-      "beta-tag": "[beta]"
     },
     "refresh": "Aktualisieren",
     "filter": "Filter"

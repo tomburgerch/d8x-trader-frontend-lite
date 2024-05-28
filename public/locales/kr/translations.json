@@ -893,10 +893,6 @@
       "connected-title": "Welcome!",
       "connected-description": "You have successfully signed in."
     },
-    "public-beta": {
-      "info-text": "This is public beta.",
-      "beta-tag": "[beta]"
-    },
     "refresh": "Refresh",
     "filter": "필터"
   },

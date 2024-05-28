@@ -1,9 +1,14 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
 import { RequestMethodE } from 'types/enums';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 function getApiUrlByChainId(chainId: number) {
-  return config.brokerUrl[chainId] || config.brokerUrl.default;
+  const urlByFirstEnabledChainId = config.brokerUrl[config.enabledChains[0]];
+  if (!isEnabledChain(chainId)) {
+    return urlByFirstEnabledChainId || config.brokerUrl.default;
+  }
+  return config.brokerUrl[chainId] || urlByFirstEnabledChainId || config.brokerUrl.default;
 }
 
 export function orderSubmitted(chainId: number, orderIds: string[]) {
