@@ -1,3 +1,4 @@
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
@@ -23,11 +24,12 @@ export const ConnectModal = () => {
   const [isOpen, setOpen] = useAtom(connectModalOpenAtom);
 
   const { isConnected } = useAccount();
+  const { connectModalOpen } = useConnectModal();
 
   const onClose = useCallback(() => setOpen(false), [setOpen]);
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className={styles.dialog}>
+    <Dialog open={isOpen && !connectModalOpen} onClose={onClose} className={styles.dialog}>
       {!isConnected && (
         <>
           <DialogTitle>{t('common.connect-modal.title')}</DialogTitle>
