@@ -23,20 +23,21 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
     }
 
     try {
-      const localLogo = (await import(/* @vite-ignore */ `assets/crypto-icons/${symbol}.svg`)).default;
+      let localLogo: TemporaryAnyT;
+      switch (symbol) {
+        case 'weeth':
+          localLogo = (await import('assets/crypto-icons/weeth.svg')).default;
+          break;
+        case 'stusd':
+          localLogo = (await import('assets/crypto-icons/stusd.svg')).default;
+          break;
+        default:
+          localLogo = (await import('assets/crypto-icons/generic.svg')).default;
+      }
+
       importedLogos[symbol] = localLogo;
       return {
         default: localLogo,
-      };
-    } catch {
-      /* continue regardless of error */
-    }
-
-    try {
-      const genericLogo = (await import('assets/crypto-icons/generic.svg')).default as TemporaryAnyT;
-      importedLogos[symbol] = genericLogo;
-      return {
-        default: genericLogo,
       };
     } catch {
       // We need to reload page, because app has been updated
