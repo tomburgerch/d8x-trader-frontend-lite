@@ -50,7 +50,7 @@ export async function approveMarginToken(
     );
 
     return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => {
-      waitForTransactionReceipt(wagmiConfig, {
+      return waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
         timeout: 30_000,
       }).then(() => ({ hash: tx }));
