@@ -20,6 +20,7 @@ export async function approveMarginToken(
     throw new Error('Account not connected');
   }
   const minAmountBN = parseUnits((1.05 * minAmount).toFixed(decimals), decimals);
+
   const allowance = await readContract(wagmiConfig, {
     address: marginTokenAddr as Address,
     abi: erc20Abi,
@@ -27,7 +28,7 @@ export async function approveMarginToken(
     args: [walletClient.account.address, proxyAddr as Address],
   });
 
-  if (allowance > minAmountBN) {
+  if (allowance >= minAmountBN) {
     return null;
   } else {
     const account = walletClient.account;
