@@ -83,8 +83,8 @@ export const PerpetualStats = () => {
         id: 'fundingRate',
         label: t('pages.trade.stats.funding-rate'),
         tooltip: t('pages.trade.stats.funding-rate-tooltip'),
-        value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(2)} %` : '--',
-        numberOnly: perpetualStatistics ? (perpetualStatistics.currentFundingRateBps / 100).toFixed(2) : '--',
+        value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(3)} %` : '--',
+        numberOnly: perpetualStatistics ? (perpetualStatistics.currentFundingRateBps / 100).toFixed(3) : '--',
         currencyOnly: perpetualStatistics ? '%' : '',
       },
       {
