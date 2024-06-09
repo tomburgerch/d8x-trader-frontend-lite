@@ -828,6 +828,7 @@
         "header": "Choose Market",
         "crypto": "Crypto",
         "fx": "FX",
+        "all": "All",
         "commodity": "Commodity",
         "closed": "Closed"
       },

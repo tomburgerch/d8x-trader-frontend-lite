@@ -712,6 +712,8 @@
     "wallet-connect": "连接",
     "account-button": "账户",
     "currency-label": "货币",
+    "close-button": "关闭",
+    "cancel-button": "取消",
     "amount-label": "数量",
     "address-label": "地址",
     "deposit-gas": "存入燃料",
@@ -739,6 +741,7 @@
       "header-to": "跨链转入",
       "header-from": "跨链转出"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "每页"
     },
@@ -825,6 +828,7 @@
         "header": "选择市场",
         "crypto": "加密货币",
         "fx": "外汇",
+        "all": "所有",
         "commodity": "大宗商品",
         "closed": "休市"
       },

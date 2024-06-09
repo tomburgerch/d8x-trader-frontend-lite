@@ -135,6 +135,7 @@ export enum ReferralDialogActionE {
 }
 
 export enum AssetTypeE {
+  All = 'all',
   Crypto = 'crypto',
   Fx = 'fx',
   Metal = 'metal',
