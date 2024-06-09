@@ -107,13 +107,15 @@ export const PerpetualStats = () => {
             {midPrice.tooltip && marketData?.ret24hPerc ? (
               <TooltipMobile tooltip={midPrice.tooltip}>
                 <div
-                  className={marketData.ret24hPerc >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative}
+                  className={
+                    marketData.ret24hPerc >= 0 ? styles.statMainValuePositiveMobile : styles.statMainValueNegativeMobile
+                  }
                 >
                   {midPrice.numberOnly}
                 </div>
               </TooltipMobile>
             ) : (
-              <div className={styles.statMainValuePositive}>{midPrice.numberOnly}</div>
+              <div className={styles.statMainValuePositiveMobile}>{midPrice.numberOnly}</div>
             )}
           </div>
           <div>
@@ -151,7 +153,20 @@ export const PerpetualStats = () => {
     return (
       <div className={styles.statContainer}>
         <div className={styles.statsBlock}>
-          {[midPrice, ...items].map((item) => (
+          {midPrice.tooltip && marketData?.ret24hPerc ? (
+            <TooltipMobile tooltip={midPrice.tooltip}>
+              <div
+                className={`${styles.statMainValueContainer} ${marketData.ret24hPerc >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative}`}
+              >
+                {midPrice.numberOnly}
+              </div>
+            </TooltipMobile>
+          ) : (
+            <div className={`${styles.statMainValueContainer} ${styles.statMainValuePositive}`}>
+              {midPrice.numberOnly}
+            </div>
+          )}
+          {[...items].map((item) => (
             <div key={item.id}>
               {item.tooltip ? (
                 <TooltipMobile tooltip={item.tooltip}>

@@ -57,23 +57,42 @@
   margin-bottom: calc($d8x-spacing / 2);
 }
 
-.statMainValuePositive {
+.statMainValuePositiveMobile {
   font-size: 1.5rem;
   color: var(--d8x-color-text-buy);
   white-space: nowrap;
   font-weight: 600;
 }
 
-.statMainValueNegative {
-  font-size: 1.5rem;
+.statMainValueNegativeMobile {
+  font-size: 1.3rem;
   color: var(--d8x-color-text-sell);
   white-space: nowrap;
+  font-weight: 600;
+}
+
+.statMainValuePositive {
+  font-size: 24px;
+  color: var(--d8x-color-text-buy);
+  font-weight: 600;
+}
+
+.statMainValueContainer {
+  display: flex;
+  align-items: flex-end;
+  height: 100%; /* Make sure the container takes the full height of the parent */
+}
+
+.statMainValueNegative {
+  font-size: 24px;
+  color: var(--d8x-color-text-sell);
   font-weight: 600;
 }
 
 .statsBlock {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end; 
 }
 
 .statLabel {
