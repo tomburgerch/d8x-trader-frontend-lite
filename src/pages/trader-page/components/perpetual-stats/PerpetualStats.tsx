@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +13,7 @@ import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { perpetualStatisticsAtom, showChartForMobileAtom } from 'store/pools.store';
 import { abbreviateNumber } from 'utils/abbreviateNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { marketsDataAtom } from 'store/tv-chart.store';
 
 import styles from './PerpetualStats.module.scss';
 
@@ -24,9 +25,15 @@ export const PerpetualStats = () => {
   const isTabletScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isMiddleScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const marketsData = useAtomValue(marketsDataAtom);
 
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [showChartForMobile, setShowChartForMobile] = useAtom(showChartForMobileAtom);
+
+  const pairId = `${perpetualStatistics?.baseCurrency}-${perpetualStatistics?.quoteCurrency}`.toLowerCase();
+  const marketData = marketsData.find((market) => market.symbol === pairId);
+
+  console.log(marketData?.ret24hPerc);
 
   const midPrice: StatDataI = useMemo(
     () => ({
@@ -97,15 +104,17 @@ export const PerpetualStats = () => {
       <div className={styles.statContainer}>
         <div className={styles.mainMobileLine}>
           <div>
-            {midPrice.tooltip ? (
+            {midPrice.tooltip && marketData?.ret24hPerc ? (
               <TooltipMobile tooltip={midPrice.tooltip}>
-                <div className={classNames(styles.statMainLabel, styles.tooltip)}>{midPrice.label}</div>
+                <div
+                  className={marketData.ret24hPerc >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative}
+                >
+                  {midPrice.numberOnly}
+                </div>
               </TooltipMobile>
             ) : (
-              <div className={styles.statMainLabel}>{midPrice.label}</div>
+              <div className={styles.statMainValuePositive}>{midPrice.numberOnly}</div>
             )}
-            <span className={styles.statMainValue}>{midPrice.numberOnly}</span>{' '}
-            <span className={styles.statValue}>{midPrice.currencyOnly}</span>
           </div>
           <div>
             <div className={styles.viewChart} onClick={() => setShowChartForMobile(!showChartForMobile)}>

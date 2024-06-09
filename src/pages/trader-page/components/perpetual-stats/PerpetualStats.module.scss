@@ -57,9 +57,16 @@
   margin-bottom: calc($d8x-spacing / 2);
 }
 
-.statMainValue {
-  font-size: 1rem;
-  color: var(--d8x-color-text-highlight);
+.statMainValuePositive {
+  font-size: 1.5rem;
+  color: var(--d8x-color-text-buy);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.statMainValueNegative {
+  font-size: 1.5rem;
+  color: var(--d8x-color-text-sell);
   white-space: nowrap;
   font-weight: 600;
 }
