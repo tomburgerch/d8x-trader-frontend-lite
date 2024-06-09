@@ -11,6 +11,7 @@ import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWr
 import { getOpenWithdrawals } from 'network/history';
 import { GlobalStats } from 'pages/vault-page/components/global-stats/GlobalStats';
 import { LiquidityBlock } from 'pages/vault-page/components/liquidity-block/LiquidityBlock';
+import { PoolCards } from 'pages/vault-page/components/pool-cards/PoolCards';
 import { selectedPoolAtom } from 'store/pools.store';
 import { triggerWithdrawalsUpdateAtom, withdrawalsAtom } from 'store/vault-pools.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -54,6 +55,9 @@ export const VaultPage = () => {
       <Helmet title={`${selectedPool?.poolSymbol} Vault | D8X App`} />
       <div className={styles.root}>
         <MaintenanceWrapper>
+          <Container className={styles.container}>
+            <PoolCards />
+          </Container>
           {isSmallScreen && (
             <div className={styles.mobileSelectBoxes}>
               <CollateralsSelect />

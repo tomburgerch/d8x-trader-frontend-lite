@@ -91,7 +91,14 @@
   color: var(--d8x-color-text-main);
 
   .label {
+    display: flex;
     font-weight: bold;
+    align-items: center;
+    gap: 2 * $d8x-spacing;
+
+    > span {
+      margin-bottom: -$d8x-spacing;
+    }
   }
 
   .value {

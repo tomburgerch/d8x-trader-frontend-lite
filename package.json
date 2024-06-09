@@ -60,6 +60,7 @@
     "@mui/utils": "5.15.14",
     "@noble/secp256k1": "2.1.0",
     "@rainbow-me/rainbowkit": "2.0.7",
+    "@splidejs/react-splide": "0.7.12",
     "@tanstack/react-query": "5.31.0",
     "@wagmi/core": "2.6.17",
     "@web3auth/base": "8.3.0",
