@@ -92,7 +92,7 @@ export const BoostStationBlock = memo(() => {
           />
         </div>
         <Typography variant="h4" className={styles.valueHolder}>
-          $ {boostStation ? formatNumber(boostStation.crossChainScore, 0) : '--'}
+          {boostStation ? formatNumber(boostStation.crossChainScore, 0) : '--'}
         </Typography>
       </div>
       <div className={styles.boostsHolder}>
@@ -106,7 +106,7 @@ export const BoostStationBlock = memo(() => {
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
-                $ {boostStation ? formatNumber(boostStation.boostedTraderVol, 0) : '--'}
+                {boostStation ? formatNumber(boostStation.boostedTraderVol, 0) : '--'}
               </Typography>
             </div>
             <div className={styles.shortMetric}>
@@ -117,7 +117,7 @@ export const BoostStationBlock = memo(() => {
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
-                + $ {boostStation ? formatNumber(boostStation.lastBoostedVol, 0) : '--'}
+                + {boostStation ? formatNumber(boostStation.lastBoostedVol, 0) : '--'}
               </Typography>
             </div>
           </div>
@@ -174,7 +174,7 @@ export const BoostStationBlock = memo(() => {
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
-                $ {boostStation ? formatNumber(boostStation.boostedLpVol, 0) : '--'}
+                {boostStation ? formatNumber(boostStation.boostedLpVol, 0) : '--'}
               </Typography>
             </div>
             <div className={styles.shortMetric}>
@@ -185,7 +185,7 @@ export const BoostStationBlock = memo(() => {
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
-                + $ {boostStation ? formatNumber(boostStation.hourlyLPBVolIncrease, 0) : '--'}
+                + {boostStation ? formatNumber(boostStation.hourlyLPBVolIncrease, 0) : '--'}
               </Typography>
             </div>
           </div>

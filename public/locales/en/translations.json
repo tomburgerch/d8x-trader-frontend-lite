@@ -376,16 +376,16 @@
       "title": "Trade and provide liquidity to BOOST your $D8X Airdrop",
       "invite-friends": "Refer",
       "boosted-volume": {
-        "title": "BOOSTED Volume",
-        "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
+        "title": "D8X Points",
+        "modal-text": "The $D8X Airdrop is calculated based on D8X Points. D8X Points is the sum of Trade Points and Liquidity Points."
       },
       "trade-volume": {
-        "title": "BOOSTED Trade Volume",
-        "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
+        "title": "Trade Points",
+        "modal-text": "For every trade we compute Volume x Trade Boost. Trade Points are the sum of it over all your trades."
       },
       "trade-last-increase": {
-        "title": "Last change",
-        "modal-text": "The amount BOOSTED Trade Volume increased from your last trade. LFG!"
+        "title": "Points earned from last trade",
+        "modal-text": "The amount Trade Points increased from your last trade. LFG!"
       },
       "trade-boost": {
         "title": "Trade Boost",
@@ -398,12 +398,12 @@
         "random": "Fortune boost:"
       },
       "liquidity-volume": {
-        "title": "BOOSTED Liquidity Volume",
-        "modal-text": "The longer you keep your liquidity in the pools, the higher your BOOSTED Liquidity volume. Over 24 hours your BOOSTED Liquidity volume can increase up to Liquidity x Liquidity Boost."
+        "title": "Liquidity Points",
+        "modal-text": "The longer you keep your liquidity in the pools, the more Liquidity Points you earn. Over 24 hours your Liquidity Points can increase up to Liquidity x Liquidity Boost."
       },
       "trade-hourly-increase": {
-        "title": "Hourly change",
-        "modal-text": "Hourly increase of BOOSTED Liquidity"
+        "title": "Points you earn per hour",
+        "modal-text": "Hourly increase of your Liquidity Points"
       },
       "liquidity-boost": {
         "title": "Liquidity Boost",
