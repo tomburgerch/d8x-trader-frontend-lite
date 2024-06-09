@@ -72,18 +72,24 @@
 }
 
 .statMainValuePositive {
+  font-size: 32px;
+  color: var(--d8x-color-text-buy);
+  font-weight: 600;
+}
+
+.statMainValueNegative {
+  font-size: 32px;
+  color: var(--d8x-color-text-sell);
+  font-weight: 600;
+}
+
+.statMainValuePositiveTablet {
   font-size: 24px;
   color: var(--d8x-color-text-buy);
   font-weight: 600;
 }
 
-.statMainValueContainer {
-  display: flex;
-  align-items: flex-end;
-  height: 100%; /* Make sure the container takes the full height of the parent */
-}
-
-.statMainValueNegative {
+.statMainValueNegativeTablet {
   font-size: 24px;
   color: var(--d8x-color-text-sell);
   font-weight: 600;

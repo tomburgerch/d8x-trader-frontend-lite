@@ -15,26 +15,49 @@ interface StatsLinePropsI {
 
 export const StatsLine = memo(({ items }: StatsLinePropsI) => (
   <div className={styles.root}>
-    {items.map((item) => (
-      <div key={item.id} className={styles.statContainer}>
-        {item.tooltip ? (
-          <TooltipMobile tooltip={item.tooltip}>
-            <Typography variant="bodyTiny" className={classNames(styles.statLabel, styles.tooltip)}>
-              {item.label}
+    {items.map((item) => {
+      const isMidPrice = item.id === 'midPrice';
+
+      return (
+        <div key={item.id} className={classNames(styles.statContainer, { [styles.midPriceContainer]: isMidPrice })}>
+          {!isMidPrice && item.tooltip ? (
+            <TooltipMobile tooltip={item.tooltip}>
+              <Typography variant="bodyTiny" className={classNames(styles.statLabel, styles.tooltip)}>
+                {item.label}
+              </Typography>
+            </TooltipMobile>
+          ) : (
+            !isMidPrice && (
+              <Typography variant="bodyTiny" className={styles.statLabel}>
+                {item.label}
+              </Typography>
+            )
+          )}
+          {isMidPrice && item.tooltip ? (
+            <TooltipMobile tooltip={item.tooltip}>
+              <Typography variant="bodyLarge" className={item.className}>
+                {item.numberOnly}
+              </Typography>
+            </TooltipMobile>
+          ) : (
+            isMidPrice && (
+              <Typography variant="bodyLarge" className={item.className}>
+                {item.numberOnly}
+              </Typography>
+            )
+          )}
+          {!isMidPrice && (
+            <Typography variant="bodyLarge" className={styles.statValue}>
+              {item.numberOnly}
             </Typography>
-          </TooltipMobile>
-        ) : (
-          <Typography variant="bodyTiny" className={styles.statLabel}>
-            {item.label}
-          </Typography>
-        )}
-        <Typography variant="bodyLarge" className={styles.statValue}>
-          {item.numberOnly}
-        </Typography>
-        <Typography variant="bodyTiny" className={styles.statCurrency}>
-          {item.currencyOnly}
-        </Typography>
-      </div>
-    ))}
+          )}
+          {!isMidPrice && (
+            <Typography variant="bodyTiny" className={styles.statCurrency}>
+              {item.currencyOnly}
+            </Typography>
+          )}
+        </div>
+      );
+    })}
   </div>
 ));

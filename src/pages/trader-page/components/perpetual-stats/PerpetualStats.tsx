@@ -32,6 +32,10 @@ export const PerpetualStats = () => {
 
   const pairId = `${perpetualStatistics?.baseCurrency}-${perpetualStatistics?.quoteCurrency}`.toLowerCase();
   const marketData = marketsData.find((market) => market.symbol === pairId);
+  let midPriceClass = styles.statMainValuePositive;
+  if (marketData?.ret24hPerc != null) {
+    midPriceClass = marketData.ret24hPerc >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative;
+  }
 
   console.log(marketData?.ret24hPerc);
 
@@ -46,9 +50,10 @@ export const PerpetualStats = () => {
       numberOnly: perpetualStatistics
         ? formatToCurrency(perpetualStatistics.midPrice, '', true, undefined, true)
         : '--',
+      className: midPriceClass, // Add the custom class here
       // currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
     }),
-    [t, perpetualStatistics]
+    [midPriceClass, t, perpetualStatistics]
   );
 
   const items: StatDataI[] = useMemo(
@@ -156,13 +161,15 @@ export const PerpetualStats = () => {
           {midPrice.tooltip && marketData?.ret24hPerc ? (
             <TooltipMobile tooltip={midPrice.tooltip}>
               <div
-                className={`${styles.statMainValueContainer} ${marketData.ret24hPerc >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative}`}
+                className={
+                  marketData.ret24hPerc >= 0 ? styles.statMainValuePositiveTablet : styles.statMainValueNegativeTablet
+                }
               >
                 {midPrice.numberOnly}
               </div>
             </TooltipMobile>
           ) : (
-            <div className={`${styles.statMainValueContainer} ${styles.statMainValuePositive}`}>
+            <div className={`${styles.statMainValueContainer} ${styles.statMainValuePositiveTablet}`}>
               {midPrice.numberOnly}
             </div>
           )}
