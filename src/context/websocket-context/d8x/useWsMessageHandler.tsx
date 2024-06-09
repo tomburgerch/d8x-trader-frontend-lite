@@ -102,6 +102,7 @@ export function useWsMessageHandler() {
   const traderAPI = useAtomValue(traderAPIAtom);
   const [executedOrders, setOrderExecuted] = useAtom(executeOrderAtom);
   const [failedOrderIds, setOrderIdFailed] = useAtom(failOrderIdAtom);
+  const currentPerpetualStatistics = useAtomValue(perpetualStatisticsAtom);
 
   const updatePerpetualStats = useCallback(
     (stats: PerpetualStatisticsI) => {
@@ -111,21 +112,28 @@ export function useWsMessageHandler() {
           stats.quoteCurrency === selectedPerpetual.quoteCurrency &&
           stats.poolName === selectedPool.poolSymbol
         ) {
+          const previousMidPrice = currentPerpetualStatistics?.midPrice || 0;
+          const midPriceDiff = stats.midPrice - previousMidPrice;
+
           if (Math.abs(stats.currentFundingRateBps) < 1e-6) {
             // update does not contain funding rate/open interest - keep current values
             setPerpetualStatistics({
               ...stats,
               currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
               openInterestBC: selectedPerpetual.openInterestBC,
+              midPriceDiff,
             });
           } else {
             // update all
-            setPerpetualStatistics(stats);
+            setPerpetualStatistics({
+              ...stats,
+              midPriceDiff,
+            });
           }
         }
       }
     },
-    [selectedPool, selectedPerpetual, setPerpetualStatistics]
+    [selectedPool, selectedPerpetual, setPerpetualStatistics, currentPerpetualStatistics]
   );
 
   return useCallback(
