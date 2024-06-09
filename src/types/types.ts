@@ -65,7 +65,7 @@ export interface PerpetualStatisticsI {
   indexPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
-  midPriceDiff?: number; // Add this line
+  midPriceDiff?: number;
 }
 
 export interface PoolI {
