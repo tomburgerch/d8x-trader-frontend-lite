@@ -6,4 +6,5 @@ export interface StatDataI {
   numberOnly?: string;
   currencyOnly?: string;
   columnNr?: number;
+  className?: string;
 }

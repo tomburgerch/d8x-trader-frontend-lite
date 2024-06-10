@@ -119,7 +119,11 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[6].label}
             leftSideTooltip={headers[6].tooltip}
-            rightSide={formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency, true)}
+            rightSide={`${formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency, true)} ${
+              position.unrealizedPnlQuoteCCY
+                ? `(${Math.round((position.unrealizedPnlQuoteCCY / (position.collateralCC * position.collToQuoteConversion)) * 10000) / 100}%)`
+                : '(0%)'
+            }`}
             leftSideStyles={styles.dataLabel}
             rightSideStyles={pnlColor}
           />

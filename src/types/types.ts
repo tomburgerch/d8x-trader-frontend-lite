@@ -65,6 +65,7 @@ export interface PerpetualStatisticsI {
   indexPrice: number;
   currentFundingRateBps: number;
   openInterestBC: number;
+  midPriceDiff?: number;
 }
 
 export interface PoolI {
@@ -273,6 +274,14 @@ export interface BoostStationResponseI {
   hourlyLPBVolIncrease: number;
   lastBoostedVol: number;
   poolVolBoost: PoolVolBoostI[];
+}
+
+export interface BoostRankResponseI {
+  addr: string;
+  score: number;
+  rank: number;
+  outOf: number;
+  Ts: number;
 }
 
 export interface BoostStationParamResponseI {

@@ -371,6 +371,10 @@
         "title": "BOOSTED Volume",
         "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
       },
+      "boosted-rank": {
+        "title": "Rank",
+        "modal-text": "Your rank / Total"
+      },
       "trade-volume": {
         "title": "BOOSTED Trade Volume",
         "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
