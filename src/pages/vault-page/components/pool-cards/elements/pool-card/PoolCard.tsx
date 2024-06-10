@@ -8,11 +8,12 @@ import { Button } from '@mui/material';
 import { getWeeklyAPI } from 'network/history';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
-import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
+import { liquidityTypeAtom, triggerAddInputFocusAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
-import { PoolWithIdI, TemporaryAnyT } from 'types/types';
+import type { PoolWithIdI, TemporaryAnyT } from 'types/types';
+import { LiquidityTypeE } from 'types/enums';
 
 import { DataColumn } from '../data-column/DataColumn';
 
@@ -33,6 +34,8 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const setSelectedPool = useSetAtom(selectedPoolAtom);
+  const setTriggerAddInputFocus = useSetAtom(triggerAddInputFocusAtom);
+  const setLiquidityType = useSetAtom(liquidityTypeAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
 
   const [weeklyAPI, setWeeklyAPI] = useState<number>();
@@ -88,6 +91,8 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   const handleClick = () => {
     setSelectedPool(pool.poolSymbol);
     setSelectedPerpetual(pool.perpetuals[0].id);
+    setLiquidityType(LiquidityTypeE.Add);
+    setTriggerAddInputFocus((prevState) => !prevState);
     clearInputsData();
   };
 
