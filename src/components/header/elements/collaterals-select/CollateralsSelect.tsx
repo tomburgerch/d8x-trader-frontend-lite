@@ -132,7 +132,7 @@ export const CollateralsSelect = memo(() => {
         renderLabel={(value) => value.poolSymbol}
         renderOption={(option) =>
           isMobileScreen ? (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
               {option.item.poolSymbol}
             </option>
           ) : (

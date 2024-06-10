@@ -34,8 +34,6 @@ export const PerpetualStats = () => {
       perpetualStatistics?.midPriceDiff >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative;
   }
 
-  console.log(perpetualStatistics?.midPriceDiff);
-
   const midPrice: StatDataI = useMemo(
     () => ({
       id: 'midPrice',
