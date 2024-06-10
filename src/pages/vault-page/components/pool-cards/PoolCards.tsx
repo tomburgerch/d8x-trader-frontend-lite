@@ -1,23 +1,25 @@
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import { useAtomValue } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+
+import { useMediaQuery, useTheme } from '@mui/material';
 
 import { poolsAtom } from 'store/pools.store';
 
+import { LogoCard } from './elements/logo-card/LogoCard';
 import { PoolCard } from './elements/pool-card/PoolCard';
 
 import styles from './PoolCards.module.scss';
 
 export const PoolCards = () => {
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
   const pools = useAtomValue(poolsAtom);
 
   const selectItems = useMemo(() => {
     return pools.filter((pool) => pool.isRunning);
   }, [pools]);
-
-  useEffect(() => {
-    console.log({ selectItems });
-  }, [selectItems]);
 
   return (
     <div className={styles.root}>
@@ -27,9 +29,8 @@ export const PoolCards = () => {
           perMove: 1,
           arrows: false,
           gap: '12px',
-          padding: '8px',
           breakpoints: {
-            904: {
+            967: {
               perPage: 1,
             },
           },
@@ -40,6 +41,11 @@ export const PoolCards = () => {
             <PoolCard pool={pool} />
           </SplideSlide>
         ))}
+        {selectItems.length === 1 && !isTablet && (
+          <SplideSlide key="dummy-card">
+            <LogoCard />
+          </SplideSlide>
+        )}
       </Splide>
     </div>
   );

@@ -117,7 +117,7 @@ export const CollateralsSelect = memo(() => {
     <Box className={styles.holderRoot}>
       <Box className={styles.iconWrapper}>
         <Suspense fallback={null}>
-          <IconComponent width={24} height={24} />
+          <IconComponent />
         </Suspense>
       </Box>
       <HeaderSelect<PoolI>
