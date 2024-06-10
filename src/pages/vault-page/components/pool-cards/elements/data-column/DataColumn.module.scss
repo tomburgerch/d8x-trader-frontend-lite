@@ -3,12 +3,24 @@
 .root {
   margin-bottom: 6 * $d8x-spacing;
 
-  .title {
+  .title,
+  .titleLink {
+    display: block;
     font-size: 16px;
     font-weight: 400;
     line-height: 20px;
-    color: var(--d8x-color-text-label-one);
     margin-bottom: 2 * $d8x-spacing;
+  }
+
+  .title {
+    color: var(--d8x-color-text-label-one);
+  }
+
+  .titleLink {
+    color: var(--d8x-color-action);
+    margin-bottom: $d8x-spacing;
+    text-decoration: underline;
+    text-decoration-style: dotted;
   }
 
   .itemLine {
@@ -22,7 +34,8 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
   .root {
-    .title {
+    .title,
+    .titleLink {
       font-size: 12px;
       line-height: 14px;
       margin-bottom: $d8x-spacing;
@@ -38,7 +51,8 @@
 
 @media screen and ($d8x-breakpoint-max-lg) and ($d8x-breakpoint-min-sm) {
   .root {
-    .title {
+    .title,
+    .titleLink {
       font-size: 14px;
       line-height: 16px;
       margin-bottom: 2 * $d8x-spacing;

@@ -103,7 +103,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       <div className={styles.header}>
         <div className={styles.logo}>
           <Suspense fallback={null}>
-            <IconComponent width={56} height={56} />
+            <IconComponent width={80} height={80} />
           </Suspense>
         </div>
         <div className={styles.symbol}>
@@ -112,7 +112,11 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       </div>
       <div className={styles.content}>
         <DataColumn title={t('pages.vault.pool-card.yields.title')} items={yieldData} />
-        <DataColumn title={t('pages.vault.pool-card.boosts.title')} items={boostsData} />
+        <DataColumn
+          title={t('pages.vault.pool-card.boosts.title')}
+          titleLink="https://turtle.club/dashboard/?ref=D8X"
+          items={boostsData}
+        />
       </div>
       <div className={styles.action}>
         <Button onClick={handleClick} className={styles.button} variant="primary">
