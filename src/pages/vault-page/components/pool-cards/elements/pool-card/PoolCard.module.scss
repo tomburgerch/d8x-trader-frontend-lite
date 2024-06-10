@@ -26,9 +26,10 @@
 .content {
   display: flex;
   flex: 1;
-  gap: 6 * $d8x-spacing;
+  gap: 14 * $d8x-spacing;
 
   @include media-phone {
     flex-direction: column;
+    gap: $d8x-spacing;
   }
 }
