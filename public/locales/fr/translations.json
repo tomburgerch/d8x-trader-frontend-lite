@@ -376,16 +376,16 @@
       "title": "Tradez et ajoutez de la liquidité pour BOOSTER votre Airdrop de $D8X",
       "invite-friends": "Parrainage",
       "boosted-volume": {
-        "title": "Volume BOOSTÉ",
-        "modal-text": "L'Airdrop $D8X est calculé en fonction du volume BOOSTÉ. Le volume BOOSTÉ est la somme du volume de transactions BOOSTÉ et du volume de liquidité BOOSTÉ."
+        "title": "Points D8X",
+        "modal-text": "L'Airdrop $D8X est calculé en fonction des Points D8X. Les points D8X sont la somme des points du trading et des points de liquidité."
       },
       "trade-volume": {
-        "title": "Volume de transactions BOOSTÉ",
-        "modal-text": "Pour chaque transaction, nous calculons volume x boost. Le volume boosté est la somme de celui-ci."
+        "title": "Points du Trading",
+        "modal-text": "Pour chaque transaction, nous calculons volume x boost. Les points du trading sont la somme de celui-ci."
       },
       "trade-last-increase": {
-        "title": "Dernière augmentation",
-        "modal-text": "Le montant que le volume BOOSTÉ a augmenté par rapport à votre dernière transaction. LFG!"
+        "title": "Points gagnés lors du dernier trade",
+        "modal-text": "Le montant que les Points du Trading ont augmentés par rapport à votre dernière transaction. LFG!"
       },
       "trade-boost": {
         "title": "Boost des trades",
@@ -398,12 +398,12 @@
         "random": "Fortune Boost:"
       },
       "liquidity-volume": {
-        "title": "Liquidité BOOSTÉE",
-        "modal-text": "Plus longtemps vous laissez votre liquidité dans les pools, plus votre volume de liquidité BOOSTÉ est élevé. Sur 24 heures, votre liquidité BOOSTÉ peut augmenter jusqu'à Liquidité x Liquidité Boost."
+        "title": "Points de Liquidité",
+        "modal-text": "Plus longtemps vous laissez votre liquidité dans les pools, plus des points de liquidité vous gagnez. Sur 24 heures, vos poitns de liquidité peuvent augmenter jusqu'à Liquidité x Liquidité Boost."
       },
       "trade-hourly-increase": {
-        "title": "Augmentation horaire",
-        "modal-text": "Augmentation horaire de la Liquidité BOOSTÉE"
+        "title": "Points que vous gagnez par heure",
+        "modal-text": "Augmentation horaire des Points de Liquidité"
       },
       "liquidity-boost": {
         "title": "Boost de la liquidité",

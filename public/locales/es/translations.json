@@ -376,16 +376,16 @@
       "title": "Participa en el comercio y añade liquidez para IMPULSAR tu bolsa de Airdrop de $D8X",
       "invite-friends": "Referir",
       "boosted-volume": {
-        "title": "Volumen IMPULSADO",
-        "modal-text": "El Airdrop de $D8X se calcula en función del volumen IMPULSADO. Para cada operación calculamos el volumen x el impulso. El volumen IMPULSADO es la suma de todos estos volumenes."
+        "title": "Puntos D8X",
+        "modal-text": "El Airdrop de $D8X se calcula en función de los puntos D8X. Puntos D8X = Puntos de operación + Puntos Liquidez."
       },
       "trade-volume": {
-        "title": "Volumen IMPULSADO por Comercio",
-        "modal-text": "Cada vez que participes en el comercio calculamos el valor de Volumen x Trade Boost. El Volumen IMPULSADO por Comercio consiste de la suma de estos valores sobre todas tus acciones, comercio y liquidez."
+        "title": "Puntos de operación",
+        "modal-text": "Cada vez que participes en el comercio calculamos el valor de Volumen x Trade Boost. Los Puntos de operación consisten en la suma de estos valores sobre todas tus acciones comercio."
       },
       "trade-last-increase": {
-        "title": "Ultimo incremento",
-        "modal-text": "El incremento de tu volumen IMPULSADO desde tu ultima accion en el comercio. LFG!"
+        "title": "Puntos ganados en la última operación",
+        "modal-text": "La cantidad de puntos comerciales aumentados desde tu última operación. LFG!"
       },
       "trade-boost": {
         "title": "Impulso por Comercio",
@@ -398,12 +398,12 @@
         "random": "Impulso por Fortuna:"
       },
       "liquidity-volume": {
-        "title": "Volumen por Liquidez IMPULSADO",
-        "modal-text": "Tu volumen por liquidez IMPULSADA crece mientras mantengas tu liquidez en la boveda. Cada 24 horas tu volumen por Liquidez IMPULSADA puede crecer hasta Liquidez x Impulso por Liquidez"
+        "title": "Puntos de liquidez",
+        "modal-text": "Cuanto más tiempo mantengas tu liquidez en los pools, más puntos de liquidez ganarás. En un período de 24 horas, tus puntos de liquidez pueden aumentar hasta Liquidez x Aumento de Liquidez."
       },
       "trade-hourly-increase": {
-        "title": "Incremento",
-        "modal-text": "Incremento por hora de la liquidez IMPULSADA"
+        "title": "Puntos que ganas por hora",
+        "modal-text": "Incremento por hora de los puntos de liquidez."
       },
       "liquidity-boost": {
         "title": "Impulso por Liquidez",
