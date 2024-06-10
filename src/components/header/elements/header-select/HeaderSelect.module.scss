@@ -22,8 +22,8 @@
   background-color: var(--d8x-color-background-icon);
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -91,7 +91,14 @@
   color: var(--d8x-color-text-main);
 
   .label {
+    display: flex;
     font-weight: bold;
+    align-items: center;
+    gap: 2 * $d8x-spacing;
+
+    > span {
+      margin-bottom: -$d8x-spacing;
+    }
   }
 
   .value {

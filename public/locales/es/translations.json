@@ -516,6 +516,24 @@
           "info2": "Si no retiras tus fondos dentro de seis dias luego de haber iniciado el proceso, cualquier persona puede ejecutar el retiro por ti. En este caso, los fondos son enviados a tu cartera, y el ejector recibe una pequena comision pagada desde tus fondos."
         }
       },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
+      },
       "global-stats": {
         "apy": "TAE hasta la fecha",
         "tvl": "Reservas Totales",
