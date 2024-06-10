@@ -136,6 +136,8 @@ export const BoostStationBlock = memo(() => {
                 <InfoLabelBlock
                   title={t('pages.boost-station.trade-volume.title')}
                   content={<Typography>{t('pages.boost-station.trade-volume.modal-text')}</Typography>}
+                  labelClassname={styles.labelAlignment}
+                  titleClassname={styles.titleAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -147,6 +149,8 @@ export const BoostStationBlock = memo(() => {
                 <InfoLabelBlock
                   title={t('pages.boost-station.trade-last-increase.title')}
                   content={<Typography>{t('pages.boost-station.trade-last-increase.modal-text')}</Typography>}
+                  labelClassname={styles.labelAlignment}
+                  titleClassname={styles.titleAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -177,6 +181,8 @@ export const BoostStationBlock = memo(() => {
                     </ol>
                   </Typography>
                 }
+                labelClassname={styles.labelAlignment}
+                titleClassname={styles.titleAlignment}
               />
             </div>
             <BoostMeter totalBoost={totalBoost} />
@@ -204,6 +210,8 @@ export const BoostStationBlock = memo(() => {
                 <InfoLabelBlock
                   title={t('pages.boost-station.liquidity-volume.title')}
                   content={<Typography>{t('pages.boost-station.liquidity-volume.modal-text')}</Typography>}
+                  labelClassname={styles.labelAlignment}
+                  titleClassname={styles.titleAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -215,6 +223,8 @@ export const BoostStationBlock = memo(() => {
                 <InfoLabelBlock
                   title={t('pages.boost-station.trade-hourly-increase.title')}
                   content={<Typography>{t('pages.boost-station.trade-hourly-increase.modal-text')}</Typography>}
+                  labelClassname={styles.labelAlignment}
+                  titleClassname={styles.titleAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -233,6 +243,8 @@ export const BoostStationBlock = memo(() => {
                     })}
                   </Typography>
                 }
+                labelClassname={styles.labelAlignment}
+                titleClassname={styles.titleAlignment}
               />
             </div>
             <div className={styles.meterHolder}>
