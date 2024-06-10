@@ -7,8 +7,8 @@ import { Typography } from '@mui/material';
 
 import D8XLogoWithText from 'assets/logos/d8xLogoWithText.svg?react';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
-import { getBoostStationData, getBoostStationParameters } from 'network/network';
-import type { BoostI, BoostStationResponseI, BoostStationParamResponseI } from 'types/types';
+import { getBoostRank, getBoostStationData, getBoostStationParameters } from 'network/network';
+import type { BoostI, BoostStationResponseI, BoostStationParamResponseI, BoostRankResponseI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -22,9 +22,11 @@ export const BoostStationBlock = memo(() => {
   const { t } = useTranslation();
 
   const [boostStation, setBoostStation] = useState<BoostStationResponseI>();
+  const [boostRank, setBoostRank] = useState<BoostRankResponseI>();
   const [boosts, setBoosts] = useState<BoostI[]>([]);
   const [boostStationParams, setBoostStationParams] = useState<BoostStationParamResponseI>();
 
+  const isRankRequestSent = useRef(false);
   const isDataRequestSent = useRef(false);
   const isParamsRequestSent = useRef(false);
 
@@ -47,12 +49,30 @@ export const BoostStationBlock = memo(() => {
       });
   }, [isConnected, address, chainId]);
 
+  const fetchRankData = useCallback(() => {
+    if (isRankRequestSent.current || !isConnected || !address || !isEnabledChain(chainId)) {
+      return;
+    }
+
+    isRankRequestSent.current = true;
+
+    getBoostRank(address)
+      .then((response) => {
+        setBoostRank(response);
+      })
+      .finally(() => {
+        isRankRequestSent.current = false;
+      });
+  }, [isConnected, address, chainId]);
+
   useEffect(() => {
     setBoostStation(undefined);
+    setBoostRank(undefined);
     setBoosts([]);
 
     fetchData();
-  }, [fetchData]);
+    fetchRankData();
+  }, [fetchData, fetchRankData]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -84,16 +104,29 @@ export const BoostStationBlock = memo(() => {
       <Typography variant="h6" sx={{ mb: 2 }}>
         <D8XLogoWithText width={86} height={20} />
       </Typography>
-      <div>
-        <div className={styles.labelHolder}>
-          <InfoLabelBlock
-            title={t('pages.boost-station.boosted-volume.title')}
-            content={<Typography>{t('pages.boost-station.boosted-volume.modal-text')}</Typography>}
-          />
+      <div className={styles.volumes}>
+        <div key="points">
+          <div className={styles.labelHolder}>
+            <InfoLabelBlock
+              title={t('pages.boost-station.boosted-volume.title')}
+              content={<Typography>{t('pages.boost-station.boosted-volume.modal-text')}</Typography>}
+            />
+          </div>
+          <Typography variant="h4" className={styles.valueHolder}>
+            {boostStation ? formatNumber(boostStation.crossChainScore, 0) : '--'}
+          </Typography>
         </div>
-        <Typography variant="h4" className={styles.valueHolder}>
-          {boostStation ? formatNumber(boostStation.crossChainScore, 0) : '--'}
-        </Typography>
+        <div key="rank">
+          <div className={styles.labelHolder}>
+            <InfoLabelBlock
+              title={t('pages.boost-station.boosted-rank.title')}
+              content={<Typography>{t('pages.boost-station.boosted-rank.modal-text')}</Typography>}
+            />
+          </div>
+          <Typography variant="h4" className={styles.valueHolder}>
+            {boostRank ? `${boostRank.rank} / ${boostRank.outOf}` : '-- / --'}
+          </Typography>
+        </div>
       </div>
       <div className={styles.boostsHolder}>
         <div className={styles.boostBlock}>

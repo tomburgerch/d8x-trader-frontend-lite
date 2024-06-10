@@ -379,6 +379,10 @@
         "title": "Puntos D8X",
         "modal-text": "El Airdrop de $D8X se calcula en función de los puntos D8X. Puntos D8X = Puntos de operación + Puntos Liquidez."
       },
+      "boosted-rank": {
+        "title": "Rango",
+        "modal-text": "Tu rango / Total"
+      },
       "trade-volume": {
         "title": "Puntos de operación",
         "modal-text": "Cada vez que participes en el comercio calculamos el valor de Volumen x Trade Boost. Los Puntos de operación consisten en la suma de estos valores sobre todas tus acciones comercio."

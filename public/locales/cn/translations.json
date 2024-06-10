@@ -379,6 +379,10 @@
         "title": "D8X 积分",
         "modal-text": "$D8X 空投的计算基于 D8X 积分。D8X 积分是交易积分和流动性积分的总和。"
       },
+      "boosted-rank": {
+        "title": "排名",
+        "modal-text": "你的排名 / 总排名"
+      },
       "trade-volume": {
         "title": "交易积分",
         "modal-text": "对于每笔交易，我们计算交易量 x 交易加速倍数。交易积分是所有交易中加速后交易量的总和。"

@@ -379,6 +379,10 @@
         "title": "D8X Punkte",
         "modal-text": "Der $D8X Airdrop wird basierend auf D8X Punkten berechnet. D8X Punkte = Handlespunkte + Liquiditätspunkte."
       },
+      "boosted-rank": {
+        "title": "Rang",
+        "modal-text": "Ihr Rang / Total"
+      },
       "trade-volume": {
         "title": "Handelspunkte",
         "modal-text": "Für jeden Trade berechnen wir Handlesvolumen x Boost. Handelspunkte die Summe davon."

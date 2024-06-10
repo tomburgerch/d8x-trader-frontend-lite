@@ -11,6 +11,11 @@
   }
 }
 
+.volumes {
+  display: flex;
+  gap: 10 * $d8x-spacing;
+}
+
 .boostsHolder {
   display: flex;
 

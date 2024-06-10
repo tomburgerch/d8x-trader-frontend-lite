@@ -379,6 +379,10 @@
         "title": "D8X Points",
         "modal-text": "The $D8X Airdrop is calculated based on D8X Points. D8X Points is the sum of Trade Points and Liquidity Points."
       },
+      "boosted-rank": {
+        "title": "Rank",
+        "modal-text": "Your rank / Total"
+      },
       "trade-volume": {
         "title": "Trade Points",
         "modal-text": "For every trade we compute Volume x Trade Boost. Trade Points are the sum of it over all your trades."

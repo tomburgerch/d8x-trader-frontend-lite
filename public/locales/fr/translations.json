@@ -379,6 +379,10 @@
         "title": "Points D8X",
         "modal-text": "L'Airdrop $D8X est calculé en fonction des Points D8X. Les points D8X sont la somme des points du trading et des points de liquidité."
       },
+      "boosted-rank": {
+        "title": "Rang",
+        "modal-text": "Votre rang / Total"
+      },
       "trade-volume": {
         "title": "Points du Trading",
         "modal-text": "Pour chaque transaction, nous calculons volume x boost. Les points du trading sont la somme de celui-ci."

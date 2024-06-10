@@ -276,6 +276,14 @@ export interface BoostStationResponseI {
   poolVolBoost: PoolVolBoostI[];
 }
 
+export interface BoostRankResponseI {
+  addr: string;
+  score: number;
+  rank: number;
+  outOf: number;
+  Ts: number;
+}
+
 export interface BoostStationParamResponseI {
   rndBoostMax: number;
   volBoostMax: number;
