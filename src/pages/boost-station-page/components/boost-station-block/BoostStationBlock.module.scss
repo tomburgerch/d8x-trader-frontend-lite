@@ -40,6 +40,10 @@
 
   .longMetric {
     flex: 2;
+
+    @include media-phone {
+      flex: 1;
+    }
   }
 
   .shortMetric {
@@ -50,8 +54,7 @@
 .labelHolder {
   display: flex;
   justify-content: flex-start;
-  margin: 4 * $d8x-spacing 0 2 * $d8x-spacing;
-  min-height: 40px;
+  margin: 4 * $d8x-spacing 0;
 }
 
 .valueHolder {
@@ -80,11 +83,33 @@
 }
 
 .labelAlignment {
+  min-height: 30px;
   align-items: flex-start;
+
+  @include media-tablet {
+    min-height: 20px;
+  }
+
+  @include media-phone {
+    align-items: flex-end;
+    min-height: 40px;
+  }
 }
 
 .titleAlignment {
   margin-top: 5px;
+
+  @include media-phone {
+    margin-top: inherit;
+  }
+}
+
+@include media-phone {
+  .iconHolderAlignment {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: -2px;
+  }
 }
 
 @include media-desktop {

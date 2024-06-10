@@ -138,6 +138,7 @@ export const BoostStationBlock = memo(() => {
                   content={<Typography>{t('pages.boost-station.trade-volume.modal-text')}</Typography>}
                   labelClassname={styles.labelAlignment}
                   titleClassname={styles.titleAlignment}
+                  iconHolderClassname={styles.iconHolderAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -151,6 +152,7 @@ export const BoostStationBlock = memo(() => {
                   content={<Typography>{t('pages.boost-station.trade-last-increase.modal-text')}</Typography>}
                   labelClassname={styles.labelAlignment}
                   titleClassname={styles.titleAlignment}
+                  iconHolderClassname={styles.iconHolderAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -181,8 +183,6 @@ export const BoostStationBlock = memo(() => {
                     </ol>
                   </Typography>
                 }
-                labelClassname={styles.labelAlignment}
-                titleClassname={styles.titleAlignment}
               />
             </div>
             <BoostMeter totalBoost={totalBoost} />
@@ -212,6 +212,7 @@ export const BoostStationBlock = memo(() => {
                   content={<Typography>{t('pages.boost-station.liquidity-volume.modal-text')}</Typography>}
                   labelClassname={styles.labelAlignment}
                   titleClassname={styles.titleAlignment}
+                  iconHolderClassname={styles.iconHolderAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -225,6 +226,7 @@ export const BoostStationBlock = memo(() => {
                   content={<Typography>{t('pages.boost-station.trade-hourly-increase.modal-text')}</Typography>}
                   labelClassname={styles.labelAlignment}
                   titleClassname={styles.titleAlignment}
+                  iconHolderClassname={styles.iconHolderAlignment}
                 />
               </div>
               <Typography variant="h6" className={styles.valueHolder}>
@@ -243,8 +245,6 @@ export const BoostStationBlock = memo(() => {
                     })}
                   </Typography>
                 }
-                labelClassname={styles.labelAlignment}
-                titleClassname={styles.titleAlignment}
               />
             </div>
             <div className={styles.meterHolder}>
