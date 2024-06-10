@@ -11,6 +11,11 @@
   }
 }
 
+.volumes {
+  display: flex;
+  gap: 14 * $d8x-spacing;
+}
+
 .boostsHolder {
   display: flex;
 
@@ -31,6 +36,7 @@
 
 .metricsBlock {
   display: flex;
+  align-items: flex-start;
 
   .longMetric {
     flex: 2;
@@ -44,7 +50,8 @@
 .labelHolder {
   display: flex;
   justify-content: flex-start;
-  margin: 4 * $d8x-spacing 0;
+  margin: 4 * $d8x-spacing 0 2 * $d8x-spacing;
+  min-height: 40px;
 }
 
 .valueHolder {
@@ -70,6 +77,14 @@
     display: flex;
     gap: $d8x-spacing * 1;
   }
+}
+
+.labelAlignment {
+  align-items: flex-start;
+}
+
+.titleAlignment {
+  margin-top: 5px;
 }
 
 @include media-desktop {

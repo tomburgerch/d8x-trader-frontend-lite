@@ -376,16 +376,20 @@
       "title": "Tradez et ajoutez de la liquidité pour BOOSTER votre Airdrop de $D8X",
       "invite-friends": "Parrainage",
       "boosted-volume": {
-        "title": "Volume BOOSTÉ",
-        "modal-text": "L'Airdrop $D8X est calculé en fonction du volume BOOSTÉ. Le volume BOOSTÉ est la somme du volume de transactions BOOSTÉ et du volume de liquidité BOOSTÉ."
+        "title": "Points D8X",
+        "modal-text": "L'Airdrop $D8X est calculé en fonction des Points D8X. Les points D8X sont la somme des points du trading et des points de liquidité."
+      },
+      "boosted-rank": {
+        "title": "Rang",
+        "modal-text": "Votre rang / Total"
       },
       "trade-volume": {
-        "title": "Volume de transactions BOOSTÉ",
-        "modal-text": "Pour chaque transaction, nous calculons volume x boost. Le volume boosté est la somme de celui-ci."
+        "title": "Points du Trading",
+        "modal-text": "Pour chaque transaction, nous calculons volume x boost. Les points du trading sont la somme de celui-ci."
       },
       "trade-last-increase": {
-        "title": "Dernière augmentation",
-        "modal-text": "Le montant que le volume BOOSTÉ a augmenté par rapport à votre dernière transaction. LFG!"
+        "title": "Points gagnés lors du dernier trade",
+        "modal-text": "Le montant que les Points du Trading ont augmentés par rapport à votre dernière transaction. LFG!"
       },
       "trade-boost": {
         "title": "Boost des trades",
@@ -398,12 +402,12 @@
         "random": "Fortune Boost:"
       },
       "liquidity-volume": {
-        "title": "Liquidité BOOSTÉE",
-        "modal-text": "Plus longtemps vous laissez votre liquidité dans les pools, plus votre volume de liquidité BOOSTÉ est élevé. Sur 24 heures, votre liquidité BOOSTÉ peut augmenter jusqu'à Liquidité x Liquidité Boost."
+        "title": "Points de Liquidité",
+        "modal-text": "Plus longtemps vous laissez votre liquidité dans les pools, plus des points de liquidité vous gagnez. Sur 24 heures, vos poitns de liquidité peuvent augmenter jusqu'à Liquidité x Liquidité Boost."
       },
       "trade-hourly-increase": {
-        "title": "Augmentation horaire",
-        "modal-text": "Augmentation horaire de la Liquidité BOOSTÉE"
+        "title": "Points que vous gagnez par heure",
+        "modal-text": "Augmentation horaire des Points de Liquidité"
       },
       "liquidity-boost": {
         "title": "Boost de la liquidité",
@@ -515,6 +519,24 @@
           "info1": "Vous pouvez retirer votre liquidité deux jours après avoir initié le retrait.",
           "info2": "Si vous ne retirez pas vos fonds dans les quatre jours après qu'ils soient prêts à être retirés, n'importe qui peut exécuter le retrait en votre nom. Dans ce cas, les fonds sont envoyés à votre adresse, et l'exécuteur gagnera une petite commission prélevée sur vos fonds."
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "APY Total",
@@ -713,6 +735,8 @@
     "account-button": "Compte",
     "currency-label": "Devise",
     "amount-label": "Montant",
+    "close-button": "Fermer",
+    "cancel-button": "Annuler",
     "address-label": "Adresse",
     "deposit-gas": "Déposer du gaz",
     "max": "Max:",
@@ -739,6 +763,7 @@
       "header-to": "Bridge in",
       "header-from": "Bridge out"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "Par page"
     },
@@ -825,6 +850,7 @@
         "header": "Choisir un marché",
         "crypto": "Crypto",
         "fx": "Devises",
+        "all": "Tout",
         "commodity": "Matières premières",
         "closed": "Fermé"
       },

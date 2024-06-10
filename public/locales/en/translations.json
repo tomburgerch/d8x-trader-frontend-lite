@@ -376,16 +376,20 @@
       "title": "Trade and provide liquidity to BOOST your $D8X Airdrop",
       "invite-friends": "Refer",
       "boosted-volume": {
-        "title": "BOOSTED Volume",
-        "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
+        "title": "D8X Points",
+        "modal-text": "The $D8X Airdrop is calculated based on D8X Points. D8X Points is the sum of Trade Points and Liquidity Points."
+      },
+      "boosted-rank": {
+        "title": "Rank",
+        "modal-text": "Your rank / Total"
       },
       "trade-volume": {
-        "title": "BOOSTED Trade Volume",
-        "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
+        "title": "Trade Points",
+        "modal-text": "For every trade we compute Volume x Trade Boost. Trade Points are the sum of it over all your trades."
       },
       "trade-last-increase": {
-        "title": "Last change",
-        "modal-text": "The amount BOOSTED Trade Volume increased from your last trade. LFG!"
+        "title": "Points earned from last trade",
+        "modal-text": "The amount Trade Points increased from your last trade. LFG!"
       },
       "trade-boost": {
         "title": "Trade Boost",
@@ -398,12 +402,12 @@
         "random": "Fortune boost:"
       },
       "liquidity-volume": {
-        "title": "BOOSTED Liquidity Volume",
-        "modal-text": "The longer you keep your liquidity in the pools, the higher your BOOSTED Liquidity volume. Over 24 hours your BOOSTED Liquidity volume can increase up to Liquidity x Liquidity Boost."
+        "title": "Liquidity Points",
+        "modal-text": "The longer you keep your liquidity in the pools, the more Liquidity Points you earn. Over 24 hours your Liquidity Points can increase up to Liquidity x Liquidity Boost."
       },
       "trade-hourly-increase": {
-        "title": "Hourly change",
-        "modal-text": "Hourly increase of BOOSTED Liquidity"
+        "title": "Points you earn per hour",
+        "modal-text": "Hourly increase of your Liquidity Points"
       },
       "liquidity-boost": {
         "title": "Liquidity Boost",
@@ -515,6 +519,24 @@
           "info1": "You can withdraw your liquidity two days after initializing withdrawal.",
           "info2": "If you do not withdraw your funds within four days after they are ready to be withdrawn, anyone can execute the withdrawal on your behalf. In this case the funds are sent to your address, and the executor will earn a small fee paid out of your funds."
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "All Time APY",
@@ -828,6 +850,7 @@
         "header": "Choose Market",
         "crypto": "Crypto",
         "fx": "FX",
+        "all": "All",
         "commodity": "Commodity",
         "closed": "Closed"
       },

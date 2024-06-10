@@ -376,16 +376,20 @@
       "title": "Participa en el comercio y añade liquidez para IMPULSAR tu bolsa de Airdrop de $D8X",
       "invite-friends": "Referir",
       "boosted-volume": {
-        "title": "Volumen IMPULSADO",
-        "modal-text": "El Airdrop de $D8X se calcula en función del volumen IMPULSADO. Para cada operación calculamos el volumen x el impulso. El volumen IMPULSADO es la suma de todos estos volumenes."
+        "title": "Puntos D8X",
+        "modal-text": "El Airdrop de $D8X se calcula en función de los puntos D8X. Puntos D8X = Puntos de operación + Puntos Liquidez."
+      },
+      "boosted-rank": {
+        "title": "Rango",
+        "modal-text": "Tu rango / Total"
       },
       "trade-volume": {
-        "title": "Volumen IMPULSADO por Comercio",
-        "modal-text": "Cada vez que participes en el comercio calculamos el valor de Volumen x Trade Boost. El Volumen IMPULSADO por Comercio consiste de la suma de estos valores sobre todas tus acciones, comercio y liquidez."
+        "title": "Puntos de operación",
+        "modal-text": "Cada vez que participes en el comercio calculamos el valor de Volumen x Trade Boost. Los Puntos de operación consisten en la suma de estos valores sobre todas tus acciones comercio."
       },
       "trade-last-increase": {
-        "title": "Ultimo incremento",
-        "modal-text": "El incremento de tu volumen IMPULSADO desde tu ultima accion en el comercio. LFG!"
+        "title": "Puntos ganados en la última operación",
+        "modal-text": "La cantidad de puntos comerciales aumentados desde tu última operación. LFG!"
       },
       "trade-boost": {
         "title": "Impulso por Comercio",
@@ -398,12 +402,12 @@
         "random": "Impulso por Fortuna:"
       },
       "liquidity-volume": {
-        "title": "Volumen por Liquidez IMPULSADO",
-        "modal-text": "Tu volumen por liquidez IMPULSADA crece mientras mantengas tu liquidez en la boveda. Cada 24 horas tu volumen por Liquidez IMPULSADA puede crecer hasta Liquidez x Impulso por Liquidez"
+        "title": "Puntos de liquidez",
+        "modal-text": "Cuanto más tiempo mantengas tu liquidez en los pools, más puntos de liquidez ganarás. En un período de 24 horas, tus puntos de liquidez pueden aumentar hasta Liquidez x Aumento de Liquidez."
       },
       "trade-hourly-increase": {
-        "title": "Incremento",
-        "modal-text": "Incremento por hora de la liquidez IMPULSADA"
+        "title": "Puntos que ganas por hora",
+        "modal-text": "Incremento por hora de los puntos de liquidez."
       },
       "liquidity-boost": {
         "title": "Impulso por Liquidez",
@@ -515,6 +519,24 @@
           "info1": "Puedes retirar tus fondos dos dias despues de haber iniciado el proceso.",
           "info2": "Si no retiras tus fondos dentro de seis dias luego de haber iniciado el proceso, cualquier persona puede ejecutar el retiro por ti. En este caso, los fondos son enviados a tu cartera, y el ejector recibe una pequena comision pagada desde tus fondos."
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "TAE hasta la fecha",
@@ -713,6 +735,8 @@
     "account-button": "Cuenta",
     "currency-label": "Divisa",
     "amount-label": "Cantidad",
+    "close-button": "Cerca",
+    "cancel-button": "Cancelar",
     "address-label": "Direccion",
     "deposit-gas": "Deposite gasolina",
     "max": "Max:",
@@ -739,6 +763,7 @@
       "header-to": "Bridge in",
       "header-from": "Bridge out"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "Por página"
     },
@@ -825,6 +850,7 @@
         "header": "Escoger Mercado",
         "crypto": "Cripto",
         "fx": "FX",
+        "all": "Todos",
         "commodity": "Productos Basicos",
         "closed": "Cerrado"
       },

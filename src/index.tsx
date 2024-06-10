@@ -23,6 +23,7 @@ import { RainbowKitProviderWrapper } from './RainbowKitProviderWrapper';
 import './i18n';
 import './polyfills';
 
+import '@splidejs/react-splide/css';
 import '@rainbow-me/rainbowkit/styles.css';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/index.scss';

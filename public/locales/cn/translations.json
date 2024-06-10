@@ -376,38 +376,42 @@
       "title": "交易并提供流动性以加速您的 $D8X 空投",
       "invite-friends": "邀请返佣",
       "boosted-volume": {
-        "title": "加速后的总量",
-        "modal-text": "$D8X 空投的计算基于加速后的总量。加速后的总量=加速后的交易量+加速后的流动性提供量"
+        "title": "D8X 积分",
+        "modal-text": "$D8X 空投的计算基于 D8X 积分。D8X 积分是交易积分和流动性积分的总和。"
+      },
+      "boosted-rank": {
+        "title": "排名",
+        "modal-text": "你的排名 / 总排名"
       },
       "trade-volume": {
-        "title": "加速后的交易量",
-        "modal-text": "对于每笔交易，我们计算实际交易量 x 加速倍数。加速后的交易量是您所有笔加速后交易量的总和。"
+        "title": "交易积分",
+        "modal-text": "对于每笔交易，我们计算交易量 x 交易加速倍数。交易积分是所有交易中加速后交易量的总和。"
       },
       "trade-last-increase": {
-        "title": "最后一次交易量【加速后】",
-        "modal-text": "您上一次的交易量【加速后】。让我们开始吧！"
+        "title": "上次交易获得的积分",
+        "modal-text": "您上一次交易增加的交易积分。让我们开始吧！"
       },
       "trade-boost": {
-        "title": "交易加速倍数",
-        "modal-text": "交易加速倍数适用于您的下一笔交易。加速范围从1倍到{{totalBoostMax}}倍，分为两部分：",
-        "modal-text2": "基础交易量加速 - 您过去7天的交易量可能为您获得从1倍到{{volBoostMax}}倍的交易量加速。交易越多，潜在的加速越高！",
-        "modal-text3": "额外幸运加速 - 每笔交易都有机会获得幸运加速——一个可以从0倍飙升至{{rndBoostMax}}倍的奖励！"
+        "title": "交易加速",
+        "modal-text": "交易加速适用于您的下一笔交易。加速范围从 1x 到 {{totalBoostMax}}x，分为两部分：",
+        "modal-text2": "交易量加速 - 您过去 7 天的交易量可能为您获得从 1x 到 {{volBoostMax}}x 的交易量加速。交易越多，潜在的加速越高！",
+        "modal-text3": "幸运加速 - 每笔交易都有机会获得幸运加速——一个可以从 0x 飙升至惊人的 {{rndBoostMax}}x 的奖励！"
       },
       "boost": {
-        "volume": "基于真实交易量的加速：",
-        "random": "随机加速："
+        "volume": "交易量加速：",
+        "random": "幸运加速："
       },
       "liquidity-volume": {
-        "title": "加速后的流动性提供量",
-        "modal-text": "您在池子中保持流动性的时间越长，您的分数就越高。超过24小时，您的加速后流动性提供量=实际流动性提供量 x 加速倍数。"
+        "title": "流动性积分",
+        "modal-text": "您在池子中保持流动性的时间越长，您的流动性积分就越高。超过 24 小时，您的流动性积分可以增加到实际流动性 x 流动性加速倍数。"
       },
       "trade-hourly-increase": {
-        "title": "每小时变化量",
-        "modal-text": "加速后的流动性提供的变化量"
+        "title": "每小时获得的积分",
+        "modal-text": "流动性积分的每小时增加量"
       },
       "liquidity-boost": {
-        "title": "流动性提供的加速倍数",
-        "modal-text": "这是应用于您提供的流动性的加速倍数。【这个加速倍数可能会随着时间变化。】"
+        "title": "流动性加速",
+        "modal-text": "流动性加速显示应用于您提供的流动性的加速倍数。这个加速倍数可能会随着时间变化。"
       }
     },
     "refer": {
@@ -515,6 +519,24 @@
           "info1": "您可以在发起提现的2天后提取流动性。",
           "info2": "如果您在准备提现后的4天内未提取资金，任何人都可以代表您执行提现。在这种情况下，资金将发送到您的地址，执行人将从您的资金中赚取少量费用。"
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "实时APY",
@@ -712,6 +734,8 @@
     "wallet-connect": "连接",
     "account-button": "账户",
     "currency-label": "货币",
+    "close-button": "关闭",
+    "cancel-button": "取消",
     "amount-label": "数量",
     "address-label": "地址",
     "deposit-gas": "存入燃料",
@@ -739,6 +763,7 @@
       "header-to": "跨链转入",
       "header-from": "跨链转出"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "每页"
     },
@@ -825,6 +850,7 @@
         "header": "选择市场",
         "crypto": "加密货币",
         "fx": "外汇",
+        "all": "所有",
         "commodity": "大宗商品",
         "closed": "休市"
       },

@@ -1,10 +1,9 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
-import { AttachMoneyOutlined } from '@mui/icons-material';
 import { Box, MenuItem, useMediaQuery, useTheme } from '@mui/material';
 
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
@@ -12,7 +11,8 @@ import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
-import type { PoolI } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
+import type { PoolI, TemporaryAnyT } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 import type { SelectItemI } from '../header-select/types';
@@ -27,6 +27,26 @@ const OptionsHeader = () => {
       <Box className={styles.leftLabel}>{t('common.select.collateral.headers.collateral')}</Box>
       <Box className={styles.rightLabel}>{t('common.select.collateral.headers.num-of-perps')}</Box>
     </MenuItem>
+  );
+};
+
+interface MenuOptionPropsI {
+  pool: PoolI;
+}
+
+const MenuOption = ({ pool }: MenuOptionPropsI) => {
+  const IconComponent = getDynamicLogo(pool.poolSymbol.toLowerCase()) as TemporaryAnyT;
+
+  return (
+    <Box className={styles.optionHolder}>
+      <Box className={styles.label}>
+        <Suspense fallback={null}>
+          <IconComponent width={16} height={16} />
+        </Suspense>
+        <span>{pool.poolSymbol}</span>
+      </Box>
+      <Box className={styles.value}>{pool.perpetuals.filter(({ state }) => state === 'NORMAL').length}</Box>
+    </Box>
   );
 };
 
@@ -91,10 +111,14 @@ export const CollateralsSelect = memo(() => {
     return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
+  const IconComponent = getDynamicLogo(selectedPool?.poolSymbol.toLowerCase() ?? '') as TemporaryAnyT;
+
   return (
     <Box className={styles.holderRoot}>
       <Box className={styles.iconWrapper}>
-        <AttachMoneyOutlined />
+        <Suspense fallback={null}>
+          <IconComponent />
+        </Suspense>
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
@@ -108,17 +132,12 @@ export const CollateralsSelect = memo(() => {
         renderLabel={(value) => value.poolSymbol}
         renderOption={(option) =>
           isMobileScreen ? (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
               {option.item.poolSymbol}
             </option>
           ) : (
             <MenuItem key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
-              <Box className={styles.optionHolder}>
-                <Box className={styles.label}>{option.item.poolSymbol}</Box>
-                <Box className={styles.value}>
-                  {option.item.perpetuals.filter(({ state }) => state === 'NORMAL').length}
-                </Box>
-              </Box>
+              <MenuOption pool={option.item} />
             </MenuItem>
           )
         }

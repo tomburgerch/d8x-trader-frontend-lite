@@ -24,11 +24,19 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
+import {
+  dCurrencyPriceAtom,
+  sdkConnectedAtom,
+  triggerAddInputFocusAtom,
+  triggerUserStatsUpdateAtom,
+} from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './Action.module.scss';
+
+const ADD_INPUT_FIELD_ID = 'add-amount-size';
+const DELAY_FOR_SCROLL = 100;
 
 enum ValidityCheckAddE {
   Empty = '-',
@@ -56,6 +64,7 @@ export const Add = memo(() => {
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
+  const triggerAddInputFocus = useAtomValue(triggerAddInputFocusAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
 
@@ -68,6 +77,7 @@ export const Add = memo(() => {
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
+  const triggerFocusStateRef = useRef(true);
 
   const handleInputCapture = useCallback((orderSizeValue: string) => {
     if (orderSizeValue) {
@@ -317,6 +327,20 @@ export const Add = memo(() => {
     approvalCompleted,
   ]);
 
+  useEffect(() => {
+    if (triggerFocusStateRef.current === triggerAddInputFocus) {
+      return;
+    }
+
+    triggerFocusStateRef.current = triggerAddInputFocus;
+
+    document.getElementById(ADD_INPUT_FIELD_ID)?.focus();
+    setTimeout(() => {
+      document.getElementById(ADD_INPUT_FIELD_ID)?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById(ADD_INPUT_FIELD_ID)?.focus();
+    }, DELAY_FOR_SCROLL);
+  }, [triggerAddInputFocus]);
+
   const handleButtonClick = () => {
     if (isMultisigAddress && !approvalCompleted) {
       handleApprove();
@@ -347,7 +371,7 @@ export const Add = memo(() => {
             />
           </div>
           <ResponsiveInput
-            id="add-amount-size"
+            id={ADD_INPUT_FIELD_ID}
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}

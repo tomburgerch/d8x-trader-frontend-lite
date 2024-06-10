@@ -72,3 +72,9 @@ input[type='number']:focus {
   -moz-appearance: textfield;
 }
 */
+
+/* Modify styles for splide */
+.splide__pagination {
+  margin-top: $d8x-spacing;
+  bottom: inherit;
+}

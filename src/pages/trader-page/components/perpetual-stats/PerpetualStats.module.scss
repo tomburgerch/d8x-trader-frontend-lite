@@ -57,16 +57,50 @@
   margin-bottom: calc($d8x-spacing / 2);
 }
 
-.statMainValue {
-  font-size: 1rem;
-  color: var(--d8x-color-text-highlight);
+.statMainValuePositiveMobile {
+  font-size: 1.3rem;
+  color: var(--d8x-color-text-buy);
   white-space: nowrap;
   font-weight: 600;
+}
+
+.statMainValueNegativeMobile {
+  font-size: 1.3rem;
+  color: var(--d8x-color-text-sell);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.statMainValuePositive {
+  font-size: 32px;
+  color: var(--d8x-color-text-buy);
+  font-weight: 600;
+}
+
+.statMainValueNegative {
+  font-size: 32px;
+  color: var(--d8x-color-text-sell);
+  font-weight: 600;
+}
+
+.statMainValuePositiveTablet {
+  font-size: 28px;
+  color: var(--d8x-color-text-buy);
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.statMainValueNegativeTablet {
+  font-size: 28px;
+  color: var(--d8x-color-text-sell);
+  font-weight: 600;
+  line-height: 24px;
 }
 
 .statsBlock {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end; 
 }
 
 .statLabel {

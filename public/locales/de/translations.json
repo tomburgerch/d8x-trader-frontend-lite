@@ -376,16 +376,20 @@
       "title": "Handle und füge Liquidität hinzu um deinen $D8X Airdrop Bag zu BOOSTEN",
       "invite-friends": "Empfehlen",
       "boosted-volume": {
-        "title": "GEBOOSTETES Volumen",
-        "modal-text": "Der $D8X Airdrop wird basierend auf dem GEBOOSTETEN Volumen berechnet. Geboostetes Volumen ist die Summe des geboosteten Handelsvolumen und des geboosteten Liquiditätsvolumen."
+        "title": "D8X Punkte",
+        "modal-text": "Der $D8X Airdrop wird basierend auf D8X Punkten berechnet. D8X Punkte = Handlespunkte + Liquiditätspunkte."
+      },
+      "boosted-rank": {
+        "title": "Rang",
+        "modal-text": "Ihr Rang / Total"
       },
       "trade-volume": {
-        "title": "GEBOOSTES Handelsvolumen",
-        "modal-text": "Für jeden Trade berechnen wir Handlesvolumen x Boost. Das geboostete Handelsvolumen ist die Summe davon."
+        "title": "Handelspunkte",
+        "modal-text": "Für jeden Trade berechnen wir Handlesvolumen x Boost. Handelspunkte die Summe davon."
       },
       "trade-last-increase": {
-        "title": "Letzer Anstieg",
-        "modal-text": "Der letze Anstieg des geboosteten Handelsvolumen. LFG!"
+        "title": "Handelspunkte die du mit deinem letzten Trade verdient hast",
+        "modal-text": "Der letze Anstieg deiner Handelspunkte. LFG!"
       },
       "trade-boost": {
         "title": "Handels Boost",
@@ -398,12 +402,12 @@
         "random": "Fortune Boost:"
       },
       "liquidity-volume": {
-        "title": "GEBOOSTETES Liquiditätsvolumen",
-        "modal-text": "Je länger deine Liquidität in den Pools ist, desto höher ist dein GEBOOSTES Liquiditätsvolumen. Innerhalb von 24 Stunden kann sich dein GEBOOSTES Liquiditätsvolumen auf bis zu Liquidität x Liquiditätsschub erhöhen."
+        "title": "Liquiditätspunkte",
+        "modal-text": "Je länger deine Liquidität in den Pools ist, desto mehr Liquiditätspunkte verdienst du. Innerhalb von 24 Stunden können sich deine Liquiditätspunkte um bis zu Liquidität x Liquiditätsschub erhöhen."
       },
       "trade-hourly-increase": {
-        "title": "Stündliche Erhöhung",
-        "modal-text": "Stündliche Erhöhung des GEBOOSTEN Liquiditätsvolumen"
+        "title": "Punkte die du pro Stunde sammelst",
+        "modal-text": "Stündliche Erhöhung der Liquiditätspunkte"
       },
       "liquidity-boost": {
         "title": "Liquiditäts Boost",
@@ -515,6 +519,24 @@
           "info1": "Sie können Ihre Liquidität zwei Tage nach Einleitung der Auszahlung abheben.",
           "info2": "Wenn Sie Ihr Guthaben nicht innerhalb von vier Tagen, nachdem es zur Abhebung bereit ist, abheben, kann jeder die Abhebung in Ihrem Namen durchführen. In diesem Fall wird das Guthaben an Ihre Adresse gesendet und der Durchführer erhält eine kleine Gebühr, die aus Ihrem Guthaben bezahlt wird."
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "Allzeit-APY",
@@ -712,6 +734,8 @@
     "wallet-connect": "Verbinden",
     "account-button": "Konto",
     "currency-label": "Währung",
+    "close-button": "Schliessen",
+    "cancel-button": "Abbrechen",
     "amount-label": "Anzahl",
     "address-label": "Adresse",
     "deposit-gas": "Gas deponieren",
@@ -739,6 +763,7 @@
       "header-to": "Bridge in",
       "header-from": "Bridge out"
     },
+    "owlto-bridge": "OWLTO bridge",
     "pagination": {
       "per-page": "Pro Seite"
     },
@@ -825,6 +850,7 @@
         "header": "Marktauswahl",
         "crypto": "Krypto",
         "fx": "Devisen",
+        "all": "Alle",
         "commodity": "Rohstoffe",
         "closed": "Geschlossen"
       },

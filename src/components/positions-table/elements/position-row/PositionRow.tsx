@@ -76,6 +76,9 @@ export const PositionRow = memo(
             className={position.unrealizedPnlQuoteCCY >= 0 ? styles.pnlPositive : styles.pnlNegative}
           >
             {formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency, true)}
+            {position.unrealizedPnlQuoteCCY
+              ? ` (${Math.round((position.unrealizedPnlQuoteCCY / (position.collateralCC * position.collToQuoteConversion)) * 10000) / 100}%)`
+              : ' (0%)'}
           </Typography>
         </TableCell>
         <TableCell align="right" className={styles.tpSlCell}>

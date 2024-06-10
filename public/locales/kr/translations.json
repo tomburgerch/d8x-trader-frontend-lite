@@ -371,6 +371,10 @@
         "title": "BOOSTED Volume",
         "modal-text": "The $D8X Airdrop is calculated based on BOOSTED Volume. BOOSTED Volume is the sum of BOOSTED Trade Volume and BOOSTED Liquidity Volume."
       },
+      "boosted-rank": {
+        "title": "Rank",
+        "modal-text": "Your rank / Total"
+      },
       "trade-volume": {
         "title": "BOOSTED Trade Volume",
         "modal-text": "For every trade we compute Volume x Trade Boost. BOOSTED Trade Volume is the sum of it over all your trades."
@@ -506,6 +510,24 @@
           "info1": "You can withdraw your liquidity two days after initializing withdrawal.",
           "info2": "If you do not withdraw your funds within four days after they are ready to be withdrawn, anyone can execute the withdrawal on your behalf. In this case the funds are sent to your address, and the executor will earn a small fee paid out of your funds."
         }
+      },
+      "pool-card": {
+        "vault": "Vault",
+        "yields": {
+          "title": "Yield sources",
+          "trading-api": "Trading APY ({{percent}}%)",
+          "weeth-yield": "weETH Staking Yield",
+          "stusd-yield": "stUSD Yield",
+          "ether-fi-points": "Ether.fi Points",
+          "eigen-layer-points": "EigenLayer Points",
+          "d8x-points": "D8X Points"
+        },
+        "boosts": {
+          "title": "Turtleclub boost",
+          "turtle-ether-fi-points": "Turtle Ether.fi Points",
+          "turtle-d8x-points": "Turtle D8X Points"
+        },
+        "deposit-button": "Deposit"
       },
       "global-stats": {
         "apy": "All Time APY",
