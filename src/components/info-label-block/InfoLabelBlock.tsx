@@ -14,9 +14,16 @@ interface InfoBlockPropsI {
   content: string | ReactNode;
   labelClassname?: string;
   titleClassname?: string;
+  iconHolderClassname?: string;
 }
 
-export const InfoLabelBlock = ({ title, content, labelClassname, titleClassname }: InfoBlockPropsI) => {
+export const InfoLabelBlock = ({
+  title,
+  content,
+  labelClassname,
+  titleClassname,
+  iconHolderClassname,
+}: InfoBlockPropsI) => {
   const { t } = useTranslation();
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -25,7 +32,7 @@ export const InfoLabelBlock = ({ title, content, labelClassname, titleClassname 
     <>
       <div className={classNames(styles.label, labelClassname)}>
         <span className={classNames(styles.title, titleClassname)}>{title}</span>{' '}
-        <span className={styles.iconHolder}>
+        <span className={classNames(styles.iconHolder, iconHolderClassname)}>
           <InfoOutlined onClick={() => setModalOpen(true)} className={styles.actionIcon} />
         </span>
       </div>

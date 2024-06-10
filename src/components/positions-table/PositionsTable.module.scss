@@ -71,9 +71,9 @@
 }
 
 @media screen and ($d8x-breakpoint-min-xl) {
-.tableBody {
-  :global(.MuiTypography-root) {
-    font-size: 12px;
+  .tableBody {
+    :global(.MuiTypography-root) {
+      font-size: 12px;
+    }
   }
-}
 }
