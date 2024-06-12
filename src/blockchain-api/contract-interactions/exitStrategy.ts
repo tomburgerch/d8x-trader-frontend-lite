@@ -61,7 +61,7 @@ export async function exitStrategy(
     .isDelegate(strategyAddr, walletClient.account.address)) as boolean;
   const { data } = await orderDigest(chainId, [order], hedgeClient.account.address);
 
-  if (!isDelegated) {
+  if (isDelegated) {
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
