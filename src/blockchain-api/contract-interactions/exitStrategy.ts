@@ -2,19 +2,17 @@ import { type Config } from '@wagmi/core';
 import { type SendTransactionMutateAsync } from '@wagmi/core/query';
 import type { Dispatch, SetStateAction } from 'react';
 import { createWalletClient, http } from 'viem';
-import { getBalance, waitForTransactionReceipt } from 'viem/actions';
 
 import { HashZero } from 'appConstants';
 import { generateStrategyAccount } from 'blockchain-api/generateStrategyAccount';
-import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { orderDigest } from 'network/network';
 import { OrderSideE, OrderTypeE } from 'types/enums';
 import { HedgeConfigI, OrderI } from 'types/types';
 
 import { postOrder } from './postOrder';
+import { fundWallet } from './fundWallet';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
-const GAS_TARGET = 2_000_000n; // good for arbitrum
 
 export async function exitStrategy(
   { chainId, walletClient, symbol, traderAPI, limitPrice, strategyAddress }: HedgeConfigI,
@@ -61,26 +59,13 @@ export async function exitStrategy(
   const isDelegated = (await traderAPI
     .getReadOnlyProxyInstance()
     .isDelegate(strategyAddr, walletClient.account.address)) as boolean;
-  const gasBalance = await getBalance(walletClient, { address: strategyAddr });
   const { data } = await orderDigest(chainId, [order], hedgeClient.account.address);
 
-  if (isDelegated) {
+  if (!isDelegated) {
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
-    const gasPrice = await getGasPrice(walletClient.chain?.id);
-    if (gasBalance < GAS_TARGET * gasPrice) {
-      const tx0 = await sendTransactionAsync({
-        account: walletClient.account,
-        chainId: walletClient.chain?.id,
-        to: strategyAddr,
-        value: 2n * GAS_TARGET * gasPrice,
-        gas: GAS_TARGET,
-      }).catch((error) => {
-        throw new Error(error.shortMessage);
-      });
-      await waitForTransactionReceipt(walletClient, { hash: tx0, timeout: 30_000 });
-    }
+    await fundWallet({ walletClient, address: strategyAddr }, sendTransactionAsync);
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(hedgeClient, [HashZero], data);
   }
