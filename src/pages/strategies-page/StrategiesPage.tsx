@@ -1,27 +1,30 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
 import { STRATEGY_BASE_CURRENCY, STRATEGY_POOL_SYMBOL, STRATEGY_QUOTE_CURRENCY, STRATEGY_SYMBOL } from 'appConstants';
 import { Container } from 'components/container/Container';
 import { Helmet } from 'components/helmet/Helmet';
 import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
-import { allPerpetualStatisticsPrimitiveAtom, poolsAtom } from 'store/pools.store';
+import { allPerpetualStatisticsPrimitiveAtom, poolsAtom, traderAPIAtom } from 'store/pools.store';
 import {
   strategyAddressesAtom,
   strategyPerpetualAtom,
   strategyPerpetualStatsAtom,
   strategyPoolAtom,
+  perpetualStrategyStaticInfoAtom,
 } from 'store/strategies.store';
+import { getPerpetualStaticInfo } from 'network/network';
 
 import { ConnectBlock } from './components/connect-block/ConnectBlock';
 import { StrategyBlock } from './components/strategy-block/StrategyBlock';
 import { StrategyPoolSubscription } from './components/StrategyPoolSubscription';
+import { getEnabledChainId } from 'utils/getEnabledChainId';
 
 import styles from './StrategiesPage.module.scss';
 
 export const StrategiesPage = () => {
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const pools = useAtomValue(poolsAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
@@ -29,6 +32,10 @@ export const StrategiesPage = () => {
   const setStrategyPool = useSetAtom(strategyPoolAtom);
   const setStrategyPerpetual = useSetAtom(strategyPerpetualAtom);
   const setStrategyPerpetualStats = useSetAtom(strategyPerpetualStatsAtom);
+  const setStrategyPerpetualStaticInfo = useSetAtom(perpetualStrategyStaticInfoAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+
+  const requestSentRef = useRef(false);
 
   useEffect(() => {
     if (pools.length) {
@@ -61,6 +68,35 @@ export const StrategiesPage = () => {
       setStrategyPerpetualStats(strategyPerpetualStats);
     }
   }, [allPerpetualStatistics, setStrategyPerpetualStats]);
+
+  useEffect(() => {
+    if (requestSentRef.current) {
+      return;
+    }
+
+    if (!STRATEGY_SYMBOL) {
+      setStrategyPerpetualStaticInfo(null);
+      return;
+    }
+
+    requestSentRef.current = true;
+
+    getPerpetualStaticInfo(getEnabledChainId(chainId), traderAPI, STRATEGY_SYMBOL)
+      .then(({ data }) => {
+        if (data.error) {
+          throw new Error(data.error);
+        } else {
+          setStrategyPerpetualStaticInfo(data);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setStrategyPerpetualStaticInfo(null);
+      })
+      .finally(() => {
+        requestSentRef.current = false;
+      });
+  }, [chainId, setStrategyPerpetualStaticInfo, traderAPI]);
 
   return (
     <>

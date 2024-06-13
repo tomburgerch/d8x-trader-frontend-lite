@@ -16,7 +16,12 @@ import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
 import { poolFeeAtom, traderAPIAtom } from 'store/pools.store';
-import { strategyAddressesAtom, strategyPerpetualStatsAtom, strategyPoolAtom } from 'store/strategies.store';
+import {
+  strategyAddressesAtom,
+  strategyPerpetualStatsAtom,
+  strategyPoolAtom,
+  perpetualStrategyStaticInfoAtom,
+} from 'store/strategies.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -40,7 +45,9 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   const feeRate = useAtomValue(poolFeeAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
   const strategyPerpetualStats = useAtomValue(strategyPerpetualStatsAtom);
-  const lotSizeBC = 0.001; // TODO: get from atom!
+
+  const strategyStaticInfo = useAtomValue(perpetualStrategyStaticInfoAtom);
+  const lotSizeBC = strategyStaticInfo?.lotSizeBC !== undefined ? strategyStaticInfo.lotSizeBC : 0.001;
 
   const [addAmount, setAddAmount] = useState(0);
   const [inputValue, setInputValue] = useState(`${addAmount}`);
