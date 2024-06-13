@@ -13,12 +13,11 @@ import {
   Chain,
   Account,
 } from 'viem';
-import { getBalance, readContract, waitForTransactionReceipt, writeContract } from 'viem/actions';
+import { readContract, waitForTransactionReceipt, writeContract } from 'viem/actions';
 
 import { HashZero } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { generateStrategyAccount } from 'blockchain-api/generateStrategyAccount';
-import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { orderDigest } from 'network/network';
 import { OrderSideE, OrderTypeE } from 'types/enums';
 import type { HedgeConfigI, OrderI } from 'types/types';
