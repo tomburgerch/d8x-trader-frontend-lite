@@ -40,6 +40,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   const feeRate = useAtomValue(poolFeeAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
   const strategyPerpetualStats = useAtomValue(strategyPerpetualStatsAtom);
+  const lotSizeBC = 0.001; // TODO: get from atom!
 
   const [addAmount, setAddAmount] = useState(0);
   const [inputValue, setInputValue] = useState(`${addAmount}`);
@@ -236,8 +237,8 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           handleInputBlur={handleBlur}
           handleInputFocus={handleFocus}
           currency="weETH"
-          step="0.001"
-          min={isEditing ? undefined : 0.01}
+          step={`${lotSizeBC}`}
+          min={isEditing ? undefined : 10 * lotSizeBC}
           max={weEthBalance || 0}
         />
       </div>
@@ -252,7 +253,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           onClick={handleEnter}
           className={styles.button}
           variant="primary"
-          disabled={requestSent || loading || addAmount === 0}
+          disabled={requestSent || loading || addAmount === 0 || addAmount > weEthBalance}
         >
           {t('pages.strategies.enter.deposit-button')}
         </Button>
