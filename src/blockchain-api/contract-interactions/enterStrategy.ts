@@ -172,7 +172,7 @@ export async function enterStrategy(
       }
     );
   }
-  setCurrentPhaseKey('pages.strategies.enter.phases.posting');
   // post order
-  return postOrder(hedgeClient!, [HashZero], data);
+  setCurrentPhaseKey('pages.strategies.enter.phases.posting');
+  return hedgeClient ? postOrder(hedgeClient, [HashZero], data) : postOrder(walletClient, [HashZero], data);
 }
