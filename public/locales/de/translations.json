@@ -739,6 +739,8 @@
     "amount-label": "Anzahl",
     "address-label": "Adresse",
     "deposit-gas": "Gas deponieren",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Kopiert",
     "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",

@@ -739,6 +739,8 @@
     "cancel-button": "Cancelar",
     "address-label": "Direccion",
     "deposit-gas": "Deposite gasolina",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",

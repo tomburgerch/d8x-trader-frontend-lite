@@ -739,6 +739,8 @@
     "cancel-button": "Annuler",
     "address-label": "Adresse",
     "deposit-gas": "Déposer du gaz",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Copié",
     "copy-error": "Une erreur est apparue lors de la copie dans le presse-papiers",

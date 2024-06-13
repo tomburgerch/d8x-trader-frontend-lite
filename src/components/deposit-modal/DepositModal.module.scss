@@ -20,6 +20,21 @@
   margin: $d8x-spacing * 6 0;
 }
 
+.widgetButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 4 * $d8x-spacing;
+
+  @include media-phone {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .actionButton {
+    min-width: 200px;
+  }
+}
+
 .noteText {
   display: block;
   margin: $d8x-spacing * 6 0;

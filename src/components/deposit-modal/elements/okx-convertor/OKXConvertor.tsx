@@ -9,19 +9,19 @@ import { Button, CircularProgress, Link, Typography } from '@mui/material';
 
 import { wrapOKB } from 'blockchain-api/contract-interactions/wrapOKB';
 import { ToastContent } from 'components/toast-content/ToastContent';
-import { CurrencyItemI } from 'components/currency-selector/types';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { OrSeparator } from 'components/separator/OrSeparator';
 import { Translate } from 'components/translate/Translate';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
+import { activatedOneClickTradingAtom } from 'store/app.store';
+import { modalSelectedCurrencyAtom } from 'store/global-modals.store';
 import { poolsAtom } from 'store/pools.store';
 import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import { xlayer } from 'utils/chains';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from '../../DepositModal.module.scss';
-import { activatedOneClickTradingAtom } from '../../../../store/app.store';
 
 const OKX_LAYER_CHAIN_ID = 196;
 const OKX_GAS_TOKEN_NAME = xlayer.nativeCurrency.name;
@@ -33,17 +33,13 @@ const currencyConvertMap: Record<string, string> = {
   [OKX_WRAPPED_TOKEN_NAME]: OKX_GAS_TOKEN_NAME,
 };
 
-interface OKXConvertorPropsI {
-  selectedCurrency: CurrencyItemI | undefined;
-}
-
 interface ActionDataI {
   amount: number;
   isWrap: boolean;
   currency: string;
 }
 
-export const OKXConvertor = ({ selectedCurrency }: OKXConvertorPropsI) => {
+export const OKXConvertor = () => {
   const { t } = useTranslation();
 
   const chainId = useChainId();
@@ -54,6 +50,7 @@ export const OKXConvertor = ({ selectedCurrency }: OKXConvertorPropsI) => {
 
   const pools = useAtomValue(poolsAtom);
   const oneClickTradingActivated = useAtomValue(activatedOneClickTradingAtom);
+  const selectedCurrency = useAtomValue(modalSelectedCurrencyAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
 
   const [amountValue, setAmountValue] = useState('0');

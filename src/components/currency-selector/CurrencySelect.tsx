@@ -1,23 +1,20 @@
-import { useAtomValue } from 'jotai';
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Address } from 'viem';
 
 import { DropDownMenuItem } from 'components/dropdown-select/components/DropDownMenuItem';
 import { DropDownSelect } from 'components/dropdown-select/DropDownSelect';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { modalSelectedCurrencyAtom } from 'store/global-modals.store';
 import { gasTokenSymbolAtom, poolsAtom } from 'store/pools.store';
 
 import { CurrencyItemI } from './types';
 
-interface CurrencySelectPropsI {
-  selectedCurrency?: CurrencyItemI | null;
-  setSelectedCurrency: Dispatch<SetStateAction<CurrencyItemI | undefined>>;
-}
-
-export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: CurrencySelectPropsI) => {
+export const CurrencySelect = () => {
   const { t } = useTranslation();
 
+  const [selectedCurrency, setSelectedCurrency] = useAtom(modalSelectedCurrencyAtom);
   const pools = useAtomValue(poolsAtom);
   const gasTokenSymbol = useAtomValue(gasTokenSymbolAtom);
 

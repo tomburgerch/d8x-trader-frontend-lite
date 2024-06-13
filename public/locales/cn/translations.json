@@ -739,6 +739,8 @@
     "amount-label": "数量",
     "address-label": "地址",
     "deposit-gas": "存入燃料",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "最大：",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",
