@@ -27,6 +27,6 @@ export async function fundWallet(
     }).catch((error) => {
       throw new Error(error.shortMessage);
     });
-    return waitForTransactionReceipt(walletClient, { hash: tx0, timeout: 30_000 });
+    return waitForTransactionReceipt(walletClient, { hash: tx0 });
   }
 }

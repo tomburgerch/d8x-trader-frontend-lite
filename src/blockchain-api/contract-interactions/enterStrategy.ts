@@ -25,6 +25,7 @@ import type { HedgeConfigI, OrderI } from 'types/types';
 
 import { postOrder } from './postOrder';
 import { setDelegate } from './setDelegate';
+import { fundWallet } from './fundWallet';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
@@ -72,7 +73,6 @@ export async function enterStrategy(
     //console.log({ position, marginTokenAddr, marginTokenDec });
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
-  const gasBalance = await getBalance(walletClient, { address: strategyAddr });
   const marginTokenBalance = await readContract(walletClient, {
     address: marginTokenAddr as Address,
     abi: erc20Abi,
@@ -124,30 +124,20 @@ export async function enterStrategy(
     }, PAGE_REFRESH_DELAY);
     throw new Error('An error appeared to enter a strategy. Please wait for page refresh.');
   }
-  const gasPrice = await getGasPrice(walletClient.chain?.id);
 
+  // now we start sending txns --> need to generate strat wallet and
+  await fundWallet({ walletClient, address: strategyAddr }, sendTransactionAsync);
+  if (hedgeClient === undefined) {
+    hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
+      createWalletClient({
+        account,
+        chain: walletClient.chain,
+        transport: http(),
+      })
+    );
+  }
+  // set user as delegate of strat wallet
   if (!isDelegated) {
-    if (gasBalance < GAS_TARGET * gasPrice) {
-      const tx0 = await sendTransactionAsync({
-        account: walletClient.account,
-        chainId: walletClient.chain?.id,
-        to: strategyAddr,
-        value: GAS_TARGET * gasPrice,
-        gas: GAS_TARGET,
-      }).catch((error) => {
-        throw new Error(error.shortMessage);
-      });
-      await waitForTransactionReceipt(walletClient, { hash: tx0, timeout: 30_000 });
-    }
-    if (hedgeClient === undefined) {
-      hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
-        createWalletClient({
-          account,
-          chain: walletClient.chain,
-          transport: http(),
-        })
-      );
-    }
     await setDelegate(
       hedgeClient!,
       traderAPI.getProxyAddress() as Address,
@@ -155,7 +145,7 @@ export async function enterStrategy(
       DELEGATE_INDEX
     );
   }
-
+  // send collateral to strat wallet
   const amountBigint = parseUnits(amount.toString(), marginTokenDec);
   if (marginTokenBalance < amountBigint) {
     //console.log('funding strategy account');
@@ -173,17 +163,9 @@ export async function enterStrategy(
     });
     await waitForTransactionReceipt(walletClient, { hash: tx1, timeout: 30_000 });
   }
+  // increase allowance if needed
   if (allowance < amountBigint) {
     //console.log('approving margin token', { marginTokenAddr, amount });
-    if (hedgeClient === undefined) {
-      hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
-        createWalletClient({
-          account,
-          chain: walletClient.chain,
-          transport: http(),
-        })
-      );
-    }
     await approveMarginToken(hedgeClient!, marginTokenAddr, traderAPI.getProxyAddress(), amount, marginTokenDec).catch(
       (error) => {
         //console.log(error);
@@ -191,33 +173,7 @@ export async function enterStrategy(
       }
     );
   }
-
-  //console.log('posting order');
-  if (isDelegated && hedgeClient === undefined) {
-    setCurrentPhaseKey('pages.strategies.enter.phases.posting');
-    return postOrder(walletClient, [HashZero], data);
-  } else {
-    if (gasBalance < GAS_TARGET * gasPrice) {
-      await sendTransactionAsync({
-        account: walletClient.account,
-        chainId: walletClient.chain?.id,
-        to: strategyAddr,
-        value: 2n * GAS_TARGET * gasPrice,
-        gas: GAS_TARGET,
-      }).catch((error) => {
-        throw new Error(error);
-      });
-    }
-    if (hedgeClient === undefined) {
-      hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
-        createWalletClient({
-          account,
-          chain: walletClient.chain,
-          transport: http(),
-        })
-      );
-    }
-    setCurrentPhaseKey('pages.strategies.enter.phases.posting');
-    return postOrder(hedgeClient!, [HashZero], data);
-  }
+  setCurrentPhaseKey('pages.strategies.enter.phases.posting');
+  // post order
+  return postOrder(hedgeClient!, [HashZero], data);
 }
