@@ -8,14 +8,25 @@ import { getGasPrice } from './getGasPrice';
 import { wagmiConfig } from './wagmi/wagmiClient';
 import { getGasLimit } from 'blockchain-api/getGasLimit';
 import { MethodE } from 'types/enums';
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from './constants';
 
-export async function approveMarginToken(
-  walletClient: WalletClient,
-  marginTokenAddr: string,
-  proxyAddr: string,
-  minAmount: number,
-  decimals: number
-) {
+interface ApproveMarginTokenPropsI {
+  walletClient: WalletClient;
+  marginTokenAddr: string;
+  isMultisigAddress: boolean | null;
+  proxyAddr: string;
+  minAmount: number;
+  decimals: number;
+}
+
+export async function approveMarginToken({
+  walletClient,
+  marginTokenAddr,
+  isMultisigAddress,
+  proxyAddr,
+  minAmount,
+  decimals,
+}: ApproveMarginTokenPropsI) {
   if (!walletClient.account?.address) {
     throw new Error('Account not connected');
   }
@@ -53,7 +64,7 @@ export async function approveMarginToken(
     return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => {
       return waitForTransactionReceipt(wagmiConfig, {
         hash: tx,
-        timeout: 30_000,
+        timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
       }).then(() => ({ hash: tx }));
     });
   }

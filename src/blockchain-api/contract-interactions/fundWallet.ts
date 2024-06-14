@@ -3,12 +3,20 @@ import { type SendTransactionMutateAsync } from '@wagmi/core/query';
 import { Address, WalletClient } from 'viem';
 import { getBalance, waitForTransactionReceipt } from 'viem/actions';
 
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from 'blockchain-api/constants';
 import { getGasPrice } from 'blockchain-api/getGasPrice';
 
 const GAS_TARGET = 2_000_000n; // good for arbitrum
 
+interface FundWalletPropsI {
+  walletClient: WalletClient;
+  address: Address;
+  isMultisigAddress: boolean | null;
+  gasAmount?: bigint;
+}
+
 export async function fundWallet(
-  { walletClient, address, gasAmount }: { walletClient: WalletClient; address: Address; gasAmount?: bigint },
+  { walletClient, address, isMultisigAddress, gasAmount }: FundWalletPropsI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
 ) {
   if (!walletClient.account?.address) {
@@ -27,6 +35,9 @@ export async function fundWallet(
     }).catch((error) => {
       throw new Error(error.shortMessage);
     });
-    return waitForTransactionReceipt(walletClient, { hash: tx0 });
+    return waitForTransactionReceipt(walletClient, {
+      hash: tx0,
+      timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
+    });
   }
 }

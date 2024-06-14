@@ -25,6 +25,7 @@ import type { HedgeConfigI, OrderI } from 'types/types';
 import { postOrder } from './postOrder';
 import { setDelegate } from './setDelegate';
 import { fundWallet } from './fundWallet';
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
@@ -32,7 +33,18 @@ const GAS_TARGET = 4_000_000n; // good for arbitrum
 const PAGE_REFRESH_DELAY = 3_000; // Let's wait 3 sec before refresh
 
 export async function enterStrategy(
-  { chainId, walletClient, symbol, traderAPI, amount, feeRate, indexPrice, limitPrice, strategyAddress }: HedgeConfigI,
+  {
+    chainId,
+    walletClient,
+    isMultisigAddress,
+    symbol,
+    traderAPI,
+    amount,
+    feeRate,
+    indexPrice,
+    limitPrice,
+    strategyAddress,
+  }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,
   setCurrentPhaseKey: Dispatch<SetStateAction<string>>
 ): Promise<{
@@ -124,8 +136,8 @@ export async function enterStrategy(
     throw new Error('An error appeared to enter a strategy. Please wait for page refresh.');
   }
 
-  // now we start sending txns --> need to generate strat wallet and
-  await fundWallet({ walletClient, address: strategyAddr }, sendTransactionAsync);
+  // now we start sending txns --> need to generate strat wallet
+  await fundWallet({ walletClient, address: strategyAddr, isMultisigAddress }, sendTransactionAsync);
   if (hedgeClient === undefined) {
     hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
       createWalletClient({
@@ -160,17 +172,25 @@ export async function enterStrategy(
     }).catch((error) => {
       throw new Error(error.shortMessage);
     });
-    await waitForTransactionReceipt(walletClient, { hash: tx1, timeout: 30_000 });
+    await waitForTransactionReceipt(walletClient, {
+      hash: tx1,
+      timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
+    });
   }
   // increase allowance if needed
   if (allowance < amountBigint) {
     //console.log('approving margin token', { marginTokenAddr, amount });
-    await approveMarginToken(hedgeClient!, marginTokenAddr, traderAPI.getProxyAddress(), amount, marginTokenDec).catch(
-      (error) => {
-        //console.log(error);
-        throw new Error(error.shortMessage);
-      }
-    );
+    await approveMarginToken({
+      walletClient: hedgeClient!,
+      marginTokenAddr,
+      isMultisigAddress,
+      proxyAddr: traderAPI.getProxyAddress(),
+      minAmount: amount,
+      decimals: marginTokenDec,
+    }).catch((error) => {
+      //console.log(error);
+      throw new Error(error.shortMessage);
+    });
   }
   // post order
   setCurrentPhaseKey('pages.strategies.enter.phases.posting');

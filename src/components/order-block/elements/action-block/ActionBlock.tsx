@@ -123,7 +123,7 @@ export const ActionBlock = memo(() => {
     chainId,
   });
 
-  const { hasEnoughGasForFee } = useUserWallet();
+  const { hasEnoughGasForFee, isMultisigAddress } = useUserWallet();
 
   const orderInfo = useAtomValue(orderInfoAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
@@ -385,13 +385,14 @@ export const ActionBlock = memo(() => {
       .then((data) => {
         if (data.data.digests.length > 0) {
           // hide modal now that metamask popup shows up
-          approveMarginToken(
+          approveMarginToken({
             walletClient,
-            selectedPool.marginTokenAddr,
+            marginTokenAddr: selectedPool.marginTokenAddr,
+            isMultisigAddress,
             proxyAddr,
-            collateralDeposit,
-            poolTokenDecimals
-          )
+            minAmount: collateralDeposit,
+            decimals: poolTokenDecimals,
+          })
             .then(() => {
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
