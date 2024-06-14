@@ -50,7 +50,7 @@ export const cardona = {
   },
 } as const satisfies Chain;
 
-export const artio = {
+export const bartio = {
   id: 80084,
   name: 'Berachain bArtio',
   // network: 'Berachain bArtio',
