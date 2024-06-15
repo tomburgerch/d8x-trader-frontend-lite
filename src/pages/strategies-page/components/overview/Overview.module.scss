@@ -18,7 +18,7 @@
       font-size: 20px;
       border-radius: 50%;
       overflow: hidden;
-      padding: 2px;
+      padding: 1px;
     }
   }
 }
@@ -44,9 +44,9 @@
   .dataValue {
     display: flex;
     align-items: center;
+    line-height: 24px;
     gap: 2 * $d8x-spacing;
     font-weight: 600;
-    line-height: 30px; 
     color: var(--d8x-color-text-highlight);
     margin-bottom: 2 * $d8x-spacing;
   }
