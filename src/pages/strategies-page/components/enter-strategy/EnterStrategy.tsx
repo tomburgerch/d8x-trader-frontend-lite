@@ -15,6 +15,7 @@ import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { poolFeeAtom, traderAPIAtom } from 'store/pools.store';
 import {
   strategyAddressesAtom,
@@ -39,6 +40,8 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   const { address, chainId, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { sendTransactionAsync } = useSendTransaction();
+
+  const { isMultisigAddress } = useUserWallet();
 
   const strategyPool = useAtomValue(strategyPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
@@ -183,6 +186,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       {
         chainId,
         walletClient,
+        isMultisigAddress,
         symbol: STRATEGY_SYMBOL,
         traderAPI,
         amount: addAmount,
@@ -211,6 +215,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   }, [
     chainId,
     walletClient,
+    isMultisigAddress,
     traderAPI,
     feeRate,
     addAmount,

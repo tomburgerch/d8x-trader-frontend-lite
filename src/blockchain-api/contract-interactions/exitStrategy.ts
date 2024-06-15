@@ -15,7 +15,7 @@ import { fundWallet } from './fundWallet';
 const DEADLINE = 60 * 60; // 1 hour from posting time
 
 export async function exitStrategy(
-  { chainId, walletClient, symbol, traderAPI, limitPrice, strategyAddress }: HedgeConfigI,
+  { chainId, walletClient, isMultisigAddress, symbol, traderAPI, limitPrice, strategyAddress }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,
   setCurrentPhaseKey: Dispatch<SetStateAction<string>>
 ) {
@@ -65,7 +65,7 @@ export async function exitStrategy(
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
-    await fundWallet({ walletClient, address: strategyAddr }, sendTransactionAsync);
+    await fundWallet({ walletClient, address: strategyAddr, isMultisigAddress }, sendTransactionAsync);
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(hedgeClient, [HashZero], data);
   }
