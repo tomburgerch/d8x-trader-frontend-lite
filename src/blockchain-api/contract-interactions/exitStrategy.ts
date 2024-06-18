@@ -23,6 +23,7 @@ export async function exitStrategy(
     throw new Error('Account not connected');
   }
 
+  console.log('exit: generate strat account');
   const hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
     createWalletClient({
       account,
@@ -31,6 +32,7 @@ export async function exitStrategy(
     })
   );
 
+  console.log('exit: fetch data');
   const position = await traderAPI
     .positionRisk(hedgeClient.account.address, symbol)
     .then((pos) => pos[0])
@@ -62,10 +64,12 @@ export async function exitStrategy(
   const { data } = await orderDigest(chainId, [order], hedgeClient.account.address);
 
   if (isDelegated) {
+    console.log('exit: post via user wallet');
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
     await fundStrategyGas({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+    console.log('exit: post via strat wallet');
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(hedgeClient, [HashZero], data);
   }

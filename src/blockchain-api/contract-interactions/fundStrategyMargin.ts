@@ -83,5 +83,8 @@ export async function fundStrategyMargin({
       hash: tx1,
       timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
     });
+    return { hash: tx1 };
+  } else {
+    return { hash: undefined };
   }
 }
