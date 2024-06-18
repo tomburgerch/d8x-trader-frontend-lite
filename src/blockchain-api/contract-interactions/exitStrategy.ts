@@ -10,7 +10,7 @@ import { OrderSideE, OrderTypeE } from 'types/enums';
 import { HedgeConfigI, OrderI } from 'types/types';
 
 import { postOrder } from './postOrder';
-import { fundStrategyWallet } from './fundStrategyWallet';
+import { fundStrategyGas } from './fundStrategyGas';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 
@@ -65,7 +65,7 @@ export async function exitStrategy(
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
-    await fundStrategyWallet({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+    await fundStrategyGas({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(hedgeClient, [HashZero], data);
   }

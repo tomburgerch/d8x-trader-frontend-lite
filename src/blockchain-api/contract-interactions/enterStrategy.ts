@@ -2,18 +2,7 @@ import { getMaxSignedPositionSize } from '@d8x/perpetuals-sdk';
 import { type Config } from '@wagmi/core';
 import { type SendTransactionMutateAsync } from '@wagmi/core/query';
 import type { Dispatch, SetStateAction } from 'react';
-import {
-  createWalletClient,
-  type Address,
-  http,
-  erc20Abi,
-  parseUnits,
-  WalletClient,
-  Transport,
-  Chain,
-  Account,
-} from 'viem';
-import { readContract, waitForTransactionReceipt, writeContract } from 'viem/actions';
+import { createWalletClient, type Address, http, WalletClient, Transport, Chain, Account } from 'viem';
 
 import { HashZero } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
@@ -24,12 +13,11 @@ import type { HedgeConfigI, OrderI } from 'types/types';
 
 import { postOrder } from './postOrder';
 import { setDelegate } from './setDelegate';
-import { fundStrategyWallet } from './fundStrategyWallet';
-import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
+import { fundStrategyGas } from './fundStrategyGas';
+import { fundStrategyMargin } from './fundStrategyMargin';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
-const GAS_TARGET = 4_000_000n; // good for arbitrum <- do we need this?
 const PAGE_REFRESH_DELAY = 3_000; // Let's wait 3 sec before refresh
 
 export async function enterStrategy(
@@ -74,7 +62,7 @@ export async function enterStrategy(
     .getReadOnlyProxyInstance()
     .isDelegate(strategyAddr, walletClient.account.address)) as boolean;
 
-  const marginTokenAddr = traderAPI.getMarginTokenFromSymbol(symbol);
+  const marginTokenAddr = traderAPI.getMarginTokenFromSymbol(symbol) as Address | undefined;
   const marginTokenDec = traderAPI.getMarginTokenDecimalsFromSymbol(symbol);
   const position = await traderAPI
     .positionRisk(strategyAddr, symbol)
@@ -84,18 +72,6 @@ export async function enterStrategy(
     //console.log({ position, marginTokenAddr, marginTokenDec });
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
-  const marginTokenBalance = await readContract(walletClient, {
-    address: marginTokenAddr as Address,
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [strategyAddr],
-  });
-  const allowance = await readContract(walletClient, {
-    address: marginTokenAddr as Address,
-    abi: erc20Abi,
-    functionName: 'allowance',
-    args: [strategyAddr, traderAPI.getProxyAddress() as Address],
-  });
 
   if (position.positionNotionalBaseCCY !== 0) {
     throw new Error(
@@ -137,7 +113,7 @@ export async function enterStrategy(
   }
 
   // now we start sending txns --> need to generate strat wallet
-  await fundStrategyWallet({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+  await fundStrategyGas({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
   if (hedgeClient === undefined) {
     hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
       createWalletClient({
@@ -157,41 +133,26 @@ export async function enterStrategy(
     );
   }
   // send collateral to strat wallet
-  const amountBigint = parseUnits(amount.toString(), marginTokenDec);
-  if (marginTokenBalance < amountBigint) {
-    //console.log('funding strategy account');
-    setCurrentPhaseKey('pages.strategies.enter.phases.funding');
-    const tx1 = await writeContract(walletClient, {
-      address: marginTokenAddr as Address,
-      chain: walletClient.chain,
-      abi: erc20Abi,
-      functionName: 'transfer',
-      args: [strategyAddr, amountBigint],
-      account: walletClient.account,
-      gas: GAS_TARGET,
-    }).catch((error) => {
-      throw new Error(error.shortMessage);
-    });
-    await waitForTransactionReceipt(walletClient, {
-      hash: tx1,
-      timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
-    });
-  }
+  await fundStrategyMargin({
+    walletClient,
+    strategyAddress: strategyAddr,
+    amount,
+    marginTokenAddress: marginTokenAddr,
+    isMultisigAddress,
+  });
   // increase allowance if needed
-  if (allowance < amountBigint) {
-    //console.log('approving margin token', { marginTokenAddr, amount });
-    await approveMarginToken({
-      walletClient: hedgeClient!,
-      marginTokenAddr,
-      isMultisigAddress,
-      proxyAddr: traderAPI.getProxyAddress(),
-      minAmount: amount,
-      decimals: marginTokenDec,
-    }).catch((error) => {
-      //console.log(error);
-      throw new Error(error.shortMessage);
-    });
-  }
+  await approveMarginToken({
+    walletClient: hedgeClient!,
+    marginTokenAddr,
+    isMultisigAddress,
+    proxyAddr: traderAPI.getProxyAddress(),
+    minAmount: amount,
+    decimals: marginTokenDec,
+  }).catch((error) => {
+    //console.log(error);
+    throw new Error(error.shortMessage);
+  });
+
   // post order
   setCurrentPhaseKey('pages.strategies.enter.phases.posting');
   return hedgeClient ? postOrder(hedgeClient, [HashZero], data) : postOrder(walletClient, [HashZero], data);

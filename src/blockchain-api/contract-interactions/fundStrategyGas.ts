@@ -14,7 +14,7 @@ interface FundWalletPropsI {
   gasAmount?: bigint;
 }
 
-export async function fundStrategyWallet(
+export async function fundStrategyGas(
   { walletClient, strategyAddress, isMultisigAddress, gasAmount }: FundWalletPropsI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
 ) {

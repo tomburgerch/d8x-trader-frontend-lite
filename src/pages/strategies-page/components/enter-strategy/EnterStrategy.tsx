@@ -30,7 +30,7 @@ import { useEnterStrategy } from './hooks/useEnterStrategy';
 
 import styles from './EnterStrategy.module.scss';
 import { STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
-import { fundStrategyWallet } from 'blockchain-api/contract-interactions/fundStrategyWallet';
+import { fundStrategyGas } from 'blockchain-api/contract-interactions/fundStrategyGas';
 
 interface EnterStrategyPropsI {
   isLoading: boolean;
@@ -186,7 +186,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     ) {
       return;
     }
-    fundStrategyWallet({ walletClient, strategyAddress, isMultisigAddress }, sendTransactionAsync)
+    fundStrategyGas({ walletClient, strategyAddress, isMultisigAddress }, sendTransactionAsync)
       .then(({ hash }) => {
         console.log(`funding strategy wallet txn: ${hash}`);
         // setTxHash(hash);
