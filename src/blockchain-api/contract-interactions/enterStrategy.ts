@@ -24,12 +24,12 @@ import type { HedgeConfigI, OrderI } from 'types/types';
 
 import { postOrder } from './postOrder';
 import { setDelegate } from './setDelegate';
-import { fundWallet } from './fundWallet';
+import { fundStrategyWallet } from './fundStrategyWallet';
 import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
-const GAS_TARGET = 4_000_000n; // good for arbitrum
+const GAS_TARGET = 4_000_000n; // good for arbitrum <- do we need this?
 const PAGE_REFRESH_DELAY = 3_000; // Let's wait 3 sec before refresh
 
 export async function enterStrategy(
@@ -137,7 +137,7 @@ export async function enterStrategy(
   }
 
   // now we start sending txns --> need to generate strat wallet
-  await fundWallet({ walletClient, address: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+  await fundStrategyWallet({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
   if (hedgeClient === undefined) {
     hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
       createWalletClient({

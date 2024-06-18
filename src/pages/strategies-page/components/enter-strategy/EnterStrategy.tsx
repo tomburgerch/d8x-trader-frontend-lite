@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type Address, erc20Abi, formatUnits } from 'viem';
-import { useAccount, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
+import { useAccount, useBalance, useGasPrice, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
 import { Button, CircularProgress, Link, Typography } from '@mui/material';
@@ -29,6 +29,8 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 import { useEnterStrategy } from './hooks/useEnterStrategy';
 
 import styles from './EnterStrategy.module.scss';
+import { STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
+import { fundStrategyWallet } from 'blockchain-api/contract-interactions/fundStrategyWallet';
 
 interface EnterStrategyPropsI {
   isLoading: boolean;
@@ -88,6 +90,15 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   });
 
   const weEthBalance = weEthPoolBalance ? +formatUnits(weEthPoolBalance[0], weEthPoolBalance[1]) * 0.99 : 0;
+
+  const { data: strategtWalletBalance, refetch: refetchGas } = useBalance({
+    address: strategyAddress,
+    chainId,
+  });
+
+  const { data: gasPrice } = useGasPrice({ chainId });
+
+  const strategyWalletGas = gasPrice && strategtWalletBalance ? strategtWalletBalance.value / gasPrice : undefined;
 
   const { setTxHash } = useEnterStrategy(addAmount);
 
@@ -163,6 +174,45 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     inputValueChangedRef.current = false;
   }, [addAmount]);
 
+  const handleFund = useCallback(() => {
+    console.log('handleFund');
+    console.log(strategyAddress, strategyWalletGas, STRATEGY_WALLET_GAS_TARGET);
+    if (
+      requestSentRef.current ||
+      !walletClient ||
+      !isEnabledChain(chainId) ||
+      !pagesConfig.enabledStrategiesPageByChains.includes(chainId) ||
+      !strategyAddress
+    ) {
+      return;
+    }
+    fundStrategyWallet({ walletClient, strategyAddress, isMultisigAddress }, sendTransactionAsync)
+      .then(({ hash }) => {
+        // console.log(`submitting enter strategy txn ${hash}`);
+        setTxHash(hash);
+        setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+        setLoading(false);
+      })
+      .finally(() => {
+        setRequestSent(false);
+        requestSentRef.current = false;
+        refetchGas();
+      });
+  }, [
+    chainId,
+    isMultisigAddress,
+    strategyWalletGas,
+    refetchGas,
+    sendTransactionAsync,
+    setTxHash,
+    strategyAddress,
+    walletClient,
+  ]);
+
   const handleEnter = useCallback(() => {
     if (
       requestSentRef.current ||
@@ -172,7 +222,8 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       !isEnabledChain(chainId) ||
       !pagesConfig.enabledStrategiesPageByChains.includes(chainId) ||
       !strategyPerpetualStats ||
-      addAmount === 0
+      addAmount === 0 ||
+      strategyWalletGas === undefined
     ) {
       return;
     }
@@ -221,10 +272,14 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     addAmount,
     strategyAddress,
     strategyPerpetualStats,
+    strategyWalletGas,
     sendTransactionAsync,
     setTxHash,
     refetch,
   ]);
+
+  const handleClick =
+    isMultisigAddress && strategyWalletGas && strategyWalletGas < STRATEGY_WALLET_GAS_TARGET ? handleFund : handleEnter;
 
   useEffect(() => {
     if (isLoading) {
@@ -262,7 +317,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       ) : null}
       <GasDepositChecker className={styles.button} multiplier={2n}>
         <Button
-          onClick={handleEnter}
+          onClick={handleClick}
           className={styles.button}
           variant="primary"
           disabled={requestSent || loading || addAmount === 0 || addAmount > weEthBalance}
