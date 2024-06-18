@@ -6,6 +6,7 @@ import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { generateStrategyAccount } from 'blockchain-api/generateStrategyAccount';
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { readContracts } from '@wagmi/core';
+import { Dispatch, SetStateAction } from 'react';
 
 interface FundMarginPropsI {
   walletClient: WalletClient;
@@ -15,13 +16,10 @@ interface FundMarginPropsI {
   marginTokenAddress: Address;
 }
 
-export async function fundStrategyMargin({
-  walletClient,
-  strategyAddress,
-  isMultisigAddress,
-  amount,
-  marginTokenAddress,
-}: FundMarginPropsI) {
+export async function fundStrategyMargin(
+  { walletClient, strategyAddress, isMultisigAddress, amount, marginTokenAddress }: FundMarginPropsI,
+  setCurrentPhaseKey: Dispatch<SetStateAction<string>>
+) {
   if (!walletClient.account?.address) {
     throw new Error('Account not connected');
   }
@@ -66,7 +64,7 @@ export async function fundStrategyMargin({
   const amountBigint = parseUnits(amount.toString(), decimals);
   if (strategyBalance < amountBigint) {
     console.log('funding strategy account');
-    // setCurrentPhaseKey('pages.strategies.enter.phases.funding');
+    setCurrentPhaseKey('pages.strategies.enter.phases.funding');
     const gasPrice = await getGasPrice(walletClient.chain?.id);
     const params: WriteContractParameters = {
       ...marginTokenContract,

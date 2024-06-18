@@ -6,6 +6,7 @@ import { getBalance, waitForTransactionReceipt } from 'viem/actions';
 import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT, STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
 import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { generateStrategyAccount } from 'blockchain-api/generateStrategyAccount';
+import { Dispatch, SetStateAction } from 'react';
 
 interface FundWalletPropsI {
   walletClient: WalletClient;
@@ -16,7 +17,8 @@ interface FundWalletPropsI {
 
 export async function fundStrategyGas(
   { walletClient, strategyAddress, isMultisigAddress, gasAmount }: FundWalletPropsI,
-  sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
+  sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,
+  setCurrentPhaseKey: Dispatch<SetStateAction<string>>
 ) {
   if (!walletClient.account?.address) {
     throw new Error('Account not connected');
@@ -38,6 +40,7 @@ export async function fundStrategyGas(
   const gasBalance = await getBalance(walletClient, { address: strategyAddr });
   const gasPrice = await getGasPrice(walletClient.chain?.id);
   if (gasBalance < gas * gasPrice) {
+    setCurrentPhaseKey('pages.strategies.enter.phases.funding');
     const tx0 = await sendTransactionAsync({
       account: walletClient.account,
       chainId: walletClient.chain?.id,

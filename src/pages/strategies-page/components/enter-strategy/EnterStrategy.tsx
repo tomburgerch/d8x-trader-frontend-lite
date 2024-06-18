@@ -199,7 +199,11 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     }
     // is gas balance too low?
     if (strategyWalletGas < STRATEGY_WALLET_GAS_TARGET) {
-      return fundStrategyGas({ walletClient, strategyAddress, isMultisigAddress }, sendTransactionAsync)
+      return fundStrategyGas(
+        { walletClient, strategyAddress, isMultisigAddress },
+        sendTransactionAsync,
+        setCurrentPhaseKey
+      )
         .then(({ hash }) => {
           console.log(`funding strategy wallet w/ gas txn: ${hash}`);
           // setTxHash(hash);
@@ -218,13 +222,16 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     }
     // is margin token balance too low?
     if (weEthStrategyBalance < addAmount) {
-      return fundStrategyMargin({
-        walletClient,
-        strategyAddress,
-        isMultisigAddress,
-        amount: addAmount,
-        marginTokenAddress: strategyPool.marginTokenAddr as Address,
-      })
+      return fundStrategyMargin(
+        {
+          walletClient,
+          strategyAddress,
+          isMultisigAddress,
+          amount: addAmount,
+          marginTokenAddress: strategyPool.marginTokenAddr as Address,
+        },
+        setCurrentPhaseKey
+      )
         .then(({ hash }) => {
           console.log(`funding strategy wallet w/ margin tokens txn: ${hash}`);
           // setTxHash(hash);
@@ -320,9 +327,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     refetch,
   ]);
 
-  const needsGas =
-    strategyWalletGas !== undefined &&
-    (strategyWalletGas < STRATEGY_WALLET_GAS_TARGET || weEthStrategyBalance < addAmount);
+  const needsGas = strategyWalletGas !== undefined && strategyWalletGas < STRATEGY_WALLET_GAS_TARGET;
 
   const needsTokens = weEthStrategyBalance < addAmount;
 
@@ -330,11 +335,11 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     if (needsGas) {
       return 'Add Gas';
     } else if (needsTokens) {
-      return `Add ${strategyStaticInfo?.S3Symbol}`;
+      return `Add ${strategyPool?.poolSymbol}`;
     } else {
       return t('pages.strategies.enter.deposit-button');
     }
-  }, [needsGas, needsTokens, strategyStaticInfo, t]);
+  }, [needsGas, needsTokens, strategyPool, t]);
 
   const handleClick = isMultisigAddress && (needsGas || needsTokens) ? handleFund : handleEnter;
 

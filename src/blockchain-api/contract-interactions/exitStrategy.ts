@@ -68,7 +68,11 @@ export async function exitStrategy(
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(walletClient, [HashZero], data);
   } else {
-    await fundStrategyGas({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+    await fundStrategyGas(
+      { walletClient, strategyAddress: strategyAddr, isMultisigAddress },
+      sendTransactionAsync,
+      setCurrentPhaseKey
+    );
     console.log('exit: post via strat wallet');
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
     return postOrder(hedgeClient, [HashZero], data);

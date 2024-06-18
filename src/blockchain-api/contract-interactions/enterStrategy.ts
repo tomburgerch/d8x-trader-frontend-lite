@@ -113,7 +113,11 @@ export async function enterStrategy(
   }
 
   // now we start sending txns --> need to generate strat wallet
-  await fundStrategyGas({ walletClient, strategyAddress: strategyAddr, isMultisigAddress }, sendTransactionAsync);
+  await fundStrategyGas(
+    { walletClient, strategyAddress: strategyAddr, isMultisigAddress },
+    sendTransactionAsync,
+    setCurrentPhaseKey
+  );
   if (hedgeClient === undefined) {
     hedgeClient = await generateStrategyAccount(walletClient).then((account) =>
       createWalletClient({
@@ -133,13 +137,16 @@ export async function enterStrategy(
     );
   }
   // send collateral to strat wallet
-  await fundStrategyMargin({
-    walletClient,
-    strategyAddress: strategyAddr,
-    amount,
-    marginTokenAddress: marginTokenAddr,
-    isMultisigAddress,
-  });
+  await fundStrategyMargin(
+    {
+      walletClient,
+      strategyAddress: strategyAddr,
+      amount,
+      marginTokenAddress: marginTokenAddr,
+      isMultisigAddress,
+    },
+    setCurrentPhaseKey
+  );
   // increase allowance if needed
   await approveMarginToken({
     walletClient: hedgeClient!,
