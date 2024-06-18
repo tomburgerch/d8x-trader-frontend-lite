@@ -188,9 +188,9 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     }
     fundStrategyWallet({ walletClient, strategyAddress, isMultisigAddress }, sendTransactionAsync)
       .then(({ hash }) => {
-        // console.log(`submitting enter strategy txn ${hash}`);
-        setTxHash(hash);
-        setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
+        console.log(`funding strategy wallet txn: ${hash}`);
+        // setTxHash(hash);
+        // setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
       })
       .catch((error) => {
         console.error(error);
@@ -202,16 +202,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
         requestSentRef.current = false;
         refetchGas();
       });
-  }, [
-    chainId,
-    isMultisigAddress,
-    strategyWalletGas,
-    refetchGas,
-    sendTransactionAsync,
-    setTxHash,
-    strategyAddress,
-    walletClient,
-  ]);
+  }, [chainId, isMultisigAddress, strategyWalletGas, refetchGas, sendTransactionAsync, strategyAddress, walletClient]);
 
   const handleEnter = useCallback(() => {
     if (
