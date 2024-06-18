@@ -55,7 +55,6 @@ export const StrategyBlock = () => {
   const [frequentUpdates, setFrequentUpdates] = useState(0);
   const [hadPosition, setHadPosition] = useState(hasPosition);
   const [refetchBalanceRequestSent, setRefetchBalanceRequestSent] = useState(false);
-  const [triggerClaimFunds, setTriggerClaimFunds] = useState(false);
   const [strategyOpenOrders, setStrategyOpenOrders] = useState<Record<string, OrderI>>({});
 
   const strategyPositionRequestSentRef = useRef(false);
@@ -223,7 +222,31 @@ export const StrategyBlock = () => {
     }
   }, [frequentUpdates, enableFrequentUpdates]);
 
-  useEffect(() => {
+  const hasFundsAfterClosing = useMemo(() => {
+    return (
+      hasPosition === false &&
+      !!hadPosition &&
+      !hasBuyOpenOrder &&
+      !claimRequestSentRef.current &&
+      !refetchBalanceRequestSent &&
+      strategyAddressBalance !== null &&
+      strategyAddressBalance > 0 &&
+      isEnabledChain(chainId) &&
+      !!traderAPI &&
+      !!walletClient
+    );
+  }, [
+    chainId,
+    hadPosition,
+    hasPosition,
+    hasBuyOpenOrder,
+    refetchBalanceRequestSent,
+    strategyAddressBalance,
+    traderAPI,
+    walletClient,
+  ]);
+
+  const claimFunds = useCallback(() => {
     if (
       hasPosition === false &&
       hadPosition &&
@@ -237,7 +260,7 @@ export const StrategyBlock = () => {
       walletClient
     ) {
       claimRequestSentRef.current = true;
-      //console.log('claiming funds');
+      console.log('claiming funds');
       claimStrategyFunds(
         {
           chainId,
@@ -251,15 +274,14 @@ export const StrategyBlock = () => {
         .then(({ hash }) => {
           if (hash) {
             setTxHash(hash);
-            //console.log('claiming funds::success');
+            console.log('claiming funds::success');
           } else {
-            //console.log('claiming funds::no hash');
+            console.log('claiming funds::no hash');
           }
         })
         .catch((error) => {
           console.error(error);
           toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
-          setTriggerClaimFunds((prev) => !prev);
         })
         .finally(() => {
           claimRequestSentRef.current = false;
@@ -277,7 +299,6 @@ export const StrategyBlock = () => {
     isMultisigAddress,
     setTxHash,
     sendTransactionAsync,
-    triggerClaimFunds,
   ]);
 
   useEffect(() => {
@@ -323,6 +344,8 @@ export const StrategyBlock = () => {
               <ExitStrategy
                 isLoading={(!hasPosition && strategyAddressBalance > 0) || hasBuyOpenOrder}
                 hasBuyOpenOrder={hasBuyOpenOrder}
+                hasFundsAfterClosing={hasFundsAfterClosing}
+                claimFunds={claimFunds}
               />
             )}
             {((!hasPosition && strategyAddressBalance === 0) || hasSellOpenOrder) && (

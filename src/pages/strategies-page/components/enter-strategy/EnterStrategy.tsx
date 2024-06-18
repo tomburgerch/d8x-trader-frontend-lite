@@ -320,12 +320,23 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     refetch,
   ]);
 
-  const needsFunds =
-    isMultisigAddress &&
-    strategyWalletGas &&
+  const needsGas =
+    strategyWalletGas !== undefined &&
     (strategyWalletGas < STRATEGY_WALLET_GAS_TARGET || weEthStrategyBalance < addAmount);
 
-  const handleClick = needsFunds ? handleFund : handleEnter;
+  const needsTokens = weEthStrategyBalance < addAmount;
+
+  const buttonLabel = useMemo(() => {
+    if (needsGas) {
+      return 'Add Gas';
+    } else if (needsTokens) {
+      return `Add ${strategyStaticInfo?.S3Symbol}`;
+    } else {
+      return t('pages.strategies.enter.deposit-button');
+    }
+  }, [needsGas, needsTokens, strategyStaticInfo, t]);
+
+  const handleClick = isMultisigAddress && (needsGas || needsTokens) ? handleFund : handleEnter;
 
   useEffect(() => {
     if (isLoading) {
@@ -370,7 +381,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           variant="primary"
           disabled={requestSent || loading || addAmount === 0 || addAmount > weEthMainBalance}
         >
-          {needsFunds ? 'Add Funds' : t('pages.strategies.enter.deposit-button')}
+          {buttonLabel}
         </Button>
       </GasDepositChecker>
 

@@ -24,9 +24,11 @@ import styles from './ExitStrategy.module.scss';
 interface ExitStrategyPropsI {
   isLoading: boolean;
   hasBuyOpenOrder: boolean;
+  claimFunds: () => void;
+  hasFundsAfterClosing: boolean;
 }
 
-export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI) => {
+export const ExitStrategy = ({ isLoading, hasBuyOpenOrder, hasFundsAfterClosing, claimFunds }: ExitStrategyPropsI) => {
   const { t } = useTranslation();
 
   const { address, chainId } = useAccount();
@@ -89,6 +91,8 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
       });
   }, [chainId, walletClient, isMultisigAddress, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
 
+  const handleClick = hasFundsAfterClosing ? claimFunds : handleExit;
+
   const handleModalClose = useCallback(() => {
     setShowConfirmModal(false);
   }, []);
@@ -125,7 +129,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
             {t('common.cancel-button')}
           </Button>
           <Button
-            onClick={handleExit}
+            onClick={handleClick}
             variant="primary"
             disabled={
               requestSent ||
@@ -136,7 +140,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
               !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
             }
           >
-            {t('pages.strategies.exit.confirm-modal.confirm-button')}
+            {hasFundsAfterClosing ? 'Claim Funds' : t('pages.strategies.exit.confirm-modal.confirm-button')}
           </Button>
         </DialogActions>
       </Dialog>
