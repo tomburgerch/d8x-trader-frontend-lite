@@ -332,14 +332,14 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   const needsTokens = weEthStrategyBalance < addAmount;
 
   const buttonLabel = useMemo(() => {
-    if (needsGas) {
+    if (needsGas && isMultisigAddress) {
       return 'Add Gas';
-    } else if (needsTokens) {
+    } else if (needsTokens && isMultisigAddress) {
       return `Add ${strategyPool?.poolSymbol}`;
     } else {
       return t('pages.strategies.enter.deposit-button');
     }
-  }, [needsGas, needsTokens, strategyPool, t]);
+  }, [isMultisigAddress, needsGas, needsTokens, strategyPool, t]);
 
   const handleClick = isMultisigAddress && (needsGas || needsTokens) ? handleFund : handleEnter;
 

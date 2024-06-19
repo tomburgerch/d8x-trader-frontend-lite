@@ -17,7 +17,6 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
-import { orderSubmitted } from 'network/broker';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom } from 'store/global-modals.store';
@@ -399,8 +398,6 @@ export const ActionBlock = memo(() => {
               postOrder(tradingClient, signatures, data.data)
                 .then((tx) => {
                   setShowReviewOrderModal(false);
-                  // success submitting order to the node - inform backend
-                  orderSubmitted(walletClient.chain.id, data.data.orderIds).then().catch(console.error);
                   // order was sent
                   clearInputsData();
                   toast.success(

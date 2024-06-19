@@ -6,6 +6,7 @@ import { estimateContractGas } from 'viem/actions';
 
 import { getGasLimit } from 'blockchain-api/getGasLimit';
 import { MethodE } from 'types/enums';
+import { orderSubmitted } from 'network/broker';
 
 export async function postOrder(
   walletClient: WalletClient,
@@ -23,12 +24,13 @@ export async function postOrder(
       TraderInterface.fromClientOrderToTypeSafeOrder
     ) as never[];
   }
-  if (!walletClient.account) {
+  if (!walletClient.account || walletClient?.chain === undefined) {
     throw new Error('account not connected');
   }
-  const gasPrice = await getGasPrice(walletClient.chain?.id);
+  const chain = walletClient.chain;
+  const gasPrice = await getGasPrice(chain.id);
   const params = {
-    chain: walletClient.chain,
+    chain,
     address: data.OrderBookAddr as Address,
     abi: LOB_ABI,
     functionName: 'postOrders',
@@ -39,6 +41,10 @@ export async function postOrder(
 
   const gasLimit = await estimateContractGas(walletClient, params)
     .then((gas) => (gas * 150n) / 100n)
-    .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }) * BigInt(orders.length));
-  return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => ({ hash: tx }));
+    .catch(() => getGasLimit({ chainId: chain.id, method: MethodE.Interact }) * BigInt(orders.length));
+  return walletClient.writeContract({ ...params, gas: gasLimit }).then((tx) => {
+    // success submitting order to the node - inform backend
+    orderSubmitted(chain.id, data.orderIds).then().catch(console.error);
+    return { hash: tx };
+  });
 }
