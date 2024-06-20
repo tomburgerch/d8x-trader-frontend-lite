@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
-import { ExtractPKModal } from 'components/extract-pk-modal/ExtractPKModal';
+import { ExtractSocialPKModal } from 'components/extract-pk-modal/ExtractSocialPKModal';
 import { Translate } from 'components/translate/Translate';
 import { Separator } from 'components/separator/Separator';
 import { Web3AuthDisconnectButton } from 'components/web3auth-connect-button/Web3AuthDisconnectButton';
@@ -14,7 +14,7 @@ import { WithdrawModal } from 'components/withdraw-modal/WithdrawModal';
 import {
   accountModalOpenAtom,
   depositModalOpenAtom,
-  extractPKModalOpenAtom,
+  extractSocialPKModalOpenAtom,
   withdrawModalOpenAtom,
 } from 'store/global-modals.store';
 import { gasTokenSymbolAtom } from 'store/pools.store';
@@ -28,7 +28,7 @@ export const AccountModal = () => {
   const gasTokenSymbol = useAtomValue(gasTokenSymbolAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
   const setWithdrawModalOpen = useSetAtom(withdrawModalOpenAtom);
-  const setExportPKModalOpen = useSetAtom(extractPKModalOpenAtom);
+  const setExtractPKModalOpen = useSetAtom(extractSocialPKModalOpenAtom);
 
   const handleOnClose = () => setAccountModalOpen(false);
 
@@ -44,7 +44,7 @@ export const AccountModal = () => {
             <Button onClick={() => setWithdrawModalOpen(true)} variant="primary" className={styles.button}>
               {t('common.account-modal.withdraw-button')}
             </Button>
-            <Button onClick={() => setExportPKModalOpen(true)} variant="primary" className={styles.button}>
+            <Button onClick={() => setExtractPKModalOpen(true)} variant="primary" className={styles.button}>
               {t('common.account-modal.extract-pk-button')}
             </Button>
           </div>
@@ -65,7 +65,7 @@ export const AccountModal = () => {
         </DialogActions>
       </Dialog>
 
-      <ExtractPKModal />
+      <ExtractSocialPKModal />
       <WithdrawModal />
     </>
   );
