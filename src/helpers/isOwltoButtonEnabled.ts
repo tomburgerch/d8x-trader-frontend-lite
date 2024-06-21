@@ -1,4 +1,4 @@
-import { config } from '../config';
+import { config } from 'config';
 
 export function isOwltoButtonEnabled(chainId?: number) {
   if (chainId && config.enabledOwltoByChains.length > 0) {

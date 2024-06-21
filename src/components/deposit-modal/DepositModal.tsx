@@ -13,9 +13,10 @@ import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
 import { Translate } from 'components/translate/Translate';
 import { WalletBalances } from 'components/wallet-balances/WalletBalances';
-import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
-import { isOwltoButtonEnabled } from 'helpers/isOwltoButtonEnabled';
+import { isCedeWidgetEnabled } from 'helpers/isCedeWidgetEnabled';
 import { isLifiWidgetEnabled } from 'helpers/isLifiWidgetEnabled';
+import { isOwltoButtonEnabled } from 'helpers/isOwltoButtonEnabled';
+import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom, modalSelectedCurrencyAtom } from 'store/global-modals.store';
 import { gasTokenSymbolAtom } from 'store/pools.store';
@@ -43,6 +44,7 @@ export const DepositModal = () => {
   const isBridgeShownOnPage = useBridgeShownOnPage();
   const isOwltoEnabled = isOwltoButtonEnabled(chainId);
   const isLiFiEnabled = isLifiWidgetEnabled(isOwltoEnabled, chainId);
+  const isCedeEnabled = isCedeWidgetEnabled(chainId);
 
   const targetAddress = useMemo(() => {
     if (activatedOneClickTrading && selectedCurrency?.isGasToken === false) {
@@ -94,17 +96,19 @@ export const DepositModal = () => {
         <div className={styles.section}>
           <CopyInput id="address" textToCopy={targetAddress || ''} />
         </div>
-        <div className={classNames(styles.section, styles.widgetButtons)}>
-          {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
-            <div>
-              {isLiFiEnabled && <LiFiWidgetButton />}
-              {isOwltoEnabled && <OwltoButton />}
-            </div>
-          ) : (
-            <div>{/* empty block */}</div>
-          )}
-          <CedeWidgetButton />
-        </div>
+        {(isCedeEnabled || isLiFiEnabled || isOwltoEnabled) && (
+          <div className={classNames(styles.section, styles.widgetButtons)}>
+            {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
+              <div>
+                {isLiFiEnabled && <LiFiWidgetButton />}
+                {isOwltoEnabled && <OwltoButton />}
+              </div>
+            ) : (
+              <div>{/* empty block */}</div>
+            )}
+            {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
+          </div>
+        )}
         <Separator />
         <div className={styles.section}>
           <WalletBalances />
