@@ -521,10 +521,10 @@
         }
       },
       "pool-card": {
-        "vault": "Vault",
+        "vault": "Bóveda",
         "yields": {
-          "title": "Yield sources",
-          "trading-api": "Trading APY ({{percent}}%)",
+          "title": "Fuentes de rendimiento",
+          "trading-api": "TAE de negociación ({{percent}}%)",
           "weeth-yield": "weETH Staking Yield",
           "stusd-yield": "stUSD Yield",
           "ether-fi-points": "Ether.fi Points",
@@ -539,7 +539,7 @@
         "deposit-button": "Deposit"
       },
       "global-stats": {
-        "apy": "TAE hasta la fecha",
+        "apy": "TAE de negociación",
         "tvl": "Reservas Totales",
         "price": "Precio de d{{poolSymbol}}",
         "supply": "Suministro total de d{{poolSymbol}}"

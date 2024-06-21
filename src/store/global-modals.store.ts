@@ -6,4 +6,5 @@ export const oneClickModalOpenAtom = atom(false);
 export const connectModalOpenAtom = atom(false);
 export const lifiModalOpenAtom = atom(false);
 export const withdrawModalOpenAtom = atom(false);
-export const extractPKModalOpenAtom = atom(false);
+export const extractSocialPKModalOpenAtom = atom(false);
+export const extractOctPKModalOpenAtom = atom(false);
