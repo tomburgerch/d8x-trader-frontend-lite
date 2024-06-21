@@ -195,7 +195,7 @@
           "price": "价格",
           "quantity": "数量",
           "fee": "手续费",
-          "realized-profit": "未实现盈亏"
+          "realized-profit": "已实现盈亏"
         },
         "table-content": {
           "connect": "请连接钱包",
