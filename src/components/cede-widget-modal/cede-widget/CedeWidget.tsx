@@ -28,7 +28,7 @@ export const CedeWidget = () => {
         address: address, // destination address
         lockNetwork: false,
         // limit exchanges to those supporting app token/network if needed
-        exchangeIds: ['binance', 'coinbase', 'bybit', 'kraken', 'bingx'],
+        // exchangeIds: ['binance', 'coinbase', 'bybit', 'kraken', 'bingx'],
       };
 
       renderSendWidget(`#${CEDE_WIDGET_ID}`, { config: widgetConfig, theme: widgetTheme }).then();
