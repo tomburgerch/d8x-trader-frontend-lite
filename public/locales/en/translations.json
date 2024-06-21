@@ -539,7 +539,7 @@
         "deposit-button": "Deposit"
       },
       "global-stats": {
-        "apy": "All Time APY",
+        "apy": "Trading APY",
         "tvl": "TVL",
         "price": "d{{poolSymbol}} Price",
         "supply": "d{{poolSymbol}} Supply"

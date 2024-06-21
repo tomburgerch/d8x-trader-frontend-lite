@@ -50,27 +50,27 @@ export const cardona = {
   },
 } as const satisfies Chain;
 
-export const artio = {
-  id: 80085,
-  name: 'Berachain Artio',
-  // network: 'Berachain Artio',
+export const bartio = {
+  id: 80084,
+  name: 'Berachain bArtio',
+  // network: 'Berachain bArtio',
   nativeCurrency: {
     decimals: 18,
     name: 'BERA',
     symbol: 'BERA',
   },
   rpcUrls: {
-    public: { http: ['https://rpc.ankr.com/berachain_testnet'] },
-    default: { http: ['https://rpc.ankr.com/berachain_testnet'] },
+    public: { http: ['https://bartio.rpc.berachain.com/'] },
+    default: { http: ['https://bartio.rpc.berachain.com/'] },
   },
   blockExplorers: {
-    etherscan: { name: 'Beratrail', url: 'https://artio.beratrail.io/' },
-    default: { name: 'Beratrail', url: 'https://artio.beratrail.io/' },
+    etherscan: { name: 'Beratrail', url: 'https://bartio.beratrail.io/' },
+    default: { name: 'Beratrail', url: 'https://bartio.beratrail.io/' },
   },
   contracts: {
     multicall3: {
-      address: '0x9d1dB8253105b007DDDE65Ce262f701814B91125',
-      blockCreated: 0,
+      address: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      blockCreated: 109269,
     },
   },
 } as const satisfies Chain;

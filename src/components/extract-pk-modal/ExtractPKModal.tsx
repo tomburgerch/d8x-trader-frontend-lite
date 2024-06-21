@@ -1,5 +1,4 @@
-import { useAtom, useAtomValue } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
@@ -7,26 +6,34 @@ import { Button, DialogActions, DialogContent, DialogTitle, Typography } from '@
 import { CopyInput } from 'components/copy-input/CopyInput';
 import { Dialog } from 'components/dialog/Dialog';
 import { Separator } from 'components/separator/Separator';
-import { extractPKModalOpenAtom } from 'store/global-modals.store';
-import { socialPKAtom } from 'store/web3-auth.store';
 
 import styles from './ExtractPKModal.module.scss';
 
-export const ExtractPKModal = () => {
+interface ExtractPKModalPropsI {
+  getPK: () => Promise<string | null>;
+  isModalOpen: boolean;
+  setModalOpen: (isOpen: boolean) => void;
+}
+
+export const ExtractPKModal = ({ getPK, isModalOpen, setModalOpen }: ExtractPKModalPropsI) => {
   const { t } = useTranslation();
 
-  const [isExtractPKModalOpen, setExtractPKModalOpen] = useAtom(extractPKModalOpenAtom);
-  const socialPK = useAtomValue(socialPKAtom);
-
+  const [pk, setPK] = useState<string | null>(null);
   const [showPK, setShowPR] = useState(false);
 
   const handleOnClose = () => {
-    setExtractPKModalOpen(false);
+    setModalOpen(false);
     setShowPR(false);
   };
 
+  useEffect(() => {
+    if (showPK) {
+      getPK().then((givenPK) => setPK(givenPK));
+    }
+  }, [showPK, getPK]);
+
   return (
-    <Dialog open={isExtractPKModalOpen} onClose={handleOnClose} className={styles.dialog}>
+    <Dialog open={isModalOpen} onClose={handleOnClose} className={styles.dialog}>
       <DialogTitle>{t('common.extract-pk-modal.title')}</DialogTitle>
       <DialogContent className={styles.dialogContent}>
         <Separator />
@@ -39,7 +46,7 @@ export const ExtractPKModal = () => {
         )}
         {showPK && (
           <div className={styles.section}>
-            <CopyInput id="socialPK" textToCopy={socialPK || ''} />
+            <CopyInput id="socialPK" textToCopy={pk || ''} />
           </div>
         )}
         <Separator />

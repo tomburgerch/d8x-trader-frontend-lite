@@ -14,12 +14,13 @@ import { setDelegate } from 'blockchain-api/contract-interactions/setDelegate';
 import { generateDelegate } from 'blockchain-api/generateDelegate';
 import { getStorageKey } from 'blockchain-api/getStorageKey';
 import { Dialog } from 'components/dialog/Dialog';
+import { ExtractOctPKModal } from 'components/extract-pk-modal/ExtractOctPKModal';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getDelegateKey } from 'helpers/getDelegateKey';
 import { activatedOneClickTradingAtom, delegateAddressAtom, tradingClientAtom } from 'store/app.store';
-import { oneClickModalOpenAtom } from 'store/global-modals.store';
+import { extractOctPKModalOpenAtom, oneClickModalOpenAtom } from 'store/global-modals.store';
 import { storageKeyAtom } from 'store/order-block.store';
 import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -45,6 +46,7 @@ export const OneClickTradingModal = () => {
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const setTradingClient = useSetAtom(tradingClientAtom);
+  const setExtractPKModalOpen = useSetAtom(extractOctPKModalOpenAtom);
 
   const [isLoading, setLoading] = useState(false);
   const [isActionLoading, setActionLoading] = useState(false);
@@ -313,9 +315,9 @@ export const OneClickTradingModal = () => {
             </>
           )}
         </Box>
-        <Box className={styles.dialogContent}>
-          <Box className={styles.actionButtonsContainer}>
-            {!isLoading && isDelegated === false && (
+        <div className={styles.dialogContent}>
+          {!isLoading && isDelegated === false && (
+            <div className={styles.actionButtonsContainer}>
               <GasDepositChecker
                 address={walletClient?.account.address}
                 multiplier={2n}
@@ -331,9 +333,11 @@ export const OneClickTradingModal = () => {
                   {t(`common.settings.one-click-modal.create-delegate.create`)}
                 </Button>
               </GasDepositChecker>
-            )}
-            {!isLoading && isDelegated === true && (
-              <>
+            </div>
+          )}
+          {!isLoading && isDelegated === true && (
+            <>
+              <div className={styles.actionButtonsContainer}>
                 {activatedOneClickTrading ? (
                   <Button
                     variant="primary"
@@ -373,10 +377,20 @@ export const OneClickTradingModal = () => {
                     {t(`common.settings.one-click-modal.manage-delegate.fund`)}
                   </Button>
                 )}
-              </>
-            )}
-          </Box>
-        </Box>
+              </div>
+              <div className={styles.actionButtonsContainer}>
+                <Button
+                  onClick={() => setExtractPKModalOpen(true)}
+                  variant="primary"
+                  className={styles.actionButton}
+                  disabled={isActionLoading}
+                >
+                  {t('common.account-modal.extract-pk-button')}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
         <Separator />
         <Box className={styles.dialogContent}>
           <Box className={styles.closeButtonContainer}>
@@ -394,6 +408,7 @@ export const OneClickTradingModal = () => {
           delegateAddress={delegateAddress as Address}
         />
       )}
+      <ExtractOctPKModal />
     </>
   );
 };

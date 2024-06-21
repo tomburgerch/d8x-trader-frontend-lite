@@ -195,7 +195,7 @@
           "price": "价格",
           "quantity": "数量",
           "fee": "手续费",
-          "realized-profit": "未实现盈亏"
+          "realized-profit": "已实现盈亏"
         },
         "table-content": {
           "connect": "请连接钱包",
@@ -521,10 +521,10 @@
         }
       },
       "pool-card": {
-        "vault": "Vault",
+        "vault": "金库",
         "yields": {
           "title": "Yield sources",
-          "trading-api": "Trading APY ({{percent}}%)",
+          "trading-api": "交易年化收益率 ({{percent}}%)",
           "weeth-yield": "weETH Staking Yield",
           "stusd-yield": "stUSD Yield",
           "ether-fi-points": "Ether.fi Points",
@@ -536,10 +536,10 @@
           "turtle-ether-fi-points": "Turtle Ether.fi Points",
           "turtle-d8x-points": "Turtle D8X Points"
         },
-        "deposit-button": "Deposit"
+        "deposit-button": " 存入"
       },
       "global-stats": {
-        "apy": "实时APY",
+        "apy": "交易年化收益率",
         "tvl": "TVL",
         "price": "d{{poolSymbol}}价格",
         "supply": "d{{poolSymbol}}供应量"
