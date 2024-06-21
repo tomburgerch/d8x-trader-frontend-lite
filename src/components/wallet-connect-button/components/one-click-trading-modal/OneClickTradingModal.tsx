@@ -379,14 +379,16 @@ export const OneClickTradingModal = () => {
                 )}
               </div>
               <div className={styles.actionButtonsContainer}>
-                <Button
-                  onClick={() => setExtractPKModalOpen(true)}
-                  variant="primary"
-                  className={styles.actionButton}
-                  disabled={isActionLoading}
-                >
-                  {t('common.account-modal.extract-pk-button')}
-                </Button>
+                {activatedOneClickTrading && (
+                  <Button
+                    onClick={() => setExtractPKModalOpen(true)}
+                    variant="primary"
+                    className={styles.actionButton}
+                    disabled={isActionLoading}
+                  >
+                    {t('common.account-modal.extract-pk-button')}
+                  </Button>
+                )}
               </div>
             </>
           )}
