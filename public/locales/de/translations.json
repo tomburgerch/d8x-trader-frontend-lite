@@ -523,23 +523,23 @@
       "pool-card": {
         "vault": "Vault",
         "yields": {
-          "title": "Yield sources",
+          "title": "Ertragsquellen",
           "trading-api": "Trading APY ({{percent}}%)",
           "weeth-yield": "weETH Staking Yield",
           "stusd-yield": "stUSD Yield",
-          "ether-fi-points": "Ether.fi Points",
-          "eigen-layer-points": "EigenLayer Points",
-          "d8x-points": "D8X Points"
+          "ether-fi-points": "Ether.fi Punkte",
+          "eigen-layer-points": "EigenLayer Punkte",
+          "d8x-points": "D8X Punkte"
         },
         "boosts": {
           "title": "Turtle Club boost",
-          "turtle-ether-fi-points": "Turtle Ether.fi Points",
-          "turtle-d8x-points": "Turtle D8X Points"
+          "turtle-ether-fi-points": "Turtle Ether.fi Punkte",
+          "turtle-d8x-points": "Turtle D8X Punkte"
         },
         "deposit-button": "Deposit"
       },
       "global-stats": {
-        "apy": "Allzeit-APY",
+        "apy": "Trading-APY",
         "tvl": "TVL",
         "price": "d{{poolSymbol}} Preis",
         "supply": "d{{poolSymbol}} Angebot"
