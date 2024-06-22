@@ -73,7 +73,14 @@ export const DepositModal = () => {
         <Separator />
         <OKXConvertor />
         <div className={styles.section}>
-          <Typography variant="bodyTiny" className={styles.noteText}>
+          {activatedOneClickTrading ? (
+            <Typography variant="bodyMedium" className={styles.noteText}>
+              {t('common.deposit-modal.important-notice.0')}
+            </Typography>
+          ) : (
+            <div>{/* empty block */}</div>
+          )}
+          <Typography variant="bodySmall" className={styles.noteText}>
             <Translate
               i18nKey="common.deposit-modal.important-notice.1"
               values={{ currencyName: selectedCurrency?.name }}
