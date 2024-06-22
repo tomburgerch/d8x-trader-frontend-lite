@@ -739,6 +739,8 @@
     "cancel-button": "Cancelar",
     "address-label": "Direccion",
     "deposit-gas": "Deposite gasolina",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",
@@ -888,7 +890,7 @@
       "title": "Depósito",
       "important-notice": {
         "full": "Aviso importante: envíe solo <bold>{{currencyName}}</bold> (dirección del token: <bold>{{currencyContractAddress}}</bold) a esta dirección. Envíe por <bold>{{chainName}}</bold>.",
-        "1": "Aviso importante: envíe solo <bold>{{currencyName}}</bold>",
+        "0": "Importante: utiliza operaciones con un solo clic. Solo deposite GAS en su billetera delegada y garantía en su billetera principal. Asegúrese de verificar la dirección de depósito para cada moneda a continuación.",        "1": "envíe solo <bold>{{currencyName}}</bold>",
         "2": "(dirección del token: ",
         "3": ")",
         "4": "a esta dirección.",

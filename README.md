@@ -36,7 +36,13 @@ This package is configured entirely via environment variables. You must specify:
   - If it is enabled by chain and same chain is inside `VITE_ENABLED_LIFI_BY_CHAINS`, OWLTO will be shown instead of
     LiFi.
   - If it is required to be enabled for specific chains then it should take the form:
-    `VITE_ENABLED_OWLTO_BY_CHAINS=196`
+    `VITE_ENABLED_OWLTO_BY_CHAINS=196;1142`
+
+- **VITE_ENABLED_CEDE_BY_CHAINS**: This is an optional variable that enables the CEDE widget by chains.
+
+  - By default, the CEDE widget is not shown.
+  - If it is required to be enabled for specific chains then it should take the form:
+    `VITE_ENABLED_CEDE_BY_CHAINS=196;1142`
 
 - **VITE_ENABLED_REFER_PAGE**: This is an optional variable that allow to disable Refer page.
 
@@ -100,7 +106,7 @@ This package is configured entirely via environment variables. You must specify:
 
 - **VITE_REFERRAL_URL**: A semicolon separated list of endpoints served by the Referral API service.
 
-  - Example: you may be hosting the frontend on two different networks, Polgyon zkEVM (chain ID **1101**) and Polygon
+  - Example: you may be hosting the frontend on two different networks, Polygon zkEVM (chain ID **1101**) and Polygon
     zkEVM Testnet (chain ID **1442**), using URLS `https://referral.yourdomain.com`
     and `https://referral.test.yourdomain.com`, respectively, with mainnet being your default landing page.
   - Then you would define
@@ -173,11 +179,11 @@ This package is configured entirely via environment variables. You must specify:
 
 - **VITE_WEB3AUTH_CLIENT_ID** and **VITE_WEB3AUTH_ENVIRONMENT**: These variables are optional and only required in order
   to enable login via social networks.
-  - Setup your credentials as described [here](https://web3auth.io/docs/dashboard-setup/projects-and-analytics).
-  - In short, the instructions linked show you how to setup a project by choosing: a project name (any name you like),
+  - Set up your credentials as described [here](https://web3auth.io/docs/dashboard-setup/projects-and-analytics).
+  - In short, the instructions linked show you how to set up a project by choosing: a project name (any name you like),
     an environment (Sapphire Mainnet for production, or Sapphire Devnet for testing), a product type (Core Kit MPC), a
     platform (Web Application), and a chain (EVM Based Chain).
-  - Set VITE_WEB3AUTH_CLIENT_ID to the generated Client Id, and VITE_WEB3AUTH_ENVIRONMENT to either "sapphire_mainnet"
+  - Set VITE_WEB3AUTH_CLIENT_ID to the generated Client ID, and VITE_WEB3AUTH_ENVIRONMENT to either "sapphire_mainnet"
     or "sapphire_devnet" depending on your choice.
 - **VITE_FIREBASE**-prefixed variables (see sample .env file for full list): These are required when login via social
   networks is enabled.
@@ -214,7 +220,7 @@ You can update the svg file.
 
 ## Colors & Color scheme
 
-By default the FE supports a light and a dark color theme
+By default, the FE supports a light and a dark color theme
 
 ### How to modify existing themes
 
@@ -234,7 +240,7 @@ Fonts can be specified in `src/styles/theme/index.scss`
 
 ## Background
 
-By default the FE has a mobile, a tablet and a desktop background. The background is handled
+By default, the FE has a mobile, a tablet and a desktop background. The background is handled
 by `src/components/static-background/StaticBackground.tsx`
 
 ### Mobile & Tablet background
@@ -260,7 +266,7 @@ Backgrounds of the PnL poster are color scheme specific and are stored in `src/a
 
 Global styles are defined in `src/styles/theme/theme.ts` and in `index.scss`
 
-Local styles are defined in corresponing components
+Local styles are defined in corresponding components
 
 ## Manifest
 

@@ -739,6 +739,8 @@
     "amount-label": "数量",
     "address-label": "地址",
     "deposit-gas": "存入燃料",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "最大：",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",
@@ -888,6 +890,7 @@
       "title": "存款",
       "important-notice": {
         "full": "重要通知：只发送 <bold>{{currencyName}}</bold> (代币地址: <bold>{{currencyContractAddress}}</bold) 到这个地址。通过 <bold>{{chainName}}</bold>发送。",
+        "0": "重要提示：您使用一键交易。仅将 GAS 存入您的委托钱包，并将抵押品存入您的主钱包。请务必检查以下每种货币的存款地址。",
         "1": "重要通知：只发送 <bold>{{currencyName}}</bold>",
         "2": "(代币地址: ",
         "3": ")",

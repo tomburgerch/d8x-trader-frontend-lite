@@ -723,6 +723,8 @@
     "amount-label": "Amount",
     "address-label": "Address",
     "deposit-gas": "Deposit gas",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",
