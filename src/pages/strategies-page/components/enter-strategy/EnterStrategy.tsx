@@ -181,8 +181,8 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   }, [addAmount]);
 
   const handleFund = useCallback(() => {
-    console.log('handleFund');
-    console.log(strategyAddress, strategyWalletGas, STRATEGY_WALLET_GAS_TARGET);
+    //console.log('handleFund');
+    //console.log(strategyAddress, strategyWalletGas, STRATEGY_WALLET_GAS_TARGET);
     if (
       requestSentRef.current ||
       !walletClient ||
@@ -202,9 +202,9 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
         setCurrentPhaseKey
       )
         .then(({ hash }) => {
-          console.log(`funding strategy wallet w/ gas txn: ${hash}`);
-          // setTxHash(hash);
-          // setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
+          //console.log(`funding strategy wallet w/ gas txn: ${hash}`);
+          //setTxHash(hash);
+          setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
         })
         .catch((error) => {
           console.error(error);

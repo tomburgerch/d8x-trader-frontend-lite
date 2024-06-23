@@ -94,6 +94,10 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
   }, []);
 
   useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
     if (isLoading && hasBuyOpenOrder) {
       setCurrentPhaseKey('pages.strategies.exit.phases.waiting');
     } else if (isLoading) {

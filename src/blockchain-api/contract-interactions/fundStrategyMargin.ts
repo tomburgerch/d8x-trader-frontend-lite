@@ -63,7 +63,7 @@ export async function fundStrategyMargin(
   });
   const amountBigint = parseUnits(amount.toString(), decimals);
   if (strategyBalance < amountBigint) {
-    console.log('funding strategy account');
+    //console.log('funding strategy account');
     setCurrentPhaseKey('pages.strategies.enter.phases.funding');
     const gasPrice = await getGasPrice(walletClient.chain?.id);
     const params: WriteContractParameters = {
