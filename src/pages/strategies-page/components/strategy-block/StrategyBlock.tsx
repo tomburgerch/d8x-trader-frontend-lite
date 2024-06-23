@@ -263,6 +263,7 @@ export const StrategyBlock = () => {
         })
         .finally(() => {
           claimRequestSentRef.current = false;
+          setHadPosition(null);
         });
     }
   }, [

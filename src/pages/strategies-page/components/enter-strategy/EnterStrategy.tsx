@@ -31,7 +31,6 @@ import { useEnterStrategy } from './hooks/useEnterStrategy';
 import styles from './EnterStrategy.module.scss';
 import { STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
 import { fundStrategyGas } from 'blockchain-api/contract-interactions/fundStrategyGas';
-import { fundStrategyMargin } from 'blockchain-api/contract-interactions/fundStrategyMargin';
 
 interface EnterStrategyPropsI {
   isLoading: boolean;
@@ -97,8 +96,6 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   });
 
   const weEthMainBalance = weEthPoolBalance ? +formatUnits(weEthPoolBalance[1], weEthPoolBalance[0]) * 0.99 : 0;
-
-  const weEthStrategyBalance = weEthPoolBalance ? +formatUnits(weEthPoolBalance[2], weEthPoolBalance[0]) * 0.99 : 0;
 
   const { data: strategtWalletBalance, refetch: refetchGas } = useBalance({
     address: strategyAddress,
@@ -220,46 +217,15 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           refetchGas();
         });
     }
-    // is margin token balance too low?
-    if (weEthStrategyBalance < addAmount) {
-      return fundStrategyMargin(
-        {
-          walletClient,
-          strategyAddress,
-          isMultisigAddress,
-          amount: addAmount,
-          marginTokenAddress: strategyPool.marginTokenAddr as Address,
-        },
-        setCurrentPhaseKey
-      )
-        .then(({ hash }) => {
-          console.log(`funding strategy wallet w/ margin tokens txn: ${hash}`);
-          // setTxHash(hash);
-          // setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
-          setLoading(false);
-        })
-        .finally(() => {
-          setRequestSent(false);
-          requestSentRef.current = false;
-          refetch();
-        });
-    }
   }, [
-    addAmount,
     chainId,
     isMultisigAddress,
     strategyPool,
     strategyWalletGas,
-    refetch,
     refetchGas,
     sendTransactionAsync,
     strategyAddress,
     walletClient,
-    weEthStrategyBalance,
   ]);
 
   const handleEnter = useCallback(() => {
@@ -329,19 +295,15 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
 
   const needsGas = strategyWalletGas !== undefined && strategyWalletGas < STRATEGY_WALLET_GAS_TARGET;
 
-  const needsTokens = weEthStrategyBalance < addAmount;
-
   const buttonLabel = useMemo(() => {
     if (needsGas && isMultisigAddress) {
       return 'Add Gas';
-    } else if (needsTokens && isMultisigAddress) {
-      return `Add ${strategyPool?.poolSymbol}`;
     } else {
       return t('pages.strategies.enter.deposit-button');
     }
-  }, [isMultisigAddress, needsGas, needsTokens, strategyPool, t]);
+  }, [isMultisigAddress, needsGas, t]);
 
-  const handleClick = isMultisigAddress && (needsGas || needsTokens) ? handleFund : handleEnter;
+  const handleClick = isMultisigAddress && needsGas ? handleFund : handleEnter;
 
   useEffect(() => {
     if (isLoading) {
@@ -384,7 +346,10 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           onClick={handleClick}
           className={styles.button}
           variant="primary"
-          disabled={requestSent || loading || addAmount === 0 || addAmount > weEthMainBalance}
+          disabled={
+            !(needsGas && isMultisigAddress) &&
+            (requestSent || loading || addAmount === 0 || addAmount > weEthMainBalance)
+          }
         >
           {buttonLabel}
         </Button>
