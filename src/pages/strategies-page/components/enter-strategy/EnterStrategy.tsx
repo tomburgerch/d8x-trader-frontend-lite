@@ -298,7 +298,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
 
   const buttonLabel = useMemo(() => {
     if (needsGas && isMultisigAddress) {
-      return 'Add Gas';
+      return t('common.deposit-gas');
     } else {
       return t('pages.strategies.enter.deposit-button');
     }

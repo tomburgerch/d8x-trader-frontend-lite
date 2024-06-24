@@ -50,11 +50,6 @@ export async function fundStrategyMargin(
         functionName: 'balanceOf',
         args: [strategyAddr],
       },
-      // {
-      //   ...marginTokenContract,
-      //   functionName: 'balanceOf',
-      //   args: [walletClient.account.address],
-      // },
       {
         ...marginTokenContract,
         functionName: 'decimals',
