@@ -201,9 +201,9 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
         sendTransactionAsync,
         setCurrentPhaseKey
       )
-        .then(({ hash }) => {
+        .then(() => {
+          // {hash} -> not used
           //console.log(`funding strategy wallet w/ gas txn: ${hash}`);
-          setTxHash(hash);
           setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
         })
         .catch((error) => {
@@ -224,7 +224,6 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     strategyWalletGas,
     refetchGas,
     sendTransactionAsync,
-    setTxHash,
     strategyAddress,
     walletClient,
   ]);
