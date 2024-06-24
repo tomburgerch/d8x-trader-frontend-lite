@@ -46,7 +46,8 @@ export async function fundStrategyGas(
       chainId: walletClient.chain?.id,
       to: strategyAddr,
       value: 2n * gas * gasPrice,
-      gas,
+      gasPrice,
+      gas: STRATEGY_WALLET_GAS_TARGET,
     }).catch((error) => {
       throw new Error(error.shortMessage);
     });
