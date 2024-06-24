@@ -54,8 +54,6 @@ export async function removeDelegate(
         to: account,
         value: balance - 2n * gasLimit * gasPrice,
         chainId: walletClient.chain?.id,
-        gas: gasLimit * 2n,
-        gasPrice,
       });
     }
   }
