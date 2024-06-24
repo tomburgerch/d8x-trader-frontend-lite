@@ -162,5 +162,5 @@ export async function enterStrategy(
 
   // post order
   setCurrentPhaseKey('pages.strategies.enter.phases.posting');
-  return hedgeClient ? postOrder(hedgeClient, [HashZero], data) : postOrder(walletClient, [HashZero], data);
+  return postOrder(hedgeClient ? hedgeClient : walletClient, [HashZero], data);
 }
