@@ -26,6 +26,7 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
@@ -66,6 +67,8 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const { address, chain, chainId } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId });
+
+  const { isMultisigAddress } = useUserWallet();
 
   const [requestSent, setRequestSent] = useState(false);
   const [modifyType, setModifyType] = useState(ModifyTypeE.Add);
@@ -405,7 +408,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       setLoading(true);
       getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral)
         .then(({ data }) => {
-          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, +addCollateral, poolTokenDecimals)
+          approveMarginToken({
+            walletClient,
+            marginTokenAddr: poolByPosition.marginTokenAddr,
+            isMultisigAddress,
+            proxyAddr,
+            minAmount: +addCollateral,
+            decimals: poolTokenDecimals,
+          })
             .then(() => {
               deposit(tradingClient, address, data)
                 .then((tx) => {

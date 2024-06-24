@@ -8,6 +8,11 @@ import { getEtherFiAPY } from 'network/network';
 import { strategyPerpetualStatsAtom, strategyPositionAtom } from 'store/strategies.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
+import EigenLayerLogo from '../assets/eigenLayerLogo.svg?react';
+import EtherFiLogo from '../assets/etherFiLogo.svg?react';
+import WeETHLogo from '../assets/weethLogo.svg?react';
+import D8XLogo from '../assets/d8xLogo.svg?react';
+
 import styles from './Overview.module.scss';
 
 export const Overview = () => {
@@ -65,6 +70,7 @@ export const Overview = () => {
             {t('pages.strategies.overview.your-yield')}
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
+            <span className={`${styles.itemLogoHolder} ${styles.rounded}`}>{<WeETHLogo />}</span>
             <span>{t('pages.strategies.overview.eth-apr')}</span>
             {strategyPosition && strategyPerpetualStats && syntheticPositionUSD && apy ? (
               <>
@@ -81,6 +87,7 @@ export const Overview = () => {
             )}
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
+            <span className={`${styles.itemLogoHolder} ${styles.rounded}`}>{<D8XLogo />}</span>
             <span>{t('pages.strategies.overview.d8x-apr')}</span>
             {strategyPerpetualStats && syntheticPositionUSD ? (
               <>{formatToCurrency((strategyPerpetualStats.currentFundingRateBps / 100 / 8) * 365 * 24, '%')}</>
@@ -90,16 +97,19 @@ export const Overview = () => {
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
             <>
+              <span className={`${styles.itemLogoHolder} ${styles.rounded}`}>{<EigenLayerLogo />}</span>
               <span>{t('pages.strategies.overview.your-points')}</span>
             </>
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
             <>
+              <span className={`${styles.itemLogoHolder} ${styles.rounded}`}>{<EtherFiLogo />}</span>
               <span>{t('pages.strategies.overview.your-points-2')}</span>
             </>
           </Typography>
           <Typography variant="bodyMedium" className={styles.dataValue}>
             <>
+              <span className={`${styles.itemLogoHolder} ${styles.rounded}`}>{<D8XLogo />}</span>
               <span>{t('pages.strategies.overview.your-points-3')}</span>
             </>
           </Typography>

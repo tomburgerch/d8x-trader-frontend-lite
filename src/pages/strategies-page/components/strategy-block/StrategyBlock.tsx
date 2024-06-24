@@ -10,6 +10,7 @@ import { CircularProgress } from '@mui/material';
 import { STRATEGY_SYMBOL } from 'appConstants';
 import { claimStrategyFunds } from 'blockchain-api/contract-interactions/claimStrategyFunds';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getOpenOrders, getPositionRisk } from 'network/network';
 import { traderAPIAtom } from 'store/pools.store';
 import {
@@ -41,6 +42,8 @@ export const StrategyBlock = () => {
   const { address, chainId, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { sendTransactionAsync } = useSendTransaction();
+
+  const { isMultisigAddress } = useUserWallet();
 
   const traderAPI = useAtomValue(traderAPIAtom);
   const strategyPool = useAtomValue(strategyPoolAtom);
@@ -235,7 +238,16 @@ export const StrategyBlock = () => {
     ) {
       claimRequestSentRef.current = true;
       //console.log('claiming funds');
-      claimStrategyFunds({ chainId, walletClient, symbol: STRATEGY_SYMBOL, traderAPI }, sendTransactionAsync)
+      claimStrategyFunds(
+        {
+          chainId,
+          walletClient,
+          isMultisigAddress,
+          symbol: STRATEGY_SYMBOL,
+          traderAPI,
+        },
+        sendTransactionAsync
+      )
         .then(({ hash }) => {
           if (hash) {
             setTxHash(hash);
@@ -251,6 +263,7 @@ export const StrategyBlock = () => {
         })
         .finally(() => {
           claimRequestSentRef.current = false;
+          setHadPosition(null);
         });
     }
   }, [
@@ -262,6 +275,7 @@ export const StrategyBlock = () => {
     chainId,
     traderAPI,
     walletClient,
+    isMultisigAddress,
     setTxHash,
     sendTransactionAsync,
     triggerClaimFunds,

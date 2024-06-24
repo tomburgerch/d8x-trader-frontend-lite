@@ -23,6 +23,7 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { orderDigest } from 'network/network';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -59,6 +60,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId: chain?.id });
 
+  const { isMultisigAddress } = useUserWallet();
   const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   const [requestSent, setRequestSent] = useState(false);
@@ -168,7 +170,14 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
     orderDigest(chain.id, [closeOrder], address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
+          approveMarginToken({
+            walletClient,
+            marginTokenAddr: poolByPosition.marginTokenAddr,
+            isMultisigAddress,
+            proxyAddr,
+            minAmount: 0,
+            decimals: poolTokenDecimals,
+          }).then(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(tradingClient, signatures, data.data)
               .then(({ hash }) => {
@@ -217,6 +226,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       await cancelOrders({
         ordersToCancel,
         chain,
+        isMultisigAddress,
         traderAPI,
         tradingClient,
         toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),

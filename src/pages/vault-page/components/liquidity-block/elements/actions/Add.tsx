@@ -172,7 +172,14 @@ export const Add = memo(() => {
     requestSentRef.current = true;
     setRequestSent(true);
     setLoading(true);
-    approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, addAmount / 1.05, poolTokenDecimals)
+    approveMarginToken({
+      walletClient,
+      marginTokenAddr: selectedPool.marginTokenAddr,
+      isMultisigAddress,
+      proxyAddr,
+      minAmount: addAmount / 1.05,
+      decimals: poolTokenDecimals,
+    })
       .then(() => {
         setApprovalCompleted(true);
         setLoading(false);
@@ -212,7 +219,14 @@ export const Add = memo(() => {
     requestSentRef.current = true;
     setRequestSent(true);
     setLoading(true);
-    approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, addAmount / 1.05, poolTokenDecimals)
+    approveMarginToken({
+      walletClient,
+      marginTokenAddr: selectedPool.marginTokenAddr,
+      isMultisigAddress,
+      proxyAddr,
+      minAmount: addAmount / 1.05,
+      decimals: poolTokenDecimals,
+    })
       .then(() => {
         setApprovalCompleted(false);
         return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount);

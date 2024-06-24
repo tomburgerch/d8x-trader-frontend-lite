@@ -10,11 +10,12 @@ import { getGasPrice } from 'blockchain-api/getGasPrice';
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { getGasLimit } from 'blockchain-api/getGasLimit';
 import { MethodE } from 'types/enums';
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
 
 const GAS_TARGET = 1_000_000n;
 
 export async function claimStrategyFunds(
-  { chainId, walletClient, symbol, traderAPI }: HedgeConfigI,
+  { chainId, walletClient, isMultisigAddress, symbol, traderAPI }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
 ): Promise<{
   hash: Address | null;
@@ -81,7 +82,10 @@ export async function claimStrategyFunds(
         value: (gasLimit ?? GAS_TARGET) * gasPrice,
         gas: gasLimit,
       });
-      await waitForTransactionReceipt(hedgeClient, { hash: tx0, timeout: 30_000 });
+      await waitForTransactionReceipt(hedgeClient, {
+        hash: tx0,
+        timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
+      });
     }
 
     //console.log(`sending ${marginTokenBalance} tokens`);
@@ -95,7 +99,10 @@ export async function claimStrategyFunds(
       gas: gasLimit,
       gasPrice,
     });
-    await waitForTransactionReceipt(hedgeClient, { hash: tx1, timeout: 30_000 });
+    await waitForTransactionReceipt(hedgeClient, {
+      hash: tx1,
+      timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
+    });
   }
 
   //console.log('estimateGas: gas');
