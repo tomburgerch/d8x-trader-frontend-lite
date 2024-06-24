@@ -12,6 +12,7 @@ import { exitStrategy } from 'blockchain-api/contract-interactions/exitStrategy'
 import { Dialog } from 'components/dialog/Dialog';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { traderAPIAtom } from 'store/pools.store';
 import { strategyAddressesAtom } from 'store/strategies.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -31,6 +32,8 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
   const { address, chainId } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { sendTransactionAsync } = useSendTransaction();
+
+  const { isMultisigAddress } = useUserWallet();
 
   const traderAPI = useAtomValue(traderAPIAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
@@ -66,7 +69,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     setLoading(true);
 
     exitStrategy(
-      { chainId, walletClient, symbol: STRATEGY_SYMBOL, traderAPI, strategyAddress },
+      { chainId, walletClient, isMultisigAddress, symbol: STRATEGY_SYMBOL, traderAPI, strategyAddress },
       sendTransactionAsync,
       setCurrentPhaseKey
     )
@@ -84,11 +87,15 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
         requestSentRef.current = false;
         setRequestSent(false);
       });
-  }, [chainId, walletClient, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
+  }, [chainId, walletClient, isMultisigAddress, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
 
   const handleModalClose = useCallback(() => {
     setShowConfirmModal(false);
   }, []);
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
 
   useEffect(() => {
     if (isLoading && hasBuyOpenOrder) {

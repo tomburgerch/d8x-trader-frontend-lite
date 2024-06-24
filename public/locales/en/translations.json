@@ -739,6 +739,8 @@
     "amount-label": "Amount",
     "address-label": "Address",
     "deposit-gas": "Deposit gas",
+    "swap-bridge": "Swap/Bridge",
+    "offramp-button": "Deposit from CEX",
     "max": "Max:",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",
@@ -888,7 +890,8 @@
       "title": "Deposit",
       "important-notice": {
         "full": "Important notice: send only <bold>{{currencyName}}</bold> (token address: <bold>{{currencyContractAddress}}</bold) to this address. Send over <bold>{{chainName}}</bold>.",
-        "1": "Important notice: send only <bold>{{currencyName}}</bold>",
+        "0": "Important: you use one-click trading. Only deposit GAS into your delegate wallet and collateral into your main wallet. Ensure you check the deposit address for each currency below.",
+        "1": "Send only <bold>{{currencyName}}</bold>",
         "2": "(token address: ",
         "3": ")",
         "4": "to this address.",

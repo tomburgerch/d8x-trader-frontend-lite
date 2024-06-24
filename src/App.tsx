@@ -6,8 +6,9 @@ import { useAccount } from 'wagmi';
 import { CircularProgress } from '@mui/material';
 
 import { AtomsGlobalUpdates } from 'components/atoms-global-updates/AtomsGlobalUpdates';
-import { Footer } from 'components/footer/Footer';
+import { CedeWidgetModal } from 'components/cede-widget-modal/CedeWidgetModal';
 import { ConnectModal } from 'components/connect-modal/ConnectModal';
+import { Footer } from 'components/footer/Footer';
 import { Header } from 'components/header/Header';
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { SDKLoader } from 'components/sdk-loader/SDKLoader';
@@ -62,6 +63,7 @@ export const App = memo(() => {
         <AtomsGlobalUpdates />
         <WelcomeModal />
         <ReferralConfirmModal />
+        <CedeWidgetModal />
         {!isSignedInSocially && isConnected && <OneClickTradingModal />}
         {web3AuthConfig.isEnabled && !isConnected && <ConnectModal />}
         <ToastContainerWrapper />

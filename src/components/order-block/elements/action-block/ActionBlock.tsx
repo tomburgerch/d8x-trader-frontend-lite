@@ -17,7 +17,6 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
-import { orderSubmitted } from 'network/broker';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom } from 'store/global-modals.store';
@@ -123,7 +122,7 @@ export const ActionBlock = memo(() => {
     chainId,
   });
 
-  const { hasEnoughGasForFee } = useUserWallet();
+  const { hasEnoughGasForFee, isMultisigAddress } = useUserWallet();
 
   const orderInfo = useAtomValue(orderInfoAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
@@ -385,21 +384,20 @@ export const ActionBlock = memo(() => {
       .then((data) => {
         if (data.data.digests.length > 0) {
           // hide modal now that metamask popup shows up
-          approveMarginToken(
+          approveMarginToken({
             walletClient,
-            selectedPool.marginTokenAddr,
+            marginTokenAddr: selectedPool.marginTokenAddr,
+            isMultisigAddress,
             proxyAddr,
-            collateralDeposit,
-            poolTokenDecimals
-          )
+            minAmount: collateralDeposit,
+            decimals: poolTokenDecimals,
+          })
             .then(() => {
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
               postOrder(tradingClient, signatures, data.data)
                 .then((tx) => {
                   setShowReviewOrderModal(false);
-                  // success submitting order to the node - inform backend
-                  orderSubmitted(walletClient.chain.id, data.data.orderIds).then().catch(console.error);
                   // order was sent
                   clearInputsData();
                   toast.success(

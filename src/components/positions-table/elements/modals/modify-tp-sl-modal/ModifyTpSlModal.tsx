@@ -15,6 +15,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getTradingFee, orderDigest, positionRiskOnTrade } from 'network/network';
@@ -81,6 +82,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
   const requestSentRef = useRef(false);
   const fetchFeeRef = useRef(false);
 
+  const { isMultisigAddress } = useUserWallet();
   const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
 
   useEffect(() => {
@@ -220,6 +222,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       ordersToCancel,
       chain,
       traderAPI,
+      isMultisigAddress,
       tradingClient,
       toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),
       nonceShift: 0,
@@ -272,13 +275,14 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
           .then((data) => {
             if (data.data.digests.length > 0) {
               // hide modal now that metamask popup shows up
-              approveMarginToken(
+              approveMarginToken({
                 walletClient,
-                poolByPosition.marginTokenAddr,
+                marginTokenAddr: poolByPosition.marginTokenAddr,
+                isMultisigAddress,
                 proxyAddr,
-                collateralDeposit,
-                poolTokenDecimals
-              )
+                minAmount: collateralDeposit,
+                decimals: poolTokenDecimals,
+              })
                 .then(() => {
                   // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
                   const signatures = new Array<string>(data.data.digests.length).fill(HashZero);

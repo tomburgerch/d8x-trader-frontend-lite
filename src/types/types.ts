@@ -460,6 +460,7 @@ export interface HedgeConfigI {
   chainId: number; //42161 | 421614;
   symbol: string; // 'ETH-USD-WEETH';
   walletClient: WalletClient;
+  isMultisigAddress: boolean | null;
   traderAPI: TraderInterface;
   amount?: number; // only used to open
   feeRate?: number; // only used to open
