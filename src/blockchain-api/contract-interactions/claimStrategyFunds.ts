@@ -80,7 +80,6 @@ export async function claimStrategyFunds(
         chainId: walletClient.chain?.id,
         to: hedgeClient.account.address,
         value: (gasLimit ?? GAS_TARGET) * gasPrice,
-        gas: gasLimit,
       });
       await waitForTransactionReceipt(hedgeClient, {
         hash: tx0,
@@ -116,13 +115,11 @@ export async function claimStrategyFunds(
     .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
   const { value: balance } = await getBalance(wagmiConfig, { address: hedgeClient.account.address });
   if (gasLimit && gasLimit * gasPrice < balance) {
-    //console.log('sendTransactionAsync');
     return sendTransactionAsync({
       account: hedgeClient.account,
       chainId: hedgeClient.chain?.id,
       to: walletClient.account.address,
       value: balance - gasLimit * gasPrice,
-      gas: gasLimit,
     }).then((tx) => ({ hash: tx }));
   }
   return { hash: null };
