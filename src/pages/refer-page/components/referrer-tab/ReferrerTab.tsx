@@ -34,6 +34,7 @@ export const ReferrerTab = memo(() => {
     const totalEarnedCommission: OverviewPoolItemI[] = [];
 
     pools.forEach((pool) => {
+      // @TODO: totalEarnedCommission in settlement token
       const earnedCommissionAmount = earnedRebates
         .filter((rebate) => !rebate.asTrader && rebate.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);

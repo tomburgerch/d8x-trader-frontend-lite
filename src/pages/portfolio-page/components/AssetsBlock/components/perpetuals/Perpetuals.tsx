@@ -11,8 +11,8 @@ import styles from './Perpetuals.module.scss';
 export const Perpetuals = () => {
   const { t } = useTranslation();
 
-  const [unrealizedPnLList] = useAtom(unrealizedPnLListAtom);
-  const [realizedPnLList] = useAtom(realizedPnLListAtom);
+  const [unrealizedPnLList] = useAtom(unrealizedPnLListAtom); // @TODO in settlement currency
+  const [realizedPnLList] = useAtom(realizedPnLListAtom); // @TODO in settlement currency
 
   return (
     <>

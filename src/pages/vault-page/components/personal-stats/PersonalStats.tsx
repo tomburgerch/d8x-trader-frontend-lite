@@ -62,7 +62,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
     earningsRequestSentRef.current = true;
 
-    getEarnings(chainId, address, selectedPool.poolSymbol)
+    getEarnings(chainId, address, selectedPool.poolSymbol) // @TODO: earnings in settlement token
       .then(({ earnings }) => setEstimatedEarnings(earnings))
       .catch((error) => {
         console.error(error);

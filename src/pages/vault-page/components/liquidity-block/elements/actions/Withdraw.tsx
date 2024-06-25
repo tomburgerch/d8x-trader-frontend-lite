@@ -207,7 +207,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     const latestWithdrawal = withdrawals[withdrawals.length - 1];
 
     if (dCurrencyPrice) {
-      return latestWithdrawal.shareAmount * dCurrencyPrice;
+      return latestWithdrawal.shareAmount * dCurrencyPrice; // @TODO in settlement currency
     }
     return 0;
   }, [dCurrencyPrice, withdrawals]);

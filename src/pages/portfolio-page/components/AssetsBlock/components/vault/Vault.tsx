@@ -16,7 +16,7 @@ export const Vault = () => {
   const { t } = useTranslation();
 
   const [poolShareTokensShare] = useAtom(poolShareTokensShareAtom);
-  const [earningsList] = useAtom(earningsListAtom);
+  const [earningsList] = useAtom(earningsListAtom); // @TODO in settlement currency
 
   const totalPoolShare = useMemo(
     () => poolShareTokensShare.reduce((acc, curr) => acc + curr.balance, 0),

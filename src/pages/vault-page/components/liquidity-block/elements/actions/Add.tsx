@@ -255,7 +255,7 @@ export const Add = memo(() => {
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
-      return addAmount / dCurrencyPrice;
+      return addAmount / dCurrencyPrice; // @TODO addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
     }
     return 0;
   }, [addAmount, dCurrencyPrice]);
@@ -392,7 +392,7 @@ export const Add = memo(() => {
             currency={selectedPool?.poolSymbol}
             step="1"
             min={0}
-            max={poolTokenBalance || 999999}
+            max={poolTokenBalance || 999999} // @TODO in settlement currency
             disabled={loading}
           />
         </div>
@@ -402,7 +402,7 @@ export const Add = memo(() => {
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
-                  handleInputCapture(`${poolTokenBalance}`);
+                  handleInputCapture(`${poolTokenBalance}`); // @TODO in settlement currency
                 }
               }}
             >
