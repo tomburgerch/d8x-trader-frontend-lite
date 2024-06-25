@@ -187,7 +187,7 @@ export const PositionsTable = () => {
         fieldType: FieldTypeE.Number,
       },
       {
-        field: 'collateralCC',
+        field: 'collateralCC', // @TODO: settlement token
         label: t('pages.trade.positions-table.table-header.margin'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,

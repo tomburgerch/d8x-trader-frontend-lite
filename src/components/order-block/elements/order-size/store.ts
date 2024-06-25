@@ -45,7 +45,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
 
   if (openPosition && openPosition.side !== orderBlockSide) {
-    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY;
+    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @TODO: margin token!
   }
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);

@@ -410,7 +410,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
         .then(({ data }) => {
           approveMarginToken({
             walletClient,
-            marginTokenAddr: poolByPosition.marginTokenAddr,
+            marginTokenAddr: poolByPosition.marginTokenAddr, // @TODO: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: +addCollateral,

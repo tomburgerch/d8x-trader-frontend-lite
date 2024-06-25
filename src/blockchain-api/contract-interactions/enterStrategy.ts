@@ -89,7 +89,7 @@ export async function enterStrategy(
     feeRate * 1e-5, // fee rate
     position.markPrice, // mark price
     indexPrice ?? position.markPrice, // index price
-    position.collToQuoteConversion // collateral price
+    position.collToQuoteConversion // collateral price // @TODO: this should be s3
   );
 
   const order: OrderI = {

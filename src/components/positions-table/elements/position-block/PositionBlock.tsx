@@ -107,6 +107,7 @@ export const PositionBlock = memo(
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />
+          {/* // @TODO: settlement token */}
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}

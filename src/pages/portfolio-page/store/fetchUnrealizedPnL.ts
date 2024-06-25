@@ -38,7 +38,7 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
     const [baseSymbol, , poolSymbol] = position.symbol.split('-');
     const positionUnrealizedPnl = position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote;
     totalUnrealizedPnl += positionUnrealizedPnl;
-
+    // @TODO: margin token, but result needed in settlement token
     totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
     totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
 

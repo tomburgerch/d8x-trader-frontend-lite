@@ -282,6 +282,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
                 : formatToCurrency(selectedPosition.liqPrice, parsedSymbol?.quoteCurrency, true)
             }
           />
+          {/* // @TODO: settlement token */}
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
             rightSide={`${formatToCurrency(selectedPosition?.collateralCC, parsedSymbol?.poolSymbol, true)}${

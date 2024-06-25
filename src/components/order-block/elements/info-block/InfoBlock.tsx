@@ -85,7 +85,7 @@ export const InfoBlock = memo(() => {
     const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
     const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
     if (openPosition && openPosition.side !== orderBlockSide) {
-      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY;
+      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @TODO: margin token!
     }
 
     let orderSizeNet = orderSize;
@@ -150,6 +150,7 @@ export const InfoBlock = memo(() => {
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
           {formatToCurrency(approxDepositFromWallet, orderInfo?.poolName)}
+          {/* @TODO: approxDeposit should be converted from margin to settlment ccy */}
         </Typography>
       </div>
       <div className={styles.row}>
