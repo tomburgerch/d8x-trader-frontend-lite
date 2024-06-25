@@ -73,7 +73,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.marginTokenAddr as Address, // @TODO: settlement token, but everything here is constant
         abi: erc20Abi,
         functionName: 'decimals',
       },

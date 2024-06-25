@@ -35,7 +35,7 @@ export const CurrencySelect = () => {
           name: pool.poolSymbol,
           isGasToken: false,
           isActiveToken: true,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.marginTokenAddr as Address, // @TODO: used to show pool info -> use settlement token
         })
       );
 
@@ -46,7 +46,7 @@ export const CurrencySelect = () => {
           name: pool.poolSymbol,
           isGasToken: false,
           isActiveToken: false,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.marginTokenAddr as Address, // @TODO: idem
         })
       );
     }

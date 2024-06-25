@@ -172,7 +172,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
         if (data.data.digests.length > 0) {
           approveMarginToken({
             walletClient,
-            marginTokenAddr: poolByPosition.marginTokenAddr,
+            marginTokenAddr: poolByPosition.marginTokenAddr, // @TODO: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: 0,

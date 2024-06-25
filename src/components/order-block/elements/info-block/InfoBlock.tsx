@@ -138,6 +138,7 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.balance')}
         </Typography>
         <TooltipMobile tooltip={selectedPool?.marginTokenAddr ? selectedPool.marginTokenAddr.toString() : '...'}>
+          {/* @TODO: settlement token */}
           <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
             {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
           </Typography>

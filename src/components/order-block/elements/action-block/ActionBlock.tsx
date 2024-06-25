@@ -386,7 +386,7 @@ export const ActionBlock = memo(() => {
           // hide modal now that metamask popup shows up
           approveMarginToken({
             walletClient,
-            marginTokenAddr: selectedPool.marginTokenAddr,
+            marginTokenAddr: selectedPool.marginTokenAddr, // @TODO: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: collateralDeposit,

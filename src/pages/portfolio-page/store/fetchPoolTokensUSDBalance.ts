@@ -15,7 +15,7 @@ export const fetchPoolTokensUSDBalanceAtom = atom(null, async (get, set, userAdd
   const [poolTokensBalances, poolTokensDecimals] = await Promise.all([
     multicall(wagmiConfig, {
       contracts: pools.map((pool) => ({
-        address: pool.marginTokenAddr as Address,
+        address: pool.marginTokenAddr as Address, // @TODO: settlement token (converted to usd anyway)
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [userAddress],

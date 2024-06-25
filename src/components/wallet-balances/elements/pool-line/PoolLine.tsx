@@ -20,7 +20,7 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: pool.marginTokenAddr as Address,
+        address: pool.marginTokenAddr as Address, // @TODO: settlement token
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],

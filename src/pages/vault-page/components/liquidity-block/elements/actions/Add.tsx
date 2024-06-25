@@ -174,7 +174,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      marginTokenAddr: selectedPool.marginTokenAddr,
+      marginTokenAddr: selectedPool.marginTokenAddr, // @TODO: settlement token
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,

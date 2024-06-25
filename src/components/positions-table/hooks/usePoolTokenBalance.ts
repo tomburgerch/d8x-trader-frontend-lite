@@ -26,13 +26,13 @@ export const usePoolTokenBalance = ({ poolByPosition }: PoolTokenBalancePropsI) 
     allowFailure: false,
     contracts: [
       {
-        address: poolByPosition?.marginTokenAddr as Address,
+        address: poolByPosition?.marginTokenAddr as Address, // @TODO: settlement token
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: poolByPosition?.marginTokenAddr as Address,
+        address: poolByPosition?.marginTokenAddr as Address, // @TODO: settlement token
         abi: erc20Abi,
         functionName: 'decimals',
       },

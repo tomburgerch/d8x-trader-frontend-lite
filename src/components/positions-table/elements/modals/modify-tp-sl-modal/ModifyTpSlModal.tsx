@@ -277,7 +277,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
               // hide modal now that metamask popup shows up
               approveMarginToken({
                 walletClient,
-                marginTokenAddr: poolByPosition.marginTokenAddr,
+                marginTokenAddr: poolByPosition.marginTokenAddr, // @TODO: settlement token
                 isMultisigAddress,
                 proxyAddr,
                 minAmount: collateralDeposit,
