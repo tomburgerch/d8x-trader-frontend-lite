@@ -158,6 +158,7 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
+          {/* @TODO: all fee data that is displaid should be converted from margin to settlment ccy */}
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>

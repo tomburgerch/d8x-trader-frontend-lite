@@ -252,7 +252,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       .then((data) => {
         setAPIBusy(false);
         setNewPositionRisk(data.data.newPositionRisk);
-        setMaxCollateral(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99);
+        setMaxCollateral(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99); // @TODO: settlement token & verify that the rest of logic can be left unchanged if max is correct
       })
       .catch((err) => {
         console.error(err);
@@ -295,7 +295,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
       getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        setMaxCollateral(data.amount < 0 ? 0 : data.amount * 0.99);
+        setMaxCollateral(data.amount < 0 ? 0 : data.amount * 0.99); // @TODO: settlement token & verify that the rest of logic can be left unchanged if max is correct
         setAPIBusy(false);
       });
     } else {
@@ -316,6 +316,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   }, [selectedPosition, parsedSymbol]);
 
   const calculatedMargin = useMemo(() => {
+    // @TODO: settlement token
     let margin;
     if (selectedPosition) {
       switch (modifyType) {

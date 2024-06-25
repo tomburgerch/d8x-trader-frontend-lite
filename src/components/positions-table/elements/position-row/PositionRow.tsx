@@ -64,12 +64,14 @@ export const PositionRow = memo(
               : formatToCurrency(position.liqPrice, parsedSymbol?.quoteCurrency, true)}
           </Typography>
         </TableCell>
+        {/* // @TODO: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
             {formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol, true)} (
             {Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>
+        {/* // @TODO: leave collateral token */}
         <TableCell align="right">
           <Typography
             variant="cellSmall"

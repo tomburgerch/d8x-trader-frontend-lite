@@ -117,6 +117,7 @@ export const PositionBlock = memo(
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />
+          {/* // @TODO: leave collateral token */}
           <SidesRow
             leftSide={headers[6].label}
             leftSideTooltip={headers[6].tooltip}

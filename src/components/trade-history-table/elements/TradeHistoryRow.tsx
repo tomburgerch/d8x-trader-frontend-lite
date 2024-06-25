@@ -47,11 +47,13 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           {perpetual ? formatToCurrency(Math.abs(tradeHistory.quantity), perpetual.baseCurrency, true) : ''}
         </Typography>
       </TableCell>
+      {/* // @TODO: fee in settlement token */}
       <TableCell align={headers[5].align}>
         <Typography variant="cellSmall">
           {perpetual ? formatToCurrency(tradeHistory.fee, perpetual.poolName, true) : ''}
         </Typography>
       </TableCell>
+      {/* // @TODO: profit in settlement token */}
       <TableCell align={headers[6].align}>
         <Typography variant="cellSmall" style={{ color: pnlColor }}>
           {perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName, true) : ''}
