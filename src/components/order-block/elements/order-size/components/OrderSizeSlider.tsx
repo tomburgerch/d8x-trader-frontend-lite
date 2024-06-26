@@ -3,7 +3,13 @@ import { useEffect } from 'react';
 
 import { Slider } from '@mui/material';
 
-import { maxOrderSizeAtom, orderSizeSliderAtom, setInputFromOrderSizeAtom, setOrderSizeAtom } from '../store';
+import {
+  maxOrderSizeAtom,
+  orderSizeAtom,
+  orderSizeSliderAtom,
+  setInputFromOrderSizeAtom,
+  setOrderSizeAtom,
+} from '../store';
 
 import styles from './OrderSizeSlider.module.scss';
 
@@ -15,16 +21,17 @@ const valueLabelFormat = (value: number) => `${Math.round(value)}%`;
 export const OrderSizeSlider = () => {
   const [sliderPercent, setSizeFromSlider] = useAtom(orderSizeSliderAtom);
   const maxOrderSize = useAtomValue(maxOrderSizeAtom);
+  const orderSize = useAtomValue(orderSizeAtom);
   const setOrderSize = useSetAtom(setOrderSizeAtom);
   const setInputFromOrderSize = useSetAtom(setInputFromOrderSizeAtom);
 
   useEffect(() => {
-    if (maxOrderSize) {
+    if (maxOrderSize && maxOrderSize < orderSize) {
       const percent = sliderPercent > 100 ? 100 : sliderPercent;
       const roundedValueBase = setOrderSize((percent * maxOrderSize) / 100);
       setInputFromOrderSize(roundedValueBase);
     }
-  }, [maxOrderSize, sliderPercent, setOrderSize, setInputFromOrderSize]);
+  }, [maxOrderSize, orderSize, sliderPercent, setOrderSize, setInputFromOrderSize]);
 
   return (
     <div className={styles.root}>
