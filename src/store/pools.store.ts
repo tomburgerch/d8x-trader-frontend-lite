@@ -232,3 +232,5 @@ export const failOrderIdAtom = atom(
     });
   }
 );
+
+export const collateralToSettleConversionAtom = atom(1);

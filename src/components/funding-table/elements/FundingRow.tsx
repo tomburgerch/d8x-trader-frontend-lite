@@ -12,10 +12,13 @@ interface FundingRowPropsI {
 }
 
 import styles from '../FundingTable.module.scss';
+import { useAtomValue } from 'jotai';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 
 export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
   const perpetual = funding.perpetual;
   const time = format(new Date(funding.timestamp), DATETIME_FORMAT);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   return (
     <TableRow key={funding.transactionHash}>
@@ -25,13 +28,13 @@ export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
       <TableCell align={headers[1].align}>
         <Typography variant="cellSmall">{funding.symbol}</Typography>
       </TableCell>
-      {/* // @TODO: funding.amount in settlement token */}
+      {/* // @DONE: funding.amount in settlement token */}
       <TableCell align={headers[2].align}>
         <Typography
           variant="cellSmall"
           className={funding.amount >= 0 ? styles.fundingPositive : styles.fundingNegative}
         >
-          {perpetual ? formatToCurrency(funding.amount, perpetual.poolName, true) : ''}
+          {perpetual ? formatToCurrency(funding.amount * c2s, perpetual.poolName, true) : ''}
         </Typography>
       </TableCell>
     </TableRow>

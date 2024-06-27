@@ -36,6 +36,8 @@ import { useTransferTokens } from './hooks/useTransferTokens';
 
 import styles from './WithdrawModal.module.scss';
 
+// @DONE use settle token, but this one looked tricky - @TODO test well
+
 export const WithdrawModal = () => {
   const { t } = useTranslation();
 
@@ -50,7 +52,7 @@ export const WithdrawModal = () => {
 
   const { gasTokenBalance, calculateGasForFee, refetchWallet } = useUserWallet();
 
-  const { setTxHash: setTxHashForTokensTransfer } = useTransferTokens(amountValue, selectedCurrency?.name);
+  const { setTxHash: setTxHashForTokensTransfer } = useTransferTokens(amountValue, selectedCurrency?.settleToken);
   const { setTxHash: setTxHashForGasTransfer } = useTransferGasToken(
     amountValue,
     selectedCurrency?.name,
@@ -192,7 +194,7 @@ export const WithdrawModal = () => {
               inputClassName={styles.input}
               inputValue={amountValue}
               setInputValue={setAmountValue}
-              currency={selectedCurrency?.name}
+              currency={selectedCurrency?.settleToken}
               min={0}
               max={maxTokenValue}
             />
@@ -206,7 +208,7 @@ export const WithdrawModal = () => {
                     }
                   }}
                 >
-                  {formatToCurrency(maxTokenValue, selectedCurrency?.name)}
+                  {formatToCurrency(maxTokenValue, selectedCurrency?.settleToken)}
                 </Link>
               </Typography>
             ) : null}

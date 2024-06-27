@@ -18,6 +18,7 @@ import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import {
+  collateralToSettleConversionAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
   proxyAddrAtom,
@@ -65,6 +66,7 @@ export const Add = memo(() => {
   const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
   const triggerAddInputFocus = useAtomValue(triggerAddInputFocusAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
 
@@ -255,10 +257,10 @@ export const Add = memo(() => {
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null) {
-      return addAmount / dCurrencyPrice; // @TODO addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
+      return addAmount / c2s / dCurrencyPrice; // @DONE addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
     }
     return 0;
-  }, [addAmount, dCurrencyPrice]);
+  }, [addAmount, c2s, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (
@@ -392,7 +394,7 @@ export const Add = memo(() => {
             currency={selectedPool?.settleSymbol}
             step="1"
             min={0}
-            max={poolTokenBalance || 999999} // @TODO in settlement currency
+            max={poolTokenBalance || 999999} // @DONE in settlement currency
             disabled={loading}
           />
         </div>
@@ -402,7 +404,7 @@ export const Add = memo(() => {
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
-                  handleInputCapture(`${poolTokenBalance}`); // @TODO in settlement currency
+                  handleInputCapture(`${poolTokenBalance}`); // @DONE in settlement currency
                 }
               }}
             >
@@ -428,7 +430,7 @@ export const Add = memo(() => {
                 </InputAdornment>
               }
               type="text"
-              value={formatToCurrency(predictedAmount, '')}
+              value={formatToCurrency(predictedAmount * c2s, '')}
               disabled
             />
           </div>

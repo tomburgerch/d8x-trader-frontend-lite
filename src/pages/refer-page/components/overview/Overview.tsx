@@ -10,6 +10,8 @@ interface OverviewPropsI {
   items: OverviewItemI[];
 }
 
+// @TODO: handle multiple c2s
+
 export const Overview = ({ title, items }: OverviewPropsI) => {
   return (
     <div className={styles.root}>

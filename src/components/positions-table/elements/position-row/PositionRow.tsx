@@ -13,7 +13,7 @@ import { TpSlValue } from '../tp-sl-value/TpSlValue';
 
 import styles from './PositionRow.module.scss';
 import { useAtomValue } from 'jotai';
-import { selectedPoolAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
 
 interface PositionRowPropsI {
   position: MarginAccountWithAdditionalDataI;
@@ -36,6 +36,7 @@ export const PositionRow = memo(
     const { t } = useTranslation();
 
     const pool = useAtomValue(selectedPoolAtom);
+    const c2s = useAtomValue(collateralToSettleConversionAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
 
@@ -73,7 +74,7 @@ export const PositionRow = memo(
         {/* // @TODO: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
-            {formatToCurrency(position.collateralCC, pool?.settleSymbol, true)} (
+            {formatToCurrency(position.collateralCC * c2s, pool?.settleSymbol, true)} (
             {Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>

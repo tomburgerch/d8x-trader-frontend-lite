@@ -13,7 +13,7 @@ import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getFundingRatePayments } from 'network/history';
-import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
+import { fundingListAtom, perpetualsAtom, poolsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -32,6 +32,7 @@ export const FundingTable = memo(() => {
 
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const perpetuals = useAtomValue(perpetualsAtom);
+  const pools = useAtomValue(poolsAtom);
   const positions = useAtomValue(positionsAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
@@ -100,15 +101,15 @@ export const FundingTable = memo(() => {
   const fundingListWithSymbol = useMemo(() => {
     return fundingList.map((funding): FundingWithSymbolDataI => {
       const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
-
+      const pool = pools.find(({ perpetuals: perps }) => perps.some(({ id }) => id === funding.perpetualId));
       return {
         ...funding,
         amount: -funding.amount,
-        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${pool?.settleSymbol}` : '',
         perpetual: perpetual ?? null,
       };
     });
-  }, [fundingList, perpetuals]);
+  }, [fundingList, perpetuals, pools]);
 
   const { filter, setFilter, filteredRows } = useFilter(fundingListWithSymbol, fundingListHeaders);
 

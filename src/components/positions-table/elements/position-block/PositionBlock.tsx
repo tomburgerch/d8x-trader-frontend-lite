@@ -14,7 +14,7 @@ import { TpSlValue } from '../tp-sl-value/TpSlValue';
 
 import styles from './PositionBlock.module.scss';
 import { useAtomValue } from 'jotai';
-import { selectedPoolAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
 
 interface PositionRowPropsI {
   headers: TableHeaderI<MarginAccountWithAdditionalDataI>[];
@@ -37,6 +37,7 @@ export const PositionBlock = memo(
     const { t } = useTranslation();
 
     const pool = useAtomValue(selectedPoolAtom);
+    const c2s = useAtomValue(collateralToSettleConversionAtom);
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
 
@@ -114,7 +115,7 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
-            rightSide={`${formatToCurrency(position.collateralCC, pool?.settleSymbol, true)}${' '}(${
+            rightSide={`${formatToCurrency(position.collateralCC * c2s, pool?.settleSymbol, true)}${' '}(${
               Math.round(position.leverage * 100) / 100
             }x)`}
             leftSideStyles={styles.dataLabel}

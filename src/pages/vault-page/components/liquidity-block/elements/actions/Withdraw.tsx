@@ -15,7 +15,7 @@ import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
   triggerUserStatsUpdateAtom,
@@ -54,6 +54,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const dCurrencyPrice = useAtomValue(dCurrencyPriceAtom);
   const userAmount = useAtomValue(userAmountAtom);
   const withdrawals = useAtomValue(withdrawalsAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const [hasOpenRequestOnChain, setWithrawalOnChain] = useAtom(withdrawalOnChainAtom);
@@ -290,7 +291,11 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           <Box className={styles.row}>
             <Typography variant="body2">{t('pages.vault.withdraw.action.receive')}</Typography>
             <Typography variant="body2">
-              <strong>{formatToCurrency(predictedAmount, selectedPool?.settleSymbol)}</strong>
+              <strong>
+                {predictedAmount === undefined
+                  ? '-'
+                  : formatToCurrency(predictedAmount * c2s, selectedPool?.settleSymbol)}
+              </strong>
             </Typography>
           </Box>
         </Box>

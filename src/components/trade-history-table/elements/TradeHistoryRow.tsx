@@ -6,6 +6,8 @@ import { TableCell, TableRow, Typography } from '@mui/material';
 import { DATETIME_FORMAT } from 'appConstants';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { useAtomValue } from 'jotai';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 
 interface TradeHistoryRowPropsI {
   headers: TableHeaderI<TradeHistoryWithSymbolDataI>[];
@@ -14,6 +16,8 @@ interface TradeHistoryRowPropsI {
 
 export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI) => {
   const { t } = useTranslation();
+
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
@@ -50,13 +54,13 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
       {/* // @TODO: fee in settlement token */}
       <TableCell align={headers[5].align}>
         <Typography variant="cellSmall">
-          {perpetual ? formatToCurrency(tradeHistory.fee, perpetual.poolName, true) : ''}
+          {perpetual ? formatToCurrency(tradeHistory.fee * c2s, perpetual.poolName, true) : ''}
         </Typography>
       </TableCell>
       {/* // @TODO: profit in settlement token */}
       <TableCell align={headers[6].align}>
         <Typography variant="cellSmall" style={{ color: pnlColor }}>
-          {perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName, true) : ''}
+          {perpetual ? formatToCurrency(tradeHistory.realizedPnl * c2s, perpetual.poolName, true) : ''}
         </Typography>
       </TableCell>
       {/* <TableCell align={headers[7].align} /> */}

@@ -9,7 +9,7 @@ import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPI } from 'network/history';
 import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom, tvlAtom } from 'store/vault-pools.store';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 
@@ -27,6 +27,7 @@ export const GlobalStats = () => {
   const traderAPI = useAtomValue(traderAPIAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
 
@@ -93,20 +94,22 @@ export const GlobalStats = () => {
     [weeklyAPI, t]
   );
 
+  // @DONE: c2s
+
   const items: StatDataI[] = useMemo(
     () => [
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
-        value: selectedPool && tvl != null ? formatToCurrency(tvl, selectedPool.settleSymbol, true) : '--',
-        numberOnly: tvl != null ? formatToCurrency(tvl, '', true) : '--',
+        value: selectedPool && tvl != null ? formatToCurrency(tvl * c2s, selectedPool.settleSymbol, true) : '--',
+        numberOnly: tvl != null ? formatToCurrency(tvl * c2s, '', true) : '--',
         currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
       },
       {
         id: 'dSymbolPrice',
         label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
-        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedPool?.settleSymbol, true) : '--',
-        numberOnly: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, '', true) : '--',
+        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice * c2s, selectedPool?.settleSymbol, true) : '--',
+        numberOnly: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice & c2s, '', true) : '--',
         currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
       },
       {
@@ -116,7 +119,7 @@ export const GlobalStats = () => {
         numberOnly: getDSupply(true),
       },
     ],
-    [selectedPool, tvl, dCurrencyPrice, getDSupply, t]
+    [selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]
   );
 
   if (isMobileScreen) {

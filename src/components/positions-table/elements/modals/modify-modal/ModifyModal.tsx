@@ -38,7 +38,13 @@ import {
   positionRiskOnCollateralAction,
 } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
-import { proxyAddrAtom, traderAPIAtom, traderAPIBusyAtom, triggerBalancesUpdateAtom } from 'store/pools.store';
+import {
+  collateralToSettleConversionAtom,
+  proxyAddrAtom,
+  traderAPIAtom,
+  traderAPIBusyAtom,
+  triggerBalancesUpdateAtom,
+} from 'store/pools.store';
 import type { MarginAccountI, PoolWithIdI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
@@ -62,6 +68,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerBalancesUpdate = useSetAtom(triggerBalancesUpdateAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
@@ -316,7 +323,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   }, [selectedPosition, parsedSymbol]);
 
   const calculatedMargin = useMemo(() => {
-    // @TODO: settlement token
+    // @DONE: settlement token
     let margin;
     if (selectedPosition) {
       switch (modifyType) {
@@ -332,9 +339,8 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     } else {
       margin = 0;
     }
-    // margin *= fx;
-    return formatToCurrency(margin, poolByPosition?.settleSymbol);
-  }, [selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
+    return formatToCurrency(margin * c2s, poolByPosition?.settleSymbol);
+  }, [c2s, selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
 
   const calculatedLeverage = useMemo(() => {
     if (!selectedPosition) {

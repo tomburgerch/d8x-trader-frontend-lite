@@ -256,6 +256,7 @@ export const OKXConvertor = () => {
   ) {
     return null;
   }
+  // @DONE: no change here (this is constant for okx)
 
   return (
     <div className={styles.section}>

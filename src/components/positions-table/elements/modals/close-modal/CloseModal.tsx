@@ -30,7 +30,7 @@ import { parseSymbol } from 'helpers/parseSymbol';
 import { orderSubmitted } from 'network/broker';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE, OrderTypeE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -55,6 +55,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
 
   const { address, chain } = useAccount();
@@ -285,7 +286,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           {/* // @TODO: settlement token */}
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={`${formatToCurrency(selectedPosition?.collateralCC, poolByPosition?.settleSymbol, true)}${
+            rightSide={`${formatToCurrency(selectedPosition.collateralCC * c2s, poolByPosition?.settleSymbol, true)}${
               selectedPosition && ` (${Math.round(selectedPosition?.leverage * 100) / 100}x)`
             }`}
           />

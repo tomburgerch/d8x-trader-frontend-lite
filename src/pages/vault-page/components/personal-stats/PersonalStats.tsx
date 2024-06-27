@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { getEarnings } from 'network/history';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   sdkConnectedAtom,
   triggerUserStatsUpdateAtom,
@@ -35,6 +35,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const hasOpenRequestOnChain = useAtomValue(withdrawalOnChainAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const [userAmount, setUserAmount] = useAtom(userAmountAtom);
 
   const [estimatedEarnings, setEstimatedEarnings] = useState<number | null>(null);
@@ -63,7 +64,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
     earningsRequestSentRef.current = true;
 
     getEarnings(chainId, address, selectedPool.poolSymbol) // @TODO: earnings in settlement token
-      .then(({ earnings }) => setEstimatedEarnings(earnings))
+      .then(({ earnings }) => setEstimatedEarnings(earnings < -0.0000000001 ? earnings : Math.max(earnings, 0)))
       .catch((error) => {
         console.error(error);
         setEstimatedEarnings(null);
@@ -112,10 +113,10 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         <Typography variant="bodyMedium" className={styles.statValue}>
           {estimatedEarnings !== null
             ? formatToCurrency(
-                estimatedEarnings < -0.0000000001 ? estimatedEarnings : Math.max(estimatedEarnings, 0),
+                estimatedEarnings * c2s,
                 selectedPool?.settleSymbol,
                 false,
-                Math.max(2, Math.ceil(4 - Math.log10(Math.max(Math.abs(estimatedEarnings), 0.0000000001))))
+                Math.max(2, Math.ceil(4 - Math.log10(Math.max(Math.abs(estimatedEarnings * c2s), 0.0000000001))))
               )
             : '--'}
         </Typography>

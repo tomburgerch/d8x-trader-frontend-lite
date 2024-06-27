@@ -23,6 +23,7 @@ import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
+  collateralToSettleConversionAtom,
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   poolFeeAtom,
@@ -138,6 +139,7 @@ export const ActionBlock = memo(() => {
   const hasTpSlOrders = useAtomValue(hasTpSlOrdersAtom);
   const poolFee = useAtomValue(poolFeeAtom);
   const currencyMultiplier = useAtomValue(currencyMultiplierAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
@@ -386,10 +388,10 @@ export const ActionBlock = memo(() => {
           // hide modal now that metamask popup shows up
           approveMarginToken({
             walletClient,
-            settleTokenAddr: selectedPool.settleTokenAddr, // @TODO: settlement token
+            settleTokenAddr: selectedPool.settleTokenAddr, // @DONE: amount is in settle ccy
             isMultisigAddress,
             proxyAddr,
-            minAmount: collateralDeposit,
+            minAmount: collateralDeposit * c2s,
             decimals: poolTokenDecimals,
           })
             .then(() => {
@@ -634,8 +636,8 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && collateralDeposit >= 0
-                    ? formatToCurrency(collateralDeposit, selectedPool?.settleSymbol)
-                    : '-' // @TODO: fx
+                    ? formatToCurrency(collateralDeposit * c2s, selectedPool?.settleSymbol)
+                    : '-' // @DONE: fx
                 }
                 rightSideStyles={styles.rightSide}
               />
@@ -648,7 +650,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol) //@TODO: fx
+                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol) //@DONE: already in settle ccy
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -766,7 +768,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
-                    ? formatToCurrency(newPositionRisk.collateralCC, selectedPool?.settleSymbol) // @TODO: fx
+                    ? formatToCurrency(newPositionRisk.collateralCC * c2s, selectedPool?.settleSymbol) // @DONE: fx
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
