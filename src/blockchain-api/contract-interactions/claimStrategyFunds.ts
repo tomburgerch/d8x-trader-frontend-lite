@@ -14,6 +14,8 @@ import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
 
 const GAS_TARGET = 1_000_000n;
 
+// @DONE: use settle token
+
 export async function claimStrategyFunds(
   { chainId, walletClient, isMultisigAddress, symbol, traderAPI }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>
@@ -38,9 +40,9 @@ export async function claimStrategyFunds(
     .positionRisk(hedgeClient.account.address, symbol)
     .then((pos) => pos[0])
     .catch(() => undefined);
-  const marginTokenAddr = traderAPI.getMarginTokenFromSymbol(symbol);
-  const marginTokenDec = traderAPI.getMarginTokenDecimalsFromSymbol(symbol);
-  if (!position || !marginTokenAddr || !marginTokenDec) {
+  const settleTokenAddr = traderAPI.getSettlementTokenFromSymbol(symbol);
+  const settleTokenDec = traderAPI.getSettlementTokenDecimalsFromSymbol(symbol);
+  if (!position || !settleTokenAddr || !settleTokenDec) {
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
   if (position.positionNotionalBaseCCY !== 0) {
@@ -50,20 +52,20 @@ export async function claimStrategyFunds(
   }
 
   //console.log('get balance and gas');
-  const marginTokenBalance = await readContract(walletClient, {
-    address: marginTokenAddr as Address,
+  const settleTokenBalance = await readContract(walletClient, {
+    address: settleTokenAddr as Address,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: [hedgeClient.account.address],
   });
   const gasPrice = await getGasPrice(walletClient.chain?.id);
-  if (marginTokenBalance > 0n) {
+  if (settleTokenBalance > 0n) {
     const params = {
-      address: marginTokenAddr as Address,
+      address: settleTokenAddr as Address,
       chain: walletClient.chain,
       abi: erc20Abi,
       functionName: 'transfer',
-      args: [walletClient.account.address, marginTokenBalance],
+      args: [walletClient.account.address, settleTokenBalance],
       account: hedgeClient.account,
       gasPrice,
     };
@@ -89,11 +91,11 @@ export async function claimStrategyFunds(
 
     //console.log(`sending ${marginTokenBalance} tokens`);
     const tx1 = await writeContract(hedgeClient, {
-      address: marginTokenAddr as Address,
+      address: settleTokenAddr as Address,
       chain: walletClient.chain,
       abi: erc20Abi,
       functionName: 'transfer',
-      args: [walletClient.account.address, marginTokenBalance],
+      args: [walletClient.account.address, settleTokenBalance],
       account: hedgeClient.account,
       gas: gasLimit,
       gasPrice,

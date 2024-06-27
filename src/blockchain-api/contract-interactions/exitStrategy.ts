@@ -14,6 +14,8 @@ import { fundStrategyGas } from './fundStrategyGas';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 
+//@DONE: didn't depend on the token used
+
 export async function exitStrategy(
   { chainId, walletClient, isMultisigAddress, symbol, traderAPI, limitPrice, strategyAddress }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,
@@ -37,9 +39,7 @@ export async function exitStrategy(
     .positionRisk(hedgeClient.account.address, symbol)
     .then((pos) => pos[0])
     .catch(() => undefined);
-  const marginTokenAddr = traderAPI.getMarginTokenFromSymbol(symbol);
-  const marginTokenDec = traderAPI.getMarginTokenDecimalsFromSymbol(symbol);
-  if (!position || !marginTokenAddr || !marginTokenDec) {
+  if (!position) {
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
   if (position.positionNotionalBaseCCY === 0 || position.side !== OrderSideE.Sell) {

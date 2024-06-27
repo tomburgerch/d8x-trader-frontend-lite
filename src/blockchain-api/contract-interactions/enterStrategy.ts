@@ -20,6 +20,8 @@ const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
 const PAGE_REFRESH_DELAY = 3_000; // Let's wait 3 sec before refresh
 
+//@DONE: use settle token
+
 export async function enterStrategy(
   {
     chainId,
@@ -62,14 +64,14 @@ export async function enterStrategy(
     .getReadOnlyProxyInstance()
     .isDelegate(strategyAddr, walletClient.account.address)) as boolean;
 
-  const marginTokenAddr = traderAPI.getMarginTokenFromSymbol(symbol) as Address | undefined;
-  const marginTokenDec = traderAPI.getMarginTokenDecimalsFromSymbol(symbol);
+  const settleTokenAddr = traderAPI.getSettlementTokenFromSymbol(symbol) as Address | undefined;
+  const settleTokenDec = traderAPI.getSettlementTokenDecimalsFromSymbol(symbol);
   const position = await traderAPI
     .positionRisk(strategyAddr, symbol)
     .then((pos) => pos[0])
     .catch(() => undefined);
-  if (!position || !marginTokenAddr || !marginTokenDec) {
-    //console.log({ position, marginTokenAddr, marginTokenDec });
+  if (!position || !settleTokenAddr || !settleTokenDec) {
+    //console.log({ position, settleTokenAddr, marginTokenDec });
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
 
@@ -142,7 +144,7 @@ export async function enterStrategy(
       walletClient,
       strategyAddress: strategyAddr,
       amount,
-      marginTokenAddress: marginTokenAddr,
+      settleTokenAddress: settleTokenAddr,
       isMultisigAddress,
     },
     setCurrentPhaseKey
@@ -150,11 +152,11 @@ export async function enterStrategy(
   // increase allowance if needed
   await approveMarginToken({
     walletClient: hedgeClient!,
-    marginTokenAddr,
+    settleTokenAddr,
     isMultisigAddress,
     proxyAddr: traderAPI.getProxyAddress(),
     minAmount: amount,
-    decimals: marginTokenDec,
+    decimals: settleTokenDec,
   }).catch((error) => {
     //console.log(error);
     throw new Error(error.shortMessage);

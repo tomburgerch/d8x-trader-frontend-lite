@@ -12,16 +12,18 @@ import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from './constants';
 
 interface ApproveMarginTokenPropsI {
   walletClient: WalletClient;
-  marginTokenAddr: string;
+  settleTokenAddr: string;
   isMultisigAddress: boolean | null;
   proxyAddr: string;
   minAmount: number;
   decimals: number;
 }
 
+// @DONE: use settle token
+
 export async function approveMarginToken({
   walletClient,
-  marginTokenAddr,
+  settleTokenAddr,
   isMultisigAddress,
   proxyAddr,
   minAmount,
@@ -33,7 +35,7 @@ export async function approveMarginToken({
   const minAmountBN = parseUnits((1.05 * minAmount).toFixed(decimals), decimals);
 
   const allowance = await readContract(wagmiConfig, {
-    address: marginTokenAddr as Address,
+    address: settleTokenAddr as Address,
     abi: erc20Abi,
     functionName: 'allowance',
     args: [walletClient.account.address, proxyAddr as Address],
@@ -49,7 +51,7 @@ export async function approveMarginToken({
     const gasPrice = await getGasPrice(walletClient.chain?.id);
     const params: WriteContractParameters = {
       chain: walletClient.chain,
-      address: marginTokenAddr as Address,
+      address: settleTokenAddr as Address,
       abi: erc20Abi,
       functionName: 'approve',
       args: [proxyAddr as Address, BigInt(MaxUint256)],
