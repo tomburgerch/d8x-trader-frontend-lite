@@ -8,7 +8,7 @@ import WeETHLogo from '../assets/weethLogo.svg?react';
 export const yieldsPerSymbol: Record<string, DataItemI[]> = {
   STUSD: [
     {
-      label: 'stUSD Yield',
+      label: 'USDC Yield', // @TODO: what to show here?
       logo: <StUSDLogo />,
       translationKey: 'stusd-yield',
     },
