@@ -172,7 +172,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
         if (data.data.digests.length > 0) {
           approveMarginToken({
             walletClient,
-            marginTokenAddr: poolByPosition.marginTokenAddr, // @TODO: settlement token
+            settleTokenAddr: poolByPosition.settleTokenAddr, // @TODO: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: 0,
@@ -285,7 +285,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           {/* // @TODO: settlement token */}
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={`${formatToCurrency(selectedPosition?.collateralCC, parsedSymbol?.poolSymbol, true)}${
+            rightSide={`${formatToCurrency(selectedPosition?.collateralCC, poolByPosition?.settleSymbol, true)}${
               selectedPosition && ` (${Math.round(selectedPosition?.leverage * 100) / 100}x)`
             }`}
           />

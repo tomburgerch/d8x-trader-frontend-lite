@@ -153,6 +153,8 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     setRequestSent(true);
     setLoading(true);
 
+    // @DONE: use settle token where corresponding, @TODO: fx?
+
     executeLiquidityWithdrawal(walletClient, liqProvTool, selectedPool.poolSymbol)
       .then((tx) => {
         setTxHash(tx.hash);
@@ -253,7 +255,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           {t('pages.vault.withdraw.info1')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
@@ -268,12 +270,12 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             title={
               <>
                 {!withdrawals.length && '2.'}{' '}
-                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.settleSymbol })}
               </>
             }
             content={
               <Typography>
-                {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.settleSymbol })}
               </Typography>
             }
           />
@@ -288,7 +290,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           <Box className={styles.row}>
             <Typography variant="body2">{t('pages.vault.withdraw.action.receive')}</Typography>
             <Typography variant="body2">
-              <strong>{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</strong>
+              <strong>{formatToCurrency(predictedAmount, selectedPool?.settleSymbol)}</strong>
             </Typography>
           </Box>
         </Box>

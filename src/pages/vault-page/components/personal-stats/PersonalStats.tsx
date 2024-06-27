@@ -73,6 +73,8 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
       });
   }, [chainId, address, selectedPool?.poolSymbol, triggerUserStatsUpdate]);
 
+  // @DONE: use settle token, @TODO: add fx
+
   return (
     <Box className={styles.root}>
       <Typography variant="h5" className={styles.heading}>
@@ -84,13 +86,13 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.amount.title')}
             content={
               <Typography>
-                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.personal-stats.amount.info', { poolSymbol: selectedPool?.settleSymbol })}
               </Typography>
             }
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {userAmount !== null ? formatToCurrency(userAmount, `d${selectedPool?.poolSymbol}`, true) : '--'}
+          {userAmount !== null ? formatToCurrency(userAmount, `d${selectedPool?.settleSymbol}`, true) : '--'}
         </Typography>
       </Box>
       <Box key="estimatedEarnings" className={styles.statContainer}>
@@ -101,7 +103,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
               <>
                 <Typography>{t('pages.vault.personal-stats.earnings.info1')}</Typography>
                 <Typography>
-                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.poolSymbol })}
+                  {t('pages.vault.personal-stats.earnings.info2', { poolSymbol: selectedPool?.settleSymbol })}
                 </Typography>
               </>
             }
@@ -111,7 +113,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           {estimatedEarnings !== null
             ? formatToCurrency(
                 estimatedEarnings < -0.0000000001 ? estimatedEarnings : Math.max(estimatedEarnings, 0),
-                selectedPool?.poolSymbol,
+                selectedPool?.settleSymbol,
                 false,
                 Math.max(2, Math.ceil(4 - Math.log10(Math.max(Math.abs(estimatedEarnings), 0.0000000001))))
               )
@@ -124,7 +126,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
             title={t('pages.vault.personal-stats.initiated.title')}
             content={
               <Typography>
-                {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.personal-stats.initiated.info1', { poolSymbol: selectedPool?.settleSymbol })}
               </Typography>
             }
           />
@@ -141,11 +143,11 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
               <>
                 <Typography>
                   {t('pages.vault.personal-stats.withdrawal-amount.info1', {
-                    poolSymbol: selectedPool?.poolSymbol,
+                    poolSymbol: selectedPool?.settleSymbol,
                   })}
                 </Typography>
                 <Typography>
-                  {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.poolSymbol })}
+                  {t('pages.vault.personal-stats.withdrawal-amount.info2', { poolSymbol: selectedPool?.settleSymbol })}
                 </Typography>
               </>
             }
@@ -153,7 +155,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
           {withdrawals && withdrawals.length > 0
-            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.poolSymbol}`)
+            ? formatToCurrency(withdrawals[withdrawals.length - 1].shareAmount, `d${selectedPool?.settleSymbol}`)
             : 'N/A'}
         </Typography>
       </Box>

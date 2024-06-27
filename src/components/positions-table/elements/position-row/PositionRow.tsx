@@ -12,6 +12,8 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { TpSlValue } from '../tp-sl-value/TpSlValue';
 
 import styles from './PositionRow.module.scss';
+import { useAtomValue } from 'jotai';
+import { selectedPoolAtom } from 'store/pools.store';
 
 interface PositionRowPropsI {
   position: MarginAccountWithAdditionalDataI;
@@ -20,6 +22,8 @@ interface PositionRowPropsI {
   handlePositionShare: (position: MarginAccountWithAdditionalDataI) => void;
   handleTpSlModify: (position: MarginAccountWithAdditionalDataI) => void;
 }
+
+// @DONE view, @TODO fx
 
 export const PositionRow = memo(
   ({
@@ -31,13 +35,15 @@ export const PositionRow = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
+    const pool = useAtomValue(selectedPoolAtom);
+
     const parsedSymbol = parseSymbol(position.symbol);
 
     return (
       <TableRow key={position.symbol}>
         <TableCell align="left">
           <Typography variant="cellSmall">
-            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{parsedSymbol?.poolSymbol}
+            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{pool?.settleSymbol}
           </Typography>
         </TableCell>
         <TableCell align="right">
@@ -67,7 +73,7 @@ export const PositionRow = memo(
         {/* // @TODO: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
-            {formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol, true)} (
+            {formatToCurrency(position.collateralCC, pool?.settleSymbol, true)} (
             {Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>

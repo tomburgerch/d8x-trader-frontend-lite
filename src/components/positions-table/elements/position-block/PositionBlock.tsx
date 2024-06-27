@@ -13,6 +13,8 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { TpSlValue } from '../tp-sl-value/TpSlValue';
 
 import styles from './PositionBlock.module.scss';
+import { useAtomValue } from 'jotai';
+import { selectedPoolAtom } from 'store/pools.store';
 
 interface PositionRowPropsI {
   headers: TableHeaderI<MarginAccountWithAdditionalDataI>[];
@@ -34,6 +36,7 @@ export const PositionBlock = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
+    const pool = useAtomValue(selectedPoolAtom);
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
 
@@ -45,7 +48,7 @@ export const PositionBlock = memo(
               {t('pages.trade.positions-table.position-block-mobile.symbol')}
             </Typography>
             <Typography variant="bodySmall" component="p" className={styles.symbol}>
-              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${parsedSymbol?.poolSymbol}`}
+              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${pool?.settleSymbol}`}
             </Typography>
           </Box>
           <IconButton
@@ -111,7 +114,7 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
-            rightSide={`${formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol, true)}${' '}(${
+            rightSide={`${formatToCurrency(position.collateralCC, pool?.settleSymbol, true)}${' '}(${
               Math.round(position.leverage * 100) / 100
             }x)`}
             leftSideStyles={styles.dataLabel}

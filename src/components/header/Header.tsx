@@ -96,6 +96,8 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const poolTokenBalanceDefinedRef = useRef(false);
   const poolTokenBalanceRetriesCountRef = useRef(0);
 
+  // fetch the settle ccy fx -> save to atom
+
   const setExchangeInfo = useCallback(
     (data: ExchangeInfoI | null) => {
       if (!data) {
@@ -126,6 +128,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
+        console.log(pool);
         perpetuals.push(
           ...pool.perpetuals.map((perpetual) => ({
             id: perpetual.id,
@@ -221,13 +224,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: selectedPool?.marginTokenAddr as Address, // @TODO: should be settlement token
+        address: selectedPool?.settleTokenAddr as Address, // @TODO: @DONE
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: selectedPool?.marginTokenAddr as Address, // @TODO: idem
+        address: selectedPool?.settleTokenAddr as Address, // @TODO: @DONE
         abi: erc20Abi,
         functionName: 'decimals',
       },
@@ -238,7 +241,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         address &&
         traderAPI?.chainId === chainId &&
         isEnabledChain(chainId) &&
-        !!selectedPool?.marginTokenAddr &&
+        !!selectedPool?.settleTokenAddr &&
         isConnected &&
         !isReconnecting &&
         !isConnecting,

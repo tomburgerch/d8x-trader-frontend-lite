@@ -73,25 +73,25 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: strategyPool?.marginTokenAddr as Address, // @TODO: settlement token, but everything here is constant
+        address: strategyPool?.settleTokenAddr as Address, // @TODO: settlement token, but everything here is constant
         abi: erc20Abi,
         functionName: 'decimals',
       },
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [strategyAddress as Address],
       },
     ],
     query: {
-      enabled: address && traderAPI?.chainId === chainId && !!strategyPool?.marginTokenAddr && isConnected,
+      enabled: address && traderAPI?.chainId === chainId && !!strategyPool?.settleTokenAddr && isConnected,
     },
   });
 

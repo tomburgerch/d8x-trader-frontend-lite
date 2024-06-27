@@ -137,7 +137,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.balance')}
         </Typography>
-        <TooltipMobile tooltip={selectedPool?.marginTokenAddr ? selectedPool.marginTokenAddr.toString() : '...'}>
+        <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
           {/* @TODO: settlement token */}
           <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
             {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
@@ -162,13 +162,13 @@ export const InfoBlock = memo(() => {
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>
-                {formatToCurrency(baseFeeInCC, selectedPool?.poolSymbol)}
+                {formatToCurrency(baseFeeInCC, selectedPool?.settleSymbol)}
               </span>
-              <span> {formatToCurrency(feeInCC, selectedPool?.poolSymbol)}</span>
+              <span> {formatToCurrency(feeInCC, selectedPool?.settleSymbol)}</span>
             </>
           ) : (
             <>
-              {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
+              {formatToCurrency(feeInCC, selectedPool?.settleSymbol)} {'('}
               {formatToCurrency(feePct, '%', false, 3)}
               {')'}
             </>
@@ -180,7 +180,7 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.execution-fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {formatToCurrency(perpetualStaticInfo?.referralRebate, selectedPool?.poolSymbol)}
+          {formatToCurrency(perpetualStaticInfo?.referralRebate, selectedPool?.settleSymbol)}
         </Typography>
       </div>
       {chainId === 1101 && (

@@ -42,7 +42,7 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
           <Typography variant="bodySmall" className={styles.label}>
             {option.item.baseCurrency}/{option.item.quoteCurrency}
             <Typography variant="bodyTiny" component="div">
-              {option.item.poolSymbol}
+              {option.item.settleSymbol}
             </Typography>
           </Typography>
         </div>

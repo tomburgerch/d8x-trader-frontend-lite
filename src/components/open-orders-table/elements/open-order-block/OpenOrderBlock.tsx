@@ -13,6 +13,8 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { typeToLabelMap } from '../../typeToLabelMap';
 
 import styles from './OpenOrderBlock.module.scss';
+import { useAtomValue } from 'jotai';
+import { selectedPoolAtom } from 'store/pools.store';
 
 interface OpenOrderBlockPropsI {
   headers: TableHeaderI<OrderWithIdI>[];
@@ -23,6 +25,7 @@ interface OpenOrderBlockPropsI {
 export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderBlockPropsI) => {
   const { t } = useTranslation();
 
+  const pool = useAtomValue(selectedPoolAtom);
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
@@ -35,7 +38,7 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
             {t('pages.trade.orders-table.order-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
-            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${parsedSymbol?.poolSymbol}`}
+            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${pool?.settleSymbol}`}
           </Typography>
         </Box>
         <IconButton

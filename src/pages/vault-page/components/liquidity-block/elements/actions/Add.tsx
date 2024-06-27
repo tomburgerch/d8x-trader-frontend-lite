@@ -174,7 +174,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      marginTokenAddr: selectedPool.marginTokenAddr, // @TODO: settlement token
+      settleTokenAddr: selectedPool.settleTokenAddr, // @TODO: settlement token
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -221,7 +221,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      marginTokenAddr: selectedPool.marginTokenAddr,
+      settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -324,7 +324,7 @@ export const Add = memo(() => {
     } else if (validityCheckAddType === ValidityCheckAddE.AmountBelowMinimum) {
       return `${t(
         'pages.vault.add.validity-amount-below-min'
-      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.poolSymbol})`;
+      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.settleSymbol})`;
     } else if (validityCheckAddType === ValidityCheckAddE.NoAmount) {
       return `${t('pages.vault.add.validity-no-amount')}`;
     }
@@ -337,7 +337,7 @@ export const Add = memo(() => {
     isMultisigAddress,
     validityCheckAddType,
     selectedPool?.brokerCollateralLotSize,
-    selectedPool?.poolSymbol,
+    selectedPool?.settleSymbol,
     approvalCompleted,
   ]);
 
@@ -370,18 +370,18 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
       </div>
       <div className={styles.contentBlock}>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
             <InfoLabelBlock
-              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.poolSymbol })}
-              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.poolSymbol })}
+              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.settleSymbol })}
+              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.settleSymbol })}
             />
           </div>
           <ResponsiveInput
@@ -389,7 +389,7 @@ export const Add = memo(() => {
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={selectedPool?.poolSymbol}
+            currency={selectedPool?.settleSymbol}
             step="1"
             min={0}
             max={poolTokenBalance || 999999} // @TODO in settlement currency
@@ -406,7 +406,7 @@ export const Add = memo(() => {
                 }
               }}
             >
-              {formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}
+              {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
             </Link>
           </Typography>
         ) : null}
@@ -415,7 +415,7 @@ export const Add = memo(() => {
         </div>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
-            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.poolSymbol })}
+            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
           </div>
           <div className={styles.inputHolder}>
             <OutlinedInput
@@ -423,7 +423,7 @@ export const Add = memo(() => {
               endAdornment={
                 <InputAdornment position="end" className={styles.expectedAmountInput}>
                   <Typography variant="adornment" color={'var(--d8x-color-text-label-one)'}>
-                    d{selectedPool?.poolSymbol}
+                    d{selectedPool?.settleSymbol}
                   </Typography>
                 </InputAdornment>
               }

@@ -54,10 +54,10 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   }
   const unroundedCCValue = tokenBalanceData ? +formatUnits(tokenBalanceData[0], tokenBalanceData[1]) : 1;
   const numberDigits = valueToFractionDigits(unroundedCCValue);
-
+  // @DONE use settle token @TODO fx
   return (
     <AssetLine
-      symbol={pool.poolSymbol}
+      symbol={pool.settleSymbol}
       value={tokenBalanceData ? (+formatUnits(tokenBalanceData[0], tokenBalanceData[1])).toFixed(numberDigits) : ''}
     />
   );

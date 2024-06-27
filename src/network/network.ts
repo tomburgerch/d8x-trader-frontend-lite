@@ -68,7 +68,8 @@ export async function getExchangeInfo(
     return { type: 'exchange-info', msg: '', data: info };
   } else {
     // console.log('exchangeInfo via BE');
-    return fetchUrl('exchange-info', chainId);
+    // return fetchUrl('exchange-info', chainId);
+    throw new Error('no api');
   }
 }
 
@@ -201,10 +202,10 @@ export async function getOpenOrders(
 // needs broker input, should go through backend
 export async function getTradingFee(
   chainId: number,
-  poolSymbol: string,
+  settleSymbol: string,
   traderAddr?: string
 ): Promise<ValidatedResponseI<number>> {
-  return fetchUrl(`trading-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`, chainId);
+  return fetchUrl(`trading-fee?settleSymbol=${settleSymbol}&traderAddr=${traderAddr}`, chainId);
 }
 
 export function getMaxOrderSizeForTrader(

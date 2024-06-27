@@ -71,10 +71,11 @@ export const currencyMultiplierAtom = atom((get) => {
 
   const selectedCurrency = get(selectedCurrencyPrimitiveAtom);
 
+  // @TODO: this should be consistent with how the multiplier is used
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
   if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
     currencyMultiplier = indexPrice;
-  } else if (selectedCurrency === selectedPool.poolSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
+  } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
     currencyMultiplier = indexPrice / collToQuoteIndexPrice;
   }
   return currencyMultiplier;

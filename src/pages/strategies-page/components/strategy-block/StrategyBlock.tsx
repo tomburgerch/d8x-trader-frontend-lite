@@ -75,13 +75,13 @@ export const StrategyBlock = () => {
     allowFailure: false,
     contracts: [
       {
-        address: strategyPool?.marginTokenAddr as Address, // @TODO: settlement token, but constant
+        address: strategyPool?.settleTokenAddr as Address, // @TODO: settlement token, but constant
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [strategyAddress!],
       },
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
       },
@@ -91,7 +91,7 @@ export const StrategyBlock = () => {
         strategyAddress &&
         traderAPI?.chainId === chainId &&
         isEnabledChain(chainId) &&
-        !!strategyPool?.marginTokenAddr &&
+        !!strategyPool?.settleTokenAddr &&
         isConnected,
     },
   });

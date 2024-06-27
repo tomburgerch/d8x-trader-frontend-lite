@@ -13,6 +13,8 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { Background } from './Background';
 import styles from './ShareModal.module.scss';
+import { useAtomValue } from 'jotai';
+import { selectedPoolAtom } from 'store/pools.store';
 
 interface ShareModalPropsI {
   isOpen: boolean;
@@ -23,6 +25,8 @@ interface ShareModalPropsI {
 export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareModalPropsI) => {
   const { t } = useTranslation();
   const statsRef = useRef<HTMLDivElement>(null);
+
+  const pool = useAtomValue(selectedPoolAtom);
 
   if (!selectedPosition) {
     return null;
@@ -75,7 +79,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
             </span>
             |
             <span>
-              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{parsedSymbol?.poolSymbol}{' '}
+              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{pool?.settleSymbol}{' '}
               {t('pages.trade.history-table.table-header.perpetual')}
             </span>
             |<span>{Math.round(selectedPosition.leverage * 100) / 100}x</span>

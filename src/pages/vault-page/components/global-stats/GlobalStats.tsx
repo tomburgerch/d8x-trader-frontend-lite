@@ -74,12 +74,12 @@ export const GlobalStats = () => {
 
   const getDSupply = useCallback(
     (justNumber: boolean) => {
-      if (selectedPool?.poolSymbol && dCurrencyPrice && tvl) {
-        return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.poolSymbol}`, true, undefined, justNumber);
+      if (selectedPool?.settleSymbol && dCurrencyPrice && tvl) {
+        return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.settleSymbol}`, true, undefined, justNumber);
       }
       return '--';
     },
-    [selectedPool?.poolSymbol, dCurrencyPrice, tvl]
+    [selectedPool?.settleSymbol, dCurrencyPrice, tvl]
   );
 
   const weeklyAPY: StatDataI = useMemo(
@@ -98,20 +98,20 @@ export const GlobalStats = () => {
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
-        value: selectedPool && tvl != null ? formatToCurrency(tvl, selectedPool.poolSymbol, true) : '--',
+        value: selectedPool && tvl != null ? formatToCurrency(tvl, selectedPool.settleSymbol, true) : '--',
         numberOnly: tvl != null ? formatToCurrency(tvl, '', true) : '--',
-        currencyOnly: selectedPool && tvl != null ? selectedPool.poolSymbol : '',
+        currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.poolSymbol }),
-        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedPool?.poolSymbol, true) : '--',
+        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
+        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedPool?.settleSymbol, true) : '--',
         numberOnly: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, '', true) : '--',
-        currencyOnly: dCurrencyPrice != null ? selectedPool?.poolSymbol : '',
+        currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.poolSymbol }),
+        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },

@@ -132,8 +132,9 @@ export const MarketSelect = memo(() => {
                 item: {
                   ...perpetual,
                   poolSymbol: pool.poolSymbol,
+                  settleSymbol: pool.settleSymbol,
                   symbol: createSymbol({
-                    poolSymbol: pool.poolSymbol,
+                    poolSymbol: pool.poolSymbol, // @TODO: not sure about this one
                     baseCurrency: perpetual.baseCurrency,
                     quoteCurrency: perpetual.quoteCurrency,
                   }),
@@ -162,7 +163,7 @@ export const MarketSelect = memo(() => {
             <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
               {cutBaseCurrency(selectedPerpetual?.baseCurrency)}/{selectedPerpetual?.quoteCurrency}
             </Typography>
-            <Typography variant="bodyTiny">{selectedPool?.poolSymbol}</Typography>
+            <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>
           </div>
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>

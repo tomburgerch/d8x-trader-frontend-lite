@@ -332,8 +332,9 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     } else {
       margin = 0;
     }
-    return formatToCurrency(margin, parsedSymbol?.poolSymbol);
-  }, [selectedPosition, modifyType, parsedSymbol, addCollateral, removeCollateral]);
+    // margin *= fx;
+    return formatToCurrency(margin, poolByPosition?.settleSymbol);
+  }, [selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
 
   const calculatedLeverage = useMemo(() => {
     if (!selectedPosition) {
@@ -411,7 +412,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
         .then(({ data }) => {
           approveMarginToken({
             walletClient,
-            marginTokenAddr: poolByPosition.marginTokenAddr, // @TODO: settlement token
+            settleTokenAddr: poolByPosition.settleTokenAddr, // @TODO: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: +addCollateral,
@@ -536,7 +537,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                     id="add-collateral"
                     endAdornment={
                       <InputAdornment position="end">
-                        <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
+                        <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
@@ -571,7 +572,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                       id="remove-collateral"
                       endAdornment={
                         <InputAdornment position="end">
-                          <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
+                          <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
                         </InputAdornment>
                       }
                       type="number"

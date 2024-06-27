@@ -24,7 +24,13 @@ export const CurrencySelect = () => {
     const currencies: CurrencyItemI[] = [];
 
     if (gasTokenSymbol) {
-      currencies.push({ id: gasTokenSymbol, name: gasTokenSymbol, isGasToken: true, isActiveToken: true });
+      currencies.push({
+        id: gasTokenSymbol,
+        name: gasTokenSymbol,
+        settleToken: gasTokenSymbol,
+        isGasToken: true,
+        isActiveToken: true,
+      });
     }
 
     if (pools.length) {
@@ -33,6 +39,7 @@ export const CurrencySelect = () => {
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: true,
           contractAddress: pool.marginTokenAddr as Address, // @TODO: used to show pool info -> use settlement token
@@ -44,6 +51,7 @@ export const CurrencySelect = () => {
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: false,
           contractAddress: pool.marginTokenAddr as Address, // @TODO: idem
