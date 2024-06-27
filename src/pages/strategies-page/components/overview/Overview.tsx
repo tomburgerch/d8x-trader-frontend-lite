@@ -75,7 +75,7 @@ export const Overview = () => {
             {strategyPosition && strategyPerpetualStats && syntheticPositionUSD && apy ? (
               <>
                 {formatToCurrency(
-                  // @TODO: margin, but this is constant
+                  // @DONE: margin, but this is constant
                   (strategyPosition?.collateralCC * Number(apy) * strategyPerpetualStats.indexPrice) /
                     syntheticPositionUSD,
                   '%',

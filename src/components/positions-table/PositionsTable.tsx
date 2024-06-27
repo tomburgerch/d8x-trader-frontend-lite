@@ -348,7 +348,6 @@ export const PositionsTable = () => {
 
       const foundPosition = positionsWithLiqPrice.find((position) => position.symbol === symbol);
       if (foundPosition) {
-        console.log(foundPosition);
         hasTpSlOrders = foundPosition.takeProfit.orders.length > 0 || foundPosition.stopLoss.orders.length > 0;
       }
     }

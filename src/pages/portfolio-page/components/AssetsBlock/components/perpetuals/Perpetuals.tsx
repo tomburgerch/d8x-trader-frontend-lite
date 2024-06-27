@@ -13,8 +13,8 @@ export const Perpetuals = () => {
   const { t } = useTranslation();
 
   const c2s = useAtomValue(collateralToSettleConversionAtom);
-  const unrealizedPnLList = useAtomValue(unrealizedPnLListAtom); // @TODO in settlement currency
-  const realizedPnLList = useAtomValue(realizedPnLListAtom); // @TODO in settlement currency
+  const unrealizedPnLList = useAtomValue(unrealizedPnLListAtom); // @DONE: values in cc ccy + settle symbol
+  const realizedPnLList = useAtomValue(realizedPnLListAtom); // @DONE idem
 
   return (
     <>

@@ -75,7 +75,7 @@ export const StrategyBlock = () => {
     allowFailure: false,
     contracts: [
       {
-        address: strategyPool?.settleTokenAddr as Address, // @TODO: settlement token, but constant
+        address: strategyPool?.settleTokenAddr as Address, // @DONE: settlement token, but constant
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [strategyAddress!],

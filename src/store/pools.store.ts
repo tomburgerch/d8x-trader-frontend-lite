@@ -142,7 +142,6 @@ export const positionsAtom = atom(
         }
 
         let unrealizedPnL;
-        // @TODO: margin token!
         if (position.side === 'BUY') {
           unrealizedPnL =
             position.positionNotionalBaseCCY * (markPrice - position.entryPrice) +

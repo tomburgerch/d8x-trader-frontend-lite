@@ -176,7 +176,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      settleTokenAddr: selectedPool.settleTokenAddr, // @TODO: settlement token
+      settleTokenAddr: selectedPool.settleTokenAddr, // @DONE: settlement token
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -231,7 +231,7 @@ export const Add = memo(() => {
     })
       .then(() => {
         setApprovalCompleted(false);
-        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount);
+        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount); // @DONE add liquidity will convert from settle to margin
       })
       .then((tx) => {
         setTxHash(tx.hash);
@@ -256,7 +256,7 @@ export const Add = memo(() => {
   };
 
   const predictedAmount = useMemo(() => {
-    if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null) {
+    if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null && c2s.has(selectedPool.poolSymbol)) {
       return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice; // @DONE addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
     }
     return 0;
@@ -432,7 +432,7 @@ export const Add = memo(() => {
               type="text"
               value={
                 selectedPool
-                  ? formatToCurrency(predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '')
+                  ? formatToCurrency(predictedAmount, '') // @DONE already in settle ccy
                   : '-'
               }
               disabled
