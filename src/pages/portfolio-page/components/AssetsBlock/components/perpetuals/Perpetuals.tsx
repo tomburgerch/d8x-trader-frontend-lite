@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { AssetLine } from 'components/asset-line/AssetLine';
@@ -7,12 +7,14 @@ import { unrealizedPnLListAtom } from 'pages/portfolio-page/store/fetchUnrealize
 import { formatCurrency } from 'utils/formatCurrency';
 
 import styles from './Perpetuals.module.scss';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 
 export const Perpetuals = () => {
   const { t } = useTranslation();
 
-  const [unrealizedPnLList] = useAtom(unrealizedPnLListAtom); // @TODO in settlement currency
-  const [realizedPnLList] = useAtom(realizedPnLListAtom); // @TODO in settlement currency
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const unrealizedPnLList = useAtomValue(unrealizedPnLListAtom); // @TODO in settlement currency
+  const realizedPnLList = useAtomValue(realizedPnLListAtom); // @TODO in settlement currency
 
   return (
     <>
@@ -21,7 +23,11 @@ export const Perpetuals = () => {
         <div className={styles.assetsList}>
           {realizedPnLList.length
             ? realizedPnLList.map((token) => (
-                <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+                <AssetLine
+                  key={token.symbol}
+                  symbol={token.settleSymbol}
+                  value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1))}
+                />
               ))
             : 'No data'}
         </div>
@@ -31,7 +37,11 @@ export const Perpetuals = () => {
         <div className={styles.assetsList}>
           {unrealizedPnLList.length
             ? unrealizedPnLList.map((token) => (
-                <AssetLine key={token.symbol} symbol={token.symbol} value={formatCurrency(token.value)} />
+                <AssetLine
+                  key={token.symbol}
+                  symbol={token.settleSymbol}
+                  value={formatCurrency(token.value * (c2s.get(token.symbol)?.value ?? 1))}
+                />
               ))
             : 'No data'}
         </div>

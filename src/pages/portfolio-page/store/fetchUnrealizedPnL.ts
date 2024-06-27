@@ -2,12 +2,13 @@ import { atom } from 'jotai';
 import { type Address } from 'viem';
 
 import { getPositionRisk } from 'network/network';
-import { traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, traderAPIAtom } from 'store/pools.store';
 
 import { poolUsdPriceAtom } from './fetchPortfolio';
 
 export interface UnrealizedPnLListAtomI {
   symbol: string;
+  settleSymbol: string;
   value: number;
 }
 
@@ -18,6 +19,7 @@ export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 
 export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: Address, chainId: number) => {
   const traderAPI = get(traderAPIAtom);
+  const c2s = get(collateralToSettleConversionAtom);
   if (!traderAPI) {
     return;
   }
@@ -30,23 +32,24 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
   const poolUsdPrice = get(poolUsdPriceAtom);
   const activePositions = data.filter(({ side }) => side !== 'CLOSED');
 
-  const unrealizedPnLReduced: Record<string, number> = {};
+  const unrealizedPnLReduced: Record<string, { value: number; poolSymbol: string }> = {};
   let totalUnrealizedPnl = 0;
   let totalPositionNotionalBaseCCY = 0;
   let totalCollateralCC = 0;
   activePositions.forEach((position) => {
     const [baseSymbol, , poolSymbol] = position.symbol.split('-');
+    const settleSymbol = [...c2s].find(([s]) => s === poolSymbol)?.[1].settleSymbol ?? poolSymbol;
     const positionUnrealizedPnl = position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote;
     totalUnrealizedPnl += positionUnrealizedPnl;
-    // @TODO: margin token, but result needed in settlement token
+    // @DONE: margin token, converted to settle elsewhere
     totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
     totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
 
     const unrealizedPnl = positionUnrealizedPnl / poolUsdPrice[poolSymbol].collateral;
-    if (!unrealizedPnLReduced[poolSymbol]) {
-      unrealizedPnLReduced[poolSymbol] = unrealizedPnl;
+    if (!unrealizedPnLReduced[settleSymbol]) {
+      unrealizedPnLReduced[settleSymbol] = { poolSymbol: poolSymbol, value: unrealizedPnl };
     } else {
-      unrealizedPnLReduced[poolSymbol] += unrealizedPnl;
+      unrealizedPnLReduced[settleSymbol].value += unrealizedPnl;
     }
   });
 
@@ -58,8 +61,9 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
   set(
     unrealizedPnLListAtom,
     Object.keys(unrealizedPnLReduced).map((key) => ({
-      symbol: key,
-      value: unrealizedPnLReduced[key],
+      symbol: unrealizedPnLReduced[key].poolSymbol,
+      settleSymbol: key,
+      value: unrealizedPnLReduced[key].value,
     }))
   );
   return { totalCollateralCC, totalUnrealizedPnl };

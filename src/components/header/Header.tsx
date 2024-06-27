@@ -22,6 +22,7 @@ import { getExchangeInfo, getPositionRisk } from 'network/network';
 import { authPages, pages } from 'routes/pages';
 import { connectModalOpenAtom } from 'store/global-modals.store';
 import {
+  collateralToSettleConversionAtom,
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
   perpetualsAtom,
@@ -82,6 +83,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const setGasTokenSymbol = useSetAtom(gasTokenSymbolAtom);
   const setPoolTokenDecimals = useSetAtom(poolTokenDecimalsAtom);
   const setConnectModalOpen = useSetAtom(connectModalOpenAtom);
+  const setCollToSettleConversion = useSetAtom(collateralToSettleConversionAtom);
   const triggerBalancesUpdate = useAtomValue(triggerBalancesUpdateAtom);
   const triggerPositionsUpdate = useAtomValue(triggerPositionsUpdateAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
@@ -128,7 +130,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {
-        console.log(pool);
         perpetuals.push(
           ...pool.perpetuals.map((perpetual) => ({
             id: perpetual.id,
@@ -197,6 +198,23 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           const data = await getExchangeInfo(enabledChainId, currentTraderAPI);
           setExchangeInfo(data.data);
           retries = MAX_RETRIES;
+
+          for (const pool of data.data.pools) {
+            const coll2settle =
+              pool.marginTokenAddr === pool.settleTokenAddr
+                ? 1
+                : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
+            console.log({
+              poolSymbol: pool.poolSymbol,
+              settleSymbol: pool.settleSymbol,
+              value: coll2settle ?? 1,
+            });
+            setCollToSettleConversion({
+              poolSymbol: pool.poolSymbol,
+              settleSymbol: pool.settleSymbol,
+              value: coll2settle ?? 1,
+            });
+          }
         } catch (error) {
           console.log(`ExchangeInfo attempt ${retries + 1} failed: ${error}`);
           retries++;
@@ -213,7 +231,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       .finally(() => {
         exchangeRequestRef.current = false;
       });
-  }, [chainId, setExchangeInfo]);
+  }, [chainId, setCollToSettleConversion, setExchangeInfo]);
 
   const {
     data: poolTokenBalance,

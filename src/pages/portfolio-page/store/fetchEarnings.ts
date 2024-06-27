@@ -15,30 +15,36 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
 
   const earningsPromises = [];
   const collateralPrices: number[] = [];
+  const settleSymbols: string[] = [];
   const poolSymbols: string[] = [];
   for (const pool of pools) {
     earningsPromises.push(getEarnings(chainId, userAddress, pool.poolSymbol));
     collateralPrices.push(poolUsdPrice[pool.poolSymbol].collateral);
+    settleSymbols.push(pool.settleSymbol);
     poolSymbols.push(pool.poolSymbol);
   }
   const earningsArray = await Promise.all(earningsPromises);
   let totalEstimatedEarnings = 0;
-  const earningsList = earningsArray.reduce<Record<string, number>>((acc, curr, index) => {
-    totalEstimatedEarnings += curr.earnings * collateralPrices[index];
-    if (acc[poolSymbols[index]]) {
-      acc[poolSymbols[index]] += curr.earnings;
-    } else {
-      acc[poolSymbols[index]] = curr.earnings;
-    }
-    return acc;
-  }, {});
+  const earningsList = earningsArray.reduce<Record<string, { value: number; poolSymbol: string }>>(
+    (acc, curr, index) => {
+      totalEstimatedEarnings += curr.earnings * collateralPrices[index];
+      if (acc[settleSymbols[index]]) {
+        acc[settleSymbols[index]].value += curr.earnings;
+      } else {
+        acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index] };
+      }
+      return acc;
+    },
+    {}
+  );
 
   set(totalEstimatedEarningsAtom, totalEstimatedEarnings);
   set(
     earningsListAtom,
     Object.keys(earningsList).map((key) => ({
-      symbol: key,
-      value: earningsList[key],
+      symbol: earningsList[key].poolSymbol,
+      settleSymbol: key,
+      value: earningsList[key].value,
     }))
   );
 });
