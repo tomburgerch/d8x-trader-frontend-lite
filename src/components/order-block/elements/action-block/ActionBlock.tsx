@@ -633,7 +633,9 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && collateralDeposit >= 0 ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-' // @TODO: settlement ccy!
+                  isOrderValid && collateralDeposit >= 0
+                    ? formatToCurrency(collateralDeposit, selectedPool?.settleSymbol)
+                    : '-' // @TODO: fx
                 }
                 rightSideStyles={styles.rightSide}
               />
@@ -646,7 +648,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, orderInfo.poolName) //@TODO: settlement token
+                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol) //@TODO: fx
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -763,8 +765,8 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 // @TODO: either
-                    ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
+                    ? formatToCurrency(newPositionRisk.collateralCC, selectedPool?.settleSymbol) // @TODO: fx
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}

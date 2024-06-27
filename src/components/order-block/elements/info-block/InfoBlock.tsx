@@ -138,9 +138,8 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.balance')}
         </Typography>
         <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
-          {/* @TODO: settlement token */}
           <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
-            {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
+            {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
           </Typography>
         </TooltipMobile>
       </div>
@@ -149,8 +148,8 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.approx-deposit')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {formatToCurrency(approxDepositFromWallet, orderInfo?.poolName)}
-          {/* @TODO: approxDeposit should be converted from margin to settlment ccy */}
+          {formatToCurrency(approxDepositFromWallet, selectedPool?.settleSymbol)}
+          {/* @TODO: fx*/}
         </Typography>
       </div>
       <div className={styles.row}>
