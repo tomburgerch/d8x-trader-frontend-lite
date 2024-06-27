@@ -339,7 +339,9 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     } else {
       margin = 0;
     }
-    return formatToCurrency(margin * c2s, poolByPosition?.settleSymbol);
+    return poolByPosition
+      ? formatToCurrency(margin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1), poolByPosition.settleSymbol)
+      : '-';
   }, [c2s, selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
 
   const calculatedLeverage = useMemo(() => {

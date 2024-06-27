@@ -115,7 +115,7 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
-            rightSide={`${formatToCurrency(position.collateralCC * c2s, pool?.settleSymbol, true)}${' '}(${
+            rightSide={`${pool ? formatToCurrency(position.collateralCC * (c2s.get(pool.poolSymbol)?.value ?? 1), pool?.settleSymbol, true) : '-'}${' '}(${
               Math.round(position.leverage * 100) / 100
             }x)`}
             leftSideStyles={styles.dataLabel}

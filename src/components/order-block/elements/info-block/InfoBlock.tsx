@@ -151,9 +151,12 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.approx-deposit')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {approxDepositFromWallet === undefined
+          {approxDepositFromWallet === undefined || !selectedPool
             ? '-'
-            : formatToCurrency(approxDepositFromWallet * c2s, selectedPool?.settleSymbol)}
+            : formatToCurrency(
+                approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool?.settleSymbol
+              )}
           {/* @TODO: fx*/}
         </Typography>
       </div>
@@ -166,13 +169,32 @@ export const InfoBlock = memo(() => {
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>
-                {baseFeeInCC === undefined ? '-' : formatToCurrency(baseFeeInCC * c2s, selectedPool?.settleSymbol)}
+                {baseFeeInCC === undefined || !selectedPool
+                  ? '-'
+                  : formatToCurrency(
+                      baseFeeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool?.settleSymbol
+                    )}
               </span>
-              <span> {formatToCurrency(feeInCC * c2s, selectedPool?.settleSymbol)}</span>
+              <span>
+                {' '}
+                {selectedPool
+                  ? formatToCurrency(
+                      feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool?.settleSymbol
+                    )
+                  : '-'}
+              </span>
             </>
           ) : (
             <>
-              {feeInCC === undefined ? '-' : formatToCurrency(feeInCC * c2s, selectedPool?.settleSymbol)} {'('}
+              {feeInCC === undefined || !selectedPool
+                ? '-'
+                : formatToCurrency(
+                    feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                    selectedPool?.settleSymbol
+                  )}{' '}
+              {'('}
               {formatToCurrency(feePct, '%', false, 3)}
               {')'}
             </>
@@ -184,8 +206,11 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.execution-fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {perpetualStaticInfo
-            ? formatToCurrency(perpetualStaticInfo.referralRebate * c2s, selectedPool?.settleSymbol)
+          {perpetualStaticInfo && selectedPool
+            ? formatToCurrency(
+                perpetualStaticInfo.referralRebate * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool.settleSymbol
+              )
             : '-'}
         </Typography>
       </div>

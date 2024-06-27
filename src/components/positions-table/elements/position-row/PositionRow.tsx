@@ -74,8 +74,14 @@ export const PositionRow = memo(
         {/* // @TODO: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
-            {formatToCurrency(position.collateralCC * c2s, pool?.settleSymbol, true)} (
-            {Math.round(position.leverage * 100) / 100}x)
+            {pool
+              ? formatToCurrency(
+                  position.collateralCC * (c2s.get(pool.poolSymbol)?.value ?? 1),
+                  pool?.settleSymbol,
+                  true
+                )
+              : '-'}{' '}
+            ({Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>
         {/* // @TODO: leave collateral token */}

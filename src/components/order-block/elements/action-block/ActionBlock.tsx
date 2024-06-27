@@ -391,7 +391,7 @@ export const ActionBlock = memo(() => {
             settleTokenAddr: selectedPool.settleTokenAddr, // @DONE: amount is in settle ccy
             isMultisigAddress,
             proxyAddr,
-            minAmount: collateralDeposit * c2s,
+            minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
             decimals: poolTokenDecimals,
           })
             .then(() => {
@@ -635,8 +635,11 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && collateralDeposit >= 0
-                    ? formatToCurrency(collateralDeposit * c2s, selectedPool?.settleSymbol)
+                  isOrderValid && collateralDeposit >= 0 && selectedPool
+                    ? formatToCurrency(
+                        collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool?.settleSymbol
+                      )
                     : '-' // @DONE: fx
                 }
                 rightSideStyles={styles.rightSide}
@@ -767,8 +770,11 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
-                    ? formatToCurrency(newPositionRisk.collateralCC * c2s, selectedPool?.settleSymbol) // @DONE: fx
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
+                    ? formatToCurrency(
+                        newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool?.settleSymbol
+                      ) // @DONE: fx
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}

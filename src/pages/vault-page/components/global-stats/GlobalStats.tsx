@@ -101,15 +101,31 @@ export const GlobalStats = () => {
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
-        value: selectedPool && tvl != null ? formatToCurrency(tvl * c2s, selectedPool.settleSymbol, true) : '--',
-        numberOnly: tvl != null ? formatToCurrency(tvl * c2s, '', true) : '--',
+        value:
+          selectedPool && tvl != null
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), selectedPool.settleSymbol, true)
+            : '--',
+        numberOnly:
+          tvl != null && selectedPool
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            : '--',
         currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
       },
       {
         id: 'dSymbolPrice',
         label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
-        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice * c2s, selectedPool?.settleSymbol, true) : '--',
-        numberOnly: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice & c2s, '', true) : '--',
+        value:
+          dCurrencyPrice != null && selectedPool
+            ? formatToCurrency(
+                dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool?.settleSymbol,
+                true
+              )
+            : '--',
+        numberOnly:
+          dCurrencyPrice != null && selectedPool
+            ? formatToCurrency(dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            : '--',
         currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
       },
       {

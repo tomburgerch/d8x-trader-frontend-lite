@@ -3,6 +3,7 @@ import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import type {
+  CollToSettleInfoI,
   FundingI,
   MarginAccountI,
   OrderI,
@@ -233,4 +234,17 @@ export const failOrderIdAtom = atom(
   }
 );
 
-export const collateralToSettleConversionAtom = atom(1);
+const collateralToSettleConversionsAtom = atom<Map<string, CollToSettleInfoI>>(new Map());
+
+export const collateralToSettleConversionAtom = atom(
+  (get) => {
+    return get(collateralToSettleConversionsAtom);
+  },
+  (_get, set, conversion: CollToSettleInfoI) => {
+    set(collateralToSettleConversionsAtom, (prev) => {
+      const updatedConversions = { ...prev };
+      updatedConversions.set(conversion.poolSymbol, conversion);
+      return updatedConversions;
+    });
+  }
+);

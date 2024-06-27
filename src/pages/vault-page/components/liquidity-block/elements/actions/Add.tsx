@@ -256,11 +256,11 @@ export const Add = memo(() => {
   };
 
   const predictedAmount = useMemo(() => {
-    if (addAmount > 0 && dCurrencyPrice != null) {
-      return addAmount / c2s / dCurrencyPrice; // @DONE addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
+    if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null) {
+      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice; // @DONE addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
     }
     return 0;
-  }, [addAmount, c2s, dCurrencyPrice]);
+  }, [addAmount, c2s, selectedPool, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (
@@ -430,7 +430,11 @@ export const Add = memo(() => {
                 </InputAdornment>
               }
               type="text"
-              value={formatToCurrency(predictedAmount * c2s, '')}
+              value={
+                selectedPool
+                  ? formatToCurrency(predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '')
+                  : '-'
+              }
               disabled
             />
           </div>

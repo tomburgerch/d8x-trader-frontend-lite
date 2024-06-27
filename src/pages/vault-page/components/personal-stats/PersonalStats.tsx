@@ -111,12 +111,23 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {estimatedEarnings !== null
+          {estimatedEarnings !== null && selectedPool
             ? formatToCurrency(
-                estimatedEarnings * c2s,
+                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                 selectedPool?.settleSymbol,
                 false,
-                Math.max(2, Math.ceil(4 - Math.log10(Math.max(Math.abs(estimatedEarnings * c2s), 0.0000000001))))
+                Math.max(
+                  2,
+                  Math.ceil(
+                    4 -
+                      Math.log10(
+                        Math.max(
+                          Math.abs(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1)),
+                          0.0000000001
+                        )
+                      )
+                  )
+                )
               )
             : '--'}
         </Typography>

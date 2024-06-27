@@ -286,7 +286,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           {/* // @TODO: settlement token */}
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={`${formatToCurrency(selectedPosition.collateralCC * c2s, poolByPosition?.settleSymbol, true)}${
+            rightSide={`${poolByPosition ? formatToCurrency(selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1), poolByPosition?.settleSymbol, true) : '-'}${
               selectedPosition && ` (${Math.round(selectedPosition?.leverage * 100) / 100}x)`
             }`}
           />

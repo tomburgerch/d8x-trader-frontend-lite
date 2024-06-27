@@ -34,7 +34,9 @@ export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
           variant="cellSmall"
           className={funding.amount >= 0 ? styles.fundingPositive : styles.fundingNegative}
         >
-          {perpetual ? formatToCurrency(funding.amount * c2s, perpetual.poolName, true) : ''}
+          {perpetual
+            ? formatToCurrency(funding.amount * (c2s.get(perpetual.poolName)?.value ?? 1), funding.settleSymbol, true)
+            : ''}
         </Typography>
       </TableCell>
     </TableRow>

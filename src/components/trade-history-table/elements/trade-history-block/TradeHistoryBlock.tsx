@@ -75,7 +75,15 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
         <SidesRow
           leftSide={headers[5].label}
           leftSideTooltip={headers[5].tooltip}
-          rightSide={perpetual ? formatToCurrency(tradeHistory.fee * c2s, perpetual.poolName, true) : ''}
+          rightSide={
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
+              : ''
+          }
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
@@ -83,7 +91,15 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
         <SidesRow
           leftSide={headers[6].label}
           leftSideTooltip={headers[6].tooltip}
-          rightSide={perpetual ? formatToCurrency(tradeHistory.realizedPnl * c2s, perpetual.poolName, true) : ''}
+          rightSide={
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
+              : ''
+          }
           leftSideStyles={styles.dataLabel}
           rightSideStyles={pnlColor}
         />

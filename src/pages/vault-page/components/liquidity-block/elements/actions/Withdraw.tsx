@@ -292,9 +292,12 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             <Typography variant="body2">{t('pages.vault.withdraw.action.receive')}</Typography>
             <Typography variant="body2">
               <strong>
-                {predictedAmount === undefined
+                {predictedAmount === undefined || !selectedPool
                   ? '-'
-                  : formatToCurrency(predictedAmount * c2s, selectedPool?.settleSymbol)}
+                  : formatToCurrency(
+                      predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )}
               </strong>
             </Typography>
           </Box>

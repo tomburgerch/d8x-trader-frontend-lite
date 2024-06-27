@@ -49,7 +49,11 @@ export const FundingBlock = ({ headers, funding }: FundingRowPropsI) => {
         <SidesRow
           leftSide={headers[2].label}
           leftSideTooltip={headers[2].tooltip}
-          rightSide={perpetual ? formatToCurrency(funding.amount * c2s, perpetual.poolName, true) : ''}
+          rightSide={
+            perpetual
+              ? formatToCurrency(funding.amount * (c2s.get(perpetual.poolName)?.value ?? 1), funding.settleSymbol, true)
+              : ''
+          }
           leftSideStyles={styles.dataLabel}
           rightSideStyles={fundingColor}
         />

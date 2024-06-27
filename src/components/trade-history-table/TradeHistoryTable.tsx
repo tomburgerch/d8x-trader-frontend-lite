@@ -128,6 +128,7 @@ export const TradeHistoryTable = memo(() => {
       return {
         ...tradeHistory,
         symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${pool?.settleSymbol}` : '',
+        settleSymbol: pool ? pool.settleSymbol : '',
         perpetual: perpetual ?? null,
       };
     });
