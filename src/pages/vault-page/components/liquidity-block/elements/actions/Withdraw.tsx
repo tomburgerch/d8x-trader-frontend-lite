@@ -154,7 +154,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     setRequestSent(true);
     setLoading(true);
 
-    // @DONE: use settle token where corresponding, @TODO: fx?
+    // @DONE: use settle token where corresponding
 
     executeLiquidityWithdrawal(walletClient, liqProvTool, selectedPool.poolSymbol)
       .then((tx) => {
@@ -200,6 +200,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     }
   }, [withdrawals]);
 
+  // @DONE in cc currency, converted later for display
   const predictedAmount = useMemo(() => {
     if (!withdrawals) {
       return;
@@ -210,7 +211,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
     const latestWithdrawal = withdrawals[withdrawals.length - 1];
 
     if (dCurrencyPrice) {
-      return latestWithdrawal.shareAmount * dCurrencyPrice; // @TODO in settlement currency
+      return latestWithdrawal.shareAmount * dCurrencyPrice;
     }
     return 0;
   }, [dCurrencyPrice, withdrawals]);
