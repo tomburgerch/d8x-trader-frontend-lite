@@ -260,7 +260,7 @@ export const OrderSize = memo(() => {
     setOpenCurrencySelector(false);
   };
 
-  // @DONE: view, @TODO: fx
+  // @DONE: view, @DONE: fx
 
   return (
     <>

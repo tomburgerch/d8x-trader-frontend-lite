@@ -51,7 +51,7 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
           {perpetual ? formatToCurrency(Math.abs(tradeHistory.quantity), perpetual.baseCurrency, true) : ''}
         </Typography>
       </TableCell>
-      {/* // @TODO: fee in settlement token */}
+      {/* // @DONE: fee in settlement token */}
       <TableCell align={headers[5].align}>
         <Typography variant="cellSmall">
           {perpetual

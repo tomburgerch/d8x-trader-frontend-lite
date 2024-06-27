@@ -187,7 +187,7 @@ export const PositionsTable = () => {
         fieldType: FieldTypeE.Number,
       },
       {
-        field: 'collateralCC', // @TODO: settlement token
+        field: 'collateralCC', // @DONE: settlement token
         label: t('pages.trade.positions-table.table-header.margin'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
@@ -348,6 +348,7 @@ export const PositionsTable = () => {
 
       const foundPosition = positionsWithLiqPrice.find((position) => position.symbol === symbol);
       if (foundPosition) {
+        console.log(foundPosition);
         hasTpSlOrders = foundPosition.takeProfit.orders.length > 0 || foundPosition.stopLoss.orders.length > 0;
       }
     }

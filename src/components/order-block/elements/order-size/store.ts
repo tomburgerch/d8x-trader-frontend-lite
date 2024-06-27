@@ -3,6 +3,7 @@ import { atom } from 'jotai';
 
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
+  collateralToSettleConversionAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   positionsAtom,
@@ -45,7 +46,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
 
   if (openPosition && openPosition.side !== orderBlockSide) {
-    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @TODO: margin token!
+    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @DONE: as-is
   }
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);
@@ -60,23 +61,25 @@ export const maxOrderSizeAtom = atom((get) => {
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 
+// @DONE: this atom accounts for settle ccy
 export const currencyMultiplierAtom = atom((get) => {
   let currencyMultiplier = 1;
 
   const selectedPool = get(selectedPoolAtom);
   const selectedPerpetual = get(selectedPerpetualAtom);
+  const c2s = get(collateralToSettleConversionAtom);
+
   if (!selectedPool || !selectedPerpetual) {
     return currencyMultiplier;
   }
 
   const selectedCurrency = get(selectedCurrencyPrimitiveAtom);
 
-  // @TODO: this should be consistent with how the multiplier is used
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
   if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
     currencyMultiplier = indexPrice;
   } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
-    currencyMultiplier = indexPrice / collToQuoteIndexPrice;
+    currencyMultiplier = indexPrice / collToQuoteIndexPrice / (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
   }
   return currencyMultiplier;
 });

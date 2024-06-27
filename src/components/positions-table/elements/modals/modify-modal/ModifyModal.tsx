@@ -87,6 +87,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const [newPositionRisk, setNewPositionRisk] = useState<MarginAccountI | null>();
   const [addCollateral, setAddCollateral] = useState('0');
   const [removeCollateral, setRemoveCollateral] = useState('0');
+  const [availableMargin, setAvailableMargin] = useState<number>();
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [loading, setLoading] = useState(false);
 
@@ -259,7 +260,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       .then((data) => {
         setAPIBusy(false);
         setNewPositionRisk(data.data.newPositionRisk);
-        setMaxCollateral(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99); // @TODO: settlement token & verify that the rest of logic can be left unchanged if max is correct
+        setAvailableMargin(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99); // @DONE: settlement token & verify that the rest of logic can be left unchanged if max is correct
       })
       .catch((err) => {
         console.error(err);
@@ -285,6 +286,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   );
 
   useEffect(() => {
+    if (availableMargin && poolByPosition) {
+      setMaxCollateral(availableMargin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1));
+    } else {
+      setMaxCollateral(undefined);
+    }
+  }, [poolByPosition, availableMargin, c2s]);
+
+  useEffect(() => {
     setAddCollateral('0');
     setRemoveCollateral('0');
     setModifyType(ModifyTypeE.Add);
@@ -302,11 +311,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
       getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        setMaxCollateral(data.amount < 0 ? 0 : data.amount * 0.99); // @TODO: settlement token & verify that the rest of logic can be left unchanged if max is correct
+        setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99); // @DONE: settlement token & verify that the rest of logic can be left unchanged if max is correct
         setAPIBusy(false);
       });
     } else {
-      setMaxCollateral(undefined);
+      setAvailableMargin(undefined);
     }
   }, [modifyType, chainId, address, selectedPosition?.symbol, setAPIBusy, traderAPI, isAPIBusy]);
 
@@ -420,11 +429,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
         .then(({ data }) => {
           approveMarginToken({
             walletClient,
-            settleTokenAddr: poolByPosition.settleTokenAddr, // @TODO: settlement token
+            settleTokenAddr: poolByPosition.settleTokenAddr, // @DONE: settlement token
             isMultisigAddress,
             proxyAddr,
             minAmount: +addCollateral,
-            decimals: poolTokenDecimals,
+            decimals: poolTokenDecimals, // actually settle token
           })
             .then(() => {
               deposit(tradingClient, address, data)

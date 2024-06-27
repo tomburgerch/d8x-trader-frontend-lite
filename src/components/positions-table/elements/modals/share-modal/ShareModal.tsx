@@ -55,7 +55,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
 
   const parsedSymbol = parseSymbol(selectedPosition.symbol);
 
-  // @TODO: margin token!
+  // @DONE: as-is
   const percent =
     100 *
     (selectedPosition.unrealizedPnlQuoteCCY / (selectedPosition.collateralCC * selectedPosition.collToQuoteConversion));

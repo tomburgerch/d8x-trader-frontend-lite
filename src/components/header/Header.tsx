@@ -242,13 +242,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: selectedPool?.settleTokenAddr as Address, // @TODO: @DONE
+        address: selectedPool?.settleTokenAddr as Address, //  @DONE
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: selectedPool?.settleTokenAddr as Address, // @TODO: @DONE
+        address: selectedPool?.settleTokenAddr as Address, //@DONE
         abi: erc20Abi,
         functionName: 'decimals',
       },

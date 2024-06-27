@@ -71,7 +71,7 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
-        {/* // @TODO: fee in settlement token */}
+        {/* // @DONE: fee in settlement token */}
         <SidesRow
           leftSide={headers[5].label}
           leftSideTooltip={headers[5].tooltip}
@@ -87,7 +87,7 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
-        {/* // @TODO: profit in settlement token */}
+        {/* // @DONE: profit in settlement token */}
         <SidesRow
           leftSide={headers[6].label}
           leftSideTooltip={headers[6].tooltip}

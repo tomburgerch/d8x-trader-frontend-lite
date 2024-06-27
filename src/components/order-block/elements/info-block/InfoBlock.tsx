@@ -87,7 +87,7 @@ export const InfoBlock = memo(() => {
     const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
     const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
     if (openPosition && openPosition.side !== orderBlockSide) {
-      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @TODO: margin token!
+      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @DONE: as-is
     }
 
     let orderSizeNet = orderSize;
@@ -157,7 +157,7 @@ export const InfoBlock = memo(() => {
                 approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                 selectedPool?.settleSymbol
               )}
-          {/* @TODO: fx*/}
+          {/* @DONE: fx*/}
         </Typography>
       </div>
       <div className={styles.row}>
@@ -165,7 +165,7 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {/* @TODO: all fee data that is displaid should be converted from margin to settlment ccy */}
+          {/* @DONE: all fee data that is displaid should be converted from margin to settlment ccy */}
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>
@@ -173,7 +173,7 @@ export const InfoBlock = memo(() => {
                   ? '-'
                   : formatToCurrency(
                       baseFeeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                      selectedPool?.settleSymbol
+                      selectedPool.settleSymbol
                     )}
               </span>
               <span>
@@ -181,7 +181,7 @@ export const InfoBlock = memo(() => {
                 {selectedPool
                   ? formatToCurrency(
                       feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                      selectedPool?.settleSymbol
+                      selectedPool.settleSymbol
                     )
                   : '-'}
               </span>

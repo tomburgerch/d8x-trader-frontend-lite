@@ -23,7 +23,7 @@ interface PositionRowPropsI {
   handleTpSlModify: (position: MarginAccountWithAdditionalDataI) => void;
 }
 
-// @DONE view, @TODO fx
+// @DONE view, @DONE fx
 
 export const PositionRow = memo(
   ({
@@ -71,7 +71,7 @@ export const PositionRow = memo(
               : formatToCurrency(position.liqPrice, parsedSymbol?.quoteCurrency, true)}
           </Typography>
         </TableCell>
-        {/* // @TODO: settlement token */}
+        {/* // @DONE: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
             {pool
@@ -84,7 +84,7 @@ export const PositionRow = memo(
             ({Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>
-        {/* // @TODO: leave collateral token */}
+        {/* // @DONE: leave collateral token */}
         <TableCell align="right">
           <Typography
             variant="cellSmall"

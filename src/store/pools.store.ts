@@ -242,7 +242,7 @@ export const collateralToSettleConversionAtom = atom(
   },
   (_get, set, conversion: CollToSettleInfoI) => {
     set(collateralToSettleConversionsAtom, (prev) => {
-      const updatedConversions = { ...prev };
+      const updatedConversions = new Map(prev);
       updatedConversions.set(conversion.poolSymbol, conversion);
       return updatedConversions;
     });
