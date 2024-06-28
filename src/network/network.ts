@@ -209,7 +209,7 @@ export async function getTradingFee(
   settleSymbol: string,
   traderAddr?: string
 ): Promise<ValidatedResponseI<number>> {
-  return fetchUrl(`trading-fee?settleSymbol=${settleSymbol}&traderAddr=${traderAddr}`, chainId);
+  return fetchUrl(`trading-fee?poolSymbol=${settleSymbol}&traderAddr=${traderAddr}`, chainId);
 }
 
 export function getMaxOrderSizeForTrader(
