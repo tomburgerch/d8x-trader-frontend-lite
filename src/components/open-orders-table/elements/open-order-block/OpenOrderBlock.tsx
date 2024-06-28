@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import IconButton from '@mui/material/IconButton';
@@ -7,14 +8,13 @@ import { Box, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { selectedPoolAtom } from 'store/pools.store';
 import type { OrderWithIdI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { typeToLabelMap } from '../../typeToLabelMap';
 
 import styles from './OpenOrderBlock.module.scss';
-import { useAtomValue } from 'jotai';
-import { selectedPoolAtom } from 'store/pools.store';
 
 interface OpenOrderBlockPropsI {
   headers: TableHeaderI<OrderWithIdI>[];
@@ -26,6 +26,7 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
   const { t } = useTranslation();
 
   const pool = useAtomValue(selectedPoolAtom);
+
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;

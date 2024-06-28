@@ -1,24 +1,25 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { DATETIME_FORMAT } from 'appConstants';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import styles from '../FundingTable.module.scss';
 
 interface FundingRowPropsI {
   headers: TableHeaderI<FundingWithSymbolDataI>[];
   funding: FundingWithSymbolDataI;
 }
 
-import styles from '../FundingTable.module.scss';
-import { useAtomValue } from 'jotai';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
-
 export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
+
   const perpetual = funding.perpetual;
   const time = format(new Date(funding.timestamp), DATETIME_FORMAT);
-  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   return (
     <TableRow key={funding.transactionHash}>

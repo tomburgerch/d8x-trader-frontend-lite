@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import IconButton from '@mui/material/IconButton';
@@ -6,13 +7,13 @@ import { DeleteForeverOutlined } from '@mui/icons-material';
 import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
+import { selectedPoolAtom } from 'store/pools.store';
 import type { OrderWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { typeToLabelMap } from '../typeToLabelMap';
+
 import styles from './OpenOrderRow.module.scss';
-import { useAtomValue } from 'jotai';
-import { selectedPoolAtom } from 'store/pools.store';
 
 interface OpenOrderRowPropsI {
   order: OrderWithIdI;
@@ -23,6 +24,7 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
   const { t } = useTranslation();
 
   const pool = useAtomValue(selectedPoolAtom);
+
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;

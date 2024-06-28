@@ -286,9 +286,15 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           {/* // @DONE: settlement token */}
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={`${poolByPosition ? formatToCurrency(selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1), poolByPosition?.settleSymbol, true) : '-'}${
-              selectedPosition && ` (${Math.round(selectedPosition?.leverage * 100) / 100}x)`
-            }`}
+            rightSide={`${
+              poolByPosition
+                ? formatToCurrency(
+                    selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1),
+                    poolByPosition.settleSymbol,
+                    true
+                  )
+                : '-'
+            }${selectedPosition && ` (${Math.round(selectedPosition.leverage * 100) / 100}x)`}`}
           />
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.unrealized')}

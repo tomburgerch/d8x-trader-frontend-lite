@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,13 +9,13 @@ import { Button, DialogActions, DialogContent } from '@mui/material';
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { selectedPoolAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { Background } from './Background';
+
 import styles from './ShareModal.module.scss';
-import { useAtomValue } from 'jotai';
-import { selectedPoolAtom } from 'store/pools.store';
 
 interface ShareModalPropsI {
   isOpen: boolean;
@@ -24,9 +25,10 @@ interface ShareModalPropsI {
 
 export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareModalPropsI) => {
   const { t } = useTranslation();
-  const statsRef = useRef<HTMLDivElement>(null);
 
   const pool = useAtomValue(selectedPoolAtom);
+
+  const statsRef = useRef<HTMLDivElement>(null);
 
   if (!selectedPosition) {
     return null;

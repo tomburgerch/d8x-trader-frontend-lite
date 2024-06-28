@@ -6,10 +6,10 @@ import { PieChart } from 'react-minimal-pie-chart';
 import { AssetLine } from 'components/asset-line/AssetLine';
 import { earningsListAtom } from 'pages/portfolio-page/store/fetchEarnings';
 import { poolShareTokensShareAtom } from 'pages/portfolio-page/store/fetchPoolShare';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { formatCurrency } from 'utils/formatCurrency';
 
 import styles from './Vault.module.scss';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
 
 const colorsArray = ['#6649DF', '#FDA13A', '#F24141', '#515151'];
 

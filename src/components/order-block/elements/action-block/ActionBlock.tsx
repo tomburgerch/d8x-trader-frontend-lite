@@ -773,7 +773,7 @@ export const ActionBlock = memo(() => {
                   isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
                     ? formatToCurrency(
                         newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                        selectedPool?.settleSymbol
+                        selectedPool.settleSymbol
                       ) // @DONE: fx
                     : '-'
                 }

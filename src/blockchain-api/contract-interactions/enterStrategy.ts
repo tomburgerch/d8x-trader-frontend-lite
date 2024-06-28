@@ -71,7 +71,7 @@ export async function enterStrategy(
     .then((pos) => pos[0])
     .catch(() => undefined);
   if (!position || !settleTokenAddr || !settleTokenDec) {
-    //console.log({ position, settleTokenAddr, marginTokenDec });
+    //console.log({ position, settleTokenAddr, settleTokenDec });
     throw new Error(`No hedging strategy available for symbol ${symbol} on chain ID ${chainId}`);
   }
 
@@ -91,7 +91,7 @@ export async function enterStrategy(
     feeRate * 1e-5, // fee rate
     position.markPrice, // mark price
     indexPrice ?? position.markPrice, // index price
-    position.collToQuoteConversion // collateral price //
+    position.collToQuoteConversion // collateral price
   );
 
   const order: OrderI = {

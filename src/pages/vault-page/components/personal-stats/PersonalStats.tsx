@@ -114,7 +114,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           {estimatedEarnings !== null && selectedPool
             ? formatToCurrency(
                 estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool?.settleSymbol,
+                selectedPool.settleSymbol,
                 false,
                 Math.max(
                   2,

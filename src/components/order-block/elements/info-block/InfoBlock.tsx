@@ -155,7 +155,7 @@ export const InfoBlock = memo(() => {
             ? '-'
             : formatToCurrency(
                 approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool?.settleSymbol
+                selectedPool.settleSymbol
               )}
           {/* @DONE: fx*/}
         </Typography>
@@ -192,7 +192,7 @@ export const InfoBlock = memo(() => {
                 ? '-'
                 : formatToCurrency(
                     feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                    selectedPool?.settleSymbol
+                    selectedPool.settleSymbol
                   )}{' '}
               {'('}
               {formatToCurrency(feePct, '%', false, 3)}

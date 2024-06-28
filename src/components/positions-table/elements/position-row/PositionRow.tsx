@@ -1,3 +1,4 @@
+import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,14 +7,13 @@ import { TableCell, TableRow, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 
 import { parseSymbol } from 'helpers/parseSymbol';
+import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import { TpSlValue } from '../tp-sl-value/TpSlValue';
 
 import styles from './PositionRow.module.scss';
-import { useAtomValue } from 'jotai';
-import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
 
 interface PositionRowPropsI {
   position: MarginAccountWithAdditionalDataI;
@@ -77,7 +77,7 @@ export const PositionRow = memo(
             {pool
               ? formatToCurrency(
                   position.collateralCC * (c2s.get(pool.poolSymbol)?.value ?? 1),
-                  pool?.settleSymbol,
+                  pool.settleSymbol,
                   true
                 )
               : '-'}{' '}

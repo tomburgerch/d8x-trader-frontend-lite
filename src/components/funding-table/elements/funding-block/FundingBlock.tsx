@@ -19,6 +19,7 @@ interface FundingRowPropsI {
 
 export const FundingBlock = ({ headers, funding }: FundingRowPropsI) => {
   const { t } = useTranslation();
+
   const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const perpetual = funding.perpetual;

@@ -118,7 +118,7 @@ export const GlobalStats = () => {
           dCurrencyPrice != null && selectedPool
             ? formatToCurrency(
                 dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool?.settleSymbol,
+                selectedPool.settleSymbol,
                 true
               )
             : '--',

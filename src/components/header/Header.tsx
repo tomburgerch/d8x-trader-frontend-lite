@@ -204,11 +204,14 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               pool.marginTokenAddr === pool.settleTokenAddr
                 ? 1
                 : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
+
+            // TODO: Remove
             console.log({
               poolSymbol: pool.poolSymbol,
               settleSymbol: pool.settleSymbol,
               value: coll2settle ?? 1,
             });
+
             setCollToSettleConversion({
               poolSymbol: pool.poolSymbol,
               settleSymbol: pool.settleSymbol,

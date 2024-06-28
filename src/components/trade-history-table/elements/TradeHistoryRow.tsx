@@ -1,13 +1,13 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { DATETIME_FORMAT } from 'appConstants';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { useAtomValue } from 'jotai';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
 
 interface TradeHistoryRowPropsI {
   headers: TableHeaderI<TradeHistoryWithSymbolDataI>[];
