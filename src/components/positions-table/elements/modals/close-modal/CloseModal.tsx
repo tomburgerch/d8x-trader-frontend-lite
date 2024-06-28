@@ -37,7 +37,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 
 import modalStyles from '../Modal.module.scss';
 import styles from './CloseModal.module.scss';
@@ -62,7 +62,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
   const { data: walletClient } = useWalletClient({ chainId: chain?.id });
 
   const { isMultisigAddress } = useUserWallet();
-  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   const [requestSent, setRequestSent] = useState(false);
   const [txHash, setTxHash] = useState<Address>();
@@ -147,7 +147,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !chain ||
       !isEnabledChain(chain?.id)
     ) {
@@ -177,7 +177,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
             isMultisigAddress,
             proxyAddr,
             minAmount: 0,
-            decimals: poolTokenDecimals,
+            decimals: settleTokenDecimals,
           }).then(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(tradingClient, signatures, data.data)

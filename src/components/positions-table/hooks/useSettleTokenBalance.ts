@@ -6,20 +6,20 @@ import { useAccount, useReadContracts } from 'wagmi';
 import { traderAPIAtom } from 'store/pools.store';
 import { PoolWithIdI } from 'types/types';
 
-interface PoolTokenBalancePropsI {
+interface SettleTokenBalancePropsI {
   poolByPosition?: PoolWithIdI | null;
 }
 
-export const usePoolTokenBalance = ({ poolByPosition }: PoolTokenBalancePropsI) => {
+export const useSettleTokenBalance = ({ poolByPosition }: SettleTokenBalancePropsI) => {
   const { address, chain, isConnected } = useAccount();
 
   const traderAPI = useAtomValue(traderAPIAtom);
 
-  const [poolTokenBalance, setPoolTokenBalance] = useState<number>();
-  const [poolTokenDecimals, setPoolTokenDecimals] = useState<number>();
+  const [settleTokenBalance, setSettleTokenBalance] = useState<number>();
+  const [settleTokenDecimals, setSettleTokenDecimals] = useState<number>();
 
   const {
-    data: poolTokenBalanceData,
+    data: settleTokenBalanceData,
     isError,
     refetch,
   } = useReadContracts({
@@ -49,17 +49,17 @@ export const usePoolTokenBalance = ({ poolByPosition }: PoolTokenBalancePropsI) 
   }, [address, chain, refetch]);
 
   useEffect(() => {
-    if (poolTokenBalanceData && chain && !isError) {
-      setPoolTokenBalance(+formatUnits(poolTokenBalanceData[0], poolTokenBalanceData[1]));
-      setPoolTokenDecimals(poolTokenBalanceData[1]);
+    if (settleTokenBalanceData && chain && !isError) {
+      setSettleTokenBalance(+formatUnits(settleTokenBalanceData[0], settleTokenBalanceData[1]));
+      setSettleTokenDecimals(settleTokenBalanceData[1]);
     } else {
-      setPoolTokenBalance(undefined);
-      setPoolTokenDecimals(undefined);
+      setSettleTokenBalance(undefined);
+      setSettleTokenDecimals(undefined);
     }
-  }, [chain, poolTokenBalanceData, isError]);
+  }, [chain, settleTokenBalanceData, isError]);
 
   return {
-    poolTokenBalance,
-    poolTokenDecimals,
+    settleTokenBalance,
+    settleTokenDecimals,
   };
 };

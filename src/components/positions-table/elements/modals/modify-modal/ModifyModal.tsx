@@ -50,7 +50,7 @@ import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 import { ModifyTypeE, ModifyTypeSelector } from '../../modify-type-selector/ModifyTypeSelector';
 
 import styles from '../Modal.module.scss';
@@ -94,7 +94,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const isAPIBusyRef = useRef(isAPIBusy);
   const requestSentRef = useRef(false);
 
-  const { poolTokenBalance, poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { settleTokenBalance, settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   const {
     isSuccess: isAddSuccess,
@@ -417,7 +417,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !isEnabledChain(chainId)
     ) {
       return;
@@ -435,7 +435,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
             isMultisigAddress,
             proxyAddr,
             minAmount: +addCollateral,
-            decimals: poolTokenDecimals, // actually settle token
+            decimals: settleTokenDecimals, // actually settle token
           })
             .then(() => {
               deposit(tradingClient, address, data)
@@ -536,7 +536,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     return null;
   }
 
-  const unroundedMaxAddValue = poolTokenBalance ? poolTokenBalance : 1;
+  const unroundedMaxAddValue = settleTokenBalance ? settleTokenBalance : 1;
   const unroundedMaxRemoveValue = maxCollateral ? maxCollateral : 1;
   const digitsForMaxAdd = valueToFractionDigits(unroundedMaxAddValue);
   const digitsForMaxRemove = valueToFractionDigits(unroundedMaxRemoveValue);
@@ -560,20 +560,20 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                       </InputAdornment>
                     }
                     type="number"
-                    inputProps={{ step: 0.01, min: 0, max: poolTokenBalance }}
+                    inputProps={{ step: 0.01, min: 0, max: settleTokenBalance }}
                     value={addCollateral}
                     onChange={(event) => setAddCollateral(event.target.value)}
                   />
                 }
               />
-              {poolTokenBalance !== undefined && poolTokenBalance > 0 && (
+              {settleTokenBalance !== undefined && settleTokenBalance > 0 && (
                 <SidesRow
                   leftSide=" "
                   rightSide={
                     <Typography className={styles.helperText} variant="bodyTiny">
                       {t('common.max')}{' '}
-                      <Link onClick={() => setAddCollateral(poolTokenBalance.toFixed(digitsForMaxAdd))}>
-                        {poolTokenBalance.toFixed(digitsForMaxAdd)}
+                      <Link onClick={() => setAddCollateral(settleTokenBalance.toFixed(digitsForMaxAdd))}>
+                        {settleTokenBalance.toFixed(digitsForMaxAdd)}
                       </Link>
                     </Typography>
                   }
