@@ -248,13 +248,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove && debouncedRemoveCollateral === '0') {
       return;
     }
+    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
 
     setAPIBusy(true);
     positionRiskOnCollateralAction(
       chainId,
       traderAPI,
       address,
-      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral : -debouncedRemoveCollateral,
+      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral / px : -debouncedRemoveCollateral / px, // @DONE needs to be in CC not SC for contract call
       selectedPosition
     )
       .then((data) => {
@@ -269,6 +270,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       });
   }, [
     chainId,
+    c2s,
     address,
     selectedPosition,
     modifyType,
@@ -276,6 +278,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     debouncedRemoveCollateral,
     setAPIBusy,
     traderAPI,
+    poolByPosition,
   ]);
 
   useDebouncedEffect(
@@ -423,12 +426,13 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     ) {
       return;
     }
+    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
 
     if (modifyType === ModifyTypeE.Add) {
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral)
+      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral / px) // @DONE: addCollateral should be in CC not SC for the contract call
         .then(({ data }) => {
           approveMarginToken({
             walletClient,
@@ -491,7 +495,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral)
+      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral / px) // @DONE removeCollateral should be in CC not SC for the contract call
         .then(({ data }) => {
           withdraw(tradingClient, address, data)
             .then(({ hash }) => {
