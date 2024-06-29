@@ -638,7 +638,7 @@ export const ActionBlock = memo(() => {
                   isOrderValid && collateralDeposit >= 0 && selectedPool
                     ? formatToCurrency(
                         collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                        selectedPool?.settleSymbol
+                        selectedPool.settleSymbol
                       )
                     : '-' // @DONE: fx
                 }
