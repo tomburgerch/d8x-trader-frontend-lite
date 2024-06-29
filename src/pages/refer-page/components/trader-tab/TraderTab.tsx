@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { collateralToSettleConversionAtom, poolsAtom } from 'store/pools.store';
+import { poolsAtom } from 'store/pools.store';
 import type { OverviewItemI, OverviewPoolItemI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -20,7 +20,6 @@ export const TraderTab = () => {
   const { t } = useTranslation();
 
   const pools = useAtomValue(poolsAtom);
-  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, chainId } = useAccount();
 
@@ -48,12 +47,12 @@ export const TraderTab = () => {
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
       earnedRebatesByPools.push({
-        symbol: pool.settleSymbol,
-        value: earnedRebatesAmount * (c2s.get(pool.poolSymbol)?.value ?? 1),
+        symbol: pool.poolSymbol,
+        value: earnedRebatesAmount,
       });
       openEarningsByPools.push({
-        symbol: pool.settleSymbol,
-        value: openEarningsAmount * (c2s.get(pool.poolSymbol)?.value ?? 1),
+        symbol: pool.poolSymbol,
+        value: openEarningsAmount,
       });
     });
 
@@ -67,7 +66,7 @@ export const TraderTab = () => {
         poolsItems: address && isEnabledChain(chainId) ? openEarningsByPools : [],
       },
     ];
-  }, [pools, openRewards, earnedRebates, address, chainId, c2s, t]);
+  }, [pools, openRewards, earnedRebates, address, chainId, t]);
 
   return (
     <div className={styles.root}>
