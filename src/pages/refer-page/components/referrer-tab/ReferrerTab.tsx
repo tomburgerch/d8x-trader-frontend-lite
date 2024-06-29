@@ -40,7 +40,7 @@ export const ReferrerTab = memo(() => {
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
       totalEarnedCommission.push({
-        symbol: pool.settleSymbol,
+        symbol: pool.poolSymbol,
         value: earnedCommissionAmount,
       });
     });
