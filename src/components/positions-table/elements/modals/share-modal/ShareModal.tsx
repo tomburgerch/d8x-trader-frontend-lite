@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,9 +8,9 @@ import { Button, DialogActions, DialogContent } from '@mui/material';
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { selectedPoolAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { useSettlementMap } from 'hooks/useSettlementMap';
 
 import { Background } from './Background';
 
@@ -26,9 +25,8 @@ interface ShareModalPropsI {
 export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareModalPropsI) => {
   const { t } = useTranslation();
 
-  const pool = useAtomValue(selectedPoolAtom);
-
   const statsRef = useRef<HTMLDivElement>(null);
+  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   if (!selectedPosition) {
     return null;
@@ -81,7 +79,8 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
             </span>
             |
             <span>
-              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{pool?.settleSymbol}{' '}
+              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/
+              {mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}{' '}
               {t('pages.trade.history-table.table-header.perpetual')}
             </span>
             |<span>{Math.round(selectedPosition.leverage * 100) / 100}x</span>
