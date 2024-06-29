@@ -3,7 +3,7 @@ import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { collateralToSettleConversionAtom, poolsAtom } from 'store/pools.store';
+import { poolsAtom } from 'store/pools.store';
 import { commissionRateAtom } from 'store/refer.store';
 import type { OverviewItemI, OverviewPoolItemI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -20,7 +20,6 @@ export const ReferrerTab = memo(() => {
 
   const pools = useAtomValue(poolsAtom);
   const commissionRate = useAtomValue(commissionRateAtom);
-  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, chainId } = useAccount();
 
@@ -35,14 +34,14 @@ export const ReferrerTab = memo(() => {
     const totalEarnedCommission: OverviewPoolItemI[] = [];
 
     pools.forEach((pool) => {
-      // @DONE: totalEarnedCommission in settlement token
+      // @DONE: totalEarnedCommission in collateral token - referral system remains in cc
       const earnedCommissionAmount = earnedRebates
         .filter((rebate) => !rebate.asTrader && rebate.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
       totalEarnedCommission.push({
         symbol: pool.settleSymbol,
-        value: earnedCommissionAmount * (c2s.get(pool.poolSymbol)?.value ?? 1),
+        value: earnedCommissionAmount,
       });
     });
 
@@ -64,7 +63,7 @@ export const ReferrerTab = memo(() => {
             : [],
       },
     ];
-  }, [pools, commissionRate, earnedRebates, address, chainId, c2s, t]);
+  }, [pools, commissionRate, earnedRebates, address, chainId, t]);
 
   return (
     <div className={styles.root}>
