@@ -336,13 +336,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const calculatedMargin = useMemo(() => {
     // @DONE: settlement token
     let margin;
+    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
     if (selectedPosition) {
       switch (modifyType) {
         case ModifyTypeE.Add:
-          margin = selectedPosition.collateralCC + +addCollateral;
+          margin = selectedPosition.collateralCC + +addCollateral / px;
           break;
         case ModifyTypeE.Remove:
-          margin = selectedPosition.collateralCC - +removeCollateral;
+          margin = selectedPosition.collateralCC - +removeCollateral / px;
           break;
         default:
           margin = selectedPosition.collateralCC;
