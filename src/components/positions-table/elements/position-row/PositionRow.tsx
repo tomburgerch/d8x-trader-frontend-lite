@@ -3,11 +3,11 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { TableCell, TableRow, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
+import { useSettlementMap } from 'hooks/useSettlementMap';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -35,8 +35,9 @@ export const PositionRow = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
-    const pool = useAtomValue(selectedPoolAtom);
     const c2s = useAtomValue(collateralToSettleConversionAtom);
+
+    const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
     const parsedSymbol = parseSymbol(position.symbol);
 
@@ -44,7 +45,8 @@ export const PositionRow = memo(
       <TableRow key={position.symbol}>
         <TableCell align="left">
           <Typography variant="cellSmall">
-            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{pool?.settleSymbol}
+            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/
+            {mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}
           </Typography>
         </TableCell>
         <TableCell align="right">
@@ -74,10 +76,10 @@ export const PositionRow = memo(
         {/* // @DONE: settlement token */}
         <TableCell align="right">
           <Typography variant="cellSmall">
-            {pool
+            {parsedSymbol
               ? formatToCurrency(
-                  position.collateralCC * (c2s.get(pool.poolSymbol)?.value ?? 1),
-                  pool.settleSymbol,
+                  position.collateralCC * (c2s.get(parsedSymbol.poolSymbol)?.value ?? 1),
+                  mapPoolSymbolToSettleSymbol(parsedSymbol.poolSymbol),
                   true
                 )
               : '-'}{' '}

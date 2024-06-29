@@ -3,12 +3,12 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, selectedPoolAtom } from 'store/pools.store';
+import { useSettlementMap } from 'hooks/useSettlementMap';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -36,8 +36,9 @@ export const PositionBlock = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
-    const pool = useAtomValue(selectedPoolAtom);
     const c2s = useAtomValue(collateralToSettleConversionAtom);
+
+    const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
@@ -50,7 +51,7 @@ export const PositionBlock = memo(
               {t('pages.trade.positions-table.position-block-mobile.symbol')}
             </Typography>
             <Typography variant="bodySmall" component="p" className={styles.symbol}>
-              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${pool?.settleSymbol}`}
+              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}`}
             </Typography>
           </Box>
           <IconButton
@@ -117,10 +118,10 @@ export const PositionBlock = memo(
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
             rightSide={`${
-              pool
+              parsedSymbol
                 ? formatToCurrency(
-                    position.collateralCC * (c2s.get(pool.poolSymbol)?.value ?? 1),
-                    pool.settleSymbol,
+                    position.collateralCC * (c2s.get(parsedSymbol.poolSymbol)?.value ?? 1),
+                    mapPoolSymbolToSettleSymbol(parsedSymbol.poolSymbol),
                     true
                   )
                 : '-'

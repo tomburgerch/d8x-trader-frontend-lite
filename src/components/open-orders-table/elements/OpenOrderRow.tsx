@@ -1,13 +1,11 @@
 import { format } from 'date-fns';
-import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import IconButton from '@mui/material/IconButton';
 import { DeleteForeverOutlined } from '@mui/icons-material';
-import { TableCell, TableRow, Typography } from '@mui/material';
+import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { selectedPoolAtom } from 'store/pools.store';
+import { useSettlementMap } from 'hooks/useSettlementMap';
 import type { OrderWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -23,7 +21,7 @@ interface OpenOrderRowPropsI {
 export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) => {
   const { t } = useTranslation();
 
-  const pool = useAtomValue(selectedPoolAtom);
+  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
@@ -33,7 +31,8 @@ export const OpenOrderRow = ({ order, handleOrderCancel }: OpenOrderRowPropsI) =
     <TableRow>
       <TableCell align="left">
         <Typography variant="cellSmall">
-          {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{pool?.settleSymbol}
+          {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/
+          {mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}
         </Typography>
       </TableCell>
       <TableCell align="left">

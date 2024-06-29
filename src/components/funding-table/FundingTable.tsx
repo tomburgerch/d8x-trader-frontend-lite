@@ -12,8 +12,9 @@ import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
+import { useSettlementMap } from 'hooks/useSettlementMap';
 import { getFundingRatePayments } from 'network/history';
-import { fundingListAtom, perpetualsAtom, poolsAtom, positionsAtom } from 'store/pools.store';
+import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -32,19 +33,20 @@ export const FundingTable = memo(() => {
 
   const [fundingList, setFundingList] = useAtom(fundingListAtom);
   const perpetuals = useAtomValue(perpetualsAtom);
-  const pools = useAtomValue(poolsAtom);
   const positions = useAtomValue(positionsAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
 
-  const updateTradesHistoryRef = useRef(false);
-
   const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
+
+  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
   const [orderBy, setOrderBy] = useState<keyof FundingWithSymbolDataI>('timestamp');
+
+  const updateTradesHistoryRef = useRef(false);
 
   const refreshFundingList = useCallback(() => {
     if (updateTradesHistoryRef.current) {
@@ -101,16 +103,16 @@ export const FundingTable = memo(() => {
   const fundingListWithSymbol = useMemo(() => {
     return fundingList.map((funding): FundingWithSymbolDataI => {
       const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
-      const pool = pools.find(({ perpetuals: perps }) => perps.some(({ id }) => id === funding.perpetualId));
+      const settleSymbol = mapPoolSymbolToSettleSymbol(perpetual?.poolName);
       return {
         ...funding,
         amount: -funding.amount,
-        symbol: perpetual && pool ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${pool.settleSymbol}` : '',
-        settleSymbol: pool ? pool.settleSymbol : '',
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${settleSymbol}` : '',
+        settleSymbol,
         perpetual: perpetual ?? null,
       };
     });
-  }, [fundingList, perpetuals, pools]);
+  }, [fundingList, perpetuals, mapPoolSymbolToSettleSymbol]);
 
   const { filter, setFilter, filteredRows } = useFilter(fundingListWithSymbol, fundingListHeaders);
 

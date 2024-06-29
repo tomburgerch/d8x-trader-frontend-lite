@@ -1,14 +1,12 @@
 import { format } from 'date-fns';
-import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import IconButton from '@mui/material/IconButton';
 import { DeleteForeverOutlined } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { selectedPoolAtom } from 'store/pools.store';
+import { useSettlementMap } from 'hooks/useSettlementMap';
 import type { OrderWithIdI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -25,7 +23,7 @@ interface OpenOrderBlockPropsI {
 export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderBlockPropsI) => {
   const { t } = useTranslation();
 
-  const pool = useAtomValue(selectedPoolAtom);
+  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
@@ -39,7 +37,7 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
             {t('pages.trade.orders-table.order-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
-            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${pool?.settleSymbol}`}
+            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}`}
           </Typography>
         </Box>
         <IconButton
