@@ -79,7 +79,7 @@ export const currencyMultiplierAtom = atom((get) => {
   if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
     currencyMultiplier = indexPrice;
   } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
-    currencyMultiplier = indexPrice / collToQuoteIndexPrice / (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
+    currencyMultiplier = (indexPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
   }
   return currencyMultiplier;
 });

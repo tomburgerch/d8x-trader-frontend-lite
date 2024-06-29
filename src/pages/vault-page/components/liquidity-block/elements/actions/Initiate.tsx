@@ -247,7 +247,7 @@ export const Initiate = memo(() => {
       const numberDigits = valueToFractionDigits(minAmount);
       return `${t('pages.vault.withdraw.initiate.validity-amount-below-min')} (${minAmount?.toFixed(
         numberDigits
-      )} ${selectedPool?.settleSymbol})`;
+      )} d${selectedPool?.settleSymbol})`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.NoAmount) {
       return `${t('pages.vault.withdraw.initiate.validity-no-amount')}`;
     } else if (validityCheckInitiateType === ValidityCheckInitiateE.AmountTooBig) {
