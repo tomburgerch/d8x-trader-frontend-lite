@@ -8,9 +8,9 @@ import { Button, DialogActions, DialogContent } from '@mui/material';
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { useSettlementMap } from 'hooks/useSettlementMap';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { useSettlementMap } from 'hooks/useSettlementMap';
 
 import { Background } from './Background';
 

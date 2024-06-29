@@ -339,7 +339,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const calculatedMargin = useMemo(() => {
     // @DONE: settlement token
     let margin;
-    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
+    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
     if (selectedPosition) {
       switch (modifyType) {
         case ModifyTypeE.Add:
@@ -426,7 +426,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     ) {
       return;
     }
-    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
+    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
 
     if (modifyType === ModifyTypeE.Add) {
       requestSentRef.current = true;
