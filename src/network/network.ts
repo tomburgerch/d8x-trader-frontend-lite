@@ -206,10 +206,10 @@ export async function getOpenOrders(
 // needs broker input, should go through backend
 export async function getTradingFee(
   chainId: number,
-  settleSymbol: string,
+  poolSymbol: string,
   traderAddr?: string
 ): Promise<ValidatedResponseI<number>> {
-  return fetchUrl(`trading-fee?poolSymbol=${settleSymbol}&traderAddr=${traderAddr}`, chainId);
+  return fetchUrl(`trading-fee?poolSymbol=${poolSymbol}&traderAddr=${traderAddr}`, chainId);
 }
 
 export function getMaxOrderSizeForTrader(
