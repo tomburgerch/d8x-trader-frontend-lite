@@ -3,6 +3,7 @@ import { atom } from 'jotai';
 
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
+  collateralToSettleConversionAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   positionsAtom,
@@ -65,6 +66,8 @@ export const currencyMultiplierAtom = atom((get) => {
 
   const selectedPool = get(selectedPoolAtom);
   const selectedPerpetual = get(selectedPerpetualAtom);
+  const c2s = get(collateralToSettleConversionAtom);
+
   if (!selectedPool || !selectedPerpetual) {
     return currencyMultiplier;
   }
@@ -74,8 +77,8 @@ export const currencyMultiplierAtom = atom((get) => {
   const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
   if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
     currencyMultiplier = indexPrice;
-  } else if (selectedCurrency === selectedPool.poolSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
-    currencyMultiplier = indexPrice / collToQuoteIndexPrice;
+  } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
+    currencyMultiplier = (indexPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
   }
   return currencyMultiplier;
 });

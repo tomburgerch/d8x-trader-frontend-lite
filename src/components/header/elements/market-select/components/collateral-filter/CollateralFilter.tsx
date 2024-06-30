@@ -1,12 +1,13 @@
 import classnames from 'classnames';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { memo, MouseEvent, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Menu, MenuItem, Typography } from '@mui/material';
 
-import { TemporaryAnyT } from 'types/types';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
+import type { TemporaryAnyT } from 'types/types';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import { collateralFilterAtom, collateralsAtom } from '../../collaterals.store';
@@ -17,7 +18,8 @@ export const CollateralFilter = memo(() => {
   const { t } = useTranslation();
 
   const [collateralFilter, setCollateralFilter] = useAtom(collateralFilterAtom);
-  const [collaterals] = useAtom(collateralsAtom);
+  const collaterals = useAtomValue(collateralsAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -39,7 +41,9 @@ export const CollateralFilter = memo(() => {
             {t('common.select.collateral.label')}
           </Typography>
           <Typography variant="bodyTiny" className={styles.value}>
-            {collateralFilter !== null ? collateralFilter : t('common.select.option-all')}
+            {collateralFilter !== null
+              ? c2s.get(collateralFilter)?.settleSymbol ?? collateralFilter
+              : t('common.select.option-all')}
           </Typography>
         </div>
         <div className={styles.arrowDropDown}>{open ? <ArrowDropUp /> : <ArrowDropDown />}</div>
@@ -83,7 +87,8 @@ export const CollateralFilter = memo(() => {
           {t('common.select.option-all')}
         </MenuItem>
         {collaterals.map((collateral) => {
-          const IconComponent = getDynamicLogo(collateral.toLowerCase()) as TemporaryAnyT;
+          const settleSymbol = c2s.get(collateral)?.settleSymbol ?? collateral;
+          const IconComponent = getDynamicLogo(settleSymbol.toLowerCase()) as TemporaryAnyT;
 
           return (
             <MenuItem
@@ -97,7 +102,7 @@ export const CollateralFilter = memo(() => {
               <Suspense fallback={null}>
                 <IconComponent className={styles.tokenIcon} />
               </Suspense>
-              {collateral}
+              {settleSymbol}
             </MenuItem>
           );
         })}

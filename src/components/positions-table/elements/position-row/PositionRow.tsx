@@ -1,11 +1,12 @@
+import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { TableCell, TableRow, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -31,13 +32,16 @@ export const PositionRow = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
+    const c2s = useAtomValue(collateralToSettleConversionAtom);
+
     const parsedSymbol = parseSymbol(position.symbol);
+    const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
     return (
       <TableRow key={position.symbol}>
         <TableCell align="left">
           <Typography variant="cellSmall">
-            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{parsedSymbol?.poolSymbol}
+            {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{collToSettleInfo?.settleSymbol ?? ''}
           </Typography>
         </TableCell>
         <TableCell align="right">
@@ -66,8 +70,10 @@ export const PositionRow = memo(
         </TableCell>
         <TableCell align="right">
           <Typography variant="cellSmall">
-            {formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol, true)} (
-            {Math.round(position.leverage * 100) / 100}x)
+            {collToSettleInfo
+              ? formatToCurrency(position.collateralCC * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+              : '-'}{' '}
+            ({Math.round(position.leverage * 100) / 100}x)
           </Typography>
         </TableCell>
         <TableCell align="right">

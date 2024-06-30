@@ -23,6 +23,7 @@ import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
+  collateralToSettleConversionAtom,
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   poolFeeAtom,
@@ -138,6 +139,7 @@ export const ActionBlock = memo(() => {
   const hasTpSlOrders = useAtomValue(hasTpSlOrdersAtom);
   const poolFee = useAtomValue(poolFeeAtom);
   const currencyMultiplier = useAtomValue(currencyMultiplierAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
@@ -386,10 +388,10 @@ export const ActionBlock = memo(() => {
           // hide modal now that metamask popup shows up
           approveMarginToken({
             walletClient,
-            marginTokenAddr: selectedPool.marginTokenAddr,
+            settleTokenAddr: selectedPool.settleTokenAddr,
             isMultisigAddress,
             proxyAddr,
-            minAmount: collateralDeposit,
+            minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
             decimals: poolTokenDecimals,
           })
             .then(() => {
@@ -633,7 +635,12 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && collateralDeposit >= 0 ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'
+                  isOrderValid && collateralDeposit >= 0 && selectedPool
+                    ? formatToCurrency(
+                        collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
+                      )
+                    : '-'
                 }
                 rightSideStyles={styles.rightSide}
               />
@@ -646,7 +653,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, orderInfo.poolName)
+                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -763,8 +770,11 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
-                    ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
+                    ? formatToCurrency(
+                        newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
+                      )
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}

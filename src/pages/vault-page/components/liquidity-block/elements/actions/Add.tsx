@@ -18,6 +18,7 @@ import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import {
+  collateralToSettleConversionAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
   proxyAddrAtom,
@@ -65,6 +66,7 @@ export const Add = memo(() => {
   const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
   const triggerAddInputFocus = useAtomValue(triggerAddInputFocusAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
 
@@ -174,7 +176,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      marginTokenAddr: selectedPool.marginTokenAddr,
+      settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -221,7 +223,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      marginTokenAddr: selectedPool.marginTokenAddr,
+      settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -254,11 +256,11 @@ export const Add = memo(() => {
   };
 
   const predictedAmount = useMemo(() => {
-    if (addAmount > 0 && dCurrencyPrice != null) {
-      return addAmount / dCurrencyPrice;
+    if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null && c2s.has(selectedPool.poolSymbol)) {
+      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice;
     }
     return 0;
-  }, [addAmount, dCurrencyPrice]);
+  }, [addAmount, c2s, selectedPool, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (
@@ -324,7 +326,7 @@ export const Add = memo(() => {
     } else if (validityCheckAddType === ValidityCheckAddE.AmountBelowMinimum) {
       return `${t(
         'pages.vault.add.validity-amount-below-min'
-      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.poolSymbol})`;
+      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.settleSymbol})`;
     } else if (validityCheckAddType === ValidityCheckAddE.NoAmount) {
       return `${t('pages.vault.add.validity-no-amount')}`;
     }
@@ -337,7 +339,7 @@ export const Add = memo(() => {
     isMultisigAddress,
     validityCheckAddType,
     selectedPool?.brokerCollateralLotSize,
-    selectedPool?.poolSymbol,
+    selectedPool?.settleSymbol,
     approvalCompleted,
   ]);
 
@@ -370,18 +372,18 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
       </div>
       <div className={styles.contentBlock}>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
             <InfoLabelBlock
-              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.poolSymbol })}
-              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.poolSymbol })}
+              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.settleSymbol })}
+              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.settleSymbol })}
             />
           </div>
           <ResponsiveInput
@@ -389,7 +391,7 @@ export const Add = memo(() => {
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={selectedPool?.poolSymbol}
+            currency={selectedPool?.settleSymbol}
             step="1"
             min={0}
             max={poolTokenBalance || 999999}
@@ -406,7 +408,7 @@ export const Add = memo(() => {
                 }
               }}
             >
-              {formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}
+              {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
             </Link>
           </Typography>
         ) : null}
@@ -415,7 +417,7 @@ export const Add = memo(() => {
         </div>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
-            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.poolSymbol })}
+            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
           </div>
           <div className={styles.inputHolder}>
             <OutlinedInput
@@ -423,12 +425,12 @@ export const Add = memo(() => {
               endAdornment={
                 <InputAdornment position="end" className={styles.expectedAmountInput}>
                   <Typography variant="adornment" color={'var(--d8x-color-text-label-one)'}>
-                    d{selectedPool?.poolSymbol}
+                    d{selectedPool?.settleSymbol}
                   </Typography>
                 </InputAdornment>
               }
               type="text"
-              value={formatToCurrency(predictedAmount, '')}
+              value={selectedPool ? formatToCurrency(predictedAmount, '') : '-'}
               disabled
             />
           </div>

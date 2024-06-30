@@ -115,7 +115,7 @@ export const OrderSize = memo(() => {
     } else if (defaultCurrency === DefaultCurrencyE.Quote) {
       setSelectedCurrency(selectedPerpetual.quoteCurrency);
     } else {
-      setSelectedCurrency(selectedPool.poolSymbol);
+      setSelectedCurrency(selectedPool.settleSymbol);
     }
   }, [selectedPerpetual, selectedPool, defaultCurrency, setSelectedCurrency]);
 
@@ -129,8 +129,8 @@ export const OrderSize = memo(() => {
     }
 
     const currencies = [selectedPerpetual.baseCurrency, selectedPerpetual.quoteCurrency];
-    if (!currencies.includes(selectedPool.poolSymbol)) {
-      currencies.push(selectedPool.poolSymbol);
+    if (!currencies.includes(selectedPool.settleSymbol)) {
+      currencies.push(selectedPool.settleSymbol);
     }
     return currencies;
   }, [selectedPool, selectedPerpetual]);

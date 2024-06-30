@@ -28,7 +28,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
@@ -83,7 +83,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
   const fetchFeeRef = useRef(false);
 
   const { isMultisigAddress } = useUserWallet();
-  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   useEffect(() => {
     if (validityCheckRef.current) {
@@ -199,7 +199,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       !proxyAddr ||
       !walletClient ||
       collateralDeposit === null ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !chain ||
       !isEnabledChain(chainId)
     ) {
@@ -277,11 +277,11 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
               // hide modal now that metamask popup shows up
               approveMarginToken({
                 walletClient,
-                marginTokenAddr: poolByPosition.marginTokenAddr,
+                settleTokenAddr: poolByPosition.settleTokenAddr,
                 isMultisigAddress,
                 proxyAddr,
                 minAmount: collateralDeposit,
-                decimals: poolTokenDecimals,
+                decimals: settleTokenDecimals,
               })
                 .then(() => {
                   // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes

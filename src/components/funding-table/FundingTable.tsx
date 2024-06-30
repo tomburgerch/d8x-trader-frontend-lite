@@ -13,7 +13,7 @@ import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getFundingRatePayments } from 'network/history';
-import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -34,8 +34,7 @@ export const FundingTable = memo(() => {
   const perpetuals = useAtomValue(perpetualsAtom);
   const positions = useAtomValue(positionsAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
-
-  const updateTradesHistoryRef = useRef(false);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
@@ -44,6 +43,8 @@ export const FundingTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
   const [orderBy, setOrderBy] = useState<keyof FundingWithSymbolDataI>('timestamp');
+
+  const updateTradesHistoryRef = useRef(false);
 
   const refreshFundingList = useCallback(() => {
     if (updateTradesHistoryRef.current) {
@@ -100,15 +101,16 @@ export const FundingTable = memo(() => {
   const fundingListWithSymbol = useMemo(() => {
     return fundingList.map((funding): FundingWithSymbolDataI => {
       const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
-
+      const settleSymbol = perpetual?.poolName ? c2s.get(perpetual?.poolName)?.settleSymbol ?? '' : '';
       return {
         ...funding,
         amount: -funding.amount,
-        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${settleSymbol}` : '',
+        settleSymbol,
         perpetual: perpetual ?? null,
       };
     });
-  }, [fundingList, perpetuals]);
+  }, [fundingList, perpetuals, c2s]);
 
   const { filter, setFilter, filteredRows } = useFilter(fundingListWithSymbol, fundingListHeaders);
 

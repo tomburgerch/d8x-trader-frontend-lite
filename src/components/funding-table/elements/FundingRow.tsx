@@ -1,19 +1,23 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { DATETIME_FORMAT } from 'appConstants';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import styles from '../FundingTable.module.scss';
 
 interface FundingRowPropsI {
   headers: TableHeaderI<FundingWithSymbolDataI>[];
   funding: FundingWithSymbolDataI;
 }
 
-import styles from '../FundingTable.module.scss';
-
 export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
+
   const perpetual = funding.perpetual;
   const time = format(new Date(funding.timestamp), DATETIME_FORMAT);
 
@@ -30,7 +34,9 @@ export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
           variant="cellSmall"
           className={funding.amount >= 0 ? styles.fundingPositive : styles.fundingNegative}
         >
-          {perpetual ? formatToCurrency(funding.amount, perpetual.poolName, true) : ''}
+          {perpetual
+            ? formatToCurrency(funding.amount * (c2s.get(perpetual.poolName)?.value ?? 1), funding.settleSymbol, true)
+            : ''}
         </Typography>
       </TableCell>
     </TableRow>

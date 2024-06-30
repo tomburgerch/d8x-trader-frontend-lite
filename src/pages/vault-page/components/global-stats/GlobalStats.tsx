@@ -9,7 +9,7 @@ import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
 import { getWeeklyAPI } from 'network/history';
 import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom, tvlAtom } from 'store/vault-pools.store';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 
@@ -27,6 +27,7 @@ export const GlobalStats = () => {
   const traderAPI = useAtomValue(traderAPIAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const [dCurrencyPrice, setDCurrencyPrice] = useAtom(dCurrencyPriceAtom);
   const [tvl, setTvl] = useAtom(tvlAtom);
 
@@ -74,12 +75,12 @@ export const GlobalStats = () => {
 
   const getDSupply = useCallback(
     (justNumber: boolean) => {
-      if (selectedPool?.poolSymbol && dCurrencyPrice && tvl) {
-        return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.poolSymbol}`, true, undefined, justNumber);
+      if (selectedPool?.settleSymbol && dCurrencyPrice && tvl) {
+        return formatToCurrency(tvl / dCurrencyPrice, `d${selectedPool.settleSymbol}`, true, undefined, justNumber);
       }
       return '--';
     },
-    [selectedPool?.poolSymbol, dCurrencyPrice, tvl]
+    [selectedPool?.settleSymbol, dCurrencyPrice, tvl]
   );
 
   const weeklyAPY: StatDataI = useMemo(
@@ -98,25 +99,41 @@ export const GlobalStats = () => {
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
-        value: selectedPool && tvl != null ? formatToCurrency(tvl, selectedPool.poolSymbol, true) : '--',
-        numberOnly: tvl != null ? formatToCurrency(tvl, '', true) : '--',
-        currencyOnly: selectedPool && tvl != null ? selectedPool.poolSymbol : '',
+        value:
+          selectedPool && tvl != null
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), selectedPool.settleSymbol, true)
+            : '--',
+        numberOnly:
+          tvl != null && selectedPool
+            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            : '--',
+        currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.poolSymbol }),
-        value: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, selectedPool?.poolSymbol, true) : '--',
-        numberOnly: dCurrencyPrice != null ? formatToCurrency(dCurrencyPrice, '', true) : '--',
-        currencyOnly: dCurrencyPrice != null ? selectedPool?.poolSymbol : '',
+        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
+        value:
+          dCurrencyPrice != null && selectedPool
+            ? formatToCurrency(
+                dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool.settleSymbol,
+                true
+              )
+            : '--',
+        numberOnly:
+          dCurrencyPrice != null && selectedPool
+            ? formatToCurrency(dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+            : '--',
+        currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.poolSymbol }),
+        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
     ],
-    [selectedPool, tvl, dCurrencyPrice, getDSupply, t]
+    [selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]
   );
 
   if (isMobileScreen) {

@@ -22,6 +22,7 @@ import { getExchangeInfo, getPositionRisk } from 'network/network';
 import { authPages, pages } from 'routes/pages';
 import { connectModalOpenAtom } from 'store/global-modals.store';
 import {
+  collateralToSettleConversionAtom,
   gasTokenSymbolAtom,
   oracleFactoryAddrAtom,
   perpetualsAtom,
@@ -82,6 +83,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const setGasTokenSymbol = useSetAtom(gasTokenSymbolAtom);
   const setPoolTokenDecimals = useSetAtom(poolTokenDecimalsAtom);
   const setConnectModalOpen = useSetAtom(connectModalOpenAtom);
+  const setCollToSettleConversion = useSetAtom(collateralToSettleConversionAtom);
   const triggerBalancesUpdate = useAtomValue(triggerBalancesUpdateAtom);
   const triggerPositionsUpdate = useAtomValue(triggerPositionsUpdateAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
@@ -95,6 +97,8 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const traderAPIRef = useRef(traderAPI);
   const poolTokenBalanceDefinedRef = useRef(false);
   const poolTokenBalanceRetriesCountRef = useRef(0);
+
+  // fetch the settle ccy fx -> save to atom
 
   const setExchangeInfo = useCallback(
     (data: ExchangeInfoI | null) => {
@@ -194,7 +198,27 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           const data = await getExchangeInfo(enabledChainId, currentTraderAPI);
           setExchangeInfo(data.data);
           retries = MAX_RETRIES;
+
+          for (const pool of data.data.pools) {
+            let coll2settle;
+            try {
+              coll2settle =
+                pool.marginTokenAddr === pool.settleTokenAddr
+                  ? 1
+                  : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
+            } catch (error) {
+              console.error(error);
+              console.log({ pool });
+            }
+
+            setCollToSettleConversion({
+              poolSymbol: pool.poolSymbol,
+              settleSymbol: pool.settleSymbol,
+              value: coll2settle ?? 1,
+            });
+          }
         } catch (error) {
+          console.error(error);
           console.log(`ExchangeInfo attempt ${retries + 1} failed: ${error}`);
           retries++;
           if (retries === MAX_RETRIES) {
@@ -210,7 +234,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       .finally(() => {
         exchangeRequestRef.current = false;
       });
-  }, [chainId, setExchangeInfo]);
+  }, [chainId, setCollToSettleConversion, setExchangeInfo]);
 
   const {
     data: poolTokenBalance,
@@ -221,13 +245,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: selectedPool?.marginTokenAddr as Address,
+        address: selectedPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: selectedPool?.marginTokenAddr as Address,
+        address: selectedPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
       },
@@ -238,7 +262,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         address &&
         traderAPI?.chainId === chainId &&
         isEnabledChain(chainId) &&
-        !!selectedPool?.marginTokenAddr &&
+        !!selectedPool?.settleTokenAddr &&
         isConnected &&
         !isReconnecting &&
         !isConnecting,
