@@ -83,7 +83,7 @@ export const DepositModal = () => {
           <Typography variant="bodySmall" className={styles.noteText}>
             <Translate
               i18nKey="common.deposit-modal.important-notice.1"
-              values={{ currencyName: selectedCurrency?.name }}
+              values={{ currencyName: selectedCurrency?.settleToken }}
             />{' '}
             {poolAddress && (
               <>

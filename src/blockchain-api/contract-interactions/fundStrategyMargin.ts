@@ -13,11 +13,11 @@ interface FundMarginPropsI {
   strategyAddress?: Address;
   isMultisigAddress: boolean | null;
   amount: number;
-  marginTokenAddress: Address;
+  settleTokenAddress: Address;
 }
 
 export async function fundStrategyMargin(
-  { walletClient, strategyAddress, isMultisigAddress, amount, marginTokenAddress }: FundMarginPropsI,
+  { walletClient, strategyAddress, isMultisigAddress, amount, settleTokenAddress }: FundMarginPropsI,
   setCurrentPhaseKey: Dispatch<SetStateAction<string>>
 ) {
   if (!walletClient.account?.address) {
@@ -37,8 +37,8 @@ export async function fundStrategyMargin(
     strategyAddr = strategyAddress;
   }
 
-  const marginTokenContract = {
-    address: marginTokenAddress,
+  const settleTokenContract = {
+    address: settleTokenAddress,
     abi: erc20Abi,
     chain: walletClient.chain,
   } as const;
@@ -46,12 +46,12 @@ export async function fundStrategyMargin(
     allowFailure: false,
     contracts: [
       {
-        ...marginTokenContract,
+        ...settleTokenContract,
         functionName: 'balanceOf',
         args: [strategyAddr],
       },
       {
-        ...marginTokenContract,
+        ...settleTokenContract,
         functionName: 'decimals',
       },
     ],
@@ -62,7 +62,7 @@ export async function fundStrategyMargin(
     setCurrentPhaseKey('pages.strategies.enter.phases.funding');
     const gasPrice = await getGasPrice(walletClient.chain?.id);
     const params: WriteContractParameters = {
-      ...marginTokenContract,
+      ...settleTokenContract,
       functionName: 'transfer',
       args: [strategyAddr, amountBigint],
       account: walletClient.account,

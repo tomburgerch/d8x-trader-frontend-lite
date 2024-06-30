@@ -3,6 +3,7 @@ import { PerpetualI } from 'types/types';
 
 export interface PerpetualWithPoolAndMarketI extends PerpetualI {
   poolSymbol: string;
+  settleSymbol: string;
   symbol: string;
   marketData: MarketDataI | null;
 }

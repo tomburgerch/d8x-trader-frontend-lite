@@ -24,7 +24,13 @@ export const CurrencySelect = () => {
     const currencies: CurrencyItemI[] = [];
 
     if (gasTokenSymbol) {
-      currencies.push({ id: gasTokenSymbol, name: gasTokenSymbol, isGasToken: true, isActiveToken: true });
+      currencies.push({
+        id: gasTokenSymbol,
+        name: gasTokenSymbol,
+        settleToken: gasTokenSymbol,
+        isGasToken: true,
+        isActiveToken: true,
+      });
     }
 
     if (pools.length) {
@@ -33,9 +39,10 @@ export const CurrencySelect = () => {
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: true,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
 
@@ -44,9 +51,10 @@ export const CurrencySelect = () => {
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: false,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
     }
@@ -66,7 +74,7 @@ export const CurrencySelect = () => {
       rightSide={
         <DropDownSelect
           id="currency-dropdown"
-          selectedValue={selectedCurrency?.name}
+          selectedValue={selectedCurrency?.settleToken}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           fullWidth
@@ -74,7 +82,7 @@ export const CurrencySelect = () => {
           {currencyItems.map((item) => (
             <DropDownMenuItem
               key={item.id}
-              option={item.name}
+              option={item.settleToken}
               isActive={item.id === selectedCurrency?.id}
               onClick={() => {
                 setSelectedCurrency(item);

@@ -35,7 +35,7 @@ interface MenuOptionPropsI {
 }
 
 const MenuOption = ({ pool }: MenuOptionPropsI) => {
-  const IconComponent = getDynamicLogo(pool.poolSymbol.toLowerCase()) as TemporaryAnyT;
+  const IconComponent = getDynamicLogo(pool.settleSymbol.toLowerCase()) as TemporaryAnyT;
 
   return (
     <Box className={styles.optionHolder}>
@@ -43,7 +43,7 @@ const MenuOption = ({ pool }: MenuOptionPropsI) => {
         <Suspense fallback={null}>
           <IconComponent width={16} height={16} />
         </Suspense>
-        <span>{pool.poolSymbol}</span>
+        <span>{pool.settleSymbol}</span>
       </Box>
       <Box className={styles.value}>{pool.perpetuals.filter(({ state }) => state === 'NORMAL').length}</Box>
     </Box>
@@ -111,7 +111,7 @@ export const CollateralsSelect = memo(() => {
     return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
-  const IconComponent = getDynamicLogo(selectedPool?.poolSymbol.toLowerCase() ?? '') as TemporaryAnyT;
+  const IconComponent = getDynamicLogo(selectedPool?.settleSymbol.toLowerCase() ?? '') as TemporaryAnyT;
 
   return (
     <Box className={styles.holderRoot}>
@@ -129,11 +129,11 @@ export const CollateralsSelect = memo(() => {
         value={selectedPool?.poolSymbol}
         handleChange={handleChange}
         OptionsHeader={OptionsHeader}
-        renderLabel={(value) => value.poolSymbol}
+        renderLabel={(value) => value.settleSymbol}
         renderOption={(option) =>
           isMobileScreen ? (
             <option key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>
-              {option.item.poolSymbol}
+              {option.item.settleSymbol}
             </option>
           ) : (
             <MenuItem key={option.value} value={option.value} selected={option.value === selectedPool?.poolSymbol}>

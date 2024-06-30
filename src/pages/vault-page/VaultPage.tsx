@@ -52,7 +52,7 @@ export const VaultPage = () => {
 
   return (
     <>
-      <Helmet title={`${selectedPool?.poolSymbol} Vault | D8X App`} />
+      <Helmet title={`${selectedPool?.settleSymbol} Vault | D8X App`} />
       <div className={styles.root}>
         <MaintenanceWrapper>
           <Container className={styles.container}>

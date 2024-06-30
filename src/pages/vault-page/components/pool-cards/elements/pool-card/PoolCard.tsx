@@ -119,8 +119,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     clearInputsData();
   };
 
-  const IconComponent = getDynamicLogo(pool.poolSymbol.toLowerCase()) as TemporaryAnyT;
-
+  const IconComponent = getDynamicLogo(pool.settleSymbol.toLowerCase()) as TemporaryAnyT;
   return (
     <div className={styles.root}>
       <div className={styles.header}>
@@ -130,7 +129,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
           </Suspense>
         </div>
         <div className={styles.symbol}>
-          {pool.poolSymbol} {t('pages.vault.pool-card.vault')}
+          {pool.settleSymbol} {t('pages.vault.pool-card.vault')}
         </div>
       </div>
       <div className={styles.content}>

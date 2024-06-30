@@ -1,12 +1,13 @@
+import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -34,8 +35,11 @@ export const PositionBlock = memo(
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
+    const c2s = useAtomValue(collateralToSettleConversionAtom);
+
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
+    const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
     return (
       <Box className={styles.root}>
@@ -45,7 +49,7 @@ export const PositionBlock = memo(
               {t('pages.trade.positions-table.position-block-mobile.symbol')}
             </Typography>
             <Typography variant="bodySmall" component="p" className={styles.symbol}>
-              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${parsedSymbol?.poolSymbol}`}
+              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${collToSettleInfo?.settleSymbol ?? ''}`}
             </Typography>
           </Box>
           <IconButton
@@ -110,9 +114,11 @@ export const PositionBlock = memo(
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
-            rightSide={`${formatToCurrency(position.collateralCC, parsedSymbol?.poolSymbol, true)}${' '}(${
-              Math.round(position.leverage * 100) / 100
-            }x)`}
+            rightSide={`${
+              collToSettleInfo
+                ? formatToCurrency(position.collateralCC * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+                : '-'
+            } (${Math.round(position.leverage * 100) / 100}x)`}
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />

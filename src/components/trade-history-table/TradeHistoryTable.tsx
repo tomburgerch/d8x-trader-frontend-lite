@@ -12,7 +12,7 @@ import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getTradesHistory } from 'network/history';
-import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
@@ -22,6 +22,7 @@ import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBl
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
 
 import { SortableHeaders } from '../table/sortable-header/SortableHeaders';
+
 import styles from './TradeHistoryTable.module.scss';
 
 const MIN_WIDTH_FOR_TABLE = 788;
@@ -33,8 +34,7 @@ export const TradeHistoryTable = memo(() => {
   const perpetuals = useAtomValue(perpetualsAtom);
   const openOrders = useAtomValue(openOrdersAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
-
-  const updateTradesHistoryRef = useRef(false);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
@@ -43,6 +43,8 @@ export const TradeHistoryTable = memo(() => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<SortOrderE>(SortOrderE.Desc);
   const [orderBy, setOrderBy] = useState<keyof TradeHistoryWithSymbolDataI>('timestamp');
+
+  const updateTradesHistoryRef = useRef(false);
 
   const refreshTradesHistory = useCallback(() => {
     if (updateTradesHistoryRef.current) {
@@ -123,14 +125,15 @@ export const TradeHistoryTable = memo(() => {
   const tradesHistoryWithSymbol: TradeHistoryWithSymbolDataI[] = useMemo(() => {
     return tradesHistory.map((tradeHistory) => {
       const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
-
+      const settleSymbol = perpetual?.poolName ? c2s.get(perpetual?.poolName)?.settleSymbol ?? '' : '';
       return {
         ...tradeHistory,
-        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${perpetual.poolName}` : '',
+        symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${settleSymbol}` : '',
+        settleSymbol,
         perpetual: perpetual ?? null,
       };
     });
-  }, [tradesHistory, perpetuals]);
+  }, [tradesHistory, perpetuals, c2s]);
 
   const { filter, setFilter, filteredRows } = useFilter(tradesHistoryWithSymbol, tradeHistoryHeaders);
 
