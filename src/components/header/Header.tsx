@@ -200,10 +200,16 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           retries = MAX_RETRIES;
 
           for (const pool of data.data.pools) {
-            const coll2settle =
-              pool.marginTokenAddr === pool.settleTokenAddr
-                ? 1
-                : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
+            let coll2settle;
+            try {
+              coll2settle =
+                pool.marginTokenAddr === pool.settleTokenAddr
+                  ? 1
+                  : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
+            } catch (error) {
+              console.error(error);
+              console.log({ pool });
+            }
 
             setCollToSettleConversion({
               poolSymbol: pool.poolSymbol,
@@ -212,6 +218,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             });
           }
         } catch (error) {
+          console.error(error);
           console.log(`ExchangeInfo attempt ${retries + 1} failed: ${error}`);
           retries++;
           if (retries === MAX_RETRIES) {
