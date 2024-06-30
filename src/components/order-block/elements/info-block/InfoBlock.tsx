@@ -8,6 +8,7 @@ import { Typography } from '@mui/material';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
+  collateralToSettleConversionAtom,
   perpetualStaticInfoAtom,
   poolTokenBalanceAtom,
   positionsAtom,
@@ -36,6 +37,7 @@ export const InfoBlock = memo(() => {
   const orderBlock = useAtomValue(orderBlockAtom);
   const positions = useAtomValue(positionsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { chainId } = useAccount();
 
@@ -137,9 +139,9 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.balance')}
         </Typography>
-        <TooltipMobile tooltip={selectedPool?.marginTokenAddr ? selectedPool.marginTokenAddr.toString() : '...'}>
+        <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
           <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
-            {formatToCurrency(poolTokenBalance, orderInfo?.poolName)}
+            {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
           </Typography>
         </TooltipMobile>
       </div>
@@ -148,7 +150,12 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.approx-deposit')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {formatToCurrency(approxDepositFromWallet, orderInfo?.poolName)}
+          {approxDepositFromWallet === undefined || !selectedPool
+            ? '-'
+            : formatToCurrency(
+                approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool.settleSymbol
+              )}
         </Typography>
       </div>
       <div className={styles.row}>
@@ -159,13 +166,32 @@ export const InfoBlock = memo(() => {
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>
-                {formatToCurrency(baseFeeInCC, selectedPool?.poolSymbol)}
+                {baseFeeInCC === undefined || !selectedPool
+                  ? '-'
+                  : formatToCurrency(
+                      baseFeeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )}
               </span>
-              <span> {formatToCurrency(feeInCC, selectedPool?.poolSymbol)}</span>
+              <span>
+                {' '}
+                {selectedPool
+                  ? formatToCurrency(
+                      feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )
+                  : '-'}
+              </span>
             </>
           ) : (
             <>
-              {formatToCurrency(feeInCC, selectedPool?.poolSymbol)} {'('}
+              {feeInCC === undefined || !selectedPool
+                ? '-'
+                : formatToCurrency(
+                    feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                    selectedPool.settleSymbol
+                  )}{' '}
+              {'('}
               {formatToCurrency(feePct, '%', false, 3)}
               {')'}
             </>
@@ -177,7 +203,12 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.execution-fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {formatToCurrency(perpetualStaticInfo?.referralRebate, selectedPool?.poolSymbol)}
+          {perpetualStaticInfo && selectedPool
+            ? formatToCurrency(
+                perpetualStaticInfo.referralRebate * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool.settleSymbol
+              )
+            : '-'}
         </Typography>
       </div>
       {chainId === 1101 && (

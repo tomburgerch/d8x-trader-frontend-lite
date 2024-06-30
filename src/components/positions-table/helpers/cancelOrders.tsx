@@ -5,6 +5,7 @@ import { getTransactionCount, waitForTransactionReceipt } from 'viem/actions';
 
 import { HashZero } from 'appConstants';
 import { cancelOrder } from 'blockchain-api/contract-interactions/cancelOrder';
+import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from 'blockchain-api/constants';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { getCancelOrder } from 'network/network';
@@ -15,6 +16,7 @@ import styles from '../elements/modals/Modal.module.scss';
 interface CancelOrdersPropsI {
   ordersToCancel: OrderWithIdI[];
   chain: Chain;
+  isMultisigAddress: boolean | null;
   traderAPI: TraderInterface | null;
   tradingClient: WalletClient;
   toastTitle: string;
@@ -23,7 +25,8 @@ interface CancelOrdersPropsI {
 }
 
 export async function cancelOrders(props: CancelOrdersPropsI) {
-  const { ordersToCancel, chain, traderAPI, tradingClient, toastTitle, nonceShift, callback } = props;
+  const { ordersToCancel, chain, isMultisigAddress, traderAPI, tradingClient, toastTitle, nonceShift, callback } =
+    props;
 
   if (ordersToCancel.length) {
     const cancelOrdersPromises: Promise<void>[] = [];
@@ -57,7 +60,10 @@ export async function cancelOrders(props: CancelOrdersPropsI) {
                       ]}
                     />
                   );
-                  waitForTransactionReceipt(tradingClient, { hash: tx.hash, timeout: 30_000 }).then();
+                  waitForTransactionReceipt(tradingClient, {
+                    hash: tx.hash,
+                    timeout: isMultisigAddress ? MULTISIG_ADDRESS_TIMEOUT : NORMAL_ADDRESS_TIMEOUT,
+                  }).then();
                 })
                 .catch((error) => {
                   console.error(error);

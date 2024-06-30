@@ -14,20 +14,30 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import {
+  collateralToSettleConversionAtom,
   poolTokenBalanceAtom,
   poolTokenDecimalsAtom,
   proxyAddrAtom,
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
+import {
+  dCurrencyPriceAtom,
+  sdkConnectedAtom,
+  triggerAddInputFocusAtom,
+  triggerUserStatsUpdateAtom,
+} from 'store/vault-pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './Action.module.scss';
+
+const ADD_INPUT_FIELD_ID = 'add-amount-size';
+const DELAY_FOR_SCROLL = 100;
 
 enum ValidityCheckAddE {
   Empty = '-',
@@ -46,6 +56,8 @@ export const Add = memo(() => {
   const { address, chain, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
 
+  const { isMultisigAddress } = useUserWallet();
+
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const selectedPool = useAtomValue(selectedPoolAtom);
   const liqProvTool = useAtomValue(traderAPIAtom);
@@ -53,6 +65,8 @@ export const Add = memo(() => {
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const poolTokenDecimals = useAtomValue(poolTokenDecimalsAtom);
   const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
+  const triggerAddInputFocus = useAtomValue(triggerAddInputFocusAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
 
@@ -61,9 +75,11 @@ export const Add = memo(() => {
   const [inputValue, setInputValue] = useState(`${addAmount}`);
   const [txHash, setTxHash] = useState<Address>();
   const [loading, setLoading] = useState(false);
+  const [approvalCompleted, setApprovalCompleted] = useState(false);
 
   const requestSentRef = useRef(false);
   const inputValueChangedRef = useRef(false);
+  const triggerFocusStateRef = useRef(true);
 
   const handleInputCapture = useCallback((orderSizeValue: string) => {
     if (orderSizeValue) {
@@ -142,6 +158,53 @@ export const Add = memo(() => {
     setInputValue('0');
   }, [isSuccess, txHash, chain, t]);
 
+  const handleApprove = () => {
+    if (requestSentRef.current) {
+      return;
+    }
+
+    if (!isSDKConnected || !selectedPool || !addAmount || addAmount < 0 || !poolTokenDecimals) {
+      return;
+    }
+
+    if (!address || !walletClient || !proxyAddr) {
+      return;
+    }
+
+    requestSentRef.current = true;
+    setRequestSent(true);
+    setLoading(true);
+    approveMarginToken({
+      walletClient,
+      settleTokenAddr: selectedPool.settleTokenAddr,
+      isMultisigAddress,
+      proxyAddr,
+      minAmount: addAmount / 1.05,
+      decimals: poolTokenDecimals,
+    })
+      .then(() => {
+        setApprovalCompleted(true);
+        setLoading(false);
+        toast.success(<ToastContent title={t('pages.vault.toast.approved')} bodyLines={[]} />);
+      })
+      .catch((err) => {
+        console.error(err);
+        let msg = (err?.message ?? err) as string;
+        msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+        toast.error(
+          <ToastContent
+            title={t('pages.vault.toast.error.title')}
+            bodyLines={[{ label: t('pages.vault.toast.error.body'), value: msg }]}
+          />
+        );
+        setLoading(false);
+      })
+      .finally(() => {
+        requestSentRef.current = false;
+        setRequestSent(false);
+      });
+  };
+
   const handleAddLiquidity = () => {
     if (requestSentRef.current) {
       return;
@@ -158,8 +221,16 @@ export const Add = memo(() => {
     requestSentRef.current = true;
     setRequestSent(true);
     setLoading(true);
-    approveMarginToken(walletClient, selectedPool.marginTokenAddr, proxyAddr, addAmount, poolTokenDecimals)
+    approveMarginToken({
+      walletClient,
+      settleTokenAddr: selectedPool.settleTokenAddr,
+      isMultisigAddress,
+      proxyAddr,
+      minAmount: addAmount / 1.05,
+      decimals: poolTokenDecimals,
+    })
       .then(() => {
+        setApprovalCompleted(false);
         return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount);
       })
       .then((tx) => {
@@ -185,11 +256,11 @@ export const Add = memo(() => {
   };
 
   const predictedAmount = useMemo(() => {
-    if (addAmount > 0 && dCurrencyPrice != null) {
-      return addAmount / dCurrencyPrice;
+    if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null && c2s.has(selectedPool.poolSymbol)) {
+      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice;
     }
     return 0;
-  }, [addAmount, dCurrencyPrice]);
+  }, [addAmount, c2s, selectedPool, dCurrencyPrice]);
 
   const isButtonDisabled = useMemo(() => {
     if (
@@ -255,12 +326,44 @@ export const Add = memo(() => {
     } else if (validityCheckAddType === ValidityCheckAddE.AmountBelowMinimum) {
       return `${t(
         'pages.vault.add.validity-amount-below-min'
-      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.poolSymbol})`;
+      )} (${selectedPool?.brokerCollateralLotSize} ${selectedPool?.settleSymbol})`;
     } else if (validityCheckAddType === ValidityCheckAddE.NoAmount) {
       return `${t('pages.vault.add.validity-no-amount')}`;
     }
+    if (isMultisigAddress && !approvalCompleted) {
+      return t('pages.vault.add.approve-button');
+    }
     return t('pages.vault.add.button');
-  }, [t, validityCheckAddType, selectedPool?.brokerCollateralLotSize, selectedPool?.poolSymbol]);
+  }, [
+    t,
+    isMultisigAddress,
+    validityCheckAddType,
+    selectedPool?.brokerCollateralLotSize,
+    selectedPool?.settleSymbol,
+    approvalCompleted,
+  ]);
+
+  useEffect(() => {
+    if (triggerFocusStateRef.current === triggerAddInputFocus) {
+      return;
+    }
+
+    triggerFocusStateRef.current = triggerAddInputFocus;
+
+    document.getElementById(ADD_INPUT_FIELD_ID)?.focus();
+    setTimeout(() => {
+      document.getElementById(ADD_INPUT_FIELD_ID)?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById(ADD_INPUT_FIELD_ID)?.focus();
+    }, DELAY_FOR_SCROLL);
+  }, [triggerAddInputFocus]);
+
+  const handleButtonClick = () => {
+    if (isMultisigAddress && !approvalCompleted) {
+      handleApprove();
+    } else {
+      handleAddLiquidity();
+    }
+  };
 
   return (
     <div className={styles.root}>
@@ -269,29 +372,29 @@ export const Add = memo(() => {
           {t('pages.vault.add.title')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info1', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.add.info2', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
       </div>
       <div className={styles.contentBlock}>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
             <InfoLabelBlock
-              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.poolSymbol })}
-              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.poolSymbol })}
+              title={t('pages.vault.add.amount.title', { poolSymbol: selectedPool?.settleSymbol })}
+              content={t('pages.vault.add.amount.info1', { poolSymbol: selectedPool?.settleSymbol })}
             />
           </div>
           <ResponsiveInput
-            id="add-amount-size"
+            id={ADD_INPUT_FIELD_ID}
             className={styles.inputHolder}
             inputValue={inputValue}
             setInputValue={handleInputCapture}
-            currency={selectedPool?.poolSymbol}
+            currency={selectedPool?.settleSymbol}
             step="1"
             min={0}
-            max={poolTokenBalance || 999999}
+            max={poolTokenBalance ? Number((poolTokenBalance * 0.99).toFixed(5)) : 999999}
             disabled={loading}
           />
         </div>
@@ -301,11 +404,11 @@ export const Add = memo(() => {
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
-                  handleInputCapture(`${poolTokenBalance}`);
+                  handleInputCapture(`${Number((poolTokenBalance * 0.99).toFixed(5))}`);
                 }
               }}
             >
-              {formatToCurrency(poolTokenBalance, selectedPool?.poolSymbol)}
+              {formatToCurrency(0.99 * poolTokenBalance, selectedPool?.settleSymbol)}
             </Link>
           </Typography>
         ) : null}
@@ -314,7 +417,7 @@ export const Add = memo(() => {
         </div>
         <div className={styles.inputLine}>
           <div className={styles.labelHolder}>
-            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.poolSymbol })}
+            {t('pages.vault.add.receive', { poolSymbol: selectedPool?.settleSymbol })}
           </div>
           <div className={styles.inputHolder}>
             <OutlinedInput
@@ -322,12 +425,12 @@ export const Add = memo(() => {
               endAdornment={
                 <InputAdornment position="end" className={styles.expectedAmountInput}>
                   <Typography variant="adornment" color={'var(--d8x-color-text-label-one)'}>
-                    d{selectedPool?.poolSymbol}
+                    d{selectedPool?.settleSymbol}
                   </Typography>
                 </InputAdornment>
               }
               type="text"
-              value={formatToCurrency(predictedAmount, '')}
+              value={selectedPool ? formatToCurrency(predictedAmount, '') : '-'}
               disabled
             />
           </div>
@@ -343,7 +446,7 @@ export const Add = memo(() => {
               <Button
                 variant="primary"
                 disabled={isButtonDisabled}
-                onClick={handleAddLiquidity}
+                onClick={handleButtonClick}
                 className={styles.actionButton}
               >
                 {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}

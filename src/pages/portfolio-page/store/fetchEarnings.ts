@@ -4,6 +4,7 @@ import { type Address } from 'viem';
 import { getEarnings } from 'network/history';
 import { poolsAtom } from 'store/pools.store';
 
+import type { PoolValueI } from '../types/types';
 import { poolUsdPriceAtom } from './fetchPortfolio';
 import { UnrealizedPnLListAtomI } from './fetchUnrealizedPnL';
 
@@ -15,20 +16,22 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
 
   const earningsPromises = [];
   const collateralPrices: number[] = [];
+  const settleSymbols: string[] = [];
   const poolSymbols: string[] = [];
   for (const pool of pools) {
     earningsPromises.push(getEarnings(chainId, userAddress, pool.poolSymbol));
     collateralPrices.push(poolUsdPrice[pool.poolSymbol].collateral);
+    settleSymbols.push(pool.settleSymbol);
     poolSymbols.push(pool.poolSymbol);
   }
   const earningsArray = await Promise.all(earningsPromises);
   let totalEstimatedEarnings = 0;
-  const earningsList = earningsArray.reduce<Record<string, number>>((acc, curr, index) => {
+  const earningsList = earningsArray.reduce<Record<string, PoolValueI>>((acc, curr, index) => {
     totalEstimatedEarnings += curr.earnings * collateralPrices[index];
-    if (acc[poolSymbols[index]]) {
-      acc[poolSymbols[index]] += curr.earnings;
+    if (acc[settleSymbols[index]]) {
+      acc[settleSymbols[index]].value += curr.earnings;
     } else {
-      acc[poolSymbols[index]] = curr.earnings;
+      acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index] };
     }
     return acc;
   }, {});
@@ -37,8 +40,9 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
   set(
     earningsListAtom,
     Object.keys(earningsList).map((key) => ({
-      symbol: key,
-      value: earningsList[key],
+      symbol: earningsList[key].poolSymbol,
+      settleSymbol: key,
+      value: earningsList[key].value,
     }))
   );
 });

@@ -17,13 +17,13 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
-import { orderSubmitted } from 'network/broker';
 import { orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
 import {
   collateralDepositAtom,
+  collateralToSettleConversionAtom,
   newPositionRiskAtom,
   perpetualStaticInfoAtom,
   poolFeeAtom,
@@ -123,7 +123,7 @@ export const ActionBlock = memo(() => {
     chainId,
   });
 
-  const { hasEnoughGasForFee } = useUserWallet();
+  const { hasEnoughGasForFee, isMultisigAddress } = useUserWallet();
 
   const orderInfo = useAtomValue(orderInfoAtom);
   const proxyAddr = useAtomValue(proxyAddrAtom);
@@ -139,6 +139,7 @@ export const ActionBlock = memo(() => {
   const hasTpSlOrders = useAtomValue(hasTpSlOrdersAtom);
   const poolFee = useAtomValue(poolFeeAtom);
   const currencyMultiplier = useAtomValue(currencyMultiplierAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
@@ -385,21 +386,20 @@ export const ActionBlock = memo(() => {
       .then((data) => {
         if (data.data.digests.length > 0) {
           // hide modal now that metamask popup shows up
-          approveMarginToken(
+          approveMarginToken({
             walletClient,
-            selectedPool.marginTokenAddr,
+            settleTokenAddr: selectedPool.settleTokenAddr,
+            isMultisigAddress,
             proxyAddr,
-            collateralDeposit,
-            poolTokenDecimals
-          )
+            minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+            decimals: poolTokenDecimals,
+          })
             .then(() => {
               // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
               const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
               postOrder(tradingClient, signatures, data.data)
                 .then((tx) => {
                   setShowReviewOrderModal(false);
-                  // success submitting order to the node - inform backend
-                  orderSubmitted(walletClient.chain.id, data.data.orderIds).then().catch(console.error);
                   // order was sent
                   clearInputsData();
                   toast.success(
@@ -635,7 +635,12 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && collateralDeposit >= 0 ? formatToCurrency(collateralDeposit, orderInfo.poolName) : '-'
+                  isOrderValid && collateralDeposit >= 0 && selectedPool
+                    ? formatToCurrency(
+                        collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
+                      )
+                    : '-'
                 }
                 rightSideStyles={styles.rightSide}
               />
@@ -648,7 +653,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, orderInfo.poolName)
+                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -765,8 +770,11 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0
-                    ? formatToCurrency(newPositionRisk.collateralCC, orderInfo.poolName)
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
+                    ? formatToCurrency(
+                        newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
+                      )
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}

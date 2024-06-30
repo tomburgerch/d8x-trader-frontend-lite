@@ -12,5 +12,6 @@ export const tvlAtom = atom<number | null>(null);
 export const userAmountAtom = atom<number | null>(null);
 export const triggerWithdrawalsUpdateAtom = atom(true);
 export const triggerUserStatsUpdateAtom = atom(true);
+export const triggerAddInputFocusAtom = atom(true);
 export const sdkConnectedAtom = atom(false);
 export const withdrawalOnChainAtom = atom(false);

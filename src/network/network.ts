@@ -3,6 +3,7 @@ import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
 import { RequestMethodE } from 'types/enums';
 import type {
+  BoostRankResponseI,
   BoostStationResponseI,
   BoostStationParamResponseI,
   CancelOrderResponseI,
@@ -422,6 +423,15 @@ export async function getPythID(symbol: string): Promise<{ id: string }[]> {
 
 export async function getBoostStationData(traderAddr: string): Promise<BoostStationResponseI> {
   const data = await fetch(`https://drip.d8x.xyz/score?addr=${traderAddr}`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
+}
+
+export async function getBoostRank(traderAddr: string): Promise<BoostRankResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/rank?addr=${traderAddr}`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);

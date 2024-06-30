@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type Address, erc20Abi, formatUnits } from 'viem';
-import { useAccount, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
+import { useAccount, useBalance, useGasPrice, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
 import { Button, CircularProgress, Link, Typography } from '@mui/material';
@@ -15,14 +15,22 @@ import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { poolFeeAtom, traderAPIAtom } from 'store/pools.store';
-import { strategyAddressesAtom, strategyPerpetualStatsAtom, strategyPoolAtom } from 'store/strategies.store';
+import {
+  strategyAddressesAtom,
+  strategyPerpetualStatsAtom,
+  strategyPoolAtom,
+  perpetualStrategyStaticInfoAtom,
+} from 'store/strategies.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useEnterStrategy } from './hooks/useEnterStrategy';
 
 import styles from './EnterStrategy.module.scss';
+import { STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
+import { fundStrategyGas } from 'blockchain-api/contract-interactions/fundStrategyGas';
 
 interface EnterStrategyPropsI {
   isLoading: boolean;
@@ -35,11 +43,16 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   const { data: walletClient } = useWalletClient();
   const { sendTransactionAsync } = useSendTransaction();
 
+  const { isMultisigAddress } = useUserWallet();
+
   const strategyPool = useAtomValue(strategyPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const feeRate = useAtomValue(poolFeeAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
   const strategyPerpetualStats = useAtomValue(strategyPerpetualStatsAtom);
+
+  const strategyStaticInfo = useAtomValue(perpetualStrategyStaticInfoAtom);
+  const lotSizeBC = strategyStaticInfo?.lotSizeBC !== undefined ? strategyStaticInfo.lotSizeBC : 0.001;
 
   const [addAmount, setAddAmount] = useState(0);
   const [inputValue, setInputValue] = useState(`${addAmount}`);
@@ -60,23 +73,38 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.settleTokenAddr as Address,
+        abi: erc20Abi,
+        functionName: 'decimals',
+      },
+      {
+        address: strategyPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: strategyPool?.marginTokenAddr as Address,
+        address: strategyPool?.settleTokenAddr as Address,
         abi: erc20Abi,
-        functionName: 'decimals',
+        functionName: 'balanceOf',
+        args: [strategyAddress as Address],
       },
     ],
     query: {
-      enabled: address && traderAPI?.chainId === chainId && !!strategyPool?.marginTokenAddr && isConnected,
+      enabled: address && traderAPI?.chainId === chainId && !!strategyPool?.settleTokenAddr && isConnected,
     },
   });
 
-  const weEthBalance = weEthPoolBalance ? +formatUnits(weEthPoolBalance[0], weEthPoolBalance[1]) * 0.99 : 0;
+  const weEthMainBalance = weEthPoolBalance ? +formatUnits(weEthPoolBalance[1], weEthPoolBalance[0]) * 0.99 : 0;
+
+  const { data: strategtWalletBalance, refetch: refetchGas } = useBalance({
+    address: strategyAddress,
+    chainId,
+  });
+
+  const { data: gasPrice } = useGasPrice({ chainId });
+
+  const strategyWalletGas = gasPrice && strategtWalletBalance ? strategtWalletBalance.value / gasPrice : undefined;
 
   const { setTxHash } = useEnterStrategy(addAmount);
 
@@ -152,6 +180,54 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     inputValueChangedRef.current = false;
   }, [addAmount]);
 
+  const handleFund = useCallback(() => {
+    //console.log('handleFund');
+    //console.log(strategyAddress, strategyWalletGas, STRATEGY_WALLET_GAS_TARGET);
+    if (
+      requestSentRef.current ||
+      !walletClient ||
+      !isEnabledChain(chainId) ||
+      !pagesConfig.enabledStrategiesPageByChains.includes(chainId) ||
+      !strategyAddress ||
+      strategyWalletGas === undefined ||
+      !strategyPool
+    ) {
+      return;
+    }
+    // is gas balance too low?
+    if (strategyWalletGas < STRATEGY_WALLET_GAS_TARGET) {
+      return fundStrategyGas(
+        { walletClient, strategyAddress, isMultisigAddress },
+        sendTransactionAsync,
+        setCurrentPhaseKey
+      )
+        .then(() => {
+          // {hash} -> not used
+          //console.log(`funding strategy wallet w/ gas txn: ${hash}`);
+          setCurrentPhaseKey('pages.strategies.enter.phases.waiting');
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+          setLoading(false);
+        })
+        .finally(() => {
+          setRequestSent(false);
+          requestSentRef.current = false;
+          refetchGas();
+        });
+    }
+  }, [
+    chainId,
+    isMultisigAddress,
+    strategyPool,
+    strategyWalletGas,
+    refetchGas,
+    sendTransactionAsync,
+    strategyAddress,
+    walletClient,
+  ]);
+
   const handleEnter = useCallback(() => {
     if (
       requestSentRef.current ||
@@ -161,7 +237,8 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       !isEnabledChain(chainId) ||
       !pagesConfig.enabledStrategiesPageByChains.includes(chainId) ||
       !strategyPerpetualStats ||
-      addAmount === 0
+      addAmount === 0 ||
+      strategyWalletGas === undefined
     ) {
       return;
     }
@@ -175,6 +252,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       {
         chainId,
         walletClient,
+        isMultisigAddress,
         symbol: STRATEGY_SYMBOL,
         traderAPI,
         amount: addAmount,
@@ -203,15 +281,29 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   }, [
     chainId,
     walletClient,
+    isMultisigAddress,
     traderAPI,
     feeRate,
     addAmount,
     strategyAddress,
     strategyPerpetualStats,
+    strategyWalletGas,
     sendTransactionAsync,
     setTxHash,
     refetch,
   ]);
+
+  const needsGas = strategyWalletGas !== undefined && strategyWalletGas < STRATEGY_WALLET_GAS_TARGET;
+
+  const buttonLabel = useMemo(() => {
+    if (needsGas && isMultisigAddress) {
+      return t('common.deposit-gas');
+    } else {
+      return t('pages.strategies.enter.deposit-button');
+    }
+  }, [isMultisigAddress, needsGas, t]);
+
+  const handleClick = isMultisigAddress && needsGas ? handleFund : handleEnter;
 
   useEffect(() => {
     if (isLoading) {
@@ -236,25 +328,30 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
           handleInputBlur={handleBlur}
           handleInputFocus={handleFocus}
           currency="weETH"
-          step="0.001"
-          min={isEditing ? undefined : 0.01}
-          max={weEthBalance || 0}
+          step={`${lotSizeBC}`}
+          min={isEditing ? undefined : 10 * lotSizeBC}
+          max={weEthMainBalance || 0}
         />
       </div>
-      {weEthBalance ? (
+      {weEthMainBalance ? (
         <Typography className={styles.helperText} variant="bodyTiny">
           {t('common.max')}{' '}
-          <Link onClick={() => handleInputCapture(`${weEthBalance}`)}>{formatToCurrency(weEthBalance, 'weETH')}</Link>
+          <Link onClick={() => handleInputCapture(`${weEthMainBalance}`)}>
+            {formatToCurrency(weEthMainBalance, 'weETH')}
+          </Link>
         </Typography>
       ) : null}
       <GasDepositChecker className={styles.button} multiplier={2n}>
         <Button
-          onClick={handleEnter}
+          onClick={handleClick}
           className={styles.button}
           variant="primary"
-          disabled={requestSent || loading || addAmount === 0}
+          disabled={
+            !(needsGas && isMultisigAddress) &&
+            (requestSent || loading || addAmount === 0 || addAmount > weEthMainBalance)
+          }
         >
-          {t('pages.strategies.enter.deposit-button')}
+          {buttonLabel}
         </Button>
       </GasDepositChecker>
 

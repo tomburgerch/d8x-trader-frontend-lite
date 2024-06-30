@@ -1,10 +1,12 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
 import { DATETIME_FORMAT } from 'appConstants';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -17,6 +19,8 @@ interface TradeHistoryRowPropsI {
 
 export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowPropsI) => {
   const { t } = useTranslation();
+
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
@@ -70,14 +74,30 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
         <SidesRow
           leftSide={headers[5].label}
           leftSideTooltip={headers[5].tooltip}
-          rightSide={perpetual ? formatToCurrency(tradeHistory.fee, perpetual.poolName, true) : ''}
+          rightSide={
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
+              : ''
+          }
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
         <SidesRow
           leftSide={headers[6].label}
           leftSideTooltip={headers[6].tooltip}
-          rightSide={perpetual ? formatToCurrency(tradeHistory.realizedPnl, perpetual.poolName, true) : ''}
+          rightSide={
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
+              : ''
+          }
           leftSideStyles={styles.dataLabel}
           rightSideStyles={pnlColor}
         />

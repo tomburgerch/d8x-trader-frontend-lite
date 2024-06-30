@@ -45,8 +45,14 @@ export const TraderTab = () => {
         .filter((volume) => volume.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
-      earnedRebatesByPools.push({ symbol: pool.poolSymbol, value: earnedRebatesAmount });
-      openEarningsByPools.push({ symbol: pool.poolSymbol, value: openEarningsAmount });
+      earnedRebatesByPools.push({
+        symbol: pool.poolSymbol,
+        value: earnedRebatesAmount,
+      });
+      openEarningsByPools.push({
+        symbol: pool.poolSymbol,
+        value: openEarningsAmount,
+      });
     });
 
     return [

@@ -17,7 +17,8 @@ export async function addLiquidity(
   if (!decimals || !poolId || !account) {
     throw new Error('undefined call parameters');
   }
-  const amountParsed = BigInt(floatToDecN(amount, decimals).toString());
+  const amountCC = await traderAPI.fetchCollateralToSettlementConversion(symbol).then((c2s) => amount / c2s);
+  const amountParsed = BigInt(floatToDecN(amountCC, decimals).toString());
   const gasPrice = await getGasPrice(walletClient.chain?.id);
   const params = {
     chain: walletClient.chain,

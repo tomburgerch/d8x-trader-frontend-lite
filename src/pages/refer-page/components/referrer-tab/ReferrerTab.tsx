@@ -38,7 +38,10 @@ export const ReferrerTab = memo(() => {
         .filter((rebate) => !rebate.asTrader && rebate.poolId === pool.poolId)
         .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
 
-      totalEarnedCommission.push({ symbol: pool.poolSymbol, value: earnedCommissionAmount });
+      totalEarnedCommission.push({
+        symbol: pool.poolSymbol,
+        value: earnedCommissionAmount,
+      });
     });
 
     return [

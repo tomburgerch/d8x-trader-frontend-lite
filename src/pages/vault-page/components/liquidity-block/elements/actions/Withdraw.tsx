@@ -15,7 +15,7 @@ import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { getTxnLink } from 'helpers/getTxnLink';
-import { selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
   dCurrencyPriceAtom,
   triggerUserStatsUpdateAtom,
@@ -54,6 +54,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
   const dCurrencyPrice = useAtomValue(dCurrencyPriceAtom);
   const userAmount = useAtomValue(userAmountAtom);
   const withdrawals = useAtomValue(withdrawalsAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerWithdrawalsUpdate = useSetAtom(triggerWithdrawalsUpdateAtom);
   const setTriggerUserStatsUpdate = useSetAtom(triggerUserStatsUpdateAtom);
   const [hasOpenRequestOnChain, setWithrawalOnChain] = useAtom(withdrawalOnChainAtom);
@@ -253,7 +254,7 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           {t('pages.vault.withdraw.info1')}
         </Typography>
         <Typography variant="body2" className={styles.text}>
-          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.poolSymbol })}
+          {t('pages.vault.withdraw.info2', { poolSymbol: selectedPool?.settleSymbol })}
         </Typography>
       </Box>
       <Box className={styles.contentBlock}>
@@ -268,12 +269,12 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
             title={
               <>
                 {!withdrawals.length && '2.'}{' '}
-                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.settleSymbol })}
               </>
             }
             content={
               <Typography>
-                {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.poolSymbol })}
+                {t('pages.vault.withdraw.action.info1', { poolSymbol: selectedPool?.settleSymbol })}
               </Typography>
             }
           />
@@ -288,7 +289,14 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
           <Box className={styles.row}>
             <Typography variant="body2">{t('pages.vault.withdraw.action.receive')}</Typography>
             <Typography variant="body2">
-              <strong>{formatToCurrency(predictedAmount, selectedPool?.poolSymbol)}</strong>
+              <strong>
+                {predictedAmount === undefined || !selectedPool
+                  ? '-'
+                  : formatToCurrency(
+                      predictedAmount * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )}
+              </strong>
             </Typography>
           </Box>
         </Box>
