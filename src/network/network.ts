@@ -68,8 +68,7 @@ export async function getExchangeInfo(
     return { type: 'exchange-info', msg: '', data: info };
   } else {
     // console.log('exchangeInfo via BE');
-    // return fetchUrl('exchange-info', chainId);
-    throw new Error('no api');
+    return fetchUrl('exchange-info', chainId);
   }
 }
 
@@ -84,8 +83,7 @@ export async function getPerpetualStaticInfo(
     return { type: 'perpetual-static-info', msg: '', data: info };
   } else {
     // console.log('perpStaticInfo via BE');
-    // return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
-    throw new Error('no api');
+    return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
   }
 }
 
@@ -108,8 +106,7 @@ export async function getPositionRisk(
     return { type: 'position-risk', msg: '', data };
   } else {
     // console.log(`positionRisk via BE`);
-    // return fetchUrl(`position-risk?${params}`, chainId);
-    throw new Error('no api');
+    return fetchUrl(`position-risk?${params}`, chainId);
   }
 }
 
@@ -160,22 +157,21 @@ export function positionRiskOnCollateralAction(
     });
   } else {
     // console.log('positionRiskOnCollateral via BE');
-    // const requestOptions = {
-    //   ...getRequestOptions(RequestMethodE.Post),
-    //   body: JSON.stringify({
-    //     amount,
-    //     traderAddr,
-    //     positionRisk,
-    //   }),
-    // };
-    // return fetch(`${getApiUrlByChainId(chainId)}/position-risk-on-collateral-action`, requestOptions).then((data) => {
-    //   if (!data.ok) {
-    //     console.error({ data });
-    //     throw new Error(data.statusText);
-    //   }
-    //   return data.json();
-    // });
-    throw new Error('no api');
+    const requestOptions = {
+      ...getRequestOptions(RequestMethodE.Post),
+      body: JSON.stringify({
+        amount,
+        traderAddr,
+        positionRisk,
+      }),
+    };
+    return fetch(`${getApiUrlByChainId(chainId)}/position-risk-on-collateral-action`, requestOptions).then((data) => {
+      if (!data.ok) {
+        console.error({ data });
+        throw new Error(data.statusText);
+      }
+      return data.json();
+    });
   }
 }
 
@@ -198,8 +194,7 @@ export async function getOpenOrders(
       params.append('t', '' + timestamp);
     }
 
-    // return fetchUrl(`open-orders?${params}`, chainId);
-    throw new Error('no api');
+    return fetchUrl(`open-orders?${params}`, chainId);
   }
 }
 
