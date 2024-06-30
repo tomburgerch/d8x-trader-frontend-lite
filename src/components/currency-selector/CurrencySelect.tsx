@@ -1,23 +1,20 @@
-import { useAtomValue } from 'jotai';
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Address } from 'viem';
 
 import { DropDownMenuItem } from 'components/dropdown-select/components/DropDownMenuItem';
 import { DropDownSelect } from 'components/dropdown-select/DropDownSelect';
 import { SidesRow } from 'components/sides-row/SidesRow';
+import { modalSelectedCurrencyAtom } from 'store/global-modals.store';
 import { gasTokenSymbolAtom, poolsAtom } from 'store/pools.store';
 
 import { CurrencyItemI } from './types';
 
-interface CurrencySelectPropsI {
-  selectedCurrency?: CurrencyItemI | null;
-  setSelectedCurrency: Dispatch<SetStateAction<CurrencyItemI | undefined>>;
-}
-
-export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: CurrencySelectPropsI) => {
+export const CurrencySelect = () => {
   const { t } = useTranslation();
 
+  const [selectedCurrency, setSelectedCurrency] = useAtom(modalSelectedCurrencyAtom);
   const pools = useAtomValue(poolsAtom);
   const gasTokenSymbol = useAtomValue(gasTokenSymbolAtom);
 
@@ -27,7 +24,13 @@ export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: Curren
     const currencies: CurrencyItemI[] = [];
 
     if (gasTokenSymbol) {
-      currencies.push({ id: gasTokenSymbol, name: gasTokenSymbol, isGasToken: true, isActiveToken: true });
+      currencies.push({
+        id: gasTokenSymbol,
+        name: gasTokenSymbol,
+        settleToken: gasTokenSymbol,
+        isGasToken: true,
+        isActiveToken: true,
+      });
     }
 
     if (pools.length) {
@@ -36,9 +39,10 @@ export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: Curren
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: true,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
 
@@ -47,9 +51,10 @@ export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: Curren
         currencies.push({
           id: `${pool.poolId}`,
           name: pool.poolSymbol,
+          settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: false,
-          contractAddress: pool.marginTokenAddr as Address,
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
     }
@@ -69,7 +74,7 @@ export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: Curren
       rightSide={
         <DropDownSelect
           id="currency-dropdown"
-          selectedValue={selectedCurrency?.name}
+          selectedValue={selectedCurrency?.settleToken}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           fullWidth
@@ -77,7 +82,7 @@ export const CurrencySelect = ({ selectedCurrency, setSelectedCurrency }: Curren
           {currencyItems.map((item) => (
             <DropDownMenuItem
               key={item.id}
-              option={item.name}
+              option={item.settleToken}
               isActive={item.id === selectedCurrency?.id}
               onClick={() => {
                 setSelectedCurrency(item);

@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PieChart } from 'react-minimal-pie-chart';
@@ -6,6 +6,7 @@ import { PieChart } from 'react-minimal-pie-chart';
 import { AssetLine } from 'components/asset-line/AssetLine';
 import { earningsListAtom } from 'pages/portfolio-page/store/fetchEarnings';
 import { poolShareTokensShareAtom } from 'pages/portfolio-page/store/fetchPoolShare';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { formatCurrency } from 'utils/formatCurrency';
 
 import styles from './Vault.module.scss';
@@ -15,8 +16,9 @@ const colorsArray = ['#6649DF', '#FDA13A', '#F24141', '#515151'];
 export const Vault = () => {
   const { t } = useTranslation();
 
-  const [poolShareTokensShare] = useAtom(poolShareTokensShareAtom);
-  const [earningsList] = useAtom(earningsListAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const poolShareTokensShare = useAtomValue(poolShareTokensShareAtom);
+  const earningsList = useAtomValue(earningsListAtom);
 
   const totalPoolShare = useMemo(
     () => poolShareTokensShare.reduce((acc, curr) => acc + curr.balance, 0),
@@ -43,7 +45,11 @@ export const Vault = () => {
           )}
           <div className={styles.assetsList}>
             {poolShareTokensShare.map((share) => (
-              <AssetLine key={share.symbol} symbol={share.symbol} value={`${(share.percent * 100).toFixed(2)}%`} />
+              <AssetLine
+                key={share.symbol}
+                symbol={share.settleSymbol}
+                value={`${(share.percent * 100).toFixed(2)}%`}
+              />
             ))}
           </div>
         </div>
@@ -52,7 +58,11 @@ export const Vault = () => {
         <div className={styles.pnlHeader}>{t('pages.portfolio.account-value.details.vault.earnings-pool')}</div>
         <div className={styles.assetsList}>
           {earningsList.map((earning) => (
-            <AssetLine key={earning.symbol} symbol={earning.symbol} value={formatCurrency(earning.value)} />
+            <AssetLine
+              key={earning.symbol}
+              symbol={earning.settleSymbol}
+              value={formatCurrency(earning.value * (c2s.get(earning.symbol)?.value ?? 1))}
+            />
           ))}
         </div>
       </div>

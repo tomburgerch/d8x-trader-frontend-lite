@@ -20,19 +20,19 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: pool.marginTokenAddr as Address,
+        address: pool.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: pool.marginTokenAddr as Address,
+        address: pool.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
       },
     ],
     query: {
-      enabled: address && pool.marginTokenAddr !== undefined && !isPending && isConnected,
+      enabled: address && pool.settleTokenAddr !== undefined && !isPending && isConnected,
     },
   });
 
@@ -52,12 +52,11 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   if (!showEmpty && tokenBalanceData?.[0] === 0n) {
     return null;
   }
-  const unroundedCCValue = tokenBalanceData ? +formatUnits(tokenBalanceData[0], tokenBalanceData[1]) : 1;
-  const numberDigits = valueToFractionDigits(unroundedCCValue);
-
+  const unroundedSCValue = tokenBalanceData ? +formatUnits(tokenBalanceData[0], tokenBalanceData[1]) : 1;
+  const numberDigits = valueToFractionDigits(unroundedSCValue);
   return (
     <AssetLine
-      symbol={pool.poolSymbol}
+      symbol={pool.settleSymbol}
       value={tokenBalanceData ? (+formatUnits(tokenBalanceData[0], tokenBalanceData[1])).toFixed(numberDigits) : ''}
     />
   );

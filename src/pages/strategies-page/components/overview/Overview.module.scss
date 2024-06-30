@@ -8,6 +8,19 @@
   @include media-tablet {
     width: 100%;
   }
+
+  .itemLogoHolder {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+
+    &.rounded {
+      font-size: 20px;
+      border-radius: 50%;
+      overflow: hidden;
+      padding: 1px;
+    }
+  }
 }
 
 .title {
@@ -29,8 +42,13 @@
   }
 
   .dataValue {
-    display: block;
+    display: flex;
+    align-items: center;
+    line-height: 24px;
+    gap: 2 * $d8x-spacing;
     font-weight: 600;
+    color: var(--d8x-color-text-highlight);
+    margin-bottom: 2 * $d8x-spacing;
   }
 
   @include media-tablet {

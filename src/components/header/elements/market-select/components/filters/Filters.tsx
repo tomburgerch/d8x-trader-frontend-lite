@@ -14,6 +14,10 @@ export const Filters = memo(() => {
 
   const options = [
     {
+      label: t('common.select.market.all'),
+      value: AssetTypeE.All,
+    },
+    {
       label: t('common.select.market.crypto'),
       value: AssetTypeE.Crypto,
     },
@@ -27,18 +31,25 @@ export const Filters = memo(() => {
     },
   ];
 
+  const handleClick = (value: AssetTypeE) => {
+    if (value === AssetTypeE.All) {
+      setGroupFilter(null);
+    } else {
+      setGroupFilter(groupFilter === value ? null : value);
+    }
+  };
+
   return (
     <div className={styles.container}>
       {options.map((option) => (
         <div
           key={option.value}
-          className={groupFilter === option.value ? styles.active : styles.inactive}
-          onClick={() => {
-            if (groupFilter === option.value) {
-              return setGroupFilter(null);
-            }
-            return setGroupFilter(option.value);
-          }}
+          className={
+            groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All)
+              ? styles.active
+              : styles.inactive
+          }
+          onClick={() => handleClick(option.value)}
         >
           {option.label}
         </div>

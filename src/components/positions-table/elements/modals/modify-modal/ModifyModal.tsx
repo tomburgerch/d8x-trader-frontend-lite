@@ -26,6 +26,7 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
@@ -37,13 +38,19 @@ import {
   positionRiskOnCollateralAction,
 } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
-import { proxyAddrAtom, traderAPIAtom, traderAPIBusyAtom, triggerBalancesUpdateAtom } from 'store/pools.store';
+import {
+  collateralToSettleConversionAtom,
+  proxyAddrAtom,
+  traderAPIAtom,
+  traderAPIBusyAtom,
+  triggerBalancesUpdateAtom,
+} from 'store/pools.store';
 import type { MarginAccountI, PoolWithIdI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 import { ModifyTypeE, ModifyTypeSelector } from '../../modify-type-selector/ModifyTypeSelector';
 
 import styles from '../Modal.module.scss';
@@ -61,11 +68,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setTriggerBalancesUpdate = useSetAtom(triggerBalancesUpdateAtom);
   const [isAPIBusy, setAPIBusy] = useAtom(traderAPIBusyAtom);
 
   const { address, chain, chainId } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId });
+
+  const { isMultisigAddress } = useUserWallet();
 
   const [requestSent, setRequestSent] = useState(false);
   const [modifyType, setModifyType] = useState(ModifyTypeE.Add);
@@ -77,13 +87,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const [newPositionRisk, setNewPositionRisk] = useState<MarginAccountI | null>();
   const [addCollateral, setAddCollateral] = useState('0');
   const [removeCollateral, setRemoveCollateral] = useState('0');
+  const [availableMargin, setAvailableMargin] = useState<number>();
   const [maxCollateral, setMaxCollateral] = useState<number>();
   const [loading, setLoading] = useState(false);
 
   const isAPIBusyRef = useRef(isAPIBusy);
   const requestSentRef = useRef(false);
 
-  const { poolTokenBalance, poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { settleTokenBalance, settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   const {
     isSuccess: isAddSuccess,
@@ -237,19 +248,20 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove && debouncedRemoveCollateral === '0') {
       return;
     }
+    const px = (poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value : 1) ?? 1;
 
     setAPIBusy(true);
     positionRiskOnCollateralAction(
       chainId,
       traderAPI,
       address,
-      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral : -debouncedRemoveCollateral,
+      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral / px : -debouncedRemoveCollateral / px,
       selectedPosition
     )
       .then((data) => {
         setAPIBusy(false);
         setNewPositionRisk(data.data.newPositionRisk);
-        setMaxCollateral(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99);
+        setAvailableMargin(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99);
       })
       .catch((err) => {
         console.error(err);
@@ -257,6 +269,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       });
   }, [
     chainId,
+    c2s,
     address,
     selectedPosition,
     modifyType,
@@ -264,6 +277,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     debouncedRemoveCollateral,
     setAPIBusy,
     traderAPI,
+    poolByPosition,
   ]);
 
   useDebouncedEffect(
@@ -273,6 +287,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     [debouncedAddCollateral, debouncedRemoveCollateral, handleRefreshPositionRisk],
     1000
   );
+
+  useEffect(() => {
+    if (availableMargin && poolByPosition) {
+      setMaxCollateral(availableMargin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1));
+    } else {
+      setMaxCollateral(undefined);
+    }
+  }, [poolByPosition, availableMargin, c2s]);
 
   useEffect(() => {
     setAddCollateral('0');
@@ -292,11 +314,11 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
       getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        setMaxCollateral(data.amount < 0 ? 0 : data.amount * 0.99);
+        setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
         setAPIBusy(false);
       });
     } else {
-      setMaxCollateral(undefined);
+      setAvailableMargin(undefined);
     }
   }, [modifyType, chainId, address, selectedPosition?.symbol, setAPIBusy, traderAPI, isAPIBusy]);
 
@@ -314,13 +336,14 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const calculatedMargin = useMemo(() => {
     let margin;
+    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
     if (selectedPosition) {
       switch (modifyType) {
         case ModifyTypeE.Add:
-          margin = selectedPosition.collateralCC + +addCollateral;
+          margin = selectedPosition.collateralCC + +addCollateral / px;
           break;
         case ModifyTypeE.Remove:
-          margin = selectedPosition.collateralCC - +removeCollateral;
+          margin = selectedPosition.collateralCC - +removeCollateral / px;
           break;
         default:
           margin = selectedPosition.collateralCC;
@@ -328,8 +351,10 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     } else {
       margin = 0;
     }
-    return formatToCurrency(margin, parsedSymbol?.poolSymbol);
-  }, [selectedPosition, modifyType, parsedSymbol, addCollateral, removeCollateral]);
+    return poolByPosition
+      ? formatToCurrency(margin * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1), poolByPosition.settleSymbol)
+      : '-';
+  }, [c2s, selectedPosition, poolByPosition, modifyType, addCollateral, removeCollateral]);
 
   const calculatedLeverage = useMemo(() => {
     if (!selectedPosition) {
@@ -393,19 +418,27 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !isEnabledChain(chainId)
     ) {
       return;
     }
+    const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
 
     if (modifyType === ModifyTypeE.Add) {
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral)
+      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral / px)
         .then(({ data }) => {
-          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, +addCollateral, poolTokenDecimals)
+          approveMarginToken({
+            walletClient,
+            settleTokenAddr: poolByPosition.settleTokenAddr,
+            isMultisigAddress,
+            proxyAddr,
+            minAmount: +addCollateral,
+            decimals: settleTokenDecimals,
+          })
             .then(() => {
               deposit(tradingClient, address, data)
                 .then((tx) => {
@@ -459,7 +492,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral)
+      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral / px)
         .then(({ data }) => {
           withdraw(tradingClient, address, data)
             .then(({ hash }) => {
@@ -505,7 +538,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     return null;
   }
 
-  const unroundedMaxAddValue = poolTokenBalance ? poolTokenBalance : 1;
+  const unroundedMaxAddValue = settleTokenBalance ? settleTokenBalance : 1;
   const unroundedMaxRemoveValue = maxCollateral ? maxCollateral : 1;
   const digitsForMaxAdd = valueToFractionDigits(unroundedMaxAddValue);
   const digitsForMaxRemove = valueToFractionDigits(unroundedMaxRemoveValue);
@@ -525,24 +558,24 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                     id="add-collateral"
                     endAdornment={
                       <InputAdornment position="end">
-                        <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
+                        <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
-                    inputProps={{ step: 0.01, min: 0, max: poolTokenBalance }}
+                    inputProps={{ step: 0.01, min: 0, max: settleTokenBalance }}
                     value={addCollateral}
                     onChange={(event) => setAddCollateral(event.target.value)}
                   />
                 }
               />
-              {poolTokenBalance !== undefined && poolTokenBalance > 0 && (
+              {settleTokenBalance !== undefined && settleTokenBalance > 0 && (
                 <SidesRow
                   leftSide=" "
                   rightSide={
                     <Typography className={styles.helperText} variant="bodyTiny">
                       {t('common.max')}{' '}
-                      <Link onClick={() => setAddCollateral(poolTokenBalance.toFixed(digitsForMaxAdd))}>
-                        {poolTokenBalance.toFixed(digitsForMaxAdd)}
+                      <Link onClick={() => setAddCollateral(settleTokenBalance.toFixed(digitsForMaxAdd))}>
+                        {settleTokenBalance.toFixed(digitsForMaxAdd)}
                       </Link>
                     </Typography>
                   }
@@ -560,7 +593,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
                       id="remove-collateral"
                       endAdornment={
                         <InputAdornment position="end">
-                          <Typography variant="adornment">{poolByPosition?.poolSymbol}</Typography>
+                          <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
                         </InputAdornment>
                       }
                       type="number"

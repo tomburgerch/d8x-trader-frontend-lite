@@ -1,6 +1,6 @@
 import { ERC20_ABI } from '@d8x/perpetuals-sdk';
 import { writeContract } from '@wagmi/core';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -20,14 +20,13 @@ import {
 
 import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 import { CurrencySelect } from 'components/currency-selector/CurrencySelect';
-import { CurrencyItemI } from 'components/currency-selector/types';
 import { Dialog } from 'components/dialog/Dialog';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { WalletBalances } from 'components/wallet-balances/WalletBalances';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
-import { withdrawModalOpenAtom } from 'store/global-modals.store';
+import { modalSelectedCurrencyAtom, withdrawModalOpenAtom } from 'store/global-modals.store';
 import { MethodE } from 'types/enums';
 import { isValidAddress } from 'utils/isValidAddress';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -40,18 +39,18 @@ import styles from './WithdrawModal.module.scss';
 export const WithdrawModal = () => {
   const { t } = useTranslation();
 
-  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyItemI>();
   const [amountValue, setAmountValue] = useState('');
   const [addressValue, setAddressValue] = useState('');
   const [loading, setLoading] = useState(false);
 
   const addressInputTouchedRef = useRef(false);
 
+  const selectedCurrency = useAtomValue(modalSelectedCurrencyAtom);
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useAtom(withdrawModalOpenAtom);
 
   const { gasTokenBalance, calculateGasForFee, refetchWallet } = useUserWallet();
 
-  const { setTxHash: setTxHashForTokensTransfer } = useTransferTokens(amountValue, selectedCurrency?.name);
+  const { setTxHash: setTxHashForTokensTransfer } = useTransferTokens(amountValue, selectedCurrency?.settleToken);
   const { setTxHash: setTxHashForGasTransfer } = useTransferGasToken(
     amountValue,
     selectedCurrency?.name,
@@ -99,7 +98,7 @@ export const WithdrawModal = () => {
         functionName: 'decimals',
       },
     ],
-    query: { enabled: address && selectedCurrency && isConnected },
+    query: { enabled: address && !!selectedCurrency && isConnected },
   });
 
   const isAddressValid = useMemo(() => {
@@ -181,7 +180,7 @@ export const WithdrawModal = () => {
       <DialogTitle>{t('common.withdraw-modal.title')}</DialogTitle>
       <DialogContent className={styles.dialogContent}>
         <div className={styles.section}>
-          <CurrencySelect selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} />
+          <CurrencySelect />
         </div>
         <Separator />
         <div className={styles.section}>
@@ -193,7 +192,7 @@ export const WithdrawModal = () => {
               inputClassName={styles.input}
               inputValue={amountValue}
               setInputValue={setAmountValue}
-              currency={selectedCurrency?.name}
+              currency={selectedCurrency?.settleToken}
               min={0}
               max={maxTokenValue}
             />
@@ -207,7 +206,7 @@ export const WithdrawModal = () => {
                     }
                   }}
                 >
-                  {formatToCurrency(maxTokenValue, selectedCurrency?.name)}
+                  {formatToCurrency(maxTokenValue, selectedCurrency?.settleToken)}
                 </Link>
               </Typography>
             ) : null}

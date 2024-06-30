@@ -15,6 +15,7 @@ import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { getTradingFee, orderDigest, positionRiskOnTrade } from 'network/network';
@@ -27,7 +28,7 @@ import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
@@ -81,7 +82,8 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
   const requestSentRef = useRef(false);
   const fetchFeeRef = useRef(false);
 
-  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { isMultisigAddress } = useUserWallet();
+  const { settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   useEffect(() => {
     if (validityCheckRef.current) {
@@ -197,7 +199,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       !proxyAddr ||
       !walletClient ||
       collateralDeposit === null ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !chain ||
       !isEnabledChain(chainId)
     ) {
@@ -220,6 +222,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       ordersToCancel,
       chain,
       traderAPI,
+      isMultisigAddress,
       tradingClient,
       toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),
       nonceShift: 0,
@@ -272,13 +275,14 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
           .then((data) => {
             if (data.data.digests.length > 0) {
               // hide modal now that metamask popup shows up
-              approveMarginToken(
+              approveMarginToken({
                 walletClient,
-                poolByPosition.marginTokenAddr,
+                settleTokenAddr: poolByPosition.settleTokenAddr,
+                isMultisigAddress,
                 proxyAddr,
-                collateralDeposit,
-                poolTokenDecimals
-              )
+                minAmount: collateralDeposit,
+                decimals: settleTokenDecimals,
+              })
                 .then(() => {
                   // trader doesn't need to sign if sending his own orders: signatures are dummy zero hashes
                   const signatures = new Array<string>(data.data.digests.length).fill(HashZero);

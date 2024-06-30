@@ -23,20 +23,21 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { orderDigest } from 'network/network';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { orderSubmitted } from 'network/broker';
 import { tradingClientAtom } from 'store/app.store';
 import { latestOrderSentTimestampAtom } from 'store/order-block.store';
-import { proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, proxyAddrAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE, OrderTypeE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI, OrderI, OrderWithIdI, PoolWithIdI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { cancelOrders } from '../../../helpers/cancelOrders';
-import { usePoolTokenBalance } from '../../../hooks/usePoolTokenBalance';
+import { useSettleTokenBalance } from '../../../hooks/useSettleTokenBalance';
 
 import modalStyles from '../Modal.module.scss';
 import styles from './CloseModal.module.scss';
@@ -54,12 +55,14 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
   const proxyAddr = useAtomValue(proxyAddrAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
   const setLatestOrderSentTimestamp = useSetAtom(latestOrderSentTimestampAtom);
 
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient({ chainId: chain?.id });
 
-  const { poolTokenDecimals } = usePoolTokenBalance({ poolByPosition });
+  const { isMultisigAddress } = useUserWallet();
+  const { settleTokenDecimals } = useSettleTokenBalance({ poolByPosition });
 
   const [requestSent, setRequestSent] = useState(false);
   const [txHash, setTxHash] = useState<Address>();
@@ -144,7 +147,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       !proxyAddr ||
       !walletClient ||
       !tradingClient ||
-      !poolTokenDecimals ||
+      !settleTokenDecimals ||
       !chain ||
       !isEnabledChain(chain?.id)
     ) {
@@ -168,7 +171,14 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
     orderDigest(chain.id, [closeOrder], address)
       .then((data) => {
         if (data.data.digests.length > 0) {
-          approveMarginToken(walletClient, poolByPosition.marginTokenAddr, proxyAddr, 0, poolTokenDecimals).then(() => {
+          approveMarginToken({
+            walletClient,
+            settleTokenAddr: poolByPosition.settleTokenAddr,
+            isMultisigAddress,
+            proxyAddr,
+            minAmount: 0,
+            decimals: settleTokenDecimals,
+          }).then(() => {
             const signatures = new Array<string>(data.data.digests.length).fill(HashZero);
             postOrder(tradingClient, signatures, data.data)
               .then(({ hash }) => {
@@ -217,6 +227,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       await cancelOrders({
         ordersToCancel,
         chain,
+        isMultisigAddress,
         traderAPI,
         tradingClient,
         toastTitle: t('pages.trade.orders-table.toasts.cancel-order.title'),
@@ -274,9 +285,15 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
           />
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={`${formatToCurrency(selectedPosition?.collateralCC, parsedSymbol?.poolSymbol, true)}${
-              selectedPosition && ` (${Math.round(selectedPosition?.leverage * 100) / 100}x)`
-            }`}
+            rightSide={`${
+              poolByPosition
+                ? formatToCurrency(
+                    selectedPosition.collateralCC * (c2s.get(poolByPosition.poolSymbol)?.value ?? 1),
+                    poolByPosition.settleSymbol,
+                    true
+                  )
+                : '-'
+            }${selectedPosition && ` (${Math.round(selectedPosition.leverage * 100) / 100}x)`}`}
           />
           <SidesRow
             leftSide={t('pages.trade.positions-table.modify-modal.pos-details.unrealized')}

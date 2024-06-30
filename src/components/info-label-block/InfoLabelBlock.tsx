@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,18 +12,27 @@ import styles from './InfoLabelBlock.module.scss';
 interface InfoBlockPropsI {
   title: string | ReactNode;
   content: string | ReactNode;
+  labelClassname?: string;
+  titleClassname?: string;
+  iconHolderClassname?: string;
 }
 
-export const InfoLabelBlock = ({ title, content }: InfoBlockPropsI) => {
+export const InfoLabelBlock = ({
+  title,
+  content,
+  labelClassname,
+  titleClassname,
+  iconHolderClassname,
+}: InfoBlockPropsI) => {
   const { t } = useTranslation();
 
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
     <>
-      <div className={styles.label}>
-        <span className={styles.title}>{title}</span>{' '}
-        <span className={styles.iconHolder}>
+      <div className={classNames(styles.label, labelClassname)}>
+        <span className={classNames(styles.title, titleClassname)}>{title}</span>{' '}
+        <span className={classNames(styles.iconHolder, iconHolderClassname)}>
           <InfoOutlined onClick={() => setModalOpen(true)} className={styles.actionIcon} />
         </span>
       </div>

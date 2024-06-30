@@ -8,7 +8,7 @@
 
 .statContainer {
   flex: 1;
-  padding: $d8x-spacing * 3 $d8x-spacing * 6;
+  padding: $d8x-spacing * 4 $d8x-spacing * 6;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-items);
   height: 72px;
@@ -16,6 +16,12 @@
   @include media-desktop {
     height: 64px;
   }
+}
+
+.midPriceContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Align the number at the bottom */
 }
 
 .statLabel {
@@ -79,7 +85,7 @@
   }
 
   .statContainer {
-    padding: $d8x-spacing * 2 $d8x-spacing * 4;
+    padding: $d8x-spacing * 3 $d8x-spacing * 4;
   }
 }
 
@@ -139,6 +145,6 @@
 @media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
   screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) and ($d8x-breakpoint-max-lg) {
   .statContainer {
-    height: 64px;
+    height: 72px;
   }
 }

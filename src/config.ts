@@ -22,6 +22,7 @@ const {
   VITE_DEFAULT_THEME: defaultTheme = 'light',
   VITE_ENABLED_LIFI_BY_CHAINS: enabledLifiByChains = '',
   VITE_ENABLED_OWLTO_BY_CHAINS: enabledOwltoByChains = '',
+  VITE_ENABLED_CEDE_BY_CHAINS: enabledCedeByChains = '',
   VITE_WELCOME_MODAL: showChallengeModal = 'false',
   VITE_FIREBASE_APIKEY: firebaseApiKey = '',
   VITE_FIREBASE_AUTHDOMAIN: firebaseAuthDomain = '',
@@ -69,6 +70,7 @@ export const config = {
   enabledChains: splitNumbers(enabledChains),
   enabledLiFiByChains: splitNumbers(enabledLifiByChains),
   enabledOwltoByChains: splitNumbers(enabledOwltoByChains),
+  enabledCedeByChains: splitNumbers(enabledCedeByChains),
   showChallengeModal: showChallengeModal === 'true',
   defaultTheme,
 };

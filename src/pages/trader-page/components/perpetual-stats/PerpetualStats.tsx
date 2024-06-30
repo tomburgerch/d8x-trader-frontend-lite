@@ -28,6 +28,12 @@ export const PerpetualStats = () => {
   const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [showChartForMobile, setShowChartForMobile] = useAtom(showChartForMobileAtom);
 
+  let midPriceClass = styles.statMainValuePositive;
+  if (perpetualStatistics?.midPriceDiff != null) {
+    midPriceClass =
+      perpetualStatistics?.midPriceDiff >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative;
+  }
+
   const midPrice: StatDataI = useMemo(
     () => ({
       id: 'midPrice',
@@ -39,9 +45,10 @@ export const PerpetualStats = () => {
       numberOnly: perpetualStatistics
         ? formatToCurrency(perpetualStatistics.midPrice, '', true, undefined, true)
         : '--',
+      className: midPriceClass, // Add the custom class here
       // currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
     }),
-    [t, perpetualStatistics]
+    [midPriceClass, t, perpetualStatistics]
   );
 
   const items: StatDataI[] = useMemo(
@@ -74,8 +81,8 @@ export const PerpetualStats = () => {
         id: 'fundingRate',
         label: t('pages.trade.stats.funding-rate'),
         tooltip: t('pages.trade.stats.funding-rate-tooltip'),
-        value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(2)} %` : '--',
-        numberOnly: perpetualStatistics ? (perpetualStatistics.currentFundingRateBps / 100).toFixed(2) : '--',
+        value: perpetualStatistics ? `${(perpetualStatistics.currentFundingRateBps / 100).toFixed(3)} %` : '--',
+        numberOnly: perpetualStatistics ? (perpetualStatistics.currentFundingRateBps / 100).toFixed(3) : '--',
         currencyOnly: perpetualStatistics ? '%' : '',
       },
       {
@@ -97,15 +104,21 @@ export const PerpetualStats = () => {
       <div className={styles.statContainer}>
         <div className={styles.mainMobileLine}>
           <div>
-            {midPrice.tooltip ? (
+            {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
               <TooltipMobile tooltip={midPrice.tooltip}>
-                <div className={classNames(styles.statMainLabel, styles.tooltip)}>{midPrice.label}</div>
+                <div
+                  className={
+                    perpetualStatistics?.midPriceDiff >= 0
+                      ? styles.statMainValuePositiveMobile
+                      : styles.statMainValueNegativeMobile
+                  }
+                >
+                  {midPrice.numberOnly}
+                </div>
               </TooltipMobile>
             ) : (
-              <div className={styles.statMainLabel}>{midPrice.label}</div>
+              <div className={styles.statMainValuePositiveMobile}>{midPrice.numberOnly}</div>
             )}
-            <span className={styles.statMainValue}>{midPrice.numberOnly}</span>{' '}
-            <span className={styles.statValue}>{midPrice.currencyOnly}</span>
           </div>
           <div>
             <div className={styles.viewChart} onClick={() => setShowChartForMobile(!showChartForMobile)}>
@@ -142,7 +155,24 @@ export const PerpetualStats = () => {
     return (
       <div className={styles.statContainer}>
         <div className={styles.statsBlock}>
-          {[midPrice, ...items].map((item) => (
+          {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
+            <TooltipMobile tooltip={midPrice.tooltip}>
+              <div
+                className={
+                  perpetualStatistics?.midPriceDiff >= 0
+                    ? styles.statMainValuePositiveTablet
+                    : styles.statMainValueNegativeTablet
+                }
+              >
+                {midPrice.numberOnly}
+              </div>
+            </TooltipMobile>
+          ) : (
+            <div className={`${styles.statMainValueContainer} ${styles.statMainValuePositiveTablet}`}>
+              {midPrice.numberOnly}
+            </div>
+          )}
+          {[...items].map((item) => (
             <div key={item.id}>
               {item.tooltip ? (
                 <TooltipMobile tooltip={item.tooltip}>

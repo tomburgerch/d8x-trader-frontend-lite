@@ -113,15 +113,18 @@ export function useWsMessageHandler() {
         ) {
           if (Math.abs(stats.currentFundingRateBps) < 1e-6) {
             // update does not contain funding rate/open interest - keep current values
-            setPerpetualStatistics({
-              ...stats,
-              currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
-              openInterestBC: selectedPerpetual.openInterestBC,
-            });
-          } else {
-            // update all
-            setPerpetualStatistics(stats);
+            stats.currentFundingRateBps = selectedPerpetual.currentFundingRateBps;
+            stats.openInterestBC = selectedPerpetual.openInterestBC;
+            console.log('zero fr received', stats);
           }
+          setPerpetualStatistics((prevState) => {
+            const previousMidPrice = prevState?.midPrice || 0;
+            const midPriceDiff = stats.midPrice - previousMidPrice;
+            return {
+              ...stats,
+              midPriceDiff,
+            };
+          });
         }
       }
     },

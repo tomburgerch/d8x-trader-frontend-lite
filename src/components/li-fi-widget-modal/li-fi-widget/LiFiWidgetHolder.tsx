@@ -39,9 +39,9 @@ export const LiFiWidgetHolder = () => {
   const [triggerSwap, setTriggerSwap] = useState(false);
 
   const admissibleTokens = useMemo(() => {
-    return pools.map(({ marginTokenAddr }) => ({
+    return pools.map(({ settleTokenAddr }) => ({
       chainId,
-      address: marginTokenAddr,
+      address: settleTokenAddr,
     }));
   }, [pools, chainId]);
 
@@ -66,7 +66,7 @@ export const LiFiWidgetHolder = () => {
         switchChain,
       },
       toChain: chainId,
-      toToken: selectedPool?.marginTokenAddr,
+      toToken: selectedPool?.settleTokenAddr,
       hiddenUI: ['language', 'appearance'],
       appearance: enabledDarkMode ? 'dark' : 'light',
       languages: {
