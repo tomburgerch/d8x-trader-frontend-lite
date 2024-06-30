@@ -10,7 +10,7 @@ interface OverviewPropsI {
   items: OverviewItemI[];
 }
 
-// @TODO: handle multiple c2s
+// @DONE: referrer system remains in CC
 
 export const Overview = ({ title, items }: OverviewPropsI) => {
   return (
