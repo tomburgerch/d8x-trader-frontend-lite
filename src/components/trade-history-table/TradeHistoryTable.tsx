@@ -11,9 +11,8 @@ import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { getComparator, stableSort } from 'helpers/tableSort';
-import { useSettlementMap } from 'hooks/useSettlementMap';
 import { getTradesHistory } from 'network/history';
-import { openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
 import { tableRefreshHandlersAtom } from 'store/tables.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
@@ -35,11 +34,10 @@ export const TradeHistoryTable = memo(() => {
   const perpetuals = useAtomValue(perpetualsAtom);
   const openOrders = useAtomValue(openOrdersAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
-
-  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -127,7 +125,7 @@ export const TradeHistoryTable = memo(() => {
   const tradesHistoryWithSymbol: TradeHistoryWithSymbolDataI[] = useMemo(() => {
     return tradesHistory.map((tradeHistory) => {
       const perpetual = perpetuals.find(({ id }) => id === tradeHistory.perpetualId);
-      const settleSymbol = mapPoolSymbolToSettleSymbol(perpetual?.poolName);
+      const settleSymbol = perpetual?.poolName ? c2s.get(perpetual?.poolName)?.settleSymbol ?? '' : '';
       return {
         ...tradeHistory,
         symbol: perpetual ? `${perpetual.baseCurrency}/${perpetual.quoteCurrency}/${settleSymbol}` : '',
@@ -135,7 +133,7 @@ export const TradeHistoryTable = memo(() => {
         perpetual: perpetual ?? null,
       };
     });
-  }, [tradesHistory, perpetuals, mapPoolSymbolToSettleSymbol]);
+  }, [tradesHistory, perpetuals, c2s]);
 
   const { filter, setFilter, filteredRows } = useFilter(tradesHistoryWithSymbol, tradeHistoryHeaders);
 

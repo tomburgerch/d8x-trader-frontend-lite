@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Menu, MenuItem, Typography } from '@mui/material';
 
-import { useSettlementMap } from 'hooks/useSettlementMap';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { TemporaryAnyT } from 'types/types';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
@@ -19,8 +19,7 @@ export const CollateralFilter = memo(() => {
 
   const [collateralFilter, setCollateralFilter] = useAtom(collateralFilterAtom);
   const collaterals = useAtomValue(collateralsAtom);
-
-  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -42,7 +41,9 @@ export const CollateralFilter = memo(() => {
             {t('common.select.collateral.label')}
           </Typography>
           <Typography variant="bodyTiny" className={styles.value}>
-            {collateralFilter !== null ? mapPoolSymbolToSettleSymbol(collateralFilter) : t('common.select.option-all')}
+            {collateralFilter !== null
+              ? c2s.get(collateralFilter)?.settleSymbol ?? collateralFilter
+              : t('common.select.option-all')}
           </Typography>
         </div>
         <div className={styles.arrowDropDown}>{open ? <ArrowDropUp /> : <ArrowDropDown />}</div>
@@ -86,7 +87,8 @@ export const CollateralFilter = memo(() => {
           {t('common.select.option-all')}
         </MenuItem>
         {collaterals.map((collateral) => {
-          const IconComponent = getDynamicLogo(mapPoolSymbolToSettleSymbol(collateral).toLowerCase()) as TemporaryAnyT;
+          const settleSymbol = c2s.get(collateral)?.settleSymbol ?? collateral;
+          const IconComponent = getDynamicLogo(settleSymbol.toLowerCase()) as TemporaryAnyT;
 
           return (
             <MenuItem
@@ -100,7 +102,7 @@ export const CollateralFilter = memo(() => {
               <Suspense fallback={null}>
                 <IconComponent className={styles.tokenIcon} />
               </Suspense>
-              {mapPoolSymbolToSettleSymbol(collateral)}
+              {settleSymbol}
             </MenuItem>
           );
         })}

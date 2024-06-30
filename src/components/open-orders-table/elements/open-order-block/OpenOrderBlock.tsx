@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined } from '@mui/icons-material';
@@ -6,7 +7,7 @@ import { Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { useSettlementMap } from 'hooks/useSettlementMap';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { OrderWithIdI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -23,11 +24,12 @@ interface OpenOrderBlockPropsI {
 export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderBlockPropsI) => {
   const { t } = useTranslation();
 
-  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const parsedSymbol = parseSymbol(order.symbol);
   const deadlineDate = order.deadline ? format(new Date(order.deadline * 1000), 'yyyy-MM-dd') : '';
   const leverage = order.leverage === undefined ? order.leverage : Math.round(100 * order.leverage) / 100;
+  const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
   return (
     <Box className={styles.root}>
@@ -37,7 +39,7 @@ export const OpenOrderBlock = ({ headers, order, handleOrderCancel }: OpenOrderB
             {t('pages.trade.orders-table.order-block-mobile.symbol')}
           </Typography>
           <Typography variant="bodySmall" component="p" className={styles.symbol}>
-            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}`}
+            {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${collToSettleInfo?.settleSymbol ?? ''}`}
           </Typography>
         </Box>
         <IconButton

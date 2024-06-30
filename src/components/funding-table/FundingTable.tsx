@@ -12,9 +12,8 @@ import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
 import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
-import { useSettlementMap } from 'hooks/useSettlementMap';
 import { getFundingRatePayments } from 'network/history';
-import { fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, fundingListAtom, perpetualsAtom, positionsAtom } from 'store/pools.store';
 import { AlignE, FieldTypeE, SortOrderE, TableTypeE } from 'types/enums';
 import type { FundingWithSymbolDataI, TableHeaderI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -35,11 +34,10 @@ export const FundingTable = memo(() => {
   const perpetuals = useAtomValue(perpetualsAtom);
   const positions = useAtomValue(positionsAtom);
   const setTableRefreshHandlers = useSetAtom(tableRefreshHandlersAtom);
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
 
   const { address, isConnected, chainId } = useAccount();
   const { width, ref } = useResizeDetector();
-
-  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -103,7 +101,7 @@ export const FundingTable = memo(() => {
   const fundingListWithSymbol = useMemo(() => {
     return fundingList.map((funding): FundingWithSymbolDataI => {
       const perpetual = perpetuals.find(({ id }) => id === funding.perpetualId);
-      const settleSymbol = mapPoolSymbolToSettleSymbol(perpetual?.poolName);
+      const settleSymbol = perpetual?.poolName ? c2s.get(perpetual?.poolName)?.settleSymbol ?? '' : '';
       return {
         ...funding,
         amount: -funding.amount,
@@ -112,7 +110,7 @@ export const FundingTable = memo(() => {
         perpetual: perpetual ?? null,
       };
     });
-  }, [fundingList, perpetuals, mapPoolSymbolToSettleSymbol]);
+  }, [fundingList, perpetuals, c2s]);
 
   const { filter, setFilter, filteredRows } = useFilter(fundingListWithSymbol, fundingListHeaders);
 

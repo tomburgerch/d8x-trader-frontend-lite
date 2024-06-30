@@ -7,7 +7,6 @@ import { Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { useSettlementMap } from 'hooks/useSettlementMap';
 import { collateralToSettleConversionAtom } from 'store/pools.store';
 import type { MarginAccountWithAdditionalDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -38,10 +37,9 @@ export const PositionBlock = memo(
 
     const c2s = useAtomValue(collateralToSettleConversionAtom);
 
-    const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
-
     const parsedSymbol = parseSymbol(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
+    const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
     return (
       <Box className={styles.root}>
@@ -51,7 +49,7 @@ export const PositionBlock = memo(
               {t('pages.trade.positions-table.position-block-mobile.symbol')}
             </Typography>
             <Typography variant="bodySmall" component="p" className={styles.symbol}>
-              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}`}
+              {`${parsedSymbol?.baseCurrency}/${parsedSymbol?.quoteCurrency}/${collToSettleInfo?.settleSymbol ?? ''}`}
             </Typography>
           </Box>
           <IconButton
@@ -118,14 +116,10 @@ export const PositionBlock = memo(
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
             rightSide={`${
-              parsedSymbol
-                ? formatToCurrency(
-                    position.collateralCC * (c2s.get(parsedSymbol.poolSymbol)?.value ?? 1),
-                    mapPoolSymbolToSettleSymbol(parsedSymbol.poolSymbol),
-                    true
-                  )
+              collToSettleInfo
+                ? formatToCurrency(position.collateralCC * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
                 : '-'
-            }${' '}(${Math.round(position.leverage * 100) / 100}x)`}
+            } (${Math.round(position.leverage * 100) / 100}x)`}
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />

@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { useAtomValue } from 'jotai';
 import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +9,7 @@ import { Button, DialogActions, DialogContent } from '@mui/material';
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { useSettlementMap } from 'hooks/useSettlementMap';
+import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -25,8 +26,9 @@ interface ShareModalPropsI {
 export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareModalPropsI) => {
   const { t } = useTranslation();
 
+  const c2s = useAtomValue(collateralToSettleConversionAtom);
+
   const statsRef = useRef<HTMLDivElement>(null);
-  const { mapPoolSymbolToSettleSymbol } = useSettlementMap();
 
   if (!selectedPosition) {
     return null;
@@ -54,6 +56,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
   };
 
   const parsedSymbol = parseSymbol(selectedPosition.symbol);
+  const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
   // @DONE: as-is
   const percent =
@@ -79,8 +82,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
             </span>
             |
             <span>
-              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/
-              {mapPoolSymbolToSettleSymbol(parsedSymbol?.poolSymbol)}{' '}
+              {parsedSymbol?.baseCurrency}/{parsedSymbol?.quoteCurrency}/{collToSettleInfo?.settleSymbol ?? ''}{' '}
               {t('pages.trade.history-table.table-header.perpetual')}
             </span>
             |<span>{Math.round(selectedPosition.leverage * 100) / 100}x</span>
