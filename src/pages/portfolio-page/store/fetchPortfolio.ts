@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import { type Address } from 'viem';
 
 import { poolsAtom, traderAPIAtom } from 'store/pools.store';
-import { OpenTraderRebateI, PoolWithIdI } from 'types/types';
+import type { OpenTraderRebateI, PoolWithIdI } from 'types/types';
 
 import { fetchEarningsAtom } from './fetchEarnings';
 import { fetchPoolShareAtom } from './fetchPoolShare';

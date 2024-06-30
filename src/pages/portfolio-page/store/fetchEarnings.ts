@@ -4,6 +4,7 @@ import { type Address } from 'viem';
 import { getEarnings } from 'network/history';
 import { poolsAtom } from 'store/pools.store';
 
+import type { PoolValueI } from '../types/types';
 import { poolUsdPriceAtom } from './fetchPortfolio';
 import { UnrealizedPnLListAtomI } from './fetchUnrealizedPnL';
 
@@ -25,18 +26,15 @@ export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Addres
   }
   const earningsArray = await Promise.all(earningsPromises);
   let totalEstimatedEarnings = 0;
-  const earningsList = earningsArray.reduce<Record<string, { value: number; poolSymbol: string }>>(
-    (acc, curr, index) => {
-      totalEstimatedEarnings += curr.earnings * collateralPrices[index];
-      if (acc[settleSymbols[index]]) {
-        acc[settleSymbols[index]].value += curr.earnings;
-      } else {
-        acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index] };
-      }
-      return acc;
-    },
-    {}
-  );
+  const earningsList = earningsArray.reduce<Record<string, PoolValueI>>((acc, curr, index) => {
+    totalEstimatedEarnings += curr.earnings * collateralPrices[index];
+    if (acc[settleSymbols[index]]) {
+      acc[settleSymbols[index]].value += curr.earnings;
+    } else {
+      acc[settleSymbols[index]] = { value: curr.earnings, poolSymbol: poolSymbols[index] };
+    }
+    return acc;
+  }, {});
 
   set(totalEstimatedEarningsAtom, totalEstimatedEarnings);
   set(

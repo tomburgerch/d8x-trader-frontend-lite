@@ -4,6 +4,7 @@ import { type Address } from 'viem';
 import { poolsAtom, traderAPIAtom } from 'store/pools.store';
 
 import { poolUsdPriceAtom } from './fetchPortfolio';
+import type { PoolShareTokenBalanceI } from '../types/types';
 
 interface TokenPoolSharePercentI {
   symbol: string;
@@ -25,7 +26,7 @@ export const fetchPoolShareAtom = atom(null, async (get, set, userAddress: Addre
   const poolUsdPrice = get(poolUsdPriceAtom);
 
   const dCurrencyPriceMap: Record<string, number> = {};
-  const poolShareTokenBalances: { symbol: string; balance: number; settleSymbol: string }[] = [];
+  const poolShareTokenBalances: PoolShareTokenBalanceI[] = [];
 
   for (const pool of pools) {
     dCurrencyPriceMap[pool.poolSymbol] = await traderAPI.getShareTokenPrice(pool.poolSymbol);

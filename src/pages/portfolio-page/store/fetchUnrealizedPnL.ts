@@ -4,6 +4,7 @@ import { type Address } from 'viem';
 import { getPositionRisk } from 'network/network';
 import { collateralToSettleConversionAtom, traderAPIAtom } from 'store/pools.store';
 
+import type { PoolValueI } from '../types/types';
 import { poolUsdPriceAtom } from './fetchPortfolio';
 
 export interface UnrealizedPnLListAtomI {
@@ -19,7 +20,6 @@ export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 
 export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: Address, chainId: number) => {
   const traderAPI = get(traderAPIAtom);
-  const c2s = get(collateralToSettleConversionAtom);
   if (!traderAPI) {
     return;
   }
@@ -29,10 +29,11 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
     return;
   }
 
+  const c2s = get(collateralToSettleConversionAtom);
   const poolUsdPrice = get(poolUsdPriceAtom);
   const activePositions = data.filter(({ side }) => side !== 'CLOSED');
 
-  const unrealizedPnLReduced: Record<string, { value: number; poolSymbol: string }> = {};
+  const unrealizedPnLReduced: Record<string, PoolValueI> = {};
   let totalUnrealizedPnl = 0;
   let totalPositionNotionalBaseCCY = 0;
   let totalCollateralCC = 0;
