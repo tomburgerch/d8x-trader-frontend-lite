@@ -74,7 +74,7 @@ export const CurrencySelect = () => {
       rightSide={
         <DropDownSelect
           id="currency-dropdown"
-          selectedValue={selectedCurrency?.name}
+          selectedValue={selectedCurrency?.settleToken}
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           fullWidth
@@ -82,7 +82,7 @@ export const CurrencySelect = () => {
           {currencyItems.map((item) => (
             <DropDownMenuItem
               key={item.id}
-              option={item.name}
+              option={item.settleToken}
               isActive={item.id === selectedCurrency?.id}
               onClick={() => {
                 setSelectedCurrency(item);
