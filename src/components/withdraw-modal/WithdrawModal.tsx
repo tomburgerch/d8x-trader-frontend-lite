@@ -36,8 +36,6 @@ import { useTransferTokens } from './hooks/useTransferTokens';
 
 import styles from './WithdrawModal.module.scss';
 
-// @DONE use settle token, but this one looked tricky - @TODO test well
-
 export const WithdrawModal = () => {
   const { t } = useTranslation();
 

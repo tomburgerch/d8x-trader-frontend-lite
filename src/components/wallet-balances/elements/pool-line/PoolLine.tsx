@@ -20,7 +20,7 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: pool.settleTokenAddr as Address, // @DONE: settlement token
+        address: pool.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
@@ -54,7 +54,6 @@ export const PoolLine = memo(({ pool, showEmpty = true }: PoolLinePropsI) => {
   }
   const unroundedSCValue = tokenBalanceData ? +formatUnits(tokenBalanceData[0], tokenBalanceData[1]) : 1;
   const numberDigits = valueToFractionDigits(unroundedSCValue);
-  // @DONE use settle token @DONE no fx needed here
   return (
     <AssetLine
       symbol={pool.settleSymbol}

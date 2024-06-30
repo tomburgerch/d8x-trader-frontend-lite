@@ -134,7 +134,7 @@ export const MarketSelect = memo(() => {
                   poolSymbol: pool.poolSymbol,
                   settleSymbol: pool.settleSymbol,
                   symbol: createSymbol({
-                    poolSymbol: pool.poolSymbol, // @DONE: as-is
+                    poolSymbol: pool.poolSymbol,
                     baseCurrency: perpetual.baseCurrency,
                     quoteCurrency: perpetual.quoteCurrency,
                   }),

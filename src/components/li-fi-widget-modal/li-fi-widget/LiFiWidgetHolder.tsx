@@ -66,7 +66,7 @@ export const LiFiWidgetHolder = () => {
         switchChain,
       },
       toChain: chainId,
-      toToken: selectedPool?.settleTokenAddr, // @DONE: settlement token
+      toToken: selectedPool?.settleTokenAddr,
       hiddenUI: ['language', 'appearance'],
       appearance: enabledDarkMode ? 'dark' : 'light',
       languages: {

@@ -260,8 +260,6 @@ export const OrderSize = memo(() => {
     setOpenCurrencySelector(false);
   };
 
-  // @DONE: view, @DONE: fx
-
   return (
     <>
       <div className={styles.root}>

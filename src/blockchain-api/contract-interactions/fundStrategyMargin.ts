@@ -16,8 +16,6 @@ interface FundMarginPropsI {
   settleTokenAddress: Address;
 }
 
-// @DONE: use settlement token
-
 export async function fundStrategyMargin(
   { walletClient, strategyAddress, isMultisigAddress, amount, settleTokenAddress }: FundMarginPropsI,
   setCurrentPhaseKey: Dispatch<SetStateAction<string>>

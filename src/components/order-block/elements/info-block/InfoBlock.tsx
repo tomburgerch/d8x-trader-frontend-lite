@@ -87,7 +87,7 @@ export const InfoBlock = memo(() => {
     const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
     const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
     if (openPosition && openPosition.side !== orderBlockSide) {
-      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @DONE: as-is
+      collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY;
     }
 
     let orderSizeNet = orderSize;
@@ -142,7 +142,6 @@ export const InfoBlock = memo(() => {
         <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
           <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
             {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
-            {/* @DONE: already in settle  ccy*/}
           </Typography>
         </TooltipMobile>
       </div>
@@ -157,7 +156,6 @@ export const InfoBlock = memo(() => {
                 approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                 selectedPool.settleSymbol
               )}
-          {/* @DONE: fx*/}
         </Typography>
       </div>
       <div className={styles.row}>
@@ -165,7 +163,6 @@ export const InfoBlock = memo(() => {
           {t('pages.trade.order-block.info.fees')}
         </Typography>
         <Typography variant="bodySmallSB" className={styles.infoText}>
-          {/* @DONE: all fee data that is displaid should be converted from margin to settlment ccy */}
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>

@@ -205,13 +205,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                 ? 1
                 : await currentTraderAPI?.fetchCollateralToSettlementConversion(pool.poolSymbol);
 
-            // TODO: Remove
-            console.log({
-              poolSymbol: pool.poolSymbol,
-              settleSymbol: pool.settleSymbol,
-              value: coll2settle ?? 1,
-            });
-
             setCollToSettleConversion({
               poolSymbol: pool.poolSymbol,
               settleSymbol: pool.settleSymbol,
@@ -245,13 +238,13 @@ export const Header = memo(({ window }: HeaderPropsI) => {
     allowFailure: false,
     contracts: [
       {
-        address: selectedPool?.settleTokenAddr as Address, //  @DONE
+        address: selectedPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: selectedPool?.settleTokenAddr as Address, //@DONE
+        address: selectedPool?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
       },

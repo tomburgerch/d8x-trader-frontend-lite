@@ -19,8 +19,6 @@ interface ApproveMarginTokenPropsI {
   decimals: number;
 }
 
-// @DONE: use settle token
-
 export async function approveMarginToken({
   walletClient,
   settleTokenAddr,

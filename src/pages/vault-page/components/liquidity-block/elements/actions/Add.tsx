@@ -176,7 +176,7 @@ export const Add = memo(() => {
     setLoading(true);
     approveMarginToken({
       walletClient,
-      settleTokenAddr: selectedPool.settleTokenAddr, // @DONE: settlement token
+      settleTokenAddr: selectedPool.settleTokenAddr,
       isMultisigAddress,
       proxyAddr,
       minAmount: addAmount / 1.05,
@@ -231,7 +231,7 @@ export const Add = memo(() => {
     })
       .then(() => {
         setApprovalCompleted(false);
-        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount); // @DONE add liquidity will convert from settle to margin
+        return addLiquidity(walletClient, liqProvTool, selectedPool.poolSymbol, addAmount);
       })
       .then((tx) => {
         setTxHash(tx.hash);
@@ -257,7 +257,7 @@ export const Add = memo(() => {
 
   const predictedAmount = useMemo(() => {
     if (addAmount > 0 && dCurrencyPrice != null && selectedPool != null && c2s.has(selectedPool.poolSymbol)) {
-      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice; // @DONE addAmount is now in settlement currency, need to adjust the conversion if settlement currency is not equal to collateral currency
+      return addAmount / (c2s.get(selectedPool.poolSymbol)?.value ?? 1) / dCurrencyPrice;
     }
     return 0;
   }, [addAmount, c2s, selectedPool, dCurrencyPrice]);
@@ -394,7 +394,7 @@ export const Add = memo(() => {
             currency={selectedPool?.settleSymbol}
             step="1"
             min={0}
-            max={poolTokenBalance || 999999} // @DONE in settlement currency
+            max={poolTokenBalance || 999999}
             disabled={loading}
           />
         </div>
@@ -404,7 +404,7 @@ export const Add = memo(() => {
             <Link
               onClick={() => {
                 if (poolTokenBalance) {
-                  handleInputCapture(`${poolTokenBalance}`); // @DONE in settlement currency
+                  handleInputCapture(`${poolTokenBalance}`);
                 }
               }}
             >
@@ -430,11 +430,7 @@ export const Add = memo(() => {
                 </InputAdornment>
               }
               type="text"
-              value={
-                selectedPool
-                  ? formatToCurrency(predictedAmount, '') // @DONE already in settle ccy
-                  : '-'
-              }
+              value={selectedPool ? formatToCurrency(predictedAmount, '') : '-'}
               disabled
             />
           </div>

@@ -29,7 +29,6 @@ export const FundingRow = ({ headers, funding }: FundingRowPropsI) => {
       <TableCell align={headers[1].align}>
         <Typography variant="cellSmall">{funding.symbol}</Typography>
       </TableCell>
-      {/* // @DONE: funding.amount in settlement token */}
       <TableCell align={headers[2].align}>
         <Typography
           variant="cellSmall"

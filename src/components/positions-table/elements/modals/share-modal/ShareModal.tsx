@@ -58,7 +58,6 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
   const parsedSymbol = parseSymbol(selectedPosition.symbol);
   const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
-  // @DONE: as-is
   const percent =
     100 *
     (selectedPosition.unrealizedPnlQuoteCCY / (selectedPosition.collateralCC * selectedPosition.collToQuoteConversion));

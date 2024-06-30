@@ -42,7 +42,7 @@ export const CurrencySelect = () => {
           settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: true,
-          contractAddress: pool.settleTokenAddr as Address, // @DONE: used to show pool info -> use settlement token
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
 
@@ -54,7 +54,7 @@ export const CurrencySelect = () => {
           settleToken: pool.settleSymbol,
           isGasToken: false,
           isActiveToken: false,
-          contractAddress: pool.settleTokenAddr as Address, // @DONE: idem
+          contractAddress: pool.settleTokenAddr as Address,
         })
       );
     }

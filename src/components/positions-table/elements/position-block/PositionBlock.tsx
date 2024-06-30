@@ -111,7 +111,6 @@ export const PositionBlock = memo(
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />
-          {/* // @DONE: settlement token */}
           <SidesRow
             leftSide={headers[5].label}
             leftSideTooltip={headers[5].tooltip}
@@ -123,7 +122,6 @@ export const PositionBlock = memo(
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />
-          {/* // @DONE: leave collateral token */}
           <SidesRow
             leftSide={headers[6].label}
             leftSideTooltip={headers[6].tooltip}

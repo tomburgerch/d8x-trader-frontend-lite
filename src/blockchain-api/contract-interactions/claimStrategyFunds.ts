@@ -14,8 +14,6 @@ import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT } from '../constants';
 
 const GAS_TARGET = 1_000_000n;
 
-// @DONE: use settle token
-
 export async function claimStrategyFunds(
   { chainId, walletClient, isMultisigAddress, symbol, traderAPI }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>

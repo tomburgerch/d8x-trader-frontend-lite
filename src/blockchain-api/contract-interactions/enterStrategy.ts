@@ -20,8 +20,6 @@ const DEADLINE = 60 * 60; // 1 hour from posting time
 const DELEGATE_INDEX = 2; // to be emitted
 const PAGE_REFRESH_DELAY = 3_000; // Let's wait 3 sec before refresh
 
-//@DONE: use settle token
-
 export async function enterStrategy(
   {
     chainId,

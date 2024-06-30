@@ -255,13 +255,12 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       chainId,
       traderAPI,
       address,
-      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral / px : -debouncedRemoveCollateral / px, // @DONE needs to be in CC not SC for contract call
+      modifyType === ModifyTypeE.Add ? +debouncedAddCollateral / px : -debouncedRemoveCollateral / px,
       selectedPosition
     )
       .then((data) => {
         setAPIBusy(false);
         setNewPositionRisk(data.data.newPositionRisk);
-        // @DONE: settlement token & verify that the rest of logic can be left unchanged if max is correct
         setAvailableMargin(data.data.availableMargin < 0 ? 0 : data.data.availableMargin * 0.99);
       })
       .catch((err) => {
@@ -315,7 +314,6 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
       getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        // @DONE: settlement token & verify that the rest of logic can be left unchanged if max is correct
         setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
         setAPIBusy(false);
       });
@@ -337,7 +335,6 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   }, [selectedPosition, parsedSymbol]);
 
   const calculatedMargin = useMemo(() => {
-    // @DONE: settlement token
     let margin;
     const px = poolByPosition ? c2s.get(poolByPosition.poolSymbol)?.value ?? 1 : 1;
     if (selectedPosition) {
@@ -432,15 +429,15 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral / px) // @DONE: addCollateral should be in CC not SC for the contract call
+      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral / px)
         .then(({ data }) => {
           approveMarginToken({
             walletClient,
-            settleTokenAddr: poolByPosition.settleTokenAddr, // @DONE: settlement token
+            settleTokenAddr: poolByPosition.settleTokenAddr,
             isMultisigAddress,
             proxyAddr,
             minAmount: +addCollateral,
-            decimals: settleTokenDecimals, // actually settle token
+            decimals: settleTokenDecimals,
           })
             .then(() => {
               deposit(tradingClient, address, data)
@@ -495,7 +492,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral / px) // @DONE removeCollateral should be in CC not SC for the contract call
+      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral / px)
         .then(({ data }) => {
           withdraw(tradingClient, address, data)
             .then(({ hash }) => {

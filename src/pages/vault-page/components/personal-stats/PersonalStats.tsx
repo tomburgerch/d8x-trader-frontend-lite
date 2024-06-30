@@ -63,7 +63,7 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
     earningsRequestSentRef.current = true;
 
-    getEarnings(chainId, address, selectedPool.poolSymbol) // @DONE: earnings are in cc, converted below for display only
+    getEarnings(chainId, address, selectedPool.poolSymbol)
       .then(({ earnings }) => setEstimatedEarnings(earnings < -0.0000000001 ? earnings : Math.max(earnings, 0)))
       .catch((error) => {
         console.error(error);
@@ -73,8 +73,6 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
         earningsRequestSentRef.current = false;
       });
   }, [chainId, address, selectedPool?.poolSymbol, triggerUserStatsUpdate]);
-
-  // @DONE: use settle token, @DONE: add fx
 
   return (
     <Box className={styles.root}>

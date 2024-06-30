@@ -46,7 +46,6 @@ export const FundingBlock = ({ headers, funding }: FundingRowPropsI) => {
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
-        {/* // @DONE: funding.amount in settlement token */}
         <SidesRow
           leftSide={headers[2].label}
           leftSideTooltip={headers[2].tooltip}

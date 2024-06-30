@@ -10,8 +10,6 @@ interface OverviewPropsI {
   items: OverviewItemI[];
 }
 
-// @DONE: referrer system remains in CC
-
 export const Overview = ({ title, items }: OverviewPropsI) => {
   return (
     <div className={styles.root}>

@@ -46,7 +46,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
 
   if (openPosition && openPosition.side !== orderBlockSide) {
-    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY; // @DONE: as-is
+    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY;
   }
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);
@@ -61,7 +61,6 @@ export const maxOrderSizeAtom = atom((get) => {
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 
-// @DONE: this atom accounts for settle ccy
 export const currencyMultiplierAtom = atom((get) => {
   let currencyMultiplier = 1;
 

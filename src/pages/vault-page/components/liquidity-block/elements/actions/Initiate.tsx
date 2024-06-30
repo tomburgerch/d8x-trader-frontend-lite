@@ -150,7 +150,6 @@ export const Initiate = memo(() => {
     setRequestSent(true);
     setLoading(true);
 
-    // @DONE: use settle token, @DONE: no fx needed here (dTokens)
     initiateLiquidityWithdrawal(walletClient, liqProvTool, selectedPool.poolSymbol, initiateAmount)
       .then((tx) => {
         setTxHash(tx.hash);
@@ -184,7 +183,6 @@ export const Initiate = memo(() => {
     t,
   ]);
 
-  // @DONE minAmount is in dCCY, as-is
   const minAmount = useMemo(() => {
     if (selectedPool && dCurrencyPrice) {
       return (0.5 * selectedPool.brokerCollateralLotSize) / dCurrencyPrice;

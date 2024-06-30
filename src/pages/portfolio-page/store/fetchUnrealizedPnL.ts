@@ -42,7 +42,6 @@ export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: A
     const settleSymbol = c2s.get(poolSymbol)?.settleSymbol || '';
     const positionUnrealizedPnl = position.unrealizedPnlQuoteCCY * poolUsdPrice[poolSymbol].quote;
     totalUnrealizedPnl += positionUnrealizedPnl;
-    // @DONE: margin token, converted to settle elsewhere
     totalPositionNotionalBaseCCY += position.positionNotionalBaseCCY * poolUsdPrice[poolSymbol].bases[baseSymbol];
     totalCollateralCC += position.collateralCC * poolUsdPrice[poolSymbol].collateral;
 

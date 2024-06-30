@@ -18,7 +18,7 @@ export const Vault = () => {
 
   const c2s = useAtomValue(collateralToSettleConversionAtom);
   const poolShareTokensShare = useAtomValue(poolShareTokensShareAtom);
-  const earningsList = useAtomValue(earningsListAtom); // @DONE in settlement currency
+  const earningsList = useAtomValue(earningsListAtom);
 
   const totalPoolShare = useMemo(
     () => poolShareTokensShare.reduce((acc, curr) => acc + curr.balance, 0),

@@ -14,8 +14,6 @@ import { fundStrategyGas } from './fundStrategyGas';
 
 const DEADLINE = 60 * 60; // 1 hour from posting time
 
-//@DONE: didn't depend on the token used
-
 export async function exitStrategy(
   { chainId, walletClient, isMultisigAddress, symbol, traderAPI, limitPrice, strategyAddress }: HedgeConfigI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,

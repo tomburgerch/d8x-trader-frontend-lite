@@ -94,8 +94,6 @@ export const GlobalStats = () => {
     [weeklyAPI, t]
   );
 
-  // @DONE: c2s
-
   const items: StatDataI[] = useMemo(
     () => [
       {

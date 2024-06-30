@@ -175,7 +175,7 @@ export const OKXConvertor = () => {
 
     wrapOKB({
       walletClient,
-      wrappedTokenAddress: poolByWrappedToken.marginTokenAddr as Address, // @DONE: can leave as-is, constant case
+      wrappedTokenAddress: poolByWrappedToken.marginTokenAddr as Address,
       wrappedTokenDecimals: gasTokenBalance.decimals,
       amountWrap: +amountValue,
     })
@@ -217,7 +217,7 @@ export const OKXConvertor = () => {
 
     wrapOKB({
       walletClient,
-      wrappedTokenAddress: poolByWrappedToken.marginTokenAddr as Address, // @DONE: idem
+      wrappedTokenAddress: poolByWrappedToken.marginTokenAddr as Address,
       wrappedTokenDecimals: gasTokenBalance.decimals,
       amountUnwrap: +amountValue,
     })
@@ -256,7 +256,6 @@ export const OKXConvertor = () => {
   ) {
     return null;
   }
-  // @DONE: no change here (this is constant for okx)
 
   return (
     <div className={styles.section}>

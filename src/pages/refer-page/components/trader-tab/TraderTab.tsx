@@ -33,7 +33,6 @@ export const TraderTab = () => {
   const { openRewards } = useFetchOpenRewards();
 
   const overviewItems: OverviewItemI[] = useMemo(() => {
-    // @DONE: earnedRebatesByPools and openEarningsByPools in settlement token
     const earnedRebatesByPools: OverviewPoolItemI[] = [];
     const openEarningsByPools: OverviewPoolItemI[] = [];
 

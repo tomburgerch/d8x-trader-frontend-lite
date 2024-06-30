@@ -26,13 +26,13 @@ export const useSettleTokenBalance = ({ poolByPosition }: SettleTokenBalanceProp
     allowFailure: false,
     contracts: [
       {
-        address: poolByPosition?.settleTokenAddr as Address, // @DONE: settlement token
+        address: poolByPosition?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: poolByPosition?.settleTokenAddr as Address, // @DONE: settlement token
+        address: poolByPosition?.settleTokenAddr as Address,
         abi: erc20Abi,
         functionName: 'decimals',
       },

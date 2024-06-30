@@ -388,7 +388,7 @@ export const ActionBlock = memo(() => {
           // hide modal now that metamask popup shows up
           approveMarginToken({
             walletClient,
-            settleTokenAddr: selectedPool.settleTokenAddr, // @DONE: amount is in settle ccy
+            settleTokenAddr: selectedPool.settleTokenAddr,
             isMultisigAddress,
             proxyAddr,
             minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
@@ -640,7 +640,7 @@ export const ActionBlock = memo(() => {
                         collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                         selectedPool.settleSymbol
                       )
-                    : '-' // @DONE: fx
+                    : '-'
                 }
                 rightSideStyles={styles.rightSide}
               />
@@ -653,7 +653,7 @@ export const ActionBlock = memo(() => {
                 }
                 rightSide={
                   isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol) //@DONE: already in settle ccy
+                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -774,7 +774,7 @@ export const ActionBlock = memo(() => {
                     ? formatToCurrency(
                         newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                         selectedPool.settleSymbol
-                      ) // @DONE: fx
+                      )
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}

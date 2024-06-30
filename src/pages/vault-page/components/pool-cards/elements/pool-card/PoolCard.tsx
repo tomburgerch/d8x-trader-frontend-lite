@@ -120,7 +120,6 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   };
 
   const IconComponent = getDynamicLogo(pool.settleSymbol.toLowerCase()) as TemporaryAnyT;
-  // @DONE: use settle token for display
   return (
     <div className={styles.root}>
       <div className={styles.header}>
