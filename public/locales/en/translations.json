@@ -525,8 +525,8 @@
         "yields": {
           "title": "Yield sources",
           "trading-api": "Trading APY ({{percent}}%)",
-          "weeth-yield": "weETH Staking Yield",
-          "stusd-yield": "stUSD Yield",
+          "weeth-yield": "weETH Staking Yield ({{weethAPY}}%)",
+          "stusd-yield": "stUSD Yield ({{stUsdAPY}}%)",
           "ether-fi-points": "Ether.fi Points",
           "eigen-layer-points": "EigenLayer Points",
           "d8x-points": "D8X Points"

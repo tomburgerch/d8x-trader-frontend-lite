@@ -5,7 +5,8 @@ import { useAccount } from 'wagmi';
 
 import { Button } from '@mui/material';
 
-import { getWeeklyAPI } from 'network/history';
+import { getWeeklyAPY } from 'network/history';
+import { getAngleAPY, getEtherFiAPY } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { liquidityTypeAtom, triggerAddInputFocusAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
@@ -41,34 +42,77 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
   const setLiquidityType = useSetAtom(liquidityTypeAtom);
   const triggerUserStatsUpdate = useAtomValue(triggerUserStatsUpdateAtom);
 
-  const [weeklyAPI, setWeeklyAPI] = useState<number>();
+  const [weeklyAPY, setWeeklyAPY] = useState<number>();
+  const [stUsdAPY, setStUsdAPY] = useState<number>();
+  const [weethAPY, setWeethAPY] = useState<string>();
 
-  const weeklyApiRequestSentRef = useRef(false);
+  const weeklyAPYRequestSentRef = useRef(false);
+  const stUsdAPYRequestSentRef = useRef(false);
+  const weethAPYRequestSentRef = useRef(false);
 
   useEffect(() => {
-    if (weeklyApiRequestSentRef.current) {
+    if (weeklyAPYRequestSentRef.current) {
       return;
     }
 
-    weeklyApiRequestSentRef.current = true;
-    getWeeklyAPI(getEnabledChainId(chainId), pool.poolSymbol)
+    weeklyAPYRequestSentRef.current = true;
+    getWeeklyAPY(getEnabledChainId(chainId), pool.poolSymbol)
       .then((data) => {
-        setWeeklyAPI(data.allTimeAPY * 100);
+        setWeeklyAPY(data.allTimeAPY * 100);
       })
       .catch((error) => {
         console.error(error);
-        setWeeklyAPI(undefined);
+        setWeeklyAPY(undefined);
       })
       .finally(() => {
-        weeklyApiRequestSentRef.current = false;
+        weeklyAPYRequestSentRef.current = false;
       });
   }, [chainId, pool.poolSymbol, triggerUserStatsUpdate]);
+
+  useEffect(() => {
+    if (stUsdAPYRequestSentRef.current || pool.poolSymbol !== 'STUSD') {
+      return;
+    }
+
+    stUsdAPYRequestSentRef.current = true;
+    getAngleAPY()
+      .then(({ apyDec }) => {
+        setStUsdAPY(Number(apyDec) * 100);
+      })
+      .catch((error) => {
+        console.error(error);
+        setStUsdAPY(undefined);
+      })
+      .finally(() => {
+        stUsdAPYRequestSentRef.current = false;
+      });
+  }, [pool.poolSymbol, triggerUserStatsUpdate]);
+
+  useEffect(() => {
+    if (weethAPYRequestSentRef.current || pool.poolSymbol !== 'WEETH') {
+      return;
+    }
+
+    weethAPYRequestSentRef.current = true;
+
+    getEtherFiAPY()
+      .then(({ etherfiApy }) => {
+        setWeethAPY(etherfiApy);
+      })
+      .catch((error) => {
+        console.error(error);
+        setWeethAPY(undefined);
+      })
+      .finally(() => {
+        weethAPYRequestSentRef.current = false;
+      });
+  }, [pool.poolSymbol, triggerUserStatsUpdate]);
 
   const yieldData = useMemo(() => {
     const yields: DataItemI[] = [];
     yields.push({
       title: t('pages.vault.pool-card.yields.trading-api', {
-        percent: weeklyAPI !== undefined ? formatToCurrency(weeklyAPI, '', true, 2) : '-',
+        percent: weeklyAPY !== undefined ? formatToCurrency(weeklyAPY, '', true, 2) : '-',
       }),
       logo: <D8XLogo />,
       logoBackground: 'transparent',
@@ -76,7 +120,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     if (yieldsPerSymbol[pool.poolSymbol] && yieldsPerSymbol[pool.poolSymbol].length > 0) {
       yieldsPerSymbol[pool.poolSymbol].map((dataItem) => {
         yields.push({
-          title: t(`pages.vault.pool-card.yields.${dataItem.translationKey}`, dataItem.label),
+          title: t(`pages.vault.pool-card.yields.${dataItem.translationKey}`, dataItem.label, { stUsdAPY, weethAPY }),
           logo: dataItem.logo,
           isRounded: dataItem.isRounded,
           logoBackground: dataItem.logoBackground,
@@ -89,7 +133,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       logoBackground: 'transparent',
     });
     return yields;
-  }, [t, weeklyAPI, pool.poolSymbol]);
+  }, [t, weeklyAPY, stUsdAPY, weethAPY, pool.poolSymbol]);
 
   const boostsData = useMemo(() => {
     const boosts: DataItemI[] = [];
