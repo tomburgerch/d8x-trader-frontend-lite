@@ -1,6 +1,6 @@
 import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
-import { EarningsI, FundingI, OpenWithdrawalsI, TradeHistoryI, WeeklyApiI } from 'types/types';
+import { EarningsI, FundingI, OpenWithdrawalsI, TradeHistoryI, WeeklyApyI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 function getHistoryUrlByChainId(chainId: number) {
@@ -28,7 +28,7 @@ export function getFundingRatePayments(chainId: number, traderAddr: string): Pro
   return fetchUrl(`funding-rate-payments?traderAddr=${traderAddr}`, chainId);
 }
 
-export function getWeeklyAPI(chainId: number, poolSymbol: string): Promise<WeeklyApiI> {
+export function getWeeklyAPY(chainId: number, poolSymbol: string): Promise<WeeklyApyI> {
   return fetchUrl(`apy?poolSymbol=${poolSymbol}`, chainId);
 }
 

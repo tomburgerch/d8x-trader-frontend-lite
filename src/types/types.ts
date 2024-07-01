@@ -292,6 +292,11 @@ export interface BoostStationParamResponseI {
   volBoostMax: number;
 }
 
+export interface AngleApyResponseI {
+  apyDec: number;
+  symbol: string;
+}
+
 export interface TableHeaderI<T> {
   label: ReactElement | string;
   tooltip?: string;
@@ -334,7 +339,7 @@ export interface FundingI {
 
 export interface FundingWithSymbolDataI extends FundingI, SymbolDataI {}
 
-export interface WeeklyApiI {
+export interface WeeklyApyI {
   startTimestamp: number;
   endTimestamp: number;
   startPrice: number;

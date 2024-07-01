@@ -526,7 +526,7 @@
           "title": "Sources de rendement",
           "trading-api": "Trading APY ({{percent}}%)",
           "weeth-yield": "weETH Staking Yield",
-          "stusd-yield": "stUSD Yield",
+          "stusd-yield": "stUSD Yield ({{stUsdAPY}}%)",
           "ether-fi-points": "Points Ether.fi",
           "eigen-layer-points": "Points EigenLayer",
           "d8x-points": "Points D8X"

@@ -3,6 +3,7 @@ import { config } from 'config';
 import { getRequestOptions } from 'helpers/getRequestOptions';
 import { RequestMethodE } from 'types/enums';
 import type {
+  AngleApyResponseI,
   BoostRankResponseI,
   BoostStationResponseI,
   BoostStationParamResponseI,
@@ -441,6 +442,15 @@ export async function getBoostRank(traderAddr: string): Promise<BoostRankRespons
 
 export async function getBoostStationParameters(): Promise<BoostStationParamResponseI> {
   const data = await fetch(`https://drip.d8x.xyz/score-params`, getRequestOptions());
+  if (!data.ok) {
+    console.error({ data });
+    throw new Error(data.statusText);
+  }
+  return data.json();
+}
+
+export async function getAngleAPY(): Promise<AngleApyResponseI> {
+  const data = await fetch(`https://drip.d8x.xyz/angle-apy`, getRequestOptions());
   if (!data.ok) {
     console.error({ data });
     throw new Error(data.statusText);
