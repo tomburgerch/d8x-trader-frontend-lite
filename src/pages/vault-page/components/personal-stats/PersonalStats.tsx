@@ -42,6 +42,8 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
 
   const earningsRequestSentRef = useRef(false);
 
+  const collToSettleInfo = selectedPool?.poolSymbol ? c2s.get(selectedPool.poolSymbol) : undefined;
+
   useEffect(() => {
     setUserAmount(null);
     if (selectedPool?.poolSymbol && traderAPI && isSDKConnected && address && isEnabledChain(chainId)) {
@@ -110,21 +112,15 @@ export const PersonalStats = memo(({ withdrawOn }: PersonalStatsPropsI) => {
           />
         </Box>
         <Typography variant="bodyMedium" className={styles.statValue}>
-          {estimatedEarnings !== null && selectedPool
+          {estimatedEarnings !== null && collToSettleInfo
             ? formatToCurrency(
-                estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol,
+                estimatedEarnings * collToSettleInfo.value,
+                collToSettleInfo.settleSymbol,
                 false,
                 Math.max(
                   2,
                   Math.ceil(
-                    4 -
-                      Math.log10(
-                        Math.max(
-                          Math.abs(estimatedEarnings * (c2s.get(selectedPool.poolSymbol)?.value ?? 1)),
-                          0.0000000001
-                        )
-                      )
+                    4 - Math.log10(Math.max(Math.abs(estimatedEarnings * collToSettleInfo.value), 0.0000000001))
                   )
                 )
               )

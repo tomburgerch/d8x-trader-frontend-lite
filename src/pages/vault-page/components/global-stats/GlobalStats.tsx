@@ -94,46 +94,44 @@ export const GlobalStats = () => {
     [weeklyAPI, t]
   );
 
+  const collToSettleInfo = useMemo(
+    () => (selectedPool?.poolSymbol ? c2s.get(selectedPool.poolSymbol) : undefined),
+    [c2s, selectedPool?.poolSymbol]
+  );
+
   const items: StatDataI[] = useMemo(
     () => [
       {
         id: 'tvl',
         label: t('pages.vault.global-stats.tvl'),
         value:
-          selectedPool && tvl != null
-            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), selectedPool.settleSymbol, true)
+          collToSettleInfo && tvl != null
+            ? formatToCurrency(tvl * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
             : '--',
-        numberOnly:
-          tvl != null && selectedPool
-            ? formatToCurrency(tvl * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
-            : '--',
-        currencyOnly: selectedPool && tvl != null ? selectedPool.settleSymbol : '',
+        numberOnly: tvl != null && collToSettleInfo ? formatToCurrency(tvl * collToSettleInfo.value, '', true) : '--',
+        currencyOnly: collToSettleInfo && tvl != null ? collToSettleInfo.settleSymbol : '',
       },
       {
         id: 'dSymbolPrice',
-        label: t('pages.vault.global-stats.price', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.price', { poolSymbol: collToSettleInfo?.settleSymbol }),
         value:
-          dCurrencyPrice != null && selectedPool
-            ? formatToCurrency(
-                dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol,
-                true
-              )
+          dCurrencyPrice != null && collToSettleInfo
+            ? formatToCurrency(dCurrencyPrice * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
             : '--',
         numberOnly:
-          dCurrencyPrice != null && selectedPool
-            ? formatToCurrency(dCurrencyPrice * (c2s.get(selectedPool.poolSymbol)?.value ?? 1), '', true)
+          dCurrencyPrice != null && collToSettleInfo
+            ? formatToCurrency(dCurrencyPrice * collToSettleInfo.value, '', true)
             : '--',
-        currencyOnly: dCurrencyPrice != null ? selectedPool?.settleSymbol : '',
+        currencyOnly: dCurrencyPrice != null ? collToSettleInfo?.settleSymbol : '',
       },
       {
         id: 'dSymbolSupply',
-        label: t('pages.vault.global-stats.supply', { poolSymbol: selectedPool?.settleSymbol }),
+        label: t('pages.vault.global-stats.supply', { poolSymbol: collToSettleInfo?.settleSymbol }),
         value: getDSupply(true),
         numberOnly: getDSupply(true),
       },
     ],
-    [selectedPool, tvl, dCurrencyPrice, c2s, getDSupply, t]
+    [collToSettleInfo, tvl, dCurrencyPrice, getDSupply, t]
   );
 
   if (isMobileScreen) {
