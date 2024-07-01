@@ -157,8 +157,6 @@ export const ActionBlock = memo(() => {
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
-  const collToSettleInfo = selectedPool?.poolSymbol ? c2s.get(selectedPool.poolSymbol) : undefined;
-
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI || !poolFee || !isEnabledChain(chainId)) {
       return;
@@ -375,8 +373,7 @@ export const ActionBlock = memo(() => {
       !selectedPool ||
       !proxyAddr ||
       !poolTokenDecimals ||
-      !isEnabledChain(chainId) ||
-      !collToSettleInfo
+      !isEnabledChain(chainId)
     ) {
       return;
     }
@@ -394,7 +391,7 @@ export const ActionBlock = memo(() => {
             settleTokenAddr: selectedPool.settleTokenAddr,
             isMultisigAddress,
             proxyAddr,
-            minAmount: collateralDeposit * collToSettleInfo.value,
+            minAmount: collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
             decimals: poolTokenDecimals,
           })
             .then(() => {
@@ -638,8 +635,11 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && collateralDeposit >= 0 && collToSettleInfo
-                    ? formatToCurrency(collateralDeposit * collToSettleInfo.value, collToSettleInfo.settleSymbol)
+                  isOrderValid && collateralDeposit >= 0 && selectedPool
+                    ? formatToCurrency(
+                        collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
+                      )
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
@@ -770,10 +770,10 @@ export const ActionBlock = memo(() => {
                   </Typography>
                 }
                 rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && collToSettleInfo
+                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
                     ? formatToCurrency(
-                        newPositionRisk.collateralCC * collToSettleInfo.value,
-                        collToSettleInfo.settleSymbol
+                        newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                        selectedPool.settleSymbol
                       )
                     : '-'
                 }

@@ -22,7 +22,6 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
   const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
   const pnlColor = tradeHistory.realizedPnl > 0 ? 'var(--d8x-color-buy-rgba)' : 'var(--d8x-color-sell-rgba)';
-  const collToSettleInfo = perpetual?.poolName ? c2s.get(perpetual.poolName) : undefined;
 
   return (
     <TableRow key={tradeHistory.transactionHash}>
@@ -54,15 +53,23 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
       </TableCell>
       <TableCell align={headers[5].align}>
         <Typography variant="cellSmall">
-          {collToSettleInfo
-            ? formatToCurrency(tradeHistory.fee * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+          {perpetual
+            ? formatToCurrency(
+                tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
+                tradeHistory.settleSymbol,
+                true
+              )
             : ''}
         </Typography>
       </TableCell>
       <TableCell align={headers[6].align}>
         <Typography variant="cellSmall" style={{ color: pnlColor }}>
-          {collToSettleInfo
-            ? formatToCurrency(tradeHistory.realizedPnl * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+          {perpetual
+            ? formatToCurrency(
+                tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1),
+                tradeHistory.settleSymbol,
+                true
+              )
             : ''}
         </Typography>
       </TableCell>

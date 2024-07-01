@@ -25,7 +25,6 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
   const perpetual = tradeHistory.perpetual;
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
   const pnlColor = tradeHistory.realizedPnl > 0 ? styles.green : styles.red;
-  const collToSettleInfo = perpetual?.poolName ? c2s.get(perpetual.poolName) : undefined;
 
   return (
     <Box className={styles.root}>
@@ -76,8 +75,12 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           leftSide={headers[5].label}
           leftSideTooltip={headers[5].tooltip}
           rightSide={
-            collToSettleInfo
-              ? formatToCurrency(tradeHistory.fee * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.fee * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
               : ''
           }
           leftSideStyles={styles.dataLabel}
@@ -87,8 +90,12 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           leftSide={headers[6].label}
           leftSideTooltip={headers[6].tooltip}
           rightSide={
-            collToSettleInfo
-              ? formatToCurrency(tradeHistory.realizedPnl * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
+            perpetual
+              ? formatToCurrency(
+                  tradeHistory.realizedPnl * (c2s.get(perpetual.poolName)?.value ?? 1),
+                  tradeHistory.settleSymbol,
+                  true
+                )
               : ''
           }
           leftSideStyles={styles.dataLabel}
