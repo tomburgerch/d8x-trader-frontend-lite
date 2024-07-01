@@ -7,7 +7,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
-import { getWeeklyAPI } from 'network/history';
+import { getWeeklyAPY } from 'network/history';
 import { dCurrencyPriceAtom, sdkConnectedAtom, triggerUserStatsUpdateAtom, tvlAtom } from 'store/vault-pools.store';
 import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -46,7 +46,7 @@ export const GlobalStats = () => {
     }
 
     weeklyApiRequestSentRef.current = true;
-    getWeeklyAPI(getEnabledChainId(chainId), selectedPool.poolSymbol)
+    getWeeklyAPY(getEnabledChainId(chainId), selectedPool.poolSymbol)
       .then((data) => {
         setWeeklyAPI(data.allTimeAPY * 100);
       })
