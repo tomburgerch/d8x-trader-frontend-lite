@@ -6,7 +6,7 @@ import { useAccount } from 'wagmi';
 import { Button } from '@mui/material';
 
 import { getWeeklyAPY } from 'network/history';
-import { getAngleAPY } from 'network/network';
+import { getAngleAPY, getEtherFiAPY } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { liquidityTypeAtom, triggerAddInputFocusAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
@@ -44,9 +44,11 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
 
   const [weeklyAPY, setWeeklyAPY] = useState<number>();
   const [stUsdAPY, setStUsdAPY] = useState<number>();
+  const [weethAPY, setWeethAPY] = useState<string>();
 
   const weeklyAPYRequestSentRef = useRef(false);
   const stUsdAPYRequestSentRef = useRef(false);
+  const weethAPYRequestSentRef = useRef(false);
 
   useEffect(() => {
     if (weeklyAPYRequestSentRef.current) {
@@ -74,8 +76,8 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
 
     stUsdAPYRequestSentRef.current = true;
     getAngleAPY()
-      .then((data) => {
-        setStUsdAPY(data.apyDec * 100);
+      .then(({ apyDec }) => {
+        setStUsdAPY(Number(apyDec) * 100);
       })
       .catch((error) => {
         console.error(error);
@@ -83,6 +85,26 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       })
       .finally(() => {
         stUsdAPYRequestSentRef.current = false;
+      });
+  }, [pool.poolSymbol, triggerUserStatsUpdate]);
+
+  useEffect(() => {
+    if (weethAPYRequestSentRef.current || pool.poolSymbol !== 'WEETH') {
+      return;
+    }
+
+    weethAPYRequestSentRef.current = true;
+
+    getEtherFiAPY()
+      .then(({ etherfiApy }) => {
+        setWeethAPY(etherfiApy);
+      })
+      .catch((error) => {
+        console.error(error);
+        setWeethAPY(undefined);
+      })
+      .finally(() => {
+        weethAPYRequestSentRef.current = false;
       });
   }, [pool.poolSymbol, triggerUserStatsUpdate]);
 
@@ -98,7 +120,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     if (yieldsPerSymbol[pool.poolSymbol] && yieldsPerSymbol[pool.poolSymbol].length > 0) {
       yieldsPerSymbol[pool.poolSymbol].map((dataItem) => {
         yields.push({
-          title: t(`pages.vault.pool-card.yields.${dataItem.translationKey}`, dataItem.label, { stUsdAPY: stUsdAPY }),
+          title: t(`pages.vault.pool-card.yields.${dataItem.translationKey}`, dataItem.label, { stUsdAPY, weethAPY }),
           logo: dataItem.logo,
           isRounded: dataItem.isRounded,
           logoBackground: dataItem.logoBackground,
@@ -111,7 +133,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       logoBackground: 'transparent',
     });
     return yields;
-  }, [t, weeklyAPY, stUsdAPY, pool.poolSymbol]);
+  }, [t, weeklyAPY, stUsdAPY, weethAPY, pool.poolSymbol]);
 
   const boostsData = useMemo(() => {
     const boosts: DataItemI[] = [];

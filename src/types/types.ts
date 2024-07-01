@@ -110,6 +110,11 @@ export interface EtherFiApyI {
   etherfiApy: string;
 }
 
+export interface AngleApyResponseI {
+  apyDec: string;
+  symbol: string;
+}
+
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
@@ -290,11 +295,6 @@ export interface BoostRankResponseI {
 export interface BoostStationParamResponseI {
   rndBoostMax: number;
   volBoostMax: number;
-}
-
-export interface AngleApyResponseI {
-  apyDec: number;
-  symbol: string;
 }
 
 export interface TableHeaderI<T> {
