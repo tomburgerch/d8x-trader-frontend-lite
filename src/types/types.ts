@@ -110,6 +110,11 @@ export interface EtherFiApyI {
   etherfiApy: string;
 }
 
+export interface AngleApyResponseI {
+  apyDec: string;
+  symbol: string;
+}
+
 export interface ExchangeInfoI {
   pools: PoolI[];
   oracleFactoryAddr: string;
@@ -334,7 +339,7 @@ export interface FundingI {
 
 export interface FundingWithSymbolDataI extends FundingI, SymbolDataI {}
 
-export interface WeeklyApiI {
+export interface WeeklyApyI {
   startTimestamp: number;
   endTimestamp: number;
   startPrice: number;

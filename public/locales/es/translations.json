@@ -525,8 +525,8 @@
         "yields": {
           "title": "Fuentes de rendimiento",
           "trading-api": "TAE de negociación ({{percent}}%)",
-          "weeth-yield": "weETH Staking Yield",
-          "stusd-yield": "stUSD Yield",
+          "weeth-yield": "weETH Staking Yield ({{weethAPY}}%)",
+          "stusd-yield": "stUSD Yield ({{stUsdAPY}}%)",
           "ether-fi-points": "Ether.fi Points",
           "eigen-layer-points": "EigenLayer Points",
           "d8x-points": "D8X Points"
@@ -890,7 +890,8 @@
       "title": "Depósito",
       "important-notice": {
         "full": "Aviso importante: envíe solo <bold>{{currencyName}}</bold> (dirección del token: <bold>{{currencyContractAddress}}</bold) a esta dirección. Envíe por <bold>{{chainName}}</bold>.",
-        "0": "Importante: utiliza operaciones con un solo clic. Solo deposite GAS en su billetera delegada y garantía en su billetera principal. Asegúrese de verificar la dirección de depósito para cada moneda a continuación.",        "1": "envíe solo <bold>{{currencyName}}</bold>",
+        "0": "Importante: utiliza operaciones con un solo clic. Solo deposite GAS en su billetera delegada y garantía en su billetera principal. Asegúrese de verificar la dirección de depósito para cada moneda a continuación.",
+        "1": "envíe solo <bold>{{currencyName}}</bold>",
         "2": "(dirección del token: ",
         "3": ")",
         "4": "a esta dirección.",
