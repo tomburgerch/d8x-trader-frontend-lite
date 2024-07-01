@@ -1,11 +1,11 @@
 import { PerpetualDataHandler, TraderInterface } from '@d8x/perpetuals-sdk';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { type Client } from 'viem';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 
 import { config } from 'config';
-import { traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, poolsAtom, traderAPIAtom, traderAPIBusyAtom } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
@@ -16,12 +16,15 @@ export const SDKLoader = memo(() => {
   const publicClient = usePublicClient();
   const { data: walletClient, isSuccess } = useWalletClient();
 
-  const activatedOneClickTrading = useAtomValue(activatedOneClickTradingAtom);
+  const [traderAPI, setTraderAPI] = useAtom(traderAPIAtom);
 
-  const setTraderAPI = useSetAtom(traderAPIAtom);
+  const activatedOneClickTrading = useAtomValue(activatedOneClickTradingAtom);
+  const pools = useAtomValue(poolsAtom);
+
   const setSDKConnected = useSetAtom(sdkConnectedAtom);
   const setAPIBusy = useSetAtom(traderAPIBusyAtom);
   const setTradingClient = useSetAtom(tradingClientAtom);
+  const setCollToSettleConversion = useSetAtom(collateralToSettleConversionAtom);
 
   const loadingAPIRef = useRef(false);
 
@@ -99,6 +102,34 @@ export const SDKLoader = memo(() => {
         setAPIBusy(false);
       });
   }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
+
+  useEffect(() => {
+    if (isConnected && traderAPI && pools.length > 0) {
+      for (const pool of pools) {
+        if (pool.marginTokenAddr != pool.settleTokenAddr) {
+          traderAPI
+            .fetchCollateralToSettlementConversion(pool.poolSymbol)
+            .then((px) =>
+              setCollToSettleConversion({
+                poolSymbol: pool.poolSymbol,
+                settleSymbol: pool.settleSymbol,
+                value: px,
+              })
+            )
+            .catch((error) => {
+              console.error(error);
+              console.log({ pool });
+            });
+        } else {
+          setCollToSettleConversion({
+            poolSymbol: pool.poolSymbol,
+            settleSymbol: pool.poolSymbol,
+            value: 1,
+          });
+        }
+      }
+    }
+  }, [pools, isConnected, traderAPI, setCollToSettleConversion]);
 
   return null;
 });
