@@ -14,6 +14,7 @@ import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChec
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
+import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { collateralToSettleConversionAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import {
@@ -30,6 +31,7 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 import { Initiate } from './Initiate';
 
 import styles from './Action.module.scss';
+import classNames from 'classnames';
 
 interface WithdrawPropsI {
   withdrawOn: string;
@@ -270,6 +272,25 @@ export const Withdraw = memo(({ withdrawOn }: WithdrawPropsI) => {
               <>
                 {!withdrawals.length && '2.'}{' '}
                 {t('pages.vault.withdraw.action.title', { poolSymbol: selectedPool?.settleSymbol })}
+                {chain?.id === 42161 && selectedPool?.poolSymbol === 'STUSD' && (
+                  <>
+                    {' '}
+                    <TooltipMobile
+                      tooltip={
+                        <span>
+                          In case Angle Protocol does not have sufficient USDC on the chain you are withdrawing your
+                          funds, funds are withdrawn in USDA. In this case you can bridge USDA with Angle to another
+                          chain and convert to{' '}
+                          <a href="https://app.angle.money/bridge/USDA" target="_blank" rel="noreferrer">
+                            USDC
+                          </a>
+                        </span>
+                      }
+                    >
+                      <span className={classNames(styles.tooltip)}>(or USDA)</span>
+                    </TooltipMobile>
+                  </>
+                )}
               </>
             }
             content={
