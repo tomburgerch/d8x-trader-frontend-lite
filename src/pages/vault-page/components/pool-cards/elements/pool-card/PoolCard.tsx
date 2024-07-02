@@ -77,7 +77,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     stUsdAPYRequestSentRef.current = true;
     getAngleAPY()
       .then(({ apyDec }) => {
-        setStUsdAPY(Number(apyDec) * 100);
+        setStUsdAPY(+(Number(apyDec) * 100).toFixed(2));
       })
       .catch((error) => {
         console.error(error);
@@ -97,7 +97,7 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
 
     getEtherFiAPY()
       .then(({ etherfiApy }) => {
-        setWeethAPY(etherfiApy);
+        setWeethAPY(Number(etherfiApy).toFixed(2));
       })
       .catch((error) => {
         console.error(error);
