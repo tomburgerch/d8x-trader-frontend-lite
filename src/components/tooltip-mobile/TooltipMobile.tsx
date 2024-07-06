@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 
 import { Tooltip } from '@mui/material';
 
 const HIDE_DELAY = 5_000; // 5sec
 
 interface TooltipMobilePropsI {
-  tooltip: string;
+  tooltip: ReactNode;
   children: ReactElement;
 }
 
