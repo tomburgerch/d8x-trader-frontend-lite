@@ -17,7 +17,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { getTxnLink } from 'helpers/getTxnLink';
 import { useDebounce } from 'helpers/useDebounce';
-import { orderDigest, positionRiskOnTrade } from 'network/network';
+import { getPerpetualPrice, orderDigest, positionRiskOnTrade } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { clearInputsDataAtom, latestOrderSentTimestampAtom, orderInfoAtom } from 'store/order-block.store';
@@ -25,6 +25,7 @@ import {
   collateralDepositAtom,
   collateralToSettleConversionAtom,
   newPositionRiskAtom,
+  perpetualPriceAtom,
   perpetualStaticInfoAtom,
   poolFeeAtom,
   poolTokenBalanceAtom,
@@ -144,6 +145,7 @@ export const ActionBlock = memo(() => {
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
   const [newPositionRisk, setNewPositionRisk] = useAtom(newPositionRiskAtom);
+  const [perpetualPrice, setPerpetualPrice] = useAtom(perpetualPriceAtom);
   const [collateralDeposit, setCollateralDeposit] = useAtom(collateralDepositAtom);
 
   const [isValidityCheckDone, setIsValidityCheckDone] = useState(false);
@@ -188,6 +190,12 @@ export const ActionBlock = memo(() => {
           }
         }
         setMaxOrderSize({ maxBuy: maxLong, maxSell: maxShort });
+      })
+      .catch(console.error);
+
+    await getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
+      .then((data) => {
+        setPerpetualPrice(data.data.price);
       })
       .catch(console.error)
       .finally(() => {
@@ -511,13 +519,13 @@ export const ActionBlock = memo(() => {
     if (
       orderInfo.orderType === OrderTypeE.Market &&
       orderInfo.maxMinEntryPrice !== null &&
-      selectedPerpetual?.midPrice !== undefined
+      perpetualPrice !== undefined
     ) {
       let isSlippageTooLarge;
       if (orderInfo.orderBlock === OrderBlockE.Long) {
-        isSlippageTooLarge = orderInfo.maxMinEntryPrice < selectedPerpetual?.midPrice;
+        isSlippageTooLarge = orderInfo.maxMinEntryPrice < perpetualPrice;
       } else {
-        isSlippageTooLarge = orderInfo.maxMinEntryPrice > selectedPerpetual?.midPrice;
+        isSlippageTooLarge = orderInfo.maxMinEntryPrice > perpetualPrice;
       }
       if (isSlippageTooLarge) {
         return ValidityCheckE.SlippageTooLarge;
@@ -531,7 +539,7 @@ export const ActionBlock = memo(() => {
     orderInfo?.orderType,
     orderInfo?.takeProfitPrice,
     orderInfo?.maxMinEntryPrice,
-    selectedPerpetual,
+    perpetualPrice,
     perpetualStaticInfo?.lotSizeBC,
     poolTokenBalance,
     isMarketClosed,
@@ -679,6 +687,18 @@ export const ActionBlock = memo(() => {
                     </Typography>
                   }
                   rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
+                  rightSideStyles={styles.rightSide}
+                />
+              )}
+              {perpetualPrice !== null && (
+                <SidesRow
+                  leftSide={
+                    <Typography variant="bodySmallPopup" className={styles.left}>
+                      {' '}
+                      {t('pages.trade.action-block.review.estimated-price')}{' '}
+                    </Typography>
+                  }
+                  rightSide={formatToCurrency(perpetualPrice, orderInfo.quoteCurrency)}
                   rightSideStyles={styles.rightSide}
                 />
               )}
