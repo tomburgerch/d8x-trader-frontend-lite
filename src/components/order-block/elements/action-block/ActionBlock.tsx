@@ -170,7 +170,7 @@ export const ActionBlock = memo(() => {
     setMaxOrderSize(undefined);
 
     const mainOrder = createMainOrder(orderInfo);
-    await positionRiskOnTrade(
+    const positionRiskOnTradePromise = positionRiskOnTrade(
       chainId,
       traderAPI,
       mainOrder,
@@ -193,14 +193,15 @@ export const ActionBlock = memo(() => {
       })
       .catch(console.error);
 
-    await getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
+    const getPerpetualPricePromise = getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
       .then((data) => {
         setPerpetualPrice(data.data.price);
       })
-      .catch(console.error)
-      .finally(() => {
-        validityCheckRef.current = false;
-      });
+      .catch(console.error);
+
+    Promise.all([positionRiskOnTradePromise, getPerpetualPricePromise]).finally(() => {
+      validityCheckRef.current = false;
+    });
   };
 
   const closeReviewOrderModal = () => {
