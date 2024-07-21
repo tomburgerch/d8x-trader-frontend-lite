@@ -150,7 +150,10 @@ export const MarketSelect = memo(() => {
   }, [pools, marketsData]);
 
   const filteredMarkets = useMarketsFilter(markets);
-  const IconComponent = getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+
+  const IconComponent = useMemo(() => {
+    return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.baseCurrency]);
 
   return (
     <div className={styles.holderRoot}>
