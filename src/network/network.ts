@@ -17,6 +17,7 @@ import type {
   OrderDigestI,
   OrderI,
   PerpetualOpenOrdersI,
+  PerpetualPriceI,
   PerpetualStaticInfoI,
   ValidatedResponseI,
 } from 'types/types';
@@ -145,6 +146,15 @@ export function positionRiskOnTrade(
         maxShortTrade: number;
       }>;
     });
+}
+
+export async function getPerpetualPrice(
+  amount: number,
+  symbol: string,
+  traderAPI: TraderInterface
+): Promise<ValidatedResponseI<PerpetualPriceI>> {
+  const price = await traderAPI.getPerpetualPrice(symbol, amount);
+  return { type: 'perpetual-price', msg: '', data: { price } };
 }
 
 export function positionRiskOnCollateralAction(

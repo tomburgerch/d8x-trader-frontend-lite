@@ -137,6 +137,10 @@ export interface PerpetualStaticInfoI extends ErrorResponseI {
   referralRebate: number;
 }
 
+export interface PerpetualPriceI {
+  price: number;
+}
+
 // Taken from `@d8x/perpetuals-sdk/src/nodeSDKTypes.ts`
 export interface MarginAccountI {
   symbol: string;
