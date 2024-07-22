@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Typography } from '@mui/material';
+import { Checkbox, Typography } from '@mui/material';
 
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
@@ -22,6 +22,7 @@ export const StopLossSelector = memo(() => {
 
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
+  const [isShown, setShown] = useState(false);
 
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
@@ -84,6 +85,14 @@ export const StopLossSelector = memo(() => {
     setStopLossPrice(stopLossInputPrice);
   }, [minStopLossPrice, maxStopLossPrice, stopLossInputPrice, setStopLoss, setStopLossPrice]);
 
+  const handleCheckChange = useCallback(
+    (_event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      setShown(checked);
+      setStopLoss(StopLossE.None);
+    },
+    [setStopLoss]
+  );
+
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
       currentOrderBlockRef.current = orderInfo?.orderBlock;
@@ -137,6 +146,7 @@ export const StopLossSelector = memo(() => {
       id="custom-stop-loss-price"
       label={
         <InfoLabelBlock
+          titlePrefix={<Checkbox id="hide-show-stop-loss" checked={isShown} onChange={handleCheckChange} />}
           title={t('pages.trade.order-block.stop-loss.title')}
           content={
             <>
@@ -157,6 +167,7 @@ export const StopLossSelector = memo(() => {
       currency={selectedPerpetual?.quoteCurrency}
       stepSize={stepSize}
       disabled={isDisabled}
+      hide={!isShown}
     />
   );
 });
