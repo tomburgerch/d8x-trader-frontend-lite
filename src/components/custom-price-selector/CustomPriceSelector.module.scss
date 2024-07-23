@@ -5,10 +5,11 @@
   align-items: flex-start;
   gap: $d8x-spacing * 2;
   margin-bottom: $d8x-spacing * 4;
-  transition: margin-bottom 0.3s ease-in;
+  transition: margin-bottom 0.4s ease-in;
 
   &.hidden {
     margin-bottom: 0;
+    max-height: 30px;
   }
 }
 
