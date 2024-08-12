@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useSendTransaction, useWalletClient } from 'wagmi';
+import { WalletClient } from 'viem';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
 import { Button, CircularProgress, DialogActions, DialogTitle, Typography } from '@mui/material';
@@ -25,9 +26,10 @@ import { claimStrategyFunds } from 'blockchain-api/contract-interactions/claimSt
 interface ExitStrategyPropsI {
   isLoading: boolean;
   hasBuyOpenOrder: boolean;
+  strategyClient: WalletClient;
 }
 
-export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI) => {
+export const ExitStrategy = ({ isLoading, hasBuyOpenOrder, strategyClient }: ExitStrategyPropsI) => {
   const { t } = useTranslation();
 
   const { address, chainId } = useAccount();
@@ -71,7 +73,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     setLoading(true);
 
     exitStrategy(
-      { chainId, walletClient, isMultisigAddress, symbol: STRATEGY_SYMBOL, traderAPI, strategyAddress },
+      { chainId, walletClient, strategyClient, isMultisigAddress, symbol: STRATEGY_SYMBOL, traderAPI, strategyAddress },
       sendTransactionAsync,
       setCurrentPhaseKey
     )
@@ -90,7 +92,16 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
         setRequestSent(false);
         setLoading(false);
       });
-  }, [chainId, walletClient, isMultisigAddress, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
+  }, [
+    chainId,
+    walletClient,
+    strategyClient,
+    isMultisigAddress,
+    traderAPI,
+    strategyAddress,
+    sendTransactionAsync,
+    setTxHash,
+  ]);
 
   const claimRequestSentRef = useRef(false);
 
@@ -118,6 +129,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
       {
         chainId,
         walletClient,
+        strategyClient,
         isMultisigAddress,
         symbol: STRATEGY_SYMBOL,
         traderAPI,
@@ -146,7 +158,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
         setRequestSent(false);
         setLoading(false);
       });
-  }, [chainId, walletClient, isMultisigAddress, traderAPI, sendTransactionAsync, setTxHash]);
+  }, [chainId, walletClient, strategyClient, isMultisigAddress, traderAPI, sendTransactionAsync, setTxHash]);
 
   const handleClick = isMultisigAddress && !hasPosition ? claimFunds : handleExit;
 

@@ -1,38 +1,31 @@
 import { type Config } from '@wagmi/core';
 import { type SendTransactionMutateAsync } from '@wagmi/core/query';
-import { Address, WalletClient, createWalletClient, http } from 'viem';
+import type { Address, WalletClient } from 'viem';
 import { getBalance, waitForTransactionReceipt } from 'viem/actions';
 
 import { MULTISIG_ADDRESS_TIMEOUT, NORMAL_ADDRESS_TIMEOUT, STRATEGY_WALLET_GAS_TARGET } from 'blockchain-api/constants';
 import { getGasPrice } from 'blockchain-api/getGasPrice';
-import { generateStrategyAccount } from 'blockchain-api/generateStrategyAccount';
 import { Dispatch, SetStateAction } from 'react';
 
 interface FundWalletPropsI {
   walletClient: WalletClient;
+  strategyClient: WalletClient;
   strategyAddress?: Address;
   isMultisigAddress: boolean | null;
   gasAmount?: bigint;
 }
 
 export async function fundStrategyGas(
-  { walletClient, strategyAddress, isMultisigAddress, gasAmount }: FundWalletPropsI,
+  { walletClient, strategyClient, strategyAddress, isMultisigAddress, gasAmount }: FundWalletPropsI,
   sendTransactionAsync: SendTransactionMutateAsync<Config, unknown>,
   setCurrentPhaseKey: Dispatch<SetStateAction<string>>
 ) {
-  if (!walletClient.account?.address) {
+  if (!walletClient.account?.address || !strategyClient.account?.address) {
     throw new Error('Account not connected');
   }
   let strategyAddr: Address;
   if (!strategyAddress) {
-    const strategyWalletClient = await generateStrategyAccount(walletClient).then((account) =>
-      createWalletClient({
-        account,
-        chain: walletClient.chain,
-        transport: http(),
-      })
-    );
-    strategyAddr = strategyWalletClient.account.address;
+    strategyAddr = strategyClient.account.address;
   } else {
     strategyAddr = strategyAddress;
   }

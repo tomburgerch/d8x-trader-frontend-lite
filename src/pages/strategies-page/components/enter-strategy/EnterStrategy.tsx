@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, erc20Abi, formatUnits } from 'viem';
+import { type Address, erc20Abi, formatUnits, WalletClient } from 'viem';
 import { useAccount, useBalance, useGasPrice, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
@@ -34,9 +34,10 @@ import { fundStrategyGas } from 'blockchain-api/contract-interactions/fundStrate
 
 interface EnterStrategyPropsI {
   isLoading: boolean;
+  strategyClient: WalletClient;
 }
 
-export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
+export const EnterStrategy = ({ isLoading, strategyClient }: EnterStrategyPropsI) => {
   const { t } = useTranslation();
 
   const { address, chainId, isConnected } = useAccount();
@@ -197,7 +198,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     // is gas balance too low?
     if (strategyWalletGas < STRATEGY_WALLET_GAS_TARGET) {
       return fundStrategyGas(
-        { walletClient, strategyAddress, isMultisigAddress },
+        { walletClient, strategyClient, strategyAddress, isMultisigAddress },
         sendTransactionAsync,
         setCurrentPhaseKey
       )
@@ -226,6 +227,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
     sendTransactionAsync,
     strategyAddress,
     walletClient,
+    strategyClient,
   ]);
 
   const handleEnter = useCallback(() => {
@@ -252,6 +254,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
       {
         chainId,
         walletClient,
+        strategyClient,
         isMultisigAddress,
         symbol: STRATEGY_SYMBOL,
         traderAPI,
@@ -281,6 +284,7 @@ export const EnterStrategy = ({ isLoading }: EnterStrategyPropsI) => {
   }, [
     chainId,
     walletClient,
+    strategyClient,
     isMultisigAddress,
     traderAPI,
     feeRate,

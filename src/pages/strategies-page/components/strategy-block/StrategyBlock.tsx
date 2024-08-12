@@ -2,7 +2,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { type Address, erc20Abi, formatUnits } from 'viem';
+import { type Address, erc20Abi, formatUnits, WalletClient } from 'viem';
 import { useAccount, useReadContracts, useSendTransaction, useWalletClient } from 'wagmi';
 
 import { CircularProgress } from '@mui/material';
@@ -36,7 +36,7 @@ const INTERVAL_FOR_DATA_POLLING = 5_000; // Each 5 sec
 const INTERVAL_FREQUENT_POLLING = 2_000; // Each 1 sec
 const MAX_FREQUENT_UPDATES = 15;
 
-export const StrategyBlock = () => {
+export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient }) => {
   const { t } = useTranslation();
 
   const { address, chainId, isConnected } = useAccount();
@@ -243,6 +243,7 @@ export const StrategyBlock = () => {
         {
           chainId,
           walletClient,
+          strategyClient,
           isMultisigAddress,
           symbol: STRATEGY_SYMBOL,
           traderAPI,
@@ -276,6 +277,7 @@ export const StrategyBlock = () => {
     chainId,
     traderAPI,
     walletClient,
+    strategyClient,
     isMultisigAddress,
     setTxHash,
     sendTransactionAsync,
@@ -325,10 +327,11 @@ export const StrategyBlock = () => {
               <ExitStrategy
                 isLoading={(!hasPosition && strategyAddressBalance > 0 && !isMultisigAddress) || hasBuyOpenOrder}
                 hasBuyOpenOrder={hasBuyOpenOrder}
+                strategyClient={strategyClient}
               />
             )}
             {((!hasPosition && strategyAddressBalance === 0) || hasSellOpenOrder) && (
-              <EnterStrategy isLoading={hasSellOpenOrder} />
+              <EnterStrategy isLoading={hasSellOpenOrder} strategyClient={strategyClient} />
             )}
           </>
         )}
