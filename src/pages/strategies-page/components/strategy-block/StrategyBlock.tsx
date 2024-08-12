@@ -234,7 +234,8 @@ export const StrategyBlock = () => {
       strategyAddressBalance > 0 &&
       isEnabledChain(chainId) &&
       traderAPI &&
-      walletClient
+      walletClient &&
+      !isMultisigAddress
     ) {
       claimRequestSentRef.current = true;
       //console.log('claiming funds');
@@ -322,7 +323,7 @@ export const StrategyBlock = () => {
           <>
             {!hasSellOpenOrder && (hasPosition || (!hasPosition && strategyAddressBalance > 0)) && (
               <ExitStrategy
-                isLoading={(!hasPosition && strategyAddressBalance > 0) || hasBuyOpenOrder}
+                isLoading={(!hasPosition && strategyAddressBalance > 0 && !isMultisigAddress) || hasBuyOpenOrder}
                 hasBuyOpenOrder={hasBuyOpenOrder}
               />
             )}

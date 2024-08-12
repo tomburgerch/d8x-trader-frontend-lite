@@ -14,12 +14,13 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { traderAPIAtom } from 'store/pools.store';
-import { strategyAddressesAtom } from 'store/strategies.store';
+import { hasPositionAtom, strategyAddressesAtom } from 'store/strategies.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useExitStrategy } from './hooks/useExitStrategy';
 
 import styles from './ExitStrategy.module.scss';
+import { claimStrategyFunds } from 'blockchain-api/contract-interactions/claimStrategyFunds';
 
 interface ExitStrategyPropsI {
   isLoading: boolean;
@@ -37,6 +38,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
 
   const traderAPI = useAtomValue(traderAPIAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
+  const hasPosition = useAtomValue(hasPositionAtom);
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -86,8 +88,67 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
       .finally(() => {
         requestSentRef.current = false;
         setRequestSent(false);
+        setLoading(false);
       });
   }, [chainId, walletClient, isMultisigAddress, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
+
+  const claimRequestSentRef = useRef(false);
+
+  const claimFunds = useCallback(() => {
+    if (
+      claimRequestSentRef.current ||
+      !walletClient ||
+      !traderAPI ||
+      !isEnabledChain(chainId) ||
+      !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
+    ) {
+      console.log('early exit');
+      return;
+    }
+
+    claimRequestSentRef.current = true;
+    setCurrentPhaseKey('');
+    setShowConfirmModal(false);
+    setRequestSent(true);
+    setLoading(true);
+
+    console.log('claimStrategyFunds');
+
+    claimStrategyFunds(
+      {
+        chainId,
+        walletClient,
+        isMultisigAddress,
+        symbol: STRATEGY_SYMBOL,
+        traderAPI,
+      },
+      sendTransactionAsync
+    )
+      .then(({ hash }) => {
+        console.log('hash');
+
+        if (hash) {
+          setTxHash(hash);
+          //console.log('claiming funds::success');
+        } else {
+          //console.log('claiming funds::no hash');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+        setLoading(false);
+      })
+      .finally(() => {
+        console.log('finally');
+
+        claimRequestSentRef.current = false;
+        setRequestSent(false);
+        setLoading(false);
+      });
+  }, [chainId, walletClient, isMultisigAddress, traderAPI, sendTransactionAsync, setTxHash]);
+
+  const handleClick = isMultisigAddress && !hasPosition ? claimFunds : handleExit;
 
   const handleModalClose = useCallback(() => {
     setShowConfirmModal(false);
@@ -105,6 +166,14 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     }
   }, [isLoading, hasBuyOpenOrder]);
 
+  const buttonLabel = useMemo(() => {
+    if (isMultisigAddress && !hasPosition) {
+      return 'Claim funds';
+    } else {
+      return t('pages.strategies.exit.exit-button');
+    }
+  }, [isMultisigAddress, hasPosition, t]);
+
   return (
     <div className={styles.root}>
       <Typography variant="h5" className={styles.title}>
@@ -114,7 +183,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
         {t('pages.strategies.exit.note')}
       </Typography>
       <Button onClick={() => setShowConfirmModal(true)} className={styles.button} variant="primary" disabled={loading}>
-        <span className={styles.modalButtonText}>{t('pages.strategies.exit.exit-button')}</span>
+        <span className={styles.modalButtonText}>{buttonLabel}</span>
       </Button>
 
       <Dialog open={showConfirmModal} className={styles.dialog}>
@@ -129,7 +198,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
             {t('common.cancel-button')}
           </Button>
           <Button
-            onClick={handleExit}
+            onClick={handleClick}
             variant="primary"
             disabled={
               requestSent ||
