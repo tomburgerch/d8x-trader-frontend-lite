@@ -686,6 +686,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Claim Funds",
         "toasts": {
           "tx-submitted": {
             "title": "您的资金已成功领取",

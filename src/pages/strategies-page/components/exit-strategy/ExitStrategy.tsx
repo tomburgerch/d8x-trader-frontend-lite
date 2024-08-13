@@ -180,7 +180,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder, strategyClient }: Exi
 
   const buttonLabel = useMemo(() => {
     if (isMultisigAddress && !hasPosition) {
-      return 'Claim funds';
+      return t('pages.strategies.claim-funds.claim-button');
     } else {
       return t('pages.strategies.exit.exit-button');
     }

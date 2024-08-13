@@ -686,6 +686,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Reclamar fondos",
         "toasts": {
           "tx-submitted": {
             "title": "Sus fondos se reclamaron exitosamente",
