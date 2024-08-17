@@ -24,10 +24,7 @@ export const PerpetualStats = () => {
   const { t } = useTranslation();
 
   const theme = useTheme();
-  const isDesktopScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const isTabletScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMiddleScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const orderBlock = useAtomValue(orderBlockAtom);
   const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
@@ -91,7 +88,7 @@ export const PerpetualStats = () => {
     [t, perpetualStatistics, displayIndexPrice, displayMarkPrice, displayCcy]
   );
 
-  if (isMobileScreen) {
+  if (isUpToMobileScreen) {
     return (
       <div className={styles.statContainer}>
         <div className={styles.mainMobileLine}>
@@ -125,28 +122,6 @@ export const PerpetualStats = () => {
 
     // TODO: VOV: Make StatsLineMobile common
     // return <StatsLineMobile items={items} />;
-  }
-
-  if ((isDesktopScreen && !isTabletScreen) || (isMiddleScreen && !isMobileScreen)) {
-    return (
-      <div className={styles.statContainer}>
-        <div className={styles.statsBlock}>
-          {[...items].map((item) => (
-            <div key={item.id}>
-              {item.tooltip ? (
-                <TooltipMobile tooltip={item.tooltip}>
-                  <div className={classNames(styles.statLabel, styles.tooltip)}>{item.label}</div>
-                </TooltipMobile>
-              ) : (
-                <div className={styles.statLabel}>{item.label}</div>
-              )}
-              <span className={styles.statValue}>{item.numberOnly}</span>{' '}
-              <span className={styles.statCurrency}>{item.currencyOnly}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   }
 
   return <StatsLine items={items} />;

@@ -3,7 +3,7 @@ import { type CandlestickData, type ISeriesApi, type Time } from 'lightweight-ch
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 
 import { candlesAtom, candlesDataReadyAtom, newCandleAtom } from 'store/tv-chart.store';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
@@ -13,8 +13,12 @@ import { ChartBlock } from './elements/chart-block/ChartBlock';
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
 
 import styles from './TradingViewChart.module.scss';
+import { MarketSelect } from '../market-select/MarketSelect';
 
 export const TradingViewChart = memo(() => {
+  const theme = useTheme();
+  const isUpFromMobileScreen = useMediaQuery(theme.breakpoints.up('sm'));
+
   const candles = useAtomValue(candlesAtom);
   const isCandleDataReady = useAtomValue(candlesDataReadyAtom);
   const [newCandle, setNewCandle] = useAtom(newCandleAtom);
@@ -73,10 +77,17 @@ export const TradingViewChart = memo(() => {
 
   return (
     <div className={styles.root} ref={ref}>
-      <ChartBlock width={width} candles={candlesWithLocalTime} seriesRef={seriesRef} numberDigits={precision} />
-      <div className={styles.periodsHolder}>
-        <PeriodSelector />
+      <div className={styles.heading}>
+        {isUpFromMobileScreen && (
+          <div className={styles.selectHolder}>
+            <MarketSelect />
+          </div>
+        )}
+        <div className={styles.periodsHolder}>
+          <PeriodSelector />
+        </div>
       </div>
+      <ChartBlock width={width} candles={candlesWithLocalTime} seriesRef={seriesRef} numberDigits={precision} />
       {!isCandleDataReady && (
         <div className={styles.loaderHolder}>
           <CircularProgress color="primary" />

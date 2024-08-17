@@ -6,6 +6,7 @@
   align-items: center;
   gap: 0.5 * $d8x-spacing;
   background-color: var(--d8x-color-background-items);
+  border: 1px solid var(--d8x-color-border);
   border-radius: 8px;
   height: 72px;
   min-width: 350px;
@@ -228,6 +229,7 @@
     width: 100%;
     min-width: inherit;
     max-width: inherit;
+    border: none;
   }
 }
 

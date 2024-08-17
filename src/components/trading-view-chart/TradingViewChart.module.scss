@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils';
 
 .root {
   position: relative;
@@ -8,10 +9,16 @@
   border-radius: $d8x-border-radius;
 }
 
-.periodsHolder {
-  margin-top: $d8x-spacing * 2;
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $d8x-spacing * 4;
   padding-right: $d8x-spacing * 3;
-  padding-bottom: $d8x-spacing * 4;
+}
+
+.selectHolder {
+  @include flex-center;
 }
 
 .loaderHolder {
@@ -22,4 +29,24 @@
   justify-content: center;
   align-items: center;
   background-color: var(--d8x-color-background-loader);
+}
+
+@media screen and ($d8x-breakpoint-max-sm) {
+  .heading {
+    flex-direction: column;
+  }
+
+  .selectHolder {
+    @include flex-center;
+  }
+
+  .periodsHolder {
+    margin-top: $d8x-spacing * 4;
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+  .periodsHolder {
+    margin-top: 0;
+  }
 }

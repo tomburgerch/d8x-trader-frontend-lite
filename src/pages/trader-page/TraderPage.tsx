@@ -281,9 +281,7 @@ export const TraderPage = () => {
               <div className={styles.leftBlock}>
                 <PerpetualStats />
               </div>
-              <div className={styles.rightBlock}>
-                <MarketSelect />
-              </div>
+              <div className={styles.rightBlock}>{isUpToMobileScreen && <MarketSelect />}</div>
             </Container>
           )}
           {!isUpToLargeScreen && (
@@ -294,7 +292,6 @@ export const TraderPage = () => {
             >
               <div className={styles.leftBlock}>
                 <div className={styles.marketAndStats}>
-                  <MarketSelect />
                   <PerpetualStats />
                 </div>
                 <ChartHolder />
