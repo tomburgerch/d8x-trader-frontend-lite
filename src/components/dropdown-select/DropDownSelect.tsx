@@ -14,6 +14,7 @@ interface DropDownSelectPropsI extends PropsWithChildren {
   fullWidth?: boolean;
   disabled?: boolean;
   className?: string;
+  hasArrow?: boolean;
 }
 
 export const DropDownSelect = ({
@@ -25,6 +26,7 @@ export const DropDownSelect = ({
   fullWidth,
   disabled,
   className,
+  hasArrow = true,
 }: DropDownSelectPropsI) => {
   const isOpen = Boolean(anchorEl);
 
@@ -43,9 +45,11 @@ export const DropDownSelect = ({
         <Typography variant="bodyMedium" className={styles.selectedValue}>
           {selectedValue}
         </Typography>
-        <div className={classnames(styles.arrowDropDown, { [styles.disabledHandle]: disabled })}>
-          {isOpen ? <ArrowDropUp /> : <ArrowDropDown />}
-        </div>
+        {hasArrow && (
+          <div className={classnames(styles.arrowDropDown, { [styles.disabledHandle]: disabled })}>
+            {isOpen ? <ArrowDropUp /> : <ArrowDropDown />}
+          </div>
+        )}
       </Button>
       <Menu
         className={styles.menuHolder}

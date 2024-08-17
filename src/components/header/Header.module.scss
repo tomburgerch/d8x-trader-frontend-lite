@@ -122,8 +122,13 @@
 }
 
 .languageSwitcher {
-  padding: $d8x-spacing * 10;
-  padding-top: $d8x-spacing * 6;
+  padding: $d8x-spacing * 6 $d8x-spacing * 10;
+}
+
+.themeSwitcher {
+  display: flex;
+  justify-content: center;
+  padding: $d8x-spacing * 6 $d8x-spacing * 10;
 }
 
 .closeAction {
@@ -154,6 +159,13 @@
 .buttonsHolder {
   display: flex;
   gap: $d8x-spacing * 4;
+  height: 48px;
+}
+
+.settingButtonsHolder {
+  display: flex;
+  margin-left: $d8x-spacing * 2;
+  gap: $d8x-spacing * 2;
   height: 48px;
 }
 
