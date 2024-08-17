@@ -8,7 +8,7 @@ import { AssetTypeE } from 'types/enums';
 import { TemporaryAnyT } from 'types/types';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
-import type { SelectItemI } from '../../../header-select/types';
+import type { SelectItemI } from '../../../header/elements/header-select/types';
 import type { PerpetualWithPoolAndMarketI } from '../../types';
 
 import styles from './MarketOption.module.scss';

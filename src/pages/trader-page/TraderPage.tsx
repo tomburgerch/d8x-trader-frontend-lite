@@ -11,7 +11,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { FundingTable } from 'components/funding-table/FundingTable';
-import { MarketSelect } from 'components/header/elements/market-select/MarketSelect';
+import { MarketSelect } from 'components/market-select/MarketSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
@@ -54,8 +54,8 @@ const MIN_REQUIRED_USDC = 20;
 export const TraderPage = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isUpToLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
@@ -272,10 +272,10 @@ export const TraderPage = () => {
       />
       <div className={styles.root}>
         <MaintenanceWrapper>
-          {isSmallScreen && (
+          {isUpToLargeScreen && (
             <Container
               className={classnames(styles.headerContainer, {
-                [styles.swapSides]: !isSmallScreen && orderBlockPosition === OrderBlockPositionE.Left,
+                [styles.swapSides]: !isUpToLargeScreen && orderBlockPosition === OrderBlockPositionE.Left,
               })}
             >
               <div className={styles.leftBlock}>
@@ -286,7 +286,7 @@ export const TraderPage = () => {
               </div>
             </Container>
           )}
-          {!isSmallScreen && (
+          {!isUpToLargeScreen && (
             <Container
               className={classnames(styles.sidesContainer, {
                 [styles.swapSides]: orderBlockPosition === OrderBlockPositionE.Left,
@@ -309,11 +309,11 @@ export const TraderPage = () => {
               </div>
             </Container>
           )}
-          {isSmallScreen && (
+          {isUpToLargeScreen && (
             <Container className={styles.columnContainer}>
               <ChartHolder />
               <OrderBlock />
-              {isMobile ? (
+              {isUpToMobileScreen ? (
                 <TableSelectorMobile selectorItems={selectorForAllItems} />
               ) : (
                 <>

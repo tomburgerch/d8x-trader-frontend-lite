@@ -1,3 +1,5 @@
+import { TraderInterface } from '@d8x/perpetuals-sdk';
+import classNames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,12 +9,16 @@ import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, DialogActions, DialogContent, Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import type { SelectItemI } from 'components/header/elements/header-select/types';
 import { Separator } from 'components/separator/Separator';
+import type { StatDataI } from 'components/stats-line/types';
+import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { clearInputsDataAtom, orderBlockAtom } from 'store/order-block.store';
 import {
+  perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   poolsAtom,
   selectedPerpetualAtom,
@@ -23,9 +29,9 @@ import { marketsDataAtom } from 'store/tv-chart.store';
 import { AssetTypeE, OrderBlockE } from 'types/enums';
 import type { TemporaryAnyT } from 'types/types';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
+import { formatToCurrency } from 'utils/formatToCurrency';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
-import type { SelectItemI } from '../header-select/types';
 import { CollateralFilter } from './components/collateral-filter/CollateralFilter';
 import { Filters } from './components/filters/Filters';
 import { MarketOption } from './components/market-option/MarketOption';
@@ -63,6 +69,8 @@ export const MarketSelect = memo(() => {
   const orderBlock = useAtomValue(orderBlockAtom);
   const marketsData = useAtomValue(marketsDataAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
@@ -184,9 +192,46 @@ export const MarketSelect = memo(() => {
 
   const filteredMarkets = useMarketsFilter(markets);
 
-  const IconComponent = useMemo(() => {
+  const BaseIconComponent = useMemo(() => {
     return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
   }, [selectedPerpetual?.baseCurrency]);
+
+  const QuoteIconComponent = useMemo(() => {
+    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.quoteCurrency]);
+
+  let midPriceClass = styles.positive;
+  if (perpetualStatistics?.midPriceDiff != null) {
+    midPriceClass = perpetualStatistics?.midPriceDiff >= 0 ? styles.positive : styles.negative;
+  }
+
+  const [displayMidPrice, displayCcy] = useMemo(() => {
+    if (!!perpetualStatistics && !!perpetualStaticInfo) {
+      let isPredictionMarket = false;
+      try {
+        isPredictionMarket = TraderInterface.isPredictionMarket(perpetualStaticInfo);
+      } catch {
+        // skip
+      }
+      const px = perpetualStatistics.midPrice;
+      return isPredictionMarket
+        ? [calculateProbability(px, orderBlock === OrderBlockE.Short), perpetualStatistics.quoteCurrency]
+        : [px, perpetualStatistics.quoteCurrency];
+    }
+    return [undefined, undefined];
+  }, [perpetualStatistics, perpetualStaticInfo, orderBlock]);
+
+  const midPrice: StatDataI = useMemo(
+    () => ({
+      id: 'midPrice',
+      label: t('pages.trade.stats.mid-price'),
+      tooltip: t('pages.trade.stats.mid-price-tooltip'),
+      value: displayCcy ? formatToCurrency(displayMidPrice, displayCcy, true) : '--',
+      numberOnly: displayCcy ? formatToCurrency(displayMidPrice, '', true, undefined, true) : '--',
+      className: midPriceClass, // Add the custom class here
+    }),
+    [t, midPriceClass, displayMidPrice, displayCcy]
+  );
 
   const isPredictionMarket = useMemo(() => {
     if (!selectedPerpetual || !selectedPool) {
@@ -209,16 +254,20 @@ export const MarketSelect = memo(() => {
   console.log({ isPredictionMarket });
   return (
     <div className={styles.holderRoot}>
-      <div className={styles.iconWrapper}>
-        <Suspense fallback={null}>
-          <IconComponent />
-        </Suspense>
+      <div className={styles.iconsWrapper}>
+        <div className={styles.baseIcon}>
+          <Suspense fallback={null}>
+            <BaseIconComponent />
+          </Suspense>
+        </div>
+        <div className={styles.quoteIcon}>
+          <Suspense fallback={null}>
+            <QuoteIconComponent />
+          </Suspense>
+        </div>
       </div>
       <Button onClick={() => setModalOpen(true)} className={styles.marketSelectButton} variant="outlined">
         <div className={styles.selectedMarketBlock}>
-          <Typography variant="bodySmall" className={styles.selectedMarketLabel}>
-            {t('common.select.market.label')}
-          </Typography>
           <div className={styles.selectedMarketValue}>
             <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
               {isPredictionMarket
@@ -227,6 +276,13 @@ export const MarketSelect = memo(() => {
             </Typography>
             <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>
           </div>
+          {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
+            <TooltipMobile tooltip={midPrice.tooltip}>
+              <div className={classNames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+            </TooltipMobile>
+          ) : (
+            <div className={classNames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+          )}
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
       </Button>

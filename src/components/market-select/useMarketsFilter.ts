@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 
-import { SelectItemI } from '../header-select/types';
+import { SelectItemI } from '../header/elements/header-select/types';
 import { searchFilterAtom } from './components/search-input/SearchInput';
 import { assetTypeFilterAtom, collateralFilterAtom } from './collaterals.store';
 import { PerpetualWithPoolAndMarketI } from './types';
