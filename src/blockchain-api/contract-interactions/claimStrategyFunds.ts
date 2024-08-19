@@ -68,6 +68,12 @@ export async function claimStrategyFunds(
     const { value: balance } = await getBalance(wagmiConfig, { address: strategyClient.account.address });
     if (!gasLimit || balance < gasPrice * gasLimit) {
       //console.log('sending funds to strategy acct');
+      console.log({
+        account: walletClient.account,
+        chainId: walletClient.chain?.id,
+        to: strategyClient.account.address,
+        value: (gasLimit ?? GAS_TARGET) * gasPrice,
+      });
       const tx0 = await sendTransactionAsync({
         account: walletClient.account,
         chainId: walletClient.chain?.id,
@@ -81,6 +87,16 @@ export async function claimStrategyFunds(
     }
 
     //console.log(`sending ${marginTokenBalance} tokens`);
+    console.log({
+      address: settleTokenAddr as Address,
+      chain: walletClient.chain,
+      abi: erc20Abi,
+      functionName: 'transfer',
+      args: [walletClient.account.address, settleTokenBalance],
+      account: strategyClient.account,
+      gas: gasLimit,
+      gasPrice,
+    });
     const tx1 = await writeContract(strategyClient, {
       address: settleTokenAddr as Address,
       chain: walletClient.chain,
@@ -108,6 +124,12 @@ export async function claimStrategyFunds(
     .catch(() => getGasLimit({ chainId: walletClient?.chain?.id, method: MethodE.Interact }));
   const { value: balance } = await getBalance(wagmiConfig, { address: strategyClient.account.address });
   if (gasLimit && gasLimit * gasPrice < balance) {
+    console.log({
+      account: strategyClient.account,
+      chainId: strategyClient.chain?.id,
+      to: walletClient.account.address,
+      value: balance - gasLimit * gasPrice,
+    });
     return sendTransactionAsync({
       account: strategyClient.account,
       chainId: strategyClient.chain?.id,

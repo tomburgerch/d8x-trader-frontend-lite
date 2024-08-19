@@ -132,9 +132,11 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
     getOpenOrders(chainId, null, strategyAddress)
       .then((data) => {
         const updatedOpenOrders: Record<string, OrderI> = {};
-        data.data.map((openOrders) => {
-          openOrders.orderIds?.forEach((orderId, index) => (updatedOpenOrders[orderId] = openOrders.orders[index]));
-        });
+        if (data.data) {
+          data.data.map((openOrders) => {
+            openOrders.orderIds?.forEach((orderId, index) => (updatedOpenOrders[orderId] = openOrders.orders[index]));
+          });
+        }
         setStrategyOpenOrders(updatedOpenOrders);
       })
       .catch((error) => {
@@ -205,6 +207,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
   }, [chainId, address, setHasPosition, enableFrequentUpdates]);
 
   const exitActionRef = useRef(!hasSellOpenOrder && (hasPosition || hasBuyOpenOrder));
+
   useEffect(() => {
     if (exitActionRef.current && strategyAddressBalance === 0) {
       exitActionRef.current = false;
@@ -238,8 +241,6 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
       }
     };
   }, [strategyAddressBalance]);
-
-  console.log(delayedVariable);
 
   return (
     <div className={styles.root}>
