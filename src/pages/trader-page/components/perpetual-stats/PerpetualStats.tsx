@@ -1,5 +1,5 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,7 +107,7 @@ export const PerpetualStats = () => {
             <div key={item.id}>
               {item.tooltip ? (
                 <TooltipMobile tooltip={item.tooltip}>
-                  <div className={classNames(styles.statLabel, styles.tooltip)}>{item.label}</div>
+                  <div className={classnames(styles.statLabel, styles.tooltip)}>{item.label}</div>
                 </TooltipMobile>
               ) : (
                 <div className={styles.statLabel}>{item.label}</div>

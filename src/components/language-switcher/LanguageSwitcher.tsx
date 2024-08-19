@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,7 +60,7 @@ export const LanguageSwitcher = ({ isMini = false }: LanguageSwitcherPropsI) => 
       setAnchorEl={setAnchorEl}
       fullWidth
       hasArrow={!isMini}
-      className={classNames({ [styles.miniButton]: isMini })}
+      className={classnames({ [styles.miniButton]: isMini })}
     >
       {Object.entries(LanguageE).map(([key, lang]) => (
         <LanguageSwitcherMenuItem languageMeta={languageMetaMap[lang]} key={key} onClick={handleClose} />

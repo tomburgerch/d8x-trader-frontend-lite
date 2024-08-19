@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 
 import { DarkMode, LightMode } from '@mui/icons-material';
@@ -15,7 +15,7 @@ export const ThemeSwitcher = () => {
   };
 
   return (
-    <div className={classNames(styles.root, { [styles.isDark]: enabledDarkMode })} onClick={toggleTheme}>
+    <div className={classnames(styles.root, { [styles.isDark]: enabledDarkMode })} onClick={toggleTheme}>
       <LightMode />
       <DarkMode />
       <div className={styles.overlay}></div>

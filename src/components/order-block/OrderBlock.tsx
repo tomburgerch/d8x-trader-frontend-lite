@@ -10,7 +10,7 @@ import { useAccount } from 'wagmi';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
-// import { Separator } from '../separator/Separator';
+import { Separator } from '../separator/Separator';
 import { ActionBlock } from './elements/action-block/ActionBlock';
 import { InfoBlock } from './elements/info-block/InfoBlock';
 import { LeverageSelector } from './elements/leverage-selector/LeverageSelector';
@@ -18,6 +18,7 @@ import { LimitPrice } from './elements/limit-price/LimitPrice';
 import { OrderSelector } from './elements/order-selector/OrderSelector';
 import { OrderSize } from './elements/order-size/OrderSize';
 import { OrderTypeSelector } from './elements/order-type-selector/OrderTypeSelector';
+import { SettingsButton } from './elements/settings-button/SettingsButton';
 import { StopLossSelector } from './elements/stop-loss-selector/StopLossSelector';
 import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSelector';
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
@@ -32,9 +33,13 @@ export const OrderBlock = memo(() => {
 
   return (
     <Card className={styles.root}>
-      <OrderSelector />
-      <CardContent className={styles.card}>
+      <CardContent className={classnames(styles.card, styles.header)}>
         <OrderTypeSelector />
+        <SettingsButton />
+      </CardContent>
+      <Separator className={styles.separator} />
+      <CardContent className={styles.card}>
+        <OrderSelector />
         <LeverageSelector />
       </CardContent>
       {/*<Separator className={styles.separator} />*/}

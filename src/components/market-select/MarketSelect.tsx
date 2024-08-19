@@ -1,5 +1,5 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -278,10 +278,10 @@ export const MarketSelect = memo(() => {
           </div>
           {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
             <TooltipMobile tooltip={midPrice.tooltip}>
-              <div className={classNames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+              <div className={classnames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
             </TooltipMobile>
           ) : (
-            <div className={classNames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+            <div className={classnames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
           )}
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>

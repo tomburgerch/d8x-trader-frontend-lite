@@ -1,9 +1,21 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   width: 100%;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-order-block);
+}
+
+.card {
+  &.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: $d8x-spacing;
+    padding-top: calc($d8x-spacing / 2);
+    padding-bottom: calc($d8x-spacing / 2);
+  }
 }
 
 .bottomCard {

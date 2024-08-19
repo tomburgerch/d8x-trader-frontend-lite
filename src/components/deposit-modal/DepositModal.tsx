@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,7 +104,7 @@ export const DepositModal = () => {
           <CopyInput id="address" textToCopy={targetAddress || ''} />
         </div>
         {(isCedeEnabled || isLiFiEnabled || isOwltoEnabled) && (
-          <div className={classNames(styles.section, styles.widgetButtons)}>
+          <div className={classnames(styles.section, styles.widgetButtons)}>
             {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
               <div>
                 {isLiFiEnabled && <LiFiWidgetButton />}

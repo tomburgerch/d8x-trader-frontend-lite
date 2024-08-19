@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -32,10 +32,10 @@ export const InfoLabelBlock = ({
 
   return (
     <>
-      <div className={classNames(styles.label, labelClassname)}>
+      <div className={classnames(styles.label, labelClassname)}>
         {titlePrefix && <span>{titlePrefix}</span>}
-        <span className={classNames(styles.title, titleClassname)}>{title}</span>
-        <span className={classNames(styles.iconHolder, iconHolderClassname)}>
+        <span className={classnames(styles.title, titleClassname)}>{title}</span>
+        <span className={classnames(styles.iconHolder, iconHolderClassname)}>
           <InfoOutlined onClick={() => setModalOpen(true)} className={styles.actionIcon} />
         </span>
       </div>
