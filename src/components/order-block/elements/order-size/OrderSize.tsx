@@ -280,8 +280,8 @@ export const OrderSize = memo(() => {
   };
 
   return (
-    <>
-      <div className={styles.root}>
+    <div className={styles.root}>
+      <div className={styles.manualBlock}>
         <div className={styles.labelHolder}>
           <InfoLabelBlock
             title={t('pages.trade.order-block.order-size.title')}
@@ -365,6 +365,6 @@ export const OrderSize = memo(() => {
         />
       </div>
       <OrderSizeSlider />
-    </>
+    </div>
   );
 });

@@ -24,7 +24,9 @@
 .selectors {
   display: flex;
   flex-direction: column;
+  padding-top: 0;
   padding-bottom: $d8x-spacing * 4 !important;
+  gap: 4 * $d8x-spacing;
 }
 
 .separator {

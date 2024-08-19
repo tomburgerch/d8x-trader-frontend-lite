@@ -7,11 +7,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: $d8x-spacing * 2;
-  margin-bottom: $d8x-spacing * 4;
+  padding: 4 * $d8x-spacing;
+  border-radius: $d8x-border-radius;
+  background-color: var(--d8x-color-background-card-overlay);
 
   &.hidden {
     margin-bottom: 0;
-    max-height: 30px;
+    max-height: 60px;
   }
 }
 

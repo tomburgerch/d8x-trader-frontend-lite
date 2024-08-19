@@ -40,10 +40,10 @@ export const OrderBlock = memo(() => {
       <Separator className={styles.separator} />
       <CardContent className={styles.card}>
         <OrderSelector />
-        <LeverageSelector />
       </CardContent>
       {/*<Separator className={styles.separator} />*/}
       <CardContent className={styles.card}>
+        <LeverageSelector />
         <TriggerPrice />
         <LimitPrice />
         <OrderSize />
