@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   position: relative;
@@ -10,14 +11,15 @@
   height: 48px;
   margin-bottom: 16px;
   border-radius: $d8x-button-border-radius;
-  border: 1px solid var(--d8x-color-border);
+  border: 1px solid var(--d8x-color-action);
   font-size: 16px;
   padding: 4px 10px;
   overflow: hidden;
   cursor: pointer;
 
   svg {
-    transition: color 0.3s linear;
+    @include transition(color);
+
     color: var(--d8x-color-icon-theme);
     z-index: 2;
 
@@ -27,8 +29,9 @@
   }
 
   .overlay {
+    @include transition(transform);
+
     position: absolute;
-    transition: transform 0.3s linear;
     border-radius: $d8x-button-border-radius - 4;
     background: var(--d8x-color-action);
     top: 5px;

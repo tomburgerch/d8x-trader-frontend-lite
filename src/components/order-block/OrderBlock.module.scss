@@ -12,9 +12,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: $d8x-spacing;
-    padding-top: calc($d8x-spacing / 2);
-    padding-bottom: calc($d8x-spacing / 2);
+    padding-top: $d8x-spacing * 3;
+    padding-bottom: $d8x-spacing * 2;
   }
 }
 

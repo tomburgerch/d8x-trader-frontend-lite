@@ -1,12 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
 import { Settings } from '@mui/icons-material';
 
-import { Dialog } from 'components/dialog/Dialog';
-import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
-import { Separator } from 'components/separator/Separator';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 
 import { SettingsBlock } from '../settings-block/SettingsBlock';
@@ -16,31 +13,46 @@ import styles from './SettingsButton.module.scss';
 export const SettingsButton = memo(() => {
   const { t } = useTranslation();
 
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isPopperOpen, setPopperOpen] = useState(false);
+
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  const handlePopperToggle = useCallback(() => {
+    setPopperOpen((prevValue) => !prevValue);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setPopperOpen(false);
+  }, []);
 
   return (
-    <>
-      <TooltipMobile tooltip={t('common.settings.title')}>
-        <Button onClick={() => setModalOpen(true)} className={styles.iconButton} variant="primary">
-          <Settings className={styles.icon} />
-        </Button>
-      </TooltipMobile>
-
-      <Dialog open={isModalOpen} className={styles.dialog} onClose={() => setModalOpen(false)}>
-        <DialogTitle>{t('common.settings.title')}</DialogTitle>
-        <Separator />
-        <DialogContent className={styles.dialogContent}>
-          <SettingsBlock />
-        </DialogContent>
-        <DialogContent className={styles.dialogContent}>
-          <LanguageSwitcher />
-        </DialogContent>
-        <DialogActions className={styles.dialogAction}>
-          <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
-            {t('common.info-modal.close')}
+    <ClickAwayListener onClickAway={handleClose} disableReactTree={true}>
+      <div className={styles.root}>
+        <TooltipMobile tooltip={t('common.settings.title')}>
+          <Button onClick={handlePopperToggle} className={styles.iconButton} variant="primary" ref={buttonRef}>
+            <Settings className={styles.icon} />
           </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        </TooltipMobile>
+
+        <Popper
+          sx={{
+            zIndex: 1,
+          }}
+          open={isPopperOpen}
+          anchorEl={buttonRef.current}
+          placement="bottom-end"
+          transition
+          disablePortal
+        >
+          {({ TransitionProps }) => (
+            <Fade {...TransitionProps} timeout={350}>
+              <Paper className={styles.paper}>
+                <SettingsBlock />
+              </Paper>
+            </Fade>
+          )}
+        </Popper>
+      </div>
+    </ClickAwayListener>
   );
 });

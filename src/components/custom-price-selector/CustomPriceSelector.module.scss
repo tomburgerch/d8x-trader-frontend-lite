@@ -1,11 +1,13 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
+  @include transition(margin-bottom);
+
   flex-direction: column;
   align-items: flex-start;
   gap: $d8x-spacing * 2;
   margin-bottom: $d8x-spacing * 4;
-  transition: margin-bottom 0.4s ease-in;
 
   &.hidden {
     margin-bottom: 0;
@@ -14,11 +16,12 @@
 }
 
 .labelHolder {
+  @include transition(margin-bottom);
+
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: $d8x-spacing * 3;
-  transition: margin-bottom 0.3s ease-in;
 
   &.hidden {
     margin-bottom: 0;
@@ -26,8 +29,9 @@
 }
 
 .customPriceInput {
+  @include transition(opacity);
+
   opacity: 1;
-  transition: opacity 0.3s ease-in;
 
   &.hidden {
     opacity: 0;
@@ -42,12 +46,13 @@
 }
 
 .priceOptions {
+  @include transition(height);
+
   width: 100%;
   display: flex;
   justify-content: flex-start;
   gap: $d8x-spacing;
   flex-wrap: wrap;
-  transition: height 0.3s ease-in;
   overflow-y: hidden;
   height: 30px;
   margin-bottom: 2 * $d8x-spacing;

@@ -327,11 +327,11 @@ export const OrderSize = memo(() => {
               <Popper
                 sx={{
                   zIndex: 1,
-                  right: 0,
                 }}
                 open={openCurrencySelector}
                 anchorEl={anchorRef.current}
                 // role={undefined}
+                placement="bottom-end"
                 transition
                 disablePortal
               >

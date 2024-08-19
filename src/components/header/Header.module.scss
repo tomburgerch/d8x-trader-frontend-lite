@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   margin-bottom: 8 * $d8x-spacing;
@@ -52,10 +53,13 @@
     gap: 8 * $d8x-spacing;
 
     > a {
+      @include transition(color);
+
       text-decoration: none;
-      transition: color 0.3s ease-in-out;
 
       &::after {
+        @include transition(opacity);
+
         content: ' ';
         position: absolute;
         left: -($d8x-spacing * 2);
@@ -64,7 +68,6 @@
         top: inherit;
         border-bottom: 2px solid var(--d8x-color-action);
         opacity: 0;
-        transition: opacity 0.3s ease-in-out;
       }
 
       &:hover {
@@ -115,9 +118,10 @@
     color: var(--d8x-color-text-main);
 
     &:hover {
+      @include transition(all);
+
       color: var(--d8x-color-action);
       cursor: pointer;
-      transition: 200ms ease-in-out;
     }
   }
 

@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   display: flex;
@@ -64,7 +65,8 @@
 }
 
 .settingsIcon {
-  transition: opacity 0.3s linear;
+  @include transition(opacity);
+
   margin-right: -$d8x-spacing * 5;
   margin-left: 0;
   padding: $d8x-spacing $d8x-spacing * 3 $d8x-spacing $d8x-spacing;

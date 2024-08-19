@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   display: flex;
@@ -7,15 +8,18 @@
 }
 
 .type {
+  @include transition(color);
+
   position: relative;
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
   padding-bottom: $d8x-spacing;
   padding-top: 2 * $d8x-spacing;
-  transition: color 0.3s ease-in-out;
 
   &::after {
+    @include transition(opacity);
+
     content: ' ';
     position: absolute;
     left: -($d8x-spacing * 2);
@@ -24,7 +28,6 @@
     top: inherit;
     border-bottom: 2px solid var(--d8x-color-action);
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
   }
 
   &:hover {
