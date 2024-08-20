@@ -206,17 +206,70 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
     enableFrequentUpdates(false);
   }, [chainId, address, setHasPosition, enableFrequentUpdates]);
 
-  const exitActionRef = useRef(!hasSellOpenOrder && (hasPosition || hasBuyOpenOrder));
+  // X(x,y,z,w) := (has position, has open sell, has open buy, has balance) \in [0,1]^4
+  // A(0,0,0,0) -> B(0,0,0,1) (send funds)
+  // B(0,0,0,1) -> B(0,0,0,1) (post order/claim funds fail), C(0,1,0,1) (post order success), A(0,0,0,0) (claim funds)
+  // C(0,1,0,1) -> B(0,0,0,1) (exec fail), D(1,0,0,1) (exec success)
+  // D(1,0,0,1) -> D(1,0,0,1) (close pos fail), E(1,0,1,1) (close order succs)
+  // E(1,0,1,1) -> D(1,0,0,1) (exec fail), B(0,0,0,1) (exec success)
+  // F(else)    -> A, B, C, D, E (transient state, e.g. waiting for a confirmation or event)
+  // A <-> B-B <-> C -> D-D <-> E -> B
+
+  const prevState = useMemo(() => {
+    if (
+      !hasPosition &&
+      !hasSellOpenOrder &&
+      !hasBuyOpenOrder &&
+      !(strategyAddressBalance != null && strategyAddressBalance > 0)
+    ) {
+      return 0; // A: can enter
+    } else if (
+      !hasPosition &&
+      !hasSellOpenOrder &&
+      !hasBuyOpenOrder &&
+      strategyAddressBalance != null &&
+      strategyAddressBalance > 0
+    ) {
+      return 1; // B: can enter or exit
+    } else if (
+      !hasPosition &&
+      hasSellOpenOrder &&
+      !hasBuyOpenOrder &&
+      strategyAddressBalance != null &&
+      strategyAddressBalance > 0
+    ) {
+      return 2; // C: trying to enter, has to wait in enter screen
+    } else if (
+      hasPosition &&
+      !hasSellOpenOrder &&
+      !hasBuyOpenOrder &&
+      strategyAddressBalance != null &&
+      strategyAddressBalance > 0
+    ) {
+      return 3; // D: can exit
+    } else if (
+      hasPosition &&
+      !hasSellOpenOrder &&
+      hasBuyOpenOrder &&
+      strategyAddressBalance != null &&
+      strategyAddressBalance > 0
+    ) {
+      return 4; // E: trying to exit, has to wait in exit screen
+    } else {
+      return 5; // F: in between states, has to wait in current screen
+    }
+  }, [hasPosition, hasSellOpenOrder, hasBuyOpenOrder, strategyAddressBalance]);
+
+  const currentState = useRef(prevState);
 
   useEffect(() => {
-    if (exitActionRef.current && strategyAddressBalance === 0) {
-      exitActionRef.current = false;
-    } else if (!exitActionRef.current && hasPosition) {
-      exitActionRef.current = true;
-    } else if (!exitActionRef.current && strategyAddressBalance && strategyAddressBalance > 0 && !hasSellOpenOrder) {
-      exitActionRef.current = true;
+    // current state changes into transient
+    if (prevState !== 5) {
+      currentState.current = prevState;
     }
-  }, [strategyAddressBalance, hasPosition, hasSellOpenOrder]);
+  }, [prevState]);
+
+  const showExitScreen = [1, 3, 4].includes(currentState.current);
 
   const previousBalanceRef = useRef(strategyAddressBalance);
 
@@ -251,7 +304,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
           textBlocks={[t('pages.strategies.info.text1'), t('pages.strategies.info.text2')]}
         />
         <div className={styles.divider} />
-        {hasPosition === null || strategyAddressBalance === null ? (
+        {currentState.current === 5 ? (
           <div className={styles.emptyBlock}>
             <div className={styles.loaderWrapper}>
               <CircularProgress />
@@ -259,9 +312,9 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
           </div>
         ) : (
           <>
-            {exitActionRef.current && !delayedVariable && (
+            {showExitScreen && !delayedVariable && strategyAddressBalance !== null && (
               <ExitStrategy
-                isLoading={hasBuyOpenOrder}
+                isLoading={hasBuyOpenOrder || prevState === 5}
                 hasBuyOpenOrder={hasBuyOpenOrder}
                 strategyClient={strategyClient}
                 strategyAddressBalance={strategyAddressBalance}
@@ -269,8 +322,8 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
                 strategyAddressBalanceBigint={strategyAddressBalanceData?.[0] ?? 0n}
               />
             )}
-            {(!exitActionRef.current || delayedVariable) && hasPosition !== null && strategyAddressBalance !== null && (
-              <EnterStrategy isLoading={hasSellOpenOrder} strategyClient={strategyClient} />
+            {(!showExitScreen || delayedVariable) && (
+              <EnterStrategy isLoading={hasSellOpenOrder || prevState === 5} strategyClient={strategyClient} />
             )}
           </>
         )}
