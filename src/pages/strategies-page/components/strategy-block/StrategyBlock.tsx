@@ -45,7 +45,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
 
   const [frequentUpdates, setFrequentUpdates] = useState(0);
   const [strategyOpenOrders, setStrategyOpenOrders] = useState<Record<string, OrderI>>({});
-  const [delayedVariable, setDelayVariable] = useState(false);
+  // const [delayedVariable, setDelayVariable] = useState(false);
 
   const strategyPositionRequestSentRef = useRef(false);
   const openOrdersRequestSentRef = useRef(false);
@@ -220,7 +220,8 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
       !hasPosition &&
       !hasSellOpenOrder &&
       !hasBuyOpenOrder &&
-      !(strategyAddressBalance != null && strategyAddressBalance > 0)
+      strategyAddressBalance != null &&
+      strategyAddressBalance === 0
     ) {
       return 0; // A: can enter
     } else if (
@@ -260,10 +261,10 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
     }
   }, [hasPosition, hasSellOpenOrder, hasBuyOpenOrder, strategyAddressBalance]);
 
-  const currentState = useRef(prevState);
+  const currentState = useRef(5);
 
   useEffect(() => {
-    // current state changes into transient
+    // keep current state on transient change
     if (prevState !== 5) {
       currentState.current = prevState;
     }
@@ -271,29 +272,29 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
 
   const showExitScreen = [1, 3, 4].includes(currentState.current);
 
-  const previousBalanceRef = useRef(strategyAddressBalance);
+  // const previousBalanceRef = useRef(strategyAddressBalance);
 
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
+  // useEffect(() => {
+  //   let timeoutId: ReturnType<typeof setTimeout>;
 
-    if (previousBalanceRef.current === 0 && strategyAddressBalance !== null && strategyAddressBalance > 0) {
-      // Balance changed from 0 to a positive value
-      setDelayVariable(true);
+  //   if (previousBalanceRef.current === 0 && strategyAddressBalance !== null && strategyAddressBalance > 0) {
+  //     // Balance changed from 0 to a positive value
+  //     setDelayVariable(true);
 
-      timeoutId = setTimeout(() => {
-        setDelayVariable(false);
-      }, 10000); // 5 seconds delay
-    }
+  //     timeoutId = setTimeout(() => {
+  //       setDelayVariable(false);
+  //     }, 10000); // 5 seconds delay
+  //   }
 
-    // Update the previous balance ref
-    previousBalanceRef.current = strategyAddressBalance;
+  //   // Update the previous balance ref
+  //   previousBalanceRef.current = strategyAddressBalance;
 
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [strategyAddressBalance]);
+  //   return () => {
+  //     if (timeoutId) {
+  //       clearTimeout(timeoutId);
+  //     }
+  //   };
+  // }, [strategyAddressBalance]);
 
   return (
     <div className={styles.root}>
@@ -304,7 +305,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
           textBlocks={[t('pages.strategies.info.text1'), t('pages.strategies.info.text2')]}
         />
         <div className={styles.divider} />
-        {currentState.current === 5 ? (
+        {currentState.current === 5 || strategyAddressBalance === null ? (
           <div className={styles.emptyBlock}>
             <div className={styles.loaderWrapper}>
               <CircularProgress />
@@ -312,7 +313,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
           </div>
         ) : (
           <>
-            {showExitScreen && !delayedVariable && strategyAddressBalance !== null && (
+            {showExitScreen && (
               <ExitStrategy
                 isLoading={hasBuyOpenOrder || prevState === 5}
                 hasBuyOpenOrder={hasBuyOpenOrder}
@@ -322,7 +323,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
                 strategyAddressBalanceBigint={strategyAddressBalanceData?.[0] ?? 0n}
               />
             )}
-            {(!showExitScreen || delayedVariable) && (
+            {!showExitScreen && (
               <EnterStrategy isLoading={hasSellOpenOrder || prevState === 5} strategyClient={strategyClient} />
             )}
           </>
