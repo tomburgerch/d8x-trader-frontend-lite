@@ -53,7 +53,7 @@ export const OrderBlock = memo(() => {
         <StopLossSelector />
         <TakeProfitSelector />
       </CardContent>
-      <CardContent className={styles.bottomCard}>
+      <CardContent className={classnames(styles.card, styles.bottomCard)}>
         <InfoBlock />
         <ActionBlock />
         {isConnected && isEnabledChain(chainId) && (

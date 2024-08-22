@@ -15,18 +15,18 @@
     padding-top: $d8x-spacing * 3;
     padding-bottom: $d8x-spacing * 2;
   }
-}
 
-.bottomCard {
-  background-color: var(--d8x-color-background-order-block-bottom);
-}
+  &.selectors {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;
+    padding-bottom: $d8x-spacing * 4 !important;
+    gap: 4 * $d8x-spacing;
+  }
 
-.selectors {
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-  padding-bottom: $d8x-spacing * 4 !important;
-  gap: 4 * $d8x-spacing;
+  &.bottomCard {
+    padding-top: 0;
+  }
 }
 
 .separator {
@@ -34,11 +34,11 @@
 }
 
 .depositLink {
-  margin-top: 2 * $d8x-spacing;
-  color: var(--d8x-color-action);
   display: inline-flex;
   align-items: center;
   gap: $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
+  color: var(--d8x-color-action);
   cursor: pointer;
 }
 

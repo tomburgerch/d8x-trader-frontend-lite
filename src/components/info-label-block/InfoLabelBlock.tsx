@@ -34,10 +34,10 @@ export const InfoLabelBlock = ({
     <>
       <div className={classnames(styles.label, labelClassname)}>
         {titlePrefix && <span>{titlePrefix}</span>}
-        <span className={classnames(styles.title, titleClassname)}>{title}</span>
         <span className={classnames(styles.iconHolder, iconHolderClassname)}>
           <InfoOutlined onClick={() => setModalOpen(true)} className={styles.actionIcon} />
         </span>
+        <span className={classnames(styles.title, titleClassname)}>{title}</span>
       </div>
       <Dialog open={isModalOpen} className={styles.dialog} onClose={() => setModalOpen(false)}>
         <DialogTitle>{title}</DialogTitle>

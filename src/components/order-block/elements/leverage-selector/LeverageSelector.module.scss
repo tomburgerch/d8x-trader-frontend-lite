@@ -25,17 +25,29 @@
   width: 100%;
   margin-top: 3 * $d8x-spacing;
   justify-content: space-between;
+  gap: $d8x-spacing;
 }
 
-.sliderHolder {
+.buttonsHolder {
+  display: flex;
+  gap: $d8x-spacing;
   width: 100%;
-  margin-left: 9px;
-  margin-right: 8 * $d8x-spacing;
+}
+
+.markButton {
+  padding: 0;
+  font-size: 14px;
+  min-width: 40px;
+
+  &.selected {
+    background-color: var(--d8x-color-action);
+    color: var(--d8x-color-text-secondary);
+  }
 }
 
 .inputHolder {
   :global(.MuiInputBase-root) {
-    width: 116px;
+    width: 124px;
     padding-right: 0;
 
     input {
@@ -47,6 +59,10 @@
     margin-top: 4px;
     margin-left: 0;
   }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: var(--d8x-color-action);
+  }
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
@@ -54,13 +70,13 @@
     justify-content: space-between;
   }
 
-  .sliderHolder {
+  .buttonsHolder {
     display: none;
   }
 }
 
 @media screen and ($d8x-breakpoint-height-max-md) {
-  .sliderHolder {
+  .buttonsHolder {
     margin-bottom: 4px;
   }
 

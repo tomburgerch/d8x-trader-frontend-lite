@@ -1,24 +1,20 @@
+import classnames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Slider, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
-import { OrderSettings } from 'components/order-block/elements/order-settings/OrderSettings';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { perpetualStaticInfoAtom } from 'store/pools.store';
-import { type MarkI } from 'types/types';
+import type { MarkI } from 'types/types';
 
 import { inputValueAtom, leverageAtom, setLeverageAtom } from './store';
 
 import styles from './LeverageSelector.module.scss';
 
-const multipliers = [0.25, 0.5, 0.75, 1];
-
-function valueLabelFormat(value: number) {
-  return `${value}x`;
-}
+const multipliers = [0.2, 0.4, 0.6, 0.8, 1];
 
 export const LeverageSelector = memo(() => {
   const { t } = useTranslation();
@@ -36,12 +32,7 @@ export const LeverageSelector = memo(() => {
   }, [perpetualStaticInfo?.initialMarginRate]);
 
   const marks = useMemo(() => {
-    const newMarks: MarkI[] = [
-      {
-        value: 1,
-        // label: '1x'
-      },
-    ];
+    const newMarks: MarkI[] = [];
     multipliers.forEach((multiplier) =>
       newMarks.push({
         value: multiplier * maxLeverage,
@@ -76,26 +67,20 @@ export const LeverageSelector = memo(() => {
             </>
           }
         />
-        <OrderSettings />
       </div>
       <div className={styles.rowTwo}>
-        <div className={styles.sliderHolder}>
-          <Slider
-            aria-label="Leverage values"
-            value={leverage}
-            min={1}
-            max={maxLeverage}
-            step={leverageStep}
-            getAriaValueText={valueLabelFormat}
-            valueLabelFormat={valueLabelFormat}
-            valueLabelDisplay="auto"
-            marks={marks}
-            onChange={(_event, newValue) => {
-              if (typeof newValue === 'number') {
-                setLeverage(newValue);
-              }
-            }}
-          />
+        <div className={styles.buttonsHolder}>
+          {marks.map((mark) => (
+            <Button
+              key={mark.value}
+              className={classnames(styles.markButton, { [styles.selected]: mark.value === leverage })}
+              variant="secondary"
+              size="small"
+              onClick={() => setLeverage(mark.value)}
+            >
+              {mark.value}x
+            </Button>
+          ))}
         </div>
         <ResponsiveInput
           id="leverage"

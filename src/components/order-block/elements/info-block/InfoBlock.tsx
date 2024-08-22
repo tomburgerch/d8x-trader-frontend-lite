@@ -129,14 +129,6 @@ export const InfoBlock = memo(() => {
     <div className={styles.root}>
       <div className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
-          {t('pages.trade.order-block.info.order-size')}
-        </Typography>
-        <Typography variant="bodySmallSB" className={styles.infoText}>
-          {orderSize}
-        </Typography>
-      </div>
-      <div className={styles.row}>
-        <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.balance')}
         </Typography>
         <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
@@ -144,19 +136,6 @@ export const InfoBlock = memo(() => {
             {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
           </Typography>
         </TooltipMobile>
-      </div>
-      <div className={styles.row}>
-        <Typography variant="bodySmallPopup" className={styles.infoText}>
-          {t('pages.trade.order-block.info.approx-deposit')}
-        </Typography>
-        <Typography variant="bodySmallSB" className={styles.infoText}>
-          {approxDepositFromWallet === undefined || !selectedPool
-            ? '-'
-            : formatToCurrency(
-                approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol
-              )}
-        </Typography>
       </div>
       <div className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
@@ -222,6 +201,19 @@ export const InfoBlock = memo(() => {
           </Typography>
         </div>
       )}
+      <div className={styles.row}>
+        <Typography variant="bodySmallPopup" className={styles.infoText}>
+          {t('pages.trade.order-block.info.approx-deposit')}
+        </Typography>
+        <Typography variant="bodySmallSB" className={styles.infoText}>
+          {approxDepositFromWallet === undefined || !selectedPool
+            ? '-'
+            : formatToCurrency(
+                approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                selectedPool.settleSymbol
+              )}
+        </Typography>
+      </div>
     </div>
   );
 });
