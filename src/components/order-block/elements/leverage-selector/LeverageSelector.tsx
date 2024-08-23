@@ -74,7 +74,7 @@ export const LeverageSelector = memo(() => {
             <Button
               key={mark.value}
               className={classnames(styles.markButton, { [styles.selected]: mark.value === leverage })}
-              variant="secondary"
+              variant={mark.value === leverage ? 'primary' : 'outlined'}
               size="small"
               onClick={() => setLeverage(mark.value)}
             >

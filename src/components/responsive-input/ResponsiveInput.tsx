@@ -6,6 +6,8 @@ import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/mat
 import DecreaseIcon from 'assets/icons/decreaseIcon.svg?react';
 import IncreaseIcon from 'assets/icons/increaseIcon.svg?react';
 
+import { InputE } from './enums';
+
 import styles from './ResponsiveInput.module.scss';
 
 interface ResponsiveInputPropsI {
@@ -23,6 +25,7 @@ interface ResponsiveInputPropsI {
   max?: number;
   adornmentAction?: ReactNode;
   disabled?: boolean;
+  type?: InputE;
 }
 
 export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
@@ -41,6 +44,7 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
     max,
     adornmentAction,
     disabled,
+    type = InputE.Regular,
   } = props;
 
   const handleValueChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -107,13 +111,22 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
       </Button>
       <OutlinedInput
         id={id}
-        endAdornment={
-          <InputAdornment position="end" className={styles.inputAdornment}>
-            <Typography variant="adornment">{currency}</Typography>
-            {adornmentAction}
-          </InputAdornment>
+        startAdornment={
+          type === InputE.Outlined ? (
+            <InputAdornment position="end" className={styles.inputStartAdornment}>
+              <Typography variant="adornment">{currency}</Typography>
+            </InputAdornment>
+          ) : undefined
         }
-        className={inputClassName}
+        endAdornment={
+          type === InputE.Regular ? (
+            <InputAdornment position="end" className={styles.inputEndAdornment}>
+              <Typography variant="adornment">{currency}</Typography>
+              {adornmentAction}
+            </InputAdornment>
+          ) : undefined
+        }
+        className={classnames(inputClassName, { [styles.outlined]: type === InputE.Outlined })}
         inputProps={{ step, min, max }}
         type="number"
         placeholder={placeholder}

@@ -72,6 +72,46 @@
   --d8x-color-text-pumpstation-overview: #fff;
   --d8x-color-text-warning: #1c1c1c;
 
+  //--New design colors
+  --d8x-button-primary-color: var(--d8x-color-text-secondary);
+  --d8x-button-primary-color-hover: var(--d8x-color-text-secondary);
+  --d8x-button-primary-color-selected: var(--d8x-button-primary-color-hover);
+  --d8x-button-primary-color-disabled: var(--d8x-color-text-secondary);
+  --d8x-button-primary-background: var(--d8x-color-background-primary);
+  --d8x-button-primary-background-hover: var(--d8x-color-action);
+  --d8x-button-primary-background-selected: var(--d8x-color-action);
+  --d8x-button-primary-background-disabled: var(--d8x-color-background-primary-disabled);
+  --d8x-button-primary-border-color: var(--d8x-color-action);
+  --d8x-button-primary-border-color-hover: var(--d8x-color-action);
+  --d8x-button-primary-border-color-selected: var(--d8x-button-primary-border-color-hover);
+  --d8x-button-primary-border-color-disabled: var(--d8x-color-action);
+  --d8x-button-secondary-color: var(--d8x-color-action);
+  --d8x-button-secondary-color-hover: var(--d8x-button-secondary-color);
+  --d8x-button-secondary-color-selected: var(--d8x-button-secondary-color-hover);
+  --d8x-button-secondary-color-disabled: var(--d8x-button-secondary-color);
+  --d8x-button-secondary-background: var(--d8x-color-background-items);
+  --d8x-button-secondary-background-hover: var(--d8x-color-background-table);
+  --d8x-button-secondary-background-selected: var(--d8x-color-action);
+  --d8x-button-secondary-background-disabled: var(--d8x-color-background-items);
+  --d8x-button-secondary-border-color: var(--d8x-color-action);
+  --d8x-button-secondary-border-color-hover: var(--d8x-button-secondary-border-color);
+  --d8x-button-secondary-border-color-selected: var(--d8x-button-secondary-border-color-hover);
+  --d8x-button-secondary-border-color-disabled: var(--d8x-color-action);
+  --d8x-button-outlined-color: var(--d8x-color-text-main);
+  --d8x-button-outlined-color-hover: var(--d8x-button-outlined-color);
+  --d8x-button-outlined-color-selected: var(--d8x-button-outlined-color-hover);
+  --d8x-button-outlined-color-disabled: var(--d8x-color-text-secondary);
+  --d8x-button-outlined-background: rgba(var(--d8x-color-action-rgb), 0.2);
+  --d8x-button-outlined-background-hover: var(--d8x-color-action);
+  --d8x-button-outlined-background-selected: var(--d8x-button-outlined-background-hover);
+  --d8x-button-outlined-background-disabled: transparent;
+  --d8x-button-outlined-border-color: rgba(var(--d8x-color-action-rgb), 0.2);
+  --d8x-button-outlined-border-color-hover: var(--d8x-color-action);
+  --d8x-button-outlined-border-color-selected: var(--d8x-button-outlined-border-color-hover);
+  --d8x-button-outlined-border-color-disabled: transparent;
+  --d8x-slider-thumb-background: var(--d8x-color-background-items);
+  --d8x-slider-thumb-border-color: var(--d8x-color-action);
+
   //--Override colors for toastify
   --toastify-color-progress-success: #664adf;
   --toastify-color-progress-error: #ffbdbd;

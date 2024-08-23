@@ -9,6 +9,12 @@
   padding-left: $d8x-spacing * 3;
   padding-right: $d8x-spacing * 3;
   border-radius: $d8x-spacing;
+  background-color: transparent;
+
+  &:hover {
+    background-color: transparent;
+    border-color: transparent;
+  }
 }
 
 .menuHolder {

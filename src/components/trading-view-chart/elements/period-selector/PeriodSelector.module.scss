@@ -3,25 +3,16 @@
 .root {
   display: flex;
   justify-content: center;
+  gap: 2 * $d8x-spacing;
 
   :global(.MuiButtonBase-root) {
     flex: 1;
-    width: 64px;
-    height: 36px;
-
-    &:not(:last-of-type) {
-      border-radius: 8px;
-      margin-right: 8px;
-      border-color: var(--d8x-color-border);
-
-      &:hover {
-        border-color: transparent;
-      }
-    }
-
-    &:last-of-type {
-      border-radius: 8px;
-    }
+    padding: 0;
+    width: 50px;
+    min-width: 50px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 400;
 
     &.selected {
       background-color: var(--d8x-color-action);

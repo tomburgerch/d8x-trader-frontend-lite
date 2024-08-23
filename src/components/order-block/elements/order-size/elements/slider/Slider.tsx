@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 
-import { Slider } from '@mui/material';
+import { Slider as MuiSlider } from '@mui/material';
 
 import {
   maxOrderSizeAtom,
@@ -9,19 +9,19 @@ import {
   orderSizeSliderAtom,
   setInputFromOrderSizeAtom,
   setOrderSizeAtom,
-} from '../store';
+} from '../../store';
 
-import styles from './OrderSizeSlider.module.scss';
+import styles from './Slider.module.scss';
 
 const multipliers = [0, 0.25, 0.5, 0.75, 1];
 const marks = multipliers.map((multiplier) => ({
   value: multiplier * 100,
-  // label: `${multiplier * 100}%`
+  label: `${multiplier * 100}%`,
 }));
 
 const valueLabelFormat = (value: number) => `${Math.round(value)}%`;
 
-export const OrderSizeSlider = () => {
+export const Slider = () => {
   const [sliderPercent, setSizeFromSlider] = useAtom(orderSizeSliderAtom);
   const maxOrderSize = useAtomValue(maxOrderSizeAtom);
   const orderSize = useAtomValue(orderSizeAtom);
@@ -38,7 +38,7 @@ export const OrderSizeSlider = () => {
 
   return (
     <div className={styles.root}>
-      <Slider
+      <MuiSlider
         aria-label="Order size values"
         value={sliderPercent}
         min={0}

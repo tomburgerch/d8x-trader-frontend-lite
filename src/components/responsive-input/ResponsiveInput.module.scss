@@ -23,7 +23,35 @@
   color: var(--d8x-color-action-icon);
 }
 
-.inputAdornment {
+.outlined {
+  padding-left: 0;
+  margin-left: 0;
+
+  &:hover,
+  &:focus-within {
+    background-color: transparent !important;
+  }
+
+  :global(.MuiInputAdornment-root) {
+    margin-bottom: -$d8x-spacing;
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: transparent !important;
+  }
+
+  :global(.MuiInputBase-input) {
+    background-color: transparent !important;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.inputStartAdornment {
+  color: var(--d8x-color-text-label-one);
+}
+
+.inputEndAdornment {
   color: var(--d8x-color-text-label-one);
 
   :global(.MuiPaper-root) {
@@ -33,7 +61,7 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
-  .inputAdornment {
+  .inputEndAdornment {
     color: var(--d8x-color-text-main);
     min-width: 65px;
   }

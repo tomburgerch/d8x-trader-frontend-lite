@@ -36,12 +36,16 @@
 
 .markButton {
   padding: 0;
-  font-size: 14px;
+  width: 40px;
   min-width: 40px;
+  height: 32px;
+  font-size: 14px;
+  font-weight: 400;
 
   &.selected {
-    background-color: var(--d8x-color-action);
-    color: var(--d8x-color-text-secondary);
+    background-color: var(--d8x-button-primary-background-selected);
+    border-color: var(--d8x-button-primary-border-color-selected);
+    color: var(--d8x-button-primary-color-selected);
   }
 }
 

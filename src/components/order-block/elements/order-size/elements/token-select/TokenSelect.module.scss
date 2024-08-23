@@ -1,0 +1,12 @@
+@import '~styles/theme/theme.scss';
+
+.currencyLabel {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2 * $d8x-spacing;
+
+  > span {
+    margin-bottom: calc($d8x-spacing / -2);
+  }
+}

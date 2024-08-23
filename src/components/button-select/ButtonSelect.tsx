@@ -4,9 +4,9 @@ import { type Dispatch, type PropsWithChildren, type ReactNode, type SetStateAct
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Menu, Typography } from '@mui/material';
 
-import styles from './DropDownSelect.module.scss';
+import styles from './ButtonSelect.module.scss';
 
-interface DropDownSelectPropsI extends PropsWithChildren {
+interface ButtonSelectPropsI extends PropsWithChildren {
   id: string;
   selectedValue: ReactNode;
   anchorEl: HTMLElement | null;
@@ -17,7 +17,7 @@ interface DropDownSelectPropsI extends PropsWithChildren {
   hasArrow?: boolean;
 }
 
-export const DropDownSelect = ({
+export const ButtonSelect = ({
   id,
   children,
   selectedValue,
@@ -27,7 +27,7 @@ export const DropDownSelect = ({
   disabled,
   className,
   hasArrow = true,
-}: DropDownSelectPropsI) => {
+}: ButtonSelectPropsI) => {
   const isOpen = Boolean(anchorEl);
 
   const handleClose = () => {
@@ -38,11 +38,11 @@ export const DropDownSelect = ({
     <>
       <Button
         onClick={(event) => setAnchorEl(event.currentTarget)}
-        className={classnames(styles.dropDownButton, className, { [styles.fullWidth]: fullWidth })}
-        variant="outlined"
+        className={classnames(styles.button, className, { [styles.fullWidth]: fullWidth })}
+        variant="primary"
         disabled={disabled}
       >
-        <Typography variant="bodyMedium" className={styles.selectedValue}>
+        <Typography variant="bodySmall" className={styles.selectedValue}>
           {selectedValue}
         </Typography>
         {hasArrow && (
