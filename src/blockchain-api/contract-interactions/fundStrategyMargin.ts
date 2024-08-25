@@ -62,7 +62,6 @@ export async function fundStrategyMargin(
       gasPrice: gasPrice,
     };
     const gas = await estimateContractGas(walletClient, params); // reverts if insufficient balance
-    console.log({ ...params, gas });
     const tx1 = await writeContract(walletClient, { ...params, gas }).catch((error) => {
       throw new Error(error.shortMessage);
     });

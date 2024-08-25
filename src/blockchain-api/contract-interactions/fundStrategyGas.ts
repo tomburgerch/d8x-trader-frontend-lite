@@ -32,7 +32,7 @@ export async function fundStrategyGas(
   const gas = gasAmount ?? STRATEGY_WALLET_GAS_TARGET;
   const gasBalance = await getBalance(walletClient, { address: strategyAddr });
   const gasPrice = await getGasPrice(walletClient.chain?.id);
-  console.log({ gasBalance, gas, gasPrice, STRATEGY_WALLET_GAS_TARGET });
+
   if (gasBalance < 2n * gas * gasPrice) {
     setCurrentPhaseKey('pages.strategies.enter.phases.funding');
     const tx0 = await sendTransactionAsync({

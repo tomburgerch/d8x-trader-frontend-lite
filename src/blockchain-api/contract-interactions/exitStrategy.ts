@@ -62,13 +62,6 @@ export async function exitStrategy(
   if (isDelegated) {
     //console.log('exit: post via user wallet');
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
-    console.log({
-      ifelse: 'if',
-      traderAddr: strategyAddr,
-      orders: [order],
-      signatures: [HashZero],
-      brokerData: data,
-    });
     return postOrder(walletClient, traderAPI, {
       traderAddr: strategyAddr,
       orders: [order],
@@ -83,13 +76,6 @@ export async function exitStrategy(
     );
     //console.log('exit: post via strat wallet');
     setCurrentPhaseKey('pages.strategies.exit.phases.posting');
-    console.log({
-      ifelse: 'else',
-      traderAddr: strategyAddr,
-      orders: [order],
-      signatures: [HashZero],
-      brokerData: data,
-    });
     return postOrder(strategyClient, traderAPI, {
       traderAddr: strategyAddr,
       orders: [order],
