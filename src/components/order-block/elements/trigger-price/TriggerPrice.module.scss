@@ -2,18 +2,12 @@
 
 .root {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 4 * $d8x-spacing;
   padding: 4 * $d8x-spacing;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-card-overlay);
-
-  @media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
-    screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) {
-    margin-bottom: 2 * $d8x-spacing;
-    margin-top: 2 * $d8x-spacing;
-  }
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
@@ -26,5 +20,13 @@
     display: flex;
     justify-content: flex-start;
     margin-bottom: 3 * $d8x-spacing;
+  }
+}
+
+@media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
+  screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) {
+  .root {
+    margin-bottom: 2 * $d8x-spacing;
+    margin-top: 2 * $d8x-spacing;
   }
 }

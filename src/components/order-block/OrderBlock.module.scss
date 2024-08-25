@@ -19,13 +19,7 @@
   &.selectors {
     display: flex;
     flex-direction: column;
-    padding-top: 0;
-    padding-bottom: $d8x-spacing * 4 !important;
     gap: 4 * $d8x-spacing;
-  }
-
-  &.bottomCard {
-    padding-top: 0;
   }
 }
 
@@ -47,10 +41,6 @@
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
-  .bottomCard {
-    padding-top: 8px;
-  }
-
   .card {
     padding-top: $d8x-spacing * 2;
     padding-bottom: $d8x-spacing * 2;
@@ -59,10 +49,6 @@
 
 @media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
   screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) {
-  .bottomCard {
-    padding-top: calc($d8x-spacing / 2);
-  }
-
   .card {
     padding-top: calc($d8x-spacing / 2);
     padding-bottom: calc($d8x-spacing / 2);

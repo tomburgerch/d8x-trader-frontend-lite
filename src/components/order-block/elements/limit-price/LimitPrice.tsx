@@ -1,6 +1,6 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
@@ -14,6 +14,9 @@ import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom
 import { OrderBlockE, OrderTypeE } from 'types/enums';
 
 import styles from './LimitPrice.module.scss';
+import { InputE } from '../../../responsive-input/enums';
+import { getDynamicLogo } from '../../../../utils/getDynamicLogo';
+import type { TemporaryAnyT } from '../../../../types/types';
 
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();
@@ -104,6 +107,13 @@ export const LimitPrice = memo(() => {
     setInputValue(limitPrice != null ? `${limitPrice}` : '');
   }, [limitPrice]);
 
+  const QuoteCurrencyIcon = useMemo(() => {
+    if (!selectedPerpetual) {
+      return null;
+    }
+    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
+  }, [selectedPerpetual]);
+
   if (orderType === OrderTypeE.Market) {
     return null;
   }
@@ -126,10 +136,15 @@ export const LimitPrice = memo(() => {
         inputValue={inputValue}
         setInputValue={handleLimitPriceChange}
         handleInputBlur={handleInputBlur}
-        currency={selectedPerpetual?.quoteCurrency}
+        currency={
+          <Suspense fallback={null}>
+            <QuoteCurrencyIcon width={24} height={24} />
+          </Suspense>
+        }
         placeholder="-"
         step={stepSize}
         min={-1}
+        type={InputE.Outlined}
       />
     </Box>
   );
