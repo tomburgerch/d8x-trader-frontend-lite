@@ -207,8 +207,8 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
   }, [chainId, address, setHasPosition, enableFrequentUpdates]);
 
   // X(x,y,z,w) := (has position, has open sell, has open buy, has balance) \in [0,1]^4
-  // A(0,0,0,0) -> B(0,0,0,1) (send funds)
-  // B(0,0,0,1) -> B(0,0,0,1) (post order/claim funds fail), C(0,1,0,1) (post order success), A(0,0,0,0) (claim funds)
+  // A(0,0,0,0) -> B(0,0,0,1) (send funds success), A(send funds fails)
+  // B(0,0,0,1) -> B(0,0,0,1) (post order/claim funds fail), C(0,1,0,1) (post order success), A(0,0,0,0) (claim funds success)
   // C(0,1,0,1) -> B(0,0,0,1) (exec fail), D(1,0,0,1) (exec success)
   // D(1,0,0,1) -> D(1,0,0,1) (close pos fail), E(1,0,1,1) (close order succs)
   // E(1,0,1,1) -> D(1,0,0,1) (exec fail), B(0,0,0,1) (exec success)
@@ -264,6 +264,14 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
   const currentState = useRef(5);
 
   useEffect(() => {
+    // posting order/sending funds failed
+    if (currentState.current === 1 && prevState === 1) {
+      currentState.current = 0;
+    }
+    // if entering and now funded, keep waiting
+    if (currentState.current === 0 && prevState === 1) {
+      return;
+    }
     // keep current state on transient change
     if (prevState !== 5) {
       currentState.current = prevState;
