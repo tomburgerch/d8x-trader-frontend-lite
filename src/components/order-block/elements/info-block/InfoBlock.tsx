@@ -5,7 +5,6 @@ import { useAccount } from 'wagmi';
 
 import { Typography } from '@mui/material';
 
-import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { orderBlockAtom, orderInfoAtom, orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
 import {
   collateralToSettleConversionAtom,
@@ -127,16 +126,6 @@ export const InfoBlock = memo(() => {
 
   return (
     <div className={styles.root}>
-      <div className={styles.row}>
-        <Typography variant="bodySmallPopup" className={styles.infoText}>
-          {t('pages.trade.order-block.info.balance')}
-        </Typography>
-        <TooltipMobile tooltip={selectedPool?.settleTokenAddr ? selectedPool.settleTokenAddr.toString() : '...'}>
-          <Typography variant="bodySmallSB" className={styles.infoTextTooltip}>
-            {formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)}
-          </Typography>
-        </TooltipMobile>
-      </div>
       <div className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.fees')}
