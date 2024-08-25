@@ -667,8 +667,11 @@
         "exit-button": "退出策略",
         "confirm-modal": {
           "title": "退出策略",
+          "title-claim": "提款",
           "text": "你确定要离开？",
-          "confirm-button": "退出"
+          "text-claim": "您想提取资金吗？",
+          "confirm-button": "退出",
+          "confirm-button-claim": "提款"
         },
         "toasts": {
           "tx-submitted": {
@@ -686,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "提款",
         "toasts": {
           "tx-submitted": {
             "title": "您的资金已成功领取",

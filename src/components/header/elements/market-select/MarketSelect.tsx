@@ -206,7 +206,6 @@ export const MarketSelect = memo(() => {
     return false;
   }, [traderAPI, selectedPerpetual, selectedPool]);
 
-  console.log({ isPredictionMarket });
   return (
     <div className={styles.holderRoot}>
       <div className={styles.iconWrapper}>
