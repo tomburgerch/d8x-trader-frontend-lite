@@ -224,6 +224,30 @@ export const ExitStrategy = ({
     }
   }, [strategyAddressBalance, hasPosition, t]);
 
+  const confirmTitle = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.title-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.title');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
+  const confirmBody = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.text-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.text');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
+  const confirmButton = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.confirm-button-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.confirm-button');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
   return (
     <div className={styles.root}>
       <Typography variant="h5" className={styles.title}>
@@ -237,10 +261,10 @@ export const ExitStrategy = ({
       </Button>
 
       <Dialog open={showConfirmModal} className={styles.dialog}>
-        <DialogTitle>{t('pages.strategies.exit.confirm-modal.title')}</DialogTitle>
+        <DialogTitle>{confirmTitle}</DialogTitle>
         <div className={styles.dialogRoot}>
           <Typography variant="bodyMedium" fontWeight={600}>
-            {t('pages.strategies.exit.confirm-modal.text')}
+            {confirmBody}
           </Typography>
         </div>
         <DialogActions className={styles.dialogAction}>
@@ -259,7 +283,7 @@ export const ExitStrategy = ({
               !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
             }
           >
-            {t('pages.strategies.exit.confirm-modal.confirm-button')}
+            {confirmButton}
           </Button>
         </DialogActions>
       </Dialog>

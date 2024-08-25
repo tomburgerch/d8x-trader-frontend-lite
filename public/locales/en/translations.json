@@ -667,8 +667,11 @@
         "exit-button": "Exit strategy",
         "confirm-modal": {
           "title": "Exit strategy",
+          "title-claim": "Claim funds",
           "text": "Are you sure you want to exit?",
-          "confirm-button": "Exit"
+          "text-claim": "Are you sure you want to claim your funds?",
+          "confirm-button": "Exit",
+          "confirm-button-claim": "Claim"
         },
         "toasts": {
           "tx-submitted": {
@@ -686,7 +689,7 @@
         }
       },
       "claim-funds": {
-        "claim-button": "Claim Funds",
+        "claim-button": "Claim",
         "toasts": {
           "tx-submitted": {
             "title": "Your funds are successfully claimed",
