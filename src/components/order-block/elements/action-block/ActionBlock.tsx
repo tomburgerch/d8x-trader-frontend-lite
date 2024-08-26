@@ -1,4 +1,4 @@
-import { TraderInterface } from '@d8x/perpetuals-sdk';
+import { BUY_SIDE, TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -197,12 +197,13 @@ export const ActionBlock = memo(() => {
     setMaxOrderSize(undefined);
 
     const mainOrder = createMainOrder(orderInfo);
+    const position = positions?.find((pos) => pos.symbol === orderInfo.symbol);
     const positionRiskOnTradePromise = positionRiskOnTrade(
       chainId,
       traderAPI,
       mainOrder,
       address,
-      positions?.find((pos) => pos.symbol === orderInfo.symbol),
+      (position?.positionNotionalBaseCCY ?? 0) * (position?.side === BUY_SIDE ? 1 : -1),
       poolFee
     )
       .then((data) => {
@@ -223,7 +224,7 @@ export const ActionBlock = memo(() => {
     const getPerpetualPricePromise = getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
       .then((data) => {
         const perpPrice =
-          perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)
+          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
             ? calculateProbability(data.data.price, orderInfo.orderBlock === OrderBlockE.Short)
             : data.data.price;
         setPerpetualPrice(perpPrice);
@@ -506,7 +507,7 @@ export const ActionBlock = memo(() => {
       } else if (orderInfo.orderType === OrderTypeE.Stop && orderInfo.triggerPrice) {
         price = orderInfo.triggerPrice;
       }
-      if (perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)) {
+      if (perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)) {
         price = calculateProbability(price, orderInfo.orderBlock === OrderBlockE.Short);
       }
       return formatToCurrency(price, orderInfo.quoteCurrency);

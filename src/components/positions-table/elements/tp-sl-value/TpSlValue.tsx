@@ -63,7 +63,7 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
 
     let isPredictionMarket = false;
     try {
-      isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+      isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
     } catch {
       // skip
     }

@@ -30,8 +30,8 @@ export const TriggerPrice = memo(() => {
   const inputValueChangedRef = useRef(false);
 
   const stepSize = useMemo(
-    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.markPrice))}`,
-    [selectedPerpetual?.markPrice]
+    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.indexPrice))}`,
+    [selectedPerpetual?.indexPrice]
   );
 
   const handleTriggerPriceChange = useCallback(
@@ -42,7 +42,7 @@ export const TriggerPrice = memo(() => {
       } else {
         const initialTrigger = perpetualStatistics?.markPrice === undefined ? -1 : perpetualStatistics?.markPrice;
         const userTrigger =
-          perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)
+          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
             ? calculateProbability(initialTrigger, orderBlock === OrderBlockE.Short)
             : initialTrigger;
         setTriggerPrice(`${userTrigger}`);

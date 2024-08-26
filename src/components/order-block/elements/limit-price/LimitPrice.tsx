@@ -44,7 +44,7 @@ export const LimitPrice = memo(() => {
         if (orderType === OrderTypeE.Limit) {
           const initialLimit = perpetualStatistics?.midPrice === undefined ? -1 : perpetualStatistics.midPrice;
           const userLimit =
-            perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo) && initialLimit > 0
+            perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo) && initialLimit > 0
               ? calculateProbability(initialLimit, orderBlock === OrderBlockE.Short)
               : initialLimit;
           setLimitPrice(`${userLimit}`);
@@ -78,7 +78,7 @@ export const LimitPrice = memo(() => {
 
       let isPredictionMarket = false;
       try {
-        isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+        isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
       } catch {
         // skip
       }

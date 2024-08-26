@@ -108,7 +108,7 @@ export const MarketSelect = memo(() => {
         quoteCurrency: selectedPerpetual.quoteCurrency,
         poolName: selectedPool.poolSymbol,
         midPrice: selectedPerpetual.midPrice,
-        markPrice: selectedPerpetual.markPrice,
+        markPrice: selectedPerpetual.markPrice, // TODO: prem vs rate, fix
         indexPrice: selectedPerpetual.indexPrice,
         currentFundingRateBps: selectedPerpetual.currentFundingRateBps,
         openInterestBC: selectedPerpetual.openInterestBC,

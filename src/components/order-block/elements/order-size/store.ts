@@ -38,6 +38,7 @@ export const maxOrderSizeAtom = atom((get) => {
   const orderBlock = get(orderBlockAtom);
   const orderFeeBps = orderInfo?.tradingFee || 0;
 
+  // TODO: mark px vs prem, or better: leve calc to SDK
   const { collToQuoteIndexPrice, indexPrice, markPrice } = selectedPerpetual;
   let collateralCC = 0;
 
@@ -79,7 +80,7 @@ export const currencyMultiplierAtom = atom((get) => {
 
   let isPredictionMarket = false;
   try {
-    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
   } catch {
     // skip
   }

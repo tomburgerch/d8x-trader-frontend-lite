@@ -45,7 +45,7 @@ export const PerpetualStats = () => {
     if (!!perpetualStatistics && !!perpetualStaticInfo) {
       let isPredictionMarket = false;
       try {
-        isPredictionMarket = TraderInterface.isPredictionMarket(perpetualStaticInfo);
+        isPredictionMarket = TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
       } catch {
         // skip
       }

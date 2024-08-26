@@ -19,6 +19,7 @@ import type {
   PerpetualPriceI,
   PerpetualStaticInfoI,
   ValidatedResponseI,
+  PerpetualI,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -75,7 +76,23 @@ export async function getExchangeInfo(
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
     // console.log('exchangeInfo via SDK');
     const info = await traderAPI.exchangeInfo();
-    return { type: 'exchange-info', msg: '', data: info };
+    const data: ExchangeInfoI = { ...info, pools: [] };
+    for (const pool of info.pools) {
+      const perpIs: PerpetualI[] = [];
+      for (const perp of pool.perpetuals) {
+        const symbol = traderAPI.getSymbolFromPerpId(perp.id)!;
+        let markPrice: number;
+        if (traderAPI.isPredictionMarket(symbol)) {
+          const px = await traderAPI.fetchPricesForPerpetual(symbol);
+          markPrice = px.ema + perp.markPremium;
+        } else {
+          markPrice = perp.indexPrice * (1 + perp.markPremium);
+        }
+        perpIs.push({ ...perp, markPrice });
+      }
+      data.pools.push({ ...pool, perpetuals: perpIs });
+    }
+    return { type: 'exchange-info', msg: '', data };
   } else {
     // console.log('exchangeInfo via BE');
     return fetchUrl('exchange-info', chainId);
@@ -127,8 +144,8 @@ export function positionRiskOnTrade(
   traderAPI: TraderInterface,
   order: OrderI,
   traderAddr: string,
-  curAccount: MarginAccountI | undefined,
-  tradingFeeTbps: number | undefined
+  signedPositionNotionalBaseCCY: number,
+  tradingFeeTbps: number
 ): Promise<
   ValidatedResponseI<{
     newPositionRisk: MarginAccountI;
@@ -138,7 +155,7 @@ export function positionRiskOnTrade(
   }>
 > {
   return traderAPI
-    .positionRiskOnTrade(traderAddr, order, curAccount, undefined, { tradingFeeTbps: tradingFeeTbps })
+    .positionRiskOnTrade(traderAddr, order, signedPositionNotionalBaseCCY, tradingFeeTbps)
     .then((data) => {
       return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;

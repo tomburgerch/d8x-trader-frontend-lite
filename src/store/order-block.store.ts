@@ -49,7 +49,7 @@ export const orderTypeAtom = atom(
 
     let isPredictionMarket = false;
     try {
-      isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+      isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
     } catch {
       // skip
     }
@@ -136,7 +136,7 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const perpetualStaticInfo = get(perpetualStaticInfoAtom);
   let isPredictionMarket = false;
   try {
-    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
   } catch {
     // skip
   }

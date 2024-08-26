@@ -250,7 +250,7 @@ export const TraderPage = () => {
 
   let isPredictionMarket = false;
   try {
-    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
   } catch {
     // skip
   }
