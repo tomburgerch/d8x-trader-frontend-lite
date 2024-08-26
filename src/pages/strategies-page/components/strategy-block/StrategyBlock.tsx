@@ -272,7 +272,6 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
       currentState.current = prevState;
     }
   }, [prevState]);
-  console.log({ currentState, prevState });
 
   const showExitScreen = [1, 3, 4].includes(currentState.current);
 
