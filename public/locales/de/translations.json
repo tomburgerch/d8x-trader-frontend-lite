@@ -667,8 +667,11 @@
         "exit-button": "Beenden",
         "confirm-modal": {
           "title": "Strategie beenden",
+          "title-claim": "Abheben",
           "text": "Sie sind sicher, dass Sie beenden wollen?",
-          "confirm-button": "beenden"
+          "text-claim": "Sind Sie sicher, dass Sie Ihr Geld abheben möchten?",
+          "confirm-button": "Beenden",
+          "confirm-button-claim": "Abheben"
         },
         "toasts": {
           "tx-submitted": {
@@ -686,7 +689,7 @@
         }
       },
       "claim-funds": {
-        "claim-button": "Claim Funds",
+        "claim-button": "Abheben",
         "toasts": {
           "tx-submitted": {
             "title": "Ihr Geld ist erfolgreich eingegangen",

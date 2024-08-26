@@ -182,8 +182,6 @@ export const EnterStrategy = ({ isLoading, strategyClient }: EnterStrategyPropsI
   }, [addAmount]);
 
   const handleFund = useCallback(() => {
-    //console.log('handleFund');
-    //console.log(strategyAddress, strategyWalletGas, STRATEGY_WALLET_GAS_TARGET);
     if (
       requestSentRef.current ||
       !walletClient ||
