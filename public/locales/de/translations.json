@@ -225,6 +225,11 @@
           "long": "Long",
           "short": "Short"
         },
+        "prediction": {
+          "yes": "Ja",
+          "no": "Nein",
+          "bet": "Wette"
+        },
         "order-type": {
           "market": "Market",
           "limit": "Limit",
@@ -662,8 +667,11 @@
         "exit-button": "Beenden",
         "confirm-modal": {
           "title": "Strategie beenden",
+          "title-claim": "Abheben",
           "text": "Sie sind sicher, dass Sie beenden wollen?",
-          "confirm-button": "beenden"
+          "text-claim": "Sind Sie sicher, dass Sie Ihr Geld abheben möchten?",
+          "confirm-button": "Beenden",
+          "confirm-button-claim": "Abheben"
         },
         "toasts": {
           "tx-submitted": {
@@ -681,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Abheben",
         "toasts": {
           "tx-submitted": {
             "title": "Ihr Geld ist erfolgreich eingegangen",
@@ -854,6 +863,7 @@
         "crypto": "Krypto",
         "fx": "Devisen",
         "all": "Alle",
+        "prediction": "Vorhersage",
         "commodity": "Rohstoffe",
         "closed": "Geschlossen"
       },

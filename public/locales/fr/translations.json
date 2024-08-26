@@ -225,6 +225,11 @@
           "long": "Long",
           "short": "Short"
         },
+        "prediction": {
+          "yes": "Oui",
+          "no": "Non",
+          "bet": "Parie"
+        },
         "order-type": {
           "market": "Marché",
           "limit": "Limite",
@@ -662,8 +667,11 @@
         "exit-button": "Quitter",
         "confirm-modal": {
           "title": "Quitter la stratégie",
+          "title-claim": "Retirer votre argent?",
           "text": "Êtes-vous sûr de vouloir quitter la stratégie?",
-          "confirm-button": "Quitter"
+          "text-claim": "Vous souhaitez retirer votre argent?",
+          "confirm-button": "Quitter",
+          "confirm-button-claim": "Retirer"
         },
         "toasts": {
           "tx-submitted": {
@@ -681,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Retirer",
         "toasts": {
           "tx-submitted": {
             "title": "Vos fonds ont été réclamés avec succès",
@@ -854,6 +863,7 @@
         "crypto": "Crypto",
         "fx": "Devises",
         "all": "Tout",
+        "prediction": "prédiction",
         "commodity": "Matières premières",
         "closed": "Fermé"
       },

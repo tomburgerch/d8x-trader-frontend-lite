@@ -225,6 +225,11 @@
           "long": "Compra",
           "short": "Venta"
         },
+        "prediction": {
+          "yes": "Si",
+          "no": "No",
+          "bet": "Apuesta"
+        },
         "order-type": {
           "market": "Mercado",
           "limit": "Límite",
@@ -663,7 +668,10 @@
         "confirm-modal": {
           "title": "Salir de la estrategia",
           "text": "¿Estás seguro de que quieres salir?",
-          "confirm-button": "Salida"
+          "title-claim": "Retirar tu dinero",
+          "text-claim": "¿Quieres retirar tu dinero?",
+          "confirm-button": "Salida",
+          "confirm-button-claim": "Retirar"
         },
         "toasts": {
           "tx-submitted": {
@@ -681,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Reclamar fondos",
         "toasts": {
           "tx-submitted": {
             "title": "Sus fondos se reclamaron exitosamente",
@@ -854,6 +863,7 @@
         "crypto": "Cripto",
         "fx": "FX",
         "all": "Todos",
+        "prediction": "Predicción",
         "commodity": "Productos Basicos",
         "closed": "Cerrado"
       },

@@ -13,6 +13,7 @@ import {
   strategyPerpetualStatsAtom,
   strategyPoolAtom,
   perpetualStrategyStaticInfoAtom,
+  activeStrategyWalletAtom,
 } from 'store/strategies.store';
 import { getPerpetualStaticInfo } from 'network/network';
 
@@ -28,6 +29,7 @@ export const StrategiesPage = () => {
 
   const pools = useAtomValue(poolsAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
+  const activeStrategyWallet = useAtomValue(activeStrategyWalletAtom);
   const allPerpetualStatistics = useAtomValue(allPerpetualStatisticsPrimitiveAtom);
   const setStrategyPool = useSetAtom(strategyPoolAtom);
   const setStrategyPerpetual = useSetAtom(strategyPerpetualAtom);
@@ -70,7 +72,7 @@ export const StrategiesPage = () => {
   }, [allPerpetualStatistics, setStrategyPerpetualStats]);
 
   useEffect(() => {
-    if (requestSentRef.current) {
+    if (requestSentRef.current || !traderAPI) {
       return;
     }
 
@@ -104,8 +106,14 @@ export const StrategiesPage = () => {
       <div className={styles.root}>
         <MaintenanceWrapper>
           <Container className={styles.container}>
-            {address && strategyAddresses.some(({ userAddress }) => userAddress === address.toLowerCase()) ? (
-              <StrategyBlock />
+            {activeStrategyWallet != null &&
+            address &&
+            strategyAddresses.some(
+              ({ userAddress, strategyAddress }) =>
+                userAddress === address.toLowerCase() &&
+                strategyAddress.toLowerCase() === activeStrategyWallet.account?.address?.toLowerCase()
+            ) ? (
+              <StrategyBlock strategyClient={activeStrategyWallet} />
             ) : (
               <ConnectBlock />
             )}

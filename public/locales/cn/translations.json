@@ -225,6 +225,11 @@
           "long": "开多",
           "short": "开空"
         },
+        "prediction": {
+          "yes": "是的",
+          "no": "不",
+          "bet": "Bet"
+        },
         "order-type": {
           "market": "市价单",
           "limit": "限价单",
@@ -662,8 +667,11 @@
         "exit-button": "退出策略",
         "confirm-modal": {
           "title": "退出策略",
+          "title-claim": "提款",
           "text": "你确定要离开？",
-          "confirm-button": "退出"
+          "text-claim": "您想提取资金吗？",
+          "confirm-button": "退出",
+          "confirm-button-claim": "提款"
         },
         "toasts": {
           "tx-submitted": {
@@ -681,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "提款",
         "toasts": {
           "tx-submitted": {
             "title": "您的资金已成功领取",
@@ -854,6 +863,7 @@
         "crypto": "加密货币",
         "fx": "外汇",
         "all": "所有",
+        "prediction": "预测的过程",
         "commodity": "大宗商品",
         "closed": "休市"
       },

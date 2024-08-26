@@ -225,6 +225,11 @@
           "long": "Long",
           "short": "Short"
         },
+        "prediction": {
+          "yes": "Yes",
+          "no": "No",
+          "bet": "Bet"
+        },
         "order-type": {
           "market": "Market",
           "limit": "Limit",
@@ -662,8 +667,11 @@
         "exit-button": "Exit strategy",
         "confirm-modal": {
           "title": "Exit strategy",
+          "title-claim": "Claim funds",
           "text": "Are you sure you want to exit?",
-          "confirm-button": "Exit"
+          "text-claim": "Are you sure you want to claim your funds?",
+          "confirm-button": "Exit",
+          "confirm-button-claim": "Claim"
         },
         "toasts": {
           "tx-submitted": {
@@ -681,6 +689,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Claim",
         "toasts": {
           "tx-submitted": {
             "title": "Your funds are successfully claimed",
@@ -854,6 +863,7 @@
         "crypto": "Crypto",
         "fx": "FX",
         "all": "All",
+        "prediction": "Prediction",
         "commodity": "Commodity",
         "closed": "Closed"
       },

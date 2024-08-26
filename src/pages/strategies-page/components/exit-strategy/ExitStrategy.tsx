@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAccount, useSendTransaction, useWalletClient } from 'wagmi';
+import { WalletClient } from 'viem';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
 import { Button, CircularProgress, DialogActions, DialogTitle, Typography } from '@mui/material';
@@ -14,19 +15,31 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 import { pagesConfig } from 'config';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
 import { traderAPIAtom } from 'store/pools.store';
-import { strategyAddressesAtom } from 'store/strategies.store';
+import { hasPositionAtom, strategyAddressesAtom } from 'store/strategies.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useExitStrategy } from './hooks/useExitStrategy';
 
 import styles from './ExitStrategy.module.scss';
+import { claimStrategyFunds } from 'blockchain-api/contract-interactions/claimStrategyFunds';
 
 interface ExitStrategyPropsI {
   isLoading: boolean;
   hasBuyOpenOrder: boolean;
+  strategyClient: WalletClient;
+  strategyAddressBalance: number;
+  strategyAddressBalanceBigint: bigint;
+  refetchStrategyAddressBalance: () => void;
 }
 
-export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI) => {
+export const ExitStrategy = ({
+  isLoading,
+  hasBuyOpenOrder,
+  strategyClient,
+  strategyAddressBalance,
+  strategyAddressBalanceBigint,
+  refetchStrategyAddressBalance,
+}: ExitStrategyPropsI) => {
   const { t } = useTranslation();
 
   const { address, chainId } = useAccount();
@@ -37,6 +50,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
 
   const traderAPI = useAtomValue(traderAPIAtom);
   const strategyAddresses = useAtomValue(strategyAddressesAtom);
+  const hasPosition = useAtomValue(hasPositionAtom);
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -49,7 +63,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     return strategyAddresses.find(({ userAddress }) => userAddress === address?.toLowerCase())?.strategyAddress;
   }, [address, strategyAddresses]);
 
-  const { setTxHash } = useExitStrategy();
+  const { setTxHash, setOrderId } = useExitStrategy();
 
   const handleExit = useCallback(() => {
     if (
@@ -69,13 +83,23 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     setLoading(true);
 
     exitStrategy(
-      { chainId, walletClient, isMultisigAddress, symbol: STRATEGY_SYMBOL, traderAPI, strategyAddress },
+      {
+        chainId,
+        walletClient,
+        strategyClient,
+        isMultisigAddress,
+        symbol: STRATEGY_SYMBOL,
+        traderAPI,
+        strategyAddress,
+        strategyAddressBalanceBigint,
+      },
       sendTransactionAsync,
       setCurrentPhaseKey
     )
-      .then(({ hash }) => {
+      .then(({ hash, orderIds }) => {
         // console.log(`submitting close strategy txn ${hash}`);
         setTxHash(hash);
+        setOrderId(orderIds[0]);
         setCurrentPhaseKey('pages.strategies.exit.phases.waiting');
       })
       .catch((error) => {
@@ -86,8 +110,95 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
       .finally(() => {
         requestSentRef.current = false;
         setRequestSent(false);
+        // setLoading(false);
       });
-  }, [chainId, walletClient, isMultisigAddress, traderAPI, strategyAddress, sendTransactionAsync, setTxHash]);
+  }, [
+    chainId,
+    walletClient,
+    strategyClient,
+    isMultisigAddress,
+    traderAPI,
+    strategyAddress,
+    sendTransactionAsync,
+    setTxHash,
+    setOrderId,
+    strategyAddressBalanceBigint,
+  ]);
+
+  const claimRequestSentRef = useRef(false);
+  const claimFunds = useCallback(
+    (balance: bigint) => {
+      if (
+        claimRequestSentRef.current ||
+        !walletClient ||
+        !traderAPI ||
+        !isEnabledChain(chainId) ||
+        !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
+      ) {
+        console.log('early exit');
+        return;
+      }
+
+      claimRequestSentRef.current = true;
+      setCurrentPhaseKey('');
+      setShowConfirmModal(false);
+      setRequestSent(true);
+      setLoading(true);
+
+      console.log('claimStrategyFunds');
+
+      claimStrategyFunds(
+        {
+          chainId,
+          walletClient,
+          strategyClient,
+          isMultisigAddress,
+          symbol: STRATEGY_SYMBOL,
+          traderAPI,
+          strategyAddressBalanceBigint: balance,
+        },
+        sendTransactionAsync
+      )
+        .then(({ hash }) => {
+          console.log({ hash });
+          if (hash) {
+            /// can't use setTxHash <- this is to trigger order status checks, not fund stuff
+            // setTxHash(hash);
+            console.log('claiming funds::success');
+          } else {
+            console.log('claiming funds::no hash');
+          }
+          refetchStrategyAddressBalance();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error(<ToastContent title={error.shortMessage || error.message} bodyLines={[]} />);
+          setLoading(false);
+        })
+        .finally(() => {
+          claimRequestSentRef.current = false;
+          setRequestSent(false);
+          setLoading(false);
+        });
+    },
+    [
+      chainId,
+      walletClient,
+      strategyClient,
+      isMultisigAddress,
+      traderAPI,
+      refetchStrategyAddressBalance,
+      sendTransactionAsync,
+    ]
+  );
+
+  const handleClick = useCallback(() => {
+    if (!hasPosition && strategyAddressBalance > 0) {
+      claimFunds(strategyAddressBalanceBigint);
+    } else {
+      handleExit();
+    }
+  }, [hasPosition, strategyAddressBalance, strategyAddressBalanceBigint, handleExit, claimFunds]);
 
   const handleModalClose = useCallback(() => {
     setShowConfirmModal(false);
@@ -105,6 +216,38 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
     }
   }, [isLoading, hasBuyOpenOrder]);
 
+  const buttonLabel = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.claim-funds.claim-button');
+    } else {
+      return t('pages.strategies.exit.exit-button');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
+  const confirmTitle = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.title-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.title');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
+  const confirmBody = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.text-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.text');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
+  const confirmButton = useMemo(() => {
+    if (!hasPosition && strategyAddressBalance) {
+      return t('pages.strategies.exit.confirm-modal.confirm-button-claim');
+    } else {
+      return t('pages.strategies.exit.confirm-modal.confirm-button');
+    }
+  }, [strategyAddressBalance, hasPosition, t]);
+
   return (
     <div className={styles.root}>
       <Typography variant="h5" className={styles.title}>
@@ -114,14 +257,14 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
         {t('pages.strategies.exit.note')}
       </Typography>
       <Button onClick={() => setShowConfirmModal(true)} className={styles.button} variant="primary" disabled={loading}>
-        <span className={styles.modalButtonText}>{t('pages.strategies.exit.exit-button')}</span>
+        <span className={styles.modalButtonText}>{buttonLabel}</span>
       </Button>
 
       <Dialog open={showConfirmModal} className={styles.dialog}>
-        <DialogTitle>{t('pages.strategies.exit.confirm-modal.title')}</DialogTitle>
+        <DialogTitle>{confirmTitle}</DialogTitle>
         <div className={styles.dialogRoot}>
           <Typography variant="bodyMedium" fontWeight={600}>
-            {t('pages.strategies.exit.confirm-modal.text')}
+            {confirmBody}
           </Typography>
         </div>
         <DialogActions className={styles.dialogAction}>
@@ -129,7 +272,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
             {t('common.cancel-button')}
           </Button>
           <Button
-            onClick={handleExit}
+            onClick={handleClick}
             variant="primary"
             disabled={
               requestSent ||
@@ -140,7 +283,7 @@ export const ExitStrategy = ({ isLoading, hasBuyOpenOrder }: ExitStrategyPropsI)
               !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
             }
           >
-            {t('pages.strategies.exit.confirm-modal.confirm-button')}
+            {confirmButton}
           </Button>
         </DialogActions>
       </Dialog>
