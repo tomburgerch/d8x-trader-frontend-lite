@@ -263,10 +263,6 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
   const currentState = useRef(5);
 
   useEffect(() => {
-    // posting order/sending funds failed
-    if (currentState.current === 1 && prevState === 1) {
-      currentState.current = 0;
-    }
     // if entering and now funded, keep waiting
     if (currentState.current === 0 && prevState === 1) {
       return;

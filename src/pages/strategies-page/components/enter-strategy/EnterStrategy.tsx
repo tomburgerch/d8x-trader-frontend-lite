@@ -341,14 +341,14 @@ export const EnterStrategy = ({ isLoading, strategyClient }: EnterStrategyPropsI
           currency="weETH"
           step={`${lotSizeBC}`}
           min={isEditing ? undefined : 10 * lotSizeBC}
-          max={0.99 * weEthMainBalance || 0}
+          max={weEthMainBalance || 0}
         />
       </div>
       {weEthMainBalance ? (
         <Typography className={styles.helperText} variant="bodyTiny">
           {t('common.max')}{' '}
-          <Link onClick={() => handleInputCapture(`${0.99 * weEthMainBalance}`)}>
-            {formatToCurrency(0.99 * weEthMainBalance, 'weETH')}
+          <Link onClick={() => handleInputCapture(`${weEthMainBalance}`)}>
+            {formatToCurrency(weEthMainBalance, 'weETH')}
           </Link>
         </Typography>
       ) : null}
