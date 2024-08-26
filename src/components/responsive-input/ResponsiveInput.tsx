@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import { type ChangeEvent, memo, type ReactNode } from 'react';
 
-import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+import { Box, Button, InputAdornment, OutlinedInput, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import DecreaseIcon from 'assets/icons/decreaseIcon.svg?react';
 import IncreaseIcon from 'assets/icons/increaseIcon.svg?react';
@@ -18,7 +18,7 @@ interface ResponsiveInputPropsI {
   setInputValue: (newValue: string) => void;
   handleInputBlur?: () => void;
   handleInputFocus?: () => void;
-  currency: ReactNode | undefined;
+  currency?: ReactNode;
   placeholder?: string;
   step?: string;
   min?: number;
@@ -46,6 +46,9 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
     disabled,
     type = InputE.Regular,
   } = props;
+
+  const theme = useTheme();
+  const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleValueChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = +event.target.value;
@@ -112,21 +115,21 @@ export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {
       <OutlinedInput
         id={id}
         startAdornment={
-          type === InputE.Outlined ? (
+          type === InputE.Outlined && currency ? (
             <InputAdornment position="end" className={styles.inputStartAdornment}>
               <Typography variant="adornment">{currency}</Typography>
             </InputAdornment>
           ) : undefined
         }
         endAdornment={
-          type === InputE.Regular ? (
+          type === InputE.Regular && currency ? (
             <InputAdornment position="end" className={styles.inputEndAdornment}>
               <Typography variant="adornment">{currency}</Typography>
               {adornmentAction}
             </InputAdornment>
           ) : undefined
         }
-        className={classnames(inputClassName, { [styles.outlined]: type === InputE.Outlined })}
+        className={classnames(inputClassName, { [styles.outlined]: !isUpToMobileScreen && type === InputE.Outlined })}
         inputProps={{ step, min, max }}
         type="number"
         placeholder={placeholder}

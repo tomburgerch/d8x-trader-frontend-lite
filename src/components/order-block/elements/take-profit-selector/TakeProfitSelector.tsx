@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Checkbox, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
@@ -24,13 +24,11 @@ export const TakeProfitSelector = memo(() => {
 
   const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
-  const [isShown, setShown] = useState(false);
 
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const handleTakeProfitPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const takeProfitPriceValue = event.target.value;
+  const handleTakeProfitPriceChange = (takeProfitPriceValue: string) => {
     if (takeProfitPriceValue !== '') {
       setTakeProfitInputPrice(+takeProfitPriceValue);
       setTakeProfit(null);
@@ -103,14 +101,6 @@ export const TakeProfitSelector = memo(() => {
     setTakeProfitPrice(takeProfitInputPrice);
   }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfit, setTakeProfitPrice]);
 
-  const handleCheckChange = useCallback(
-    (_event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      setShown(checked);
-      setTakeProfit(TakeProfitE.None);
-    },
-    [setTakeProfit]
-  );
-
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
       currentOrderBlockRef.current = orderInfo?.orderBlock;
@@ -166,7 +156,6 @@ export const TakeProfitSelector = memo(() => {
       id="custom-take-profit-price"
       label={
         <InfoLabelBlock
-          titlePrefix={<Checkbox id="hide-show-take-profit" checked={isShown} onChange={handleCheckChange} />}
           title={t('pages.trade.order-block.take-profit.title')}
           content={
             <>
@@ -184,10 +173,8 @@ export const TakeProfitSelector = memo(() => {
       validateInputPrice={validateTakeProfitPrice}
       selectedInputPrice={takeProfitInputPrice}
       selectedPrice={takeProfit}
-      currency={selectedPerpetual?.quoteCurrency}
       stepSize={stepSize}
       disabled={isDisabled}
-      hide={!isShown}
     />
   );
 });

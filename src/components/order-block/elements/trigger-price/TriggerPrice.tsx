@@ -6,17 +6,17 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
+import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { orderBlockAtom, orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
+import type { TemporaryAnyT } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './TriggerPrice.module.scss';
-import { InputE } from '../../../responsive-input/enums';
-import { getDynamicLogo } from '../../../../utils/getDynamicLogo';
-import type { TemporaryAnyT } from '../../../../types/types';
 
 export const TriggerPrice = memo(() => {
   const { t } = useTranslation();
@@ -94,6 +94,7 @@ export const TriggerPrice = memo(() => {
       </Box>
       <ResponsiveInput
         id="trigger-size"
+        className={styles.responsiveInput}
         inputValue={inputValue}
         setInputValue={handleTriggerPriceChange}
         handleInputBlur={handleInputBlur}

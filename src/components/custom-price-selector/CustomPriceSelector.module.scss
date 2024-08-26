@@ -4,16 +4,20 @@
 .root {
   @include transition(margin-bottom);
 
+  flex: 1;
   flex-direction: column;
   align-items: flex-start;
   gap: $d8x-spacing * 2;
-  padding: 4 * $d8x-spacing;
+  padding: $d8x-spacing * 3;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-card-overlay);
 
-  &.hidden {
-    margin-bottom: 0;
-    max-height: 60px;
+  .active,
+  &:focus,
+  &:focus-within,
+  &:hover {
+    border: 1px solid var(--d8x-color-action);
+    padding: calc(3 * $d8x-spacing - 1px);
   }
 }
 
@@ -21,29 +25,13 @@
   @include transition(margin-bottom);
 
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: $d8x-spacing * 3;
-
-  &.hidden {
-    margin-bottom: 0;
-  }
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.customPriceInput {
-  @include transition(opacity);
-
-  opacity: 1;
-
-  &.hidden {
-    opacity: 0;
-    cursor: pointer;
-    user-select: none;
-    pointer-events: none;
-  }
-
-  :global(.MuiOutlinedInput-input) {
-    padding: 2 * $d8x-spacing 10px;
+.responsiveInput {
+  :global(.MuiInputBase-root) {
+    width: 130px;
   }
 }
 
@@ -58,10 +46,6 @@
   overflow-y: hidden;
   height: 30px;
   margin-bottom: 2 * $d8x-spacing;
-
-  &.hidden {
-    height: 0;
-  }
 
   :global(.MuiButtonGroup-root) {
     width: 100%;
@@ -96,22 +80,10 @@
       max-height: 35px;
     }
   }
-}
 
-@media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
-  screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) {
-  .root {
-    margin-bottom: 0;
-    margin-top: 0;
-  }
-
-  .labelHolder {
-    margin-bottom: $d8x-spacing * 2;
-  }
-
-  .priceOptions {
-    :global(.MuiButtonBase-root) {
-      max-height: 30px;
+  .responsiveInput {
+    :global(.MuiInputBase-root) {
+      width: 140px;
     }
   }
 }

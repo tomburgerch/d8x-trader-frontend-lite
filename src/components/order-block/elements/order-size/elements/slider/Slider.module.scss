@@ -1,7 +1,7 @@
 @import '~styles/theme/theme';
 
 .root {
-  margin: 2px 9px;
+  margin: 0 10px;
 
   :global(.MuiSlider-thumb) {
     background-color: var(--d8x-slider-thumb-background);

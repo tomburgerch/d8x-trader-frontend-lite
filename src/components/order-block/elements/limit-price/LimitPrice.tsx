@@ -6,17 +6,17 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
+import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { limitPriceAtom, orderBlockAtom, orderTypeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
+import type { TemporaryAnyT } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './LimitPrice.module.scss';
-import { InputE } from '../../../responsive-input/enums';
-import { getDynamicLogo } from '../../../../utils/getDynamicLogo';
-import type { TemporaryAnyT } from '../../../../types/types';
 
 export const LimitPrice = memo(() => {
   const { t } = useTranslation();
@@ -133,6 +133,7 @@ export const LimitPrice = memo(() => {
       </Box>
       <ResponsiveInput
         id="limit-size"
+        className={styles.responsiveInput}
         inputValue={inputValue}
         setInputValue={handleLimitPriceChange}
         handleInputBlur={handleInputBlur}

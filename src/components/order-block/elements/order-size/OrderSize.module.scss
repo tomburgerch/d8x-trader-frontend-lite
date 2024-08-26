@@ -2,9 +2,16 @@
 @import '~styles/theme/utils.scss';
 
 .root {
-  padding: 4 * $d8x-spacing;
+  padding: 3 * $d8x-spacing;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-card-overlay);
+
+  &:focus,
+  &:focus-within,
+  &:hover {
+    border: 1px solid var(--d8x-color-action);
+    padding: calc(3 * $d8x-spacing - 1px);
+  }
 }
 
 .manualBlock {
@@ -87,11 +94,6 @@
 @media screen and ($d8x-breakpoint-max-xs) {
   .actionIconsHolder {
     display: none;
-  }
-
-  .manualBlock {
-    flex-direction: column;
-    align-items: stretch;
   }
 }
 

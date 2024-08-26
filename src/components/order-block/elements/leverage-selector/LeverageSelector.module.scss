@@ -5,10 +5,17 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 4 * $d8x-spacing;
-  padding: 4 * $d8x-spacing;
+  margin-bottom: 2 * $d8x-spacing;
+  padding: 3 * $d8x-spacing;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-card-overlay);
+
+  &:focus,
+  &:focus-within,
+  &:hover {
+    border: 1px solid var(--d8x-color-action);
+    padding: calc(3 * $d8x-spacing - 1px);
+  }
 }
 
 .rowOne {
@@ -23,7 +30,7 @@
 .rowTwo {
   display: flex;
   width: 100%;
-  margin-top: 3 * $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
   justify-content: space-between;
   gap: $d8x-spacing;
 }
@@ -82,9 +89,5 @@
 @media screen and ($d8x-breakpoint-height-max-md) {
   .buttonsHolder {
     margin-bottom: 4px;
-  }
-
-  .root {
-    margin-top: 2 * $d8x-spacing;
   }
 }

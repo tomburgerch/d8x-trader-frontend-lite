@@ -33,7 +33,8 @@
   }
 
   :global(.MuiInputAdornment-root) {
-    margin-bottom: -$d8x-spacing;
+    margin-left: 0;
+    margin-right: $d8x-spacing;
   }
 
   :global(.MuiOutlinedInput-notchedOutline) {
@@ -44,6 +45,7 @@
     background-color: transparent !important;
     font-size: 24px;
     font-weight: 500;
+    padding: 0;
   }
 }
 
@@ -103,6 +105,10 @@
         margin-left: 0;
         margin-right: 4px;
       }
+    }
+
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: var(--d8x-color-action);
     }
 
     .decreaseButton,

@@ -1,9 +1,14 @@
-import classnames from 'classnames';
-import { ChangeEvent, ReactNode } from 'react';
+// import classnames from 'classnames';
+// import { type ReactNode, Suspense, useMemo } from 'react';
+import { type ReactNode } from 'react';
 
-import { Box, Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
+// import { Button } from '@mui/material';
 
+import { InputE } from 'components/responsive-input/enums';
+import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { genericMemo } from 'helpers/genericMemo';
+// import { getDynamicLogo } from 'utils/getDynamicLogo';
+// import type { TemporaryAnyT } from 'types/types';
 
 import styles from './CustomPriceSelector.module.scss';
 
@@ -12,7 +17,7 @@ interface CustomPriceSelectorPropsI<T extends string> {
   label: ReactNode;
   options: T[];
   translationMap: Record<T, string>;
-  handleInputPriceChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleInputPriceChange: (newValue: string) => void;
   validateInputPrice: () => void;
   handlePriceChange: (key: T) => void;
   selectedInputPrice: number | null | undefined;
@@ -20,48 +25,49 @@ interface CustomPriceSelectorPropsI<T extends string> {
   currency?: string;
   stepSize: string;
   disabled?: boolean;
-  hide?: boolean;
 }
 
 function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelectorPropsI<T>) {
   const {
     id,
     label,
-    options,
-    translationMap,
-    handlePriceChange,
+    // options,
+    // translationMap,
+    // handlePriceChange,
     handleInputPriceChange,
     validateInputPrice,
     selectedInputPrice,
-    selectedPrice,
-    currency,
+    // selectedPrice,
+    // currency,
     stepSize,
     disabled = false,
-    hide = false,
   } = props;
 
+  // const CurrencyIcon = useMemo(() => {
+  //   if (!currency) {
+  //     return null;
+  //   }
+  //   return getDynamicLogo(currency.toLowerCase()) as TemporaryAnyT;
+  // }, [currency]);
+
   return (
-    <Box className={classnames(styles.root, { [styles.hidden]: hide })}>
-      <Box className={classnames(styles.labelHolder, { [styles.hidden]: hide })}>
+    <div className={styles.root}>
+      <div className={styles.labelHolder}>
         {label}
-        <OutlinedInput
+        <ResponsiveInput
           id={id}
-          className={classnames(styles.customPriceInput, { [styles.hidden]: hide })}
-          endAdornment={
-            <InputAdornment position="end">
-              <Typography variant="adornment">{currency}</Typography>
-            </InputAdornment>
-          }
-          type="number"
-          value={selectedInputPrice != null ? selectedInputPrice : ''}
+          className={styles.responsiveInput}
+          inputValue={selectedInputPrice != null ? selectedInputPrice : ''}
           placeholder="-"
-          onChange={handleInputPriceChange}
-          onBlur={validateInputPrice}
-          inputProps={{ step: stepSize, min: 0 }}
+          step={stepSize}
+          min={0}
+          setInputValue={handleInputPriceChange}
+          handleInputBlur={validateInputPrice}
           disabled={disabled}
+          type={InputE.Outlined}
         />
-      </Box>
-      <Box className={classnames(styles.priceOptions, { [styles.hidden]: hide })}>
+      </div>
+      {/*<div className={styles.priceOptions}>
         {options.map((key) => (
           <Button
             key={key}
@@ -73,8 +79,8 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
             {translationMap[key]}
           </Button>
         ))}
-      </Box>
-    </Box>
+      </div>*/}
+    </div>
   );
 }
 

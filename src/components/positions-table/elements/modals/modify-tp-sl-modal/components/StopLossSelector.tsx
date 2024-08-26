@@ -1,14 +1,5 @@
 import { useAtomValue } from 'jotai';
-import {
-  type ChangeEvent,
-  type Dispatch,
-  memo,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { type Dispatch, memo, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
@@ -40,8 +31,7 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
 
   const parsedSymbol = parseSymbol(position.symbol);
 
-  const handleStopLossPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const stopLossPriceValue = event.target.value;
+  const handleStopLossPriceChange = (stopLossPriceValue: string) => {
     if (stopLossPriceValue !== '') {
       setStopLossInputPrice(+stopLossPriceValue);
     } else {

@@ -1,14 +1,5 @@
 import { useAtomValue } from 'jotai';
-import {
-  type ChangeEvent,
-  type Dispatch,
-  memo,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { type Dispatch, memo, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
@@ -40,8 +31,7 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled
 
   const parsedSymbol = parseSymbol(position.symbol);
 
-  const handleTakeProfitPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const takeProfitPriceValue = event.target.value;
+  const handleTakeProfitPriceChange = (takeProfitPriceValue: string) => {
     if (takeProfitPriceValue !== '') {
       setTakeProfitInputPrice(+takeProfitPriceValue);
     } else {

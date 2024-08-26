@@ -1,13 +1,26 @@
 @import '~styles/theme/theme.scss';
 
 .root {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 4 * $d8x-spacing;
-  padding: 4 * $d8x-spacing;
+  padding: 3 * $d8x-spacing;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-card-overlay);
+
+  &:focus,
+  &:focus-within,
+  &:hover {
+    border: 1px solid var(--d8x-color-action);
+    padding: calc(3 * $d8x-spacing - 1px);
+  }
+}
+
+.responsiveInput {
+  :global(.MuiInputBase-root) {
+    width: 100%;
+  }
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
@@ -20,13 +33,5 @@
     display: flex;
     justify-content: flex-start;
     margin-bottom: $d8x-spacing * 3;
-  }
-}
-
-@media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
-  screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) {
-  .root {
-    margin-bottom: 2 * $d8x-spacing;
-    margin-top: 2 * $d8x-spacing;
   }
 }

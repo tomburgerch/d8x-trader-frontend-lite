@@ -1,13 +1,14 @@
 import classnames from 'classnames';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import { ArrowForward } from '@mui/icons-material';
 import { Card, CardContent, Link } from '@mui/material';
 import { useAccount } from 'wagmi';
 
 import { depositModalOpenAtom } from 'store/global-modals.store';
+import { orderTypeAtom } from 'store/order-block.store';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { Separator } from '../separator/Separator';
@@ -24,11 +25,14 @@ import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSe
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
 
 import styles from './OrderBlock.module.scss';
+import { OrderTypeE } from '../../types/enums';
 
 export const OrderBlock = memo(() => {
   const { t } = useTranslation();
 
+  const orderType = useAtomValue(orderTypeAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
+
   const { chainId, isConnected } = useAccount();
 
   return (
@@ -38,17 +42,17 @@ export const OrderBlock = memo(() => {
         <SettingsButton />
       </CardContent>
       <Separator className={styles.separator} />
-      <CardContent className={styles.card}>
+      <CardContent className={classnames(styles.card, styles.orders)}>
         <OrderSelector />
       </CardContent>
-      {/*<Separator className={styles.separator} />*/}
       <CardContent className={styles.card}>
         <LeverageSelector />
-        <TriggerPrice />
-        <LimitPrice />
         <OrderSize />
+        <div className={classnames(styles.additionalPrices, { [styles.hidden]: orderType === OrderTypeE.Market })}>
+          <LimitPrice />
+          <TriggerPrice />
+        </div>
       </CardContent>
-      {/*<Separator className={styles.separator} />*/}
       <CardContent className={classnames(styles.card, styles.selectors)}>
         <StopLossSelector />
         <TakeProfitSelector />
