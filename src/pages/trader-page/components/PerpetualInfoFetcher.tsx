@@ -19,6 +19,7 @@ export const PerpetualInfoFetcher = () => {
 
   const symbol = useMemo(() => {
     if (selectedPool && selectedPerpetual) {
+      console.log({ selectedPerpetual });
       return createSymbol({
         baseCurrency: selectedPerpetual.baseCurrency,
         quoteCurrency: selectedPerpetual.quoteCurrency,

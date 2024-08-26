@@ -74,7 +74,7 @@ export async function getExchangeInfo(
   traderAPI: TraderInterface | null
 ): Promise<ValidatedResponseI<ExchangeInfoI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    // console.log('exchangeInfo via SDK');
+    console.log('exchangeInfo via SDK');
     const info = await traderAPI.exchangeInfo();
     const data: ExchangeInfoI = { ...info, pools: [] };
     for (const pool of info.pools) {
@@ -83,6 +83,7 @@ export async function getExchangeInfo(
         const symbol = traderAPI.getSymbolFromPerpId(perp.id)!;
         let markPrice: number;
         if (traderAPI.isPredictionMarket(symbol)) {
+          console.log({ symbol, perp });
           const px = await traderAPI.fetchPricesForPerpetual(symbol);
           markPrice = px.ema + perp.markPremium;
         } else {
@@ -94,8 +95,9 @@ export async function getExchangeInfo(
     }
     return { type: 'exchange-info', msg: '', data };
   } else {
-    // console.log('exchangeInfo via BE');
-    return fetchUrl('exchange-info', chainId);
+    console.log('exchangeInfo via BE');
+    throw new Error('disabled on purpose'); // TODO; undo this
+    // return fetchUrl('exchange-info', chainId);
   }
 }
 
@@ -105,11 +107,12 @@ export async function getPerpetualStaticInfo(
   symbol: string
 ): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    // console.log('perpStaticInfo via SDK');
+    console.log('perpStaticInfo via SDK', { chainId, symbol });
     const info = traderAPI.getPerpetualStaticInfo(symbol);
+    console.log(info);
     return { type: 'perpetual-static-info', msg: '', data: info };
   } else {
-    // TODO: legacy, remove error when new BEs are live
+    // TODO: legacy, remove error when ethers-v6 BEs are live
     throw new Error(`Unable to fetch perpetual static info for symbol ${symbol}`);
     // console.log('perpStaticInfo via BE');
     // return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
@@ -130,11 +133,11 @@ export async function getPositionRisk(
   }
 
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    // console.log(`positionRisk via SDK`);
+    console.log(`positionRisk via SDK`);
     const data = await traderAPI.positionRisk(traderAddr);
     return { type: 'position-risk', msg: '', data };
   } else {
-    // console.log(`positionRisk via BE`);
+    console.log(`positionRisk via BE`);
     return fetchUrl(`position-risk?${params}`, chainId);
   }
 }
