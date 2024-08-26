@@ -1,9 +1,6 @@
 @import '~styles/theme/theme.scss';
-@import '~styles/theme/utils.scss';
 
 .root {
-  @include transition(margin-bottom);
-
   flex: 1;
   flex-direction: column;
   align-items: flex-start;
@@ -22,22 +19,27 @@
 }
 
 .labelHolder {
-  @include transition(margin-bottom);
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
+.inputHolder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $d8x-spacing * 2;
+}
+
 .responsiveInput {
+  flex: 1;
+
   :global(.MuiInputBase-root) {
-    width: 130px;
+    width: 120px;
   }
 }
 
 .priceOptions {
-  @include transition(height);
-
   width: 100%;
   display: flex;
   justify-content: flex-start;

@@ -1,0 +1,68 @@
+@import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
+
+.dialog {
+  :global(.MuiPaper-root) {
+    width: 100%;
+    max-width: 620px;
+  }
+}
+
+.customPrices {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4 * $d8x-spacing;
+}
+
+.takeProfit,
+.stopLoss {
+  @include transition(opacity);
+
+  display: flex;
+  flex-direction: column;
+  opacity: 0.2;
+  cursor: pointer;
+
+  .price {
+    display: flex;
+    align-items: center;
+    gap: 2 * $d8x-spacing;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 34px;
+
+    .currencyIcon {
+      margin-top: -$d8x-spacing;
+    }
+  }
+
+  .label {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 18px;
+  }
+
+  &:hover,
+  &.active {
+    opacity: 1;
+  }
+
+  &.active {
+    pointer-events: none;
+  }
+}
+
+.stopLoss {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.takeProfit {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.chartHolder {
+  margin-bottom: 4 * $d8x-spacing;
+}

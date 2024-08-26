@@ -27,8 +27,10 @@ export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(Number(ExpiryE['90D']));
 export const stopLossAtom = atom<StopLossE | null>(StopLossE.None);
 export const stopLossPriceAtom = atom<number | null>(null);
+export const stopLossInputPriceAtom = atom<number | null>(null);
 export const takeProfitAtom = atom<TakeProfitE | null>(TakeProfitE.None);
 export const takeProfitPriceAtom = atom<number | null>(null);
+export const takeProfitInputPriceAtom = atom<number | null>(null);
 export const storageKeyAtom = atom<string | null>(null);
 
 export const latestOrderSentTimestampAtom = atom(0);

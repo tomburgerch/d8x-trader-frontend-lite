@@ -4,25 +4,30 @@ import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
 
+import { CustomPriceModal } from 'components/custom-price-modal/CustomPriceModal';
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { calculateProbability } from 'helpers/calculateProbability';
-import { orderInfoAtom, takeProfitAtom, takeProfitPriceAtom } from 'store/order-block.store';
+import { takeProfitModalOpenAtom } from 'store/global-modals.store';
+import { orderInfoAtom, takeProfitAtom, takeProfitInputPriceAtom, takeProfitPriceAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, TakeProfitE } from 'types/enums';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 
+import styles from './TakeProfitSelector.module.scss';
+
 export const TakeProfitSelector = memo(() => {
   const { t } = useTranslation();
-  const traderAPI = useAtomValue(traderAPIAtom);
 
+  const traderAPI = useAtomValue(traderAPIAtom);
   const orderInfo = useAtomValue(orderInfoAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
+  const setTakeProfitModalOpen = useSetAtom(takeProfitModalOpenAtom);
   const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
+  const [takeProfitInputPrice, setTakeProfitInputPrice] = useAtom(takeProfitInputPriceAtom);
 
-  const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
 
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
@@ -99,7 +104,14 @@ export const TakeProfitSelector = memo(() => {
     }
 
     setTakeProfitPrice(takeProfitInputPrice);
-  }, [minTakeProfitPrice, maxTakeProfitPrice, takeProfitInputPrice, setTakeProfit, setTakeProfitPrice]);
+  }, [
+    minTakeProfitPrice,
+    maxTakeProfitPrice,
+    takeProfitInputPrice,
+    setTakeProfit,
+    setTakeProfitPrice,
+    setTakeProfitInputPrice,
+  ]);
 
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
@@ -112,7 +124,7 @@ export const TakeProfitSelector = memo(() => {
         setTakeProfit(TakeProfitE.None);
       }
     }
-  }, [orderInfo?.orderBlock, orderInfo?.takeProfit, setTakeProfitPrice, setTakeProfit]);
+  }, [orderInfo?.orderBlock, orderInfo?.takeProfit, setTakeProfit, setTakeProfitPrice, setTakeProfitInputPrice]);
 
   useEffect(() => {
     if (currentLeverageRef.current !== orderInfo?.leverage) {
@@ -130,7 +142,7 @@ export const TakeProfitSelector = memo(() => {
     } else if (takeProfit && takeProfit === TakeProfitE.None) {
       setTakeProfitInputPrice(null);
     }
-  }, [takeProfit, orderInfo?.takeProfitPrice]);
+  }, [takeProfit, orderInfo?.takeProfitPrice, setTakeProfitInputPrice]);
 
   useEffect(() => {
     if (orderInfo && orderInfo.reduceOnly && orderInfo.orderType !== OrderTypeE.Market) {
@@ -143,6 +155,21 @@ export const TakeProfitSelector = memo(() => {
     }
   }, [setTakeProfitInputPrice, setTakeProfitPrice, setTakeProfit, orderInfo]);
 
+  const handleModalOpen = useCallback(() => {
+    setTakeProfitModalOpen(true);
+  }, [setTakeProfitModalOpen]);
+
+  const calculatedPercent = useMemo(() => {
+    if (takeProfitInputPrice === null || !midPrice) {
+      return '--';
+    }
+    let percent = takeProfitInputPrice / midPrice - 1;
+    if (percent < 0.005) {
+      percent = 0;
+    }
+    return `${Math.round(100 * percent)}%`;
+  }, [midPrice, takeProfitInputPrice]);
+
   const translationMap: Record<TakeProfitE, string> = {
     [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
     [TakeProfitE['5%']]: '5%',
@@ -152,29 +179,38 @@ export const TakeProfitSelector = memo(() => {
   };
 
   return (
-    <CustomPriceSelector<TakeProfitE>
-      id="custom-take-profit-price"
-      label={
-        <InfoLabelBlock
-          title={t('pages.trade.order-block.take-profit.title')}
-          content={
-            <>
-              <Typography>{t('pages.trade.order-block.take-profit.body1')}</Typography>
-              <Typography>{t('pages.trade.order-block.take-profit.body2')}</Typography>
-              <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
-            </>
-          }
-        />
-      }
-      options={Object.values(TakeProfitE)}
-      translationMap={translationMap}
-      handlePriceChange={handleTakeProfitChange}
-      handleInputPriceChange={handleTakeProfitPriceChange}
-      validateInputPrice={validateTakeProfitPrice}
-      selectedInputPrice={takeProfitInputPrice}
-      selectedPrice={takeProfit}
-      stepSize={stepSize}
-      disabled={isDisabled}
-    />
+    <>
+      <CustomPriceSelector<TakeProfitE>
+        id="custom-take-profit-price"
+        label={
+          <InfoLabelBlock
+            title={t('pages.trade.order-block.take-profit.title')}
+            content={
+              <>
+                <Typography>{t('pages.trade.order-block.take-profit.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
+              </>
+            }
+          />
+        }
+        options={Object.values(TakeProfitE)}
+        translationMap={translationMap}
+        handlePriceChange={handleTakeProfitChange}
+        handleInputPriceChange={handleTakeProfitPriceChange}
+        validateInputPrice={validateTakeProfitPrice}
+        selectedInputPrice={takeProfitInputPrice}
+        selectedPrice={takeProfit}
+        stepSize={stepSize}
+        disabled={isDisabled}
+        percentComponent={
+          <div onClick={handleModalOpen} className={styles.percent}>
+            {calculatedPercent}
+          </div>
+        }
+      />
+
+      <CustomPriceModal />
+    </>
   );
 });

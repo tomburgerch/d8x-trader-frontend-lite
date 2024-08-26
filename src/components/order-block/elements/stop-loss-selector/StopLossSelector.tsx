@@ -4,14 +4,18 @@ import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
 
+import { CustomPriceModal } from 'components/custom-price-modal/CustomPriceModal';
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { orderInfoAtom, stopLossAtom, stopLossPriceAtom } from 'store/order-block.store';
+import { stopLossModalOpenAtom } from 'store/global-modals.store';
+import { orderInfoAtom, stopLossAtom, stopLossInputPriceAtom, stopLossPriceAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE, StopLossE } from 'types/enums';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
+
+import styles from './StopLossSelector.module.scss';
 
 export const StopLossSelector = memo(() => {
   const { t } = useTranslation();
@@ -20,9 +24,10 @@ export const StopLossSelector = memo(() => {
   const orderInfo = useAtomValue(orderInfoAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setStopLossPrice = useSetAtom(stopLossPriceAtom);
+  const setStopLossModalOpen = useSetAtom(stopLossModalOpenAtom);
   const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
+  const [stopLossInputPrice, setStopLossInputPrice] = useAtom(stopLossInputPriceAtom);
 
-  const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
 
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
@@ -103,7 +108,7 @@ export const StopLossSelector = memo(() => {
     }
 
     setStopLossPrice(stopLossInputPrice);
-  }, [minStopLossPrice, maxStopLossPrice, stopLossInputPrice, setStopLoss, setStopLossPrice]);
+  }, [minStopLossPrice, maxStopLossPrice, stopLossInputPrice, setStopLoss, setStopLossPrice, setStopLossInputPrice]);
 
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
@@ -116,7 +121,7 @@ export const StopLossSelector = memo(() => {
         setStopLoss(StopLossE.None);
       }
     }
-  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setStopLossPrice, setStopLoss]);
+  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setStopLoss, setStopLossPrice, setStopLossInputPrice]);
 
   useEffect(() => {
     if (currentLeverageRef.current !== orderInfo?.leverage) {
@@ -132,7 +137,7 @@ export const StopLossSelector = memo(() => {
     } else if (stopLoss && stopLoss === StopLossE.None) {
       setStopLossInputPrice(null);
     }
-  }, [stopLoss, orderInfo?.stopLossPrice]);
+  }, [stopLoss, orderInfo?.stopLossPrice, setStopLossInputPrice]);
 
   useEffect(() => {
     if (orderInfo && orderInfo.reduceOnly && orderInfo.orderType !== OrderTypeE.Market) {
@@ -145,6 +150,21 @@ export const StopLossSelector = memo(() => {
     }
   }, [setStopLossInputPrice, setStopLossPrice, setStopLoss, orderInfo]);
 
+  const handleModalOpen = useCallback(() => {
+    setStopLossModalOpen(true);
+  }, [setStopLossModalOpen]);
+
+  const calculatedPercent = useMemo(() => {
+    if (stopLossInputPrice === null || !midPrice) {
+      return '--';
+    }
+    let percent = stopLossInputPrice / midPrice - 1;
+    if (percent > -0.005) {
+      percent = 0;
+    }
+    return `${Math.round(100 * percent)}%`;
+  }, [midPrice, stopLossInputPrice]);
+
   const translationMap: Record<StopLossE, string> = {
     [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),
     [StopLossE['5%']]: '5%',
@@ -154,29 +174,38 @@ export const StopLossSelector = memo(() => {
   };
 
   return (
-    <CustomPriceSelector<StopLossE>
-      id="custom-stop-loss-price"
-      label={
-        <InfoLabelBlock
-          title={t('pages.trade.order-block.stop-loss.title')}
-          content={
-            <>
-              <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
-            </>
-          }
-        />
-      }
-      options={Object.values(StopLossE)}
-      translationMap={translationMap}
-      handlePriceChange={handleStopLossChange}
-      handleInputPriceChange={handleStopLossPriceChange}
-      validateInputPrice={validateStopLossPrice}
-      selectedInputPrice={stopLossInputPrice}
-      selectedPrice={stopLoss}
-      stepSize={stepSize}
-      disabled={isDisabled}
-    />
+    <>
+      <CustomPriceSelector<StopLossE>
+        id="custom-stop-loss-price"
+        label={
+          <InfoLabelBlock
+            title={t('pages.trade.order-block.stop-loss.title')}
+            content={
+              <>
+                <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
+              </>
+            }
+          />
+        }
+        options={Object.values(StopLossE)}
+        translationMap={translationMap}
+        handlePriceChange={handleStopLossChange}
+        handleInputPriceChange={handleStopLossPriceChange}
+        validateInputPrice={validateStopLossPrice}
+        selectedInputPrice={stopLossInputPrice}
+        selectedPrice={stopLoss}
+        stepSize={stepSize}
+        disabled={isDisabled}
+        percentComponent={
+          <div onClick={handleModalOpen} className={styles.percent}>
+            {calculatedPercent}
+          </div>
+        }
+      />
+
+      <CustomPriceModal />
+    </>
   );
 });

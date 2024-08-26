@@ -25,6 +25,7 @@ interface CustomPriceSelectorPropsI<T extends string> {
   currency?: string;
   stepSize: string;
   disabled?: boolean;
+  percentComponent?: ReactNode;
 }
 
 function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelectorPropsI<T>) {
@@ -41,6 +42,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
     // currency,
     stepSize,
     disabled = false,
+    percentComponent,
   } = props;
 
   // const CurrencyIcon = useMemo(() => {
@@ -52,8 +54,8 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
 
   return (
     <div className={styles.root}>
-      <div className={styles.labelHolder}>
-        {label}
+      <div className={styles.labelHolder}>{label}</div>
+      <div className={styles.inputHolder}>
         <ResponsiveInput
           id={id}
           className={styles.responsiveInput}
@@ -66,6 +68,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
           disabled={disabled}
           type={InputE.Outlined}
         />
+        {percentComponent}
       </div>
       {/*<div className={styles.priceOptions}>
         {options.map((key) => (

@@ -5,6 +5,7 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 
+import { MarketSelect } from 'components/market-select/MarketSelect';
 import { candlesAtom, candlesDataReadyAtom, newCandleAtom } from 'store/tv-chart.store';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 
@@ -13,9 +14,13 @@ import { ChartBlock } from './elements/chart-block/ChartBlock';
 import { PeriodSelector } from './elements/period-selector/PeriodSelector';
 
 import styles from './TradingViewChart.module.scss';
-import { MarketSelect } from '../market-select/MarketSelect';
 
-export const TradingViewChart = memo(() => {
+interface TradingViewChartPropsI {
+  onlyChart?: boolean;
+  height?: number;
+}
+
+export const TradingViewChart = memo(({ onlyChart = false, height }: TradingViewChartPropsI) => {
   const theme = useTheme();
   const isUpFromMobileScreen = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -77,17 +82,25 @@ export const TradingViewChart = memo(() => {
 
   return (
     <div className={styles.root} ref={ref}>
-      <div className={styles.heading}>
-        {isUpFromMobileScreen && (
-          <div className={styles.selectHolder}>
-            <MarketSelect />
+      {!onlyChart && (
+        <div className={styles.heading}>
+          {isUpFromMobileScreen && (
+            <div className={styles.selectHolder}>
+              <MarketSelect />
+            </div>
+          )}
+          <div className={styles.periodsHolder}>
+            <PeriodSelector />
           </div>
-        )}
-        <div className={styles.periodsHolder}>
-          <PeriodSelector />
         </div>
-      </div>
-      <ChartBlock width={width} candles={candlesWithLocalTime} seriesRef={seriesRef} numberDigits={precision} />
+      )}
+      <ChartBlock
+        width={width}
+        height={height}
+        candles={candlesWithLocalTime}
+        seriesRef={seriesRef}
+        numberDigits={precision}
+      />
       {!isCandleDataReady && (
         <div className={styles.loaderHolder}>
           <CircularProgress color="primary" />
