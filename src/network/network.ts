@@ -19,7 +19,6 @@ import type {
   PerpetualPriceI,
   PerpetualStaticInfoI,
   ValidatedResponseI,
-  PerpetualI,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -76,24 +75,8 @@ export async function getExchangeInfo(
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
     console.log('exchangeInfo via SDK');
     const info = await traderAPI.exchangeInfo();
-    const data: ExchangeInfoI = { ...info, pools: [] };
-    for (const pool of info.pools) {
-      const perpIs: PerpetualI[] = [];
-      for (const perp of pool.perpetuals) {
-        const symbol = traderAPI.getSymbolFromPerpId(perp.id)!;
-        let markPrice: number;
-        if (traderAPI.isPredictionMarket(symbol)) {
-          console.log({ symbol, perp });
-          const px = await traderAPI.fetchPricesForPerpetual(symbol);
-          markPrice = px.ema + perp.markPremium;
-        } else {
-          markPrice = perp.indexPrice * (1 + perp.markPremium);
-        }
-        perpIs.push({ ...perp, markPrice });
-      }
-      data.pools.push({ ...pool, perpetuals: perpIs });
-    }
-    return { type: 'exchange-info', msg: '', data };
+
+    return { type: 'exchange-info', msg: '', data: info };
   } else {
     console.log('exchangeInfo via BE');
     throw new Error('disabled on purpose'); // TODO; undo this
@@ -256,13 +239,15 @@ export function getMaxOrderSizeForTrader(
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
+    console.log('getMaxOrderSizeForTrader via sdk');
     return traderAPI
       .maxOrderSizeForTrader(traderAddr, symbol)
       .then(({ buy, sell }) => {
+        console.log({ buy, sell });
         return {
           type: 'max-order-size-for-trader',
           msg: '',
-          data: { buy: buy, sell: sell },
+          data: { buy: Math.abs(buy), sell: Math.abs(sell) },
         } as ValidatedResponseI<MaxOrderSizeResponseI>;
       })
       .catch((error) => {
@@ -270,6 +255,7 @@ export function getMaxOrderSizeForTrader(
         throw new Error(error);
       });
   } else {
+    console.log('getMaxOrderSizeForTrader via BE');
     const params = new URLSearchParams({
       symbol,
       traderAddr,
