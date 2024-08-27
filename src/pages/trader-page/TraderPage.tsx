@@ -19,6 +19,7 @@ import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
 import { type SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { TradeHistoryBlock } from 'components/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { UsdcSwapModal } from 'components/usdc-swap-modal/UsdcSwapModal';
 import { NEW_USDC_ADDRESS, OLD_USDC_ADDRESS } from 'components/usdc-swap-widget/constants';
@@ -48,7 +49,6 @@ import { CandlesWebSocketListener } from './components/candles-webSocket-listene
 import { TableDataFetcher } from './components/table-data-refetcher/TableDataFetcher';
 
 import styles from './TraderPage.module.scss';
-import { TradeHistoryBlock } from '../../components/trade-history-block/TradeHistoryBlock';
 
 const MIN_REQUIRED_USDC = 20;
 

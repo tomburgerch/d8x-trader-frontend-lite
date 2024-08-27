@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { tradeHistoryModalOpenAtom } from 'store/global-modals.store';
 
 import styles from './TradeHistoryModal.module.scss';
-import { TradeHistoryTable } from '../trade-history-table/TradeHistoryTable';
 
 export const TradeHistoryModal = () => {
   const { t } = useTranslation();

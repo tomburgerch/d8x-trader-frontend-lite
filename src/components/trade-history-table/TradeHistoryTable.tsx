@@ -10,6 +10,7 @@ import { Table as MuiTable, TableBody, TableContainer, TableHead, TablePaginatio
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getTradesHistory } from 'network/history';
 import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
@@ -20,8 +21,6 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
-
-import { SortableHeaders } from '../table/sortable-header/SortableHeaders';
 
 import styles from './TradeHistoryTable.module.scss';
 

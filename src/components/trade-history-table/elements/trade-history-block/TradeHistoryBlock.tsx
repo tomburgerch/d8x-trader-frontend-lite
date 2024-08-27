@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { format } from 'date-fns';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -57,12 +58,15 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           leftSide={headers[2].label}
           leftSideTooltip={headers[2].tooltip}
           rightSide={
-            tradeHistory.side === 'BUY'
+            tradeHistory.side.indexOf('BUY') > -1
               ? t('pages.trade.positions-table.table-content.buy')
               : t('pages.trade.positions-table.table-content.sell')
           }
           leftSideStyles={styles.dataLabel}
-          rightSideStyles={styles.dataValue}
+          rightSideStyles={classnames(styles.dataValue, {
+            [styles.buy]: tradeHistory.side.indexOf('BUY') > -1,
+            [styles.sell]: tradeHistory.side.indexOf('SELL') > -1,
+          })}
         />
         <SidesRow
           leftSide={headers[3].label}
