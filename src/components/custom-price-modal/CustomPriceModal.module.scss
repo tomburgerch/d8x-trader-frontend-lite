@@ -8,6 +8,20 @@
   }
 }
 
+.dialogContent {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.dialogAction {
+  justify-content: center;
+}
+
+.actionButton {
+  height: 48px;
+  font-size: 16px;
+}
+
 .customPrices {
   display: flex;
   justify-content: space-between;
@@ -65,4 +79,81 @@
 
 .chartHolder {
   margin-bottom: 4 * $d8x-spacing;
+}
+
+.priceCustomization {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $d8x-spacing;
+  margin-bottom: 2 * $d8x-spacing;
+}
+
+.priceOptions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  gap: $d8x-spacing;
+  flex-wrap: wrap;
+  overflow-y: hidden;
+
+  :global(.MuiButtonGroup-root) {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: $d8x-spacing;
+  }
+
+  :global(.MuiButtonBase-root) {
+    flex: 1;
+    border-radius: 8px;
+    min-width: inherit;
+    padding: $d8x-spacing 0 0.5 * $d8x-spacing;
+    height: 32px;
+
+    &.selected {
+      border: 1px solid transparent;
+      background-color: var(--d8x-color-action);
+      color: var(--d8x-color-text-secondary);
+    }
+  }
+}
+
+.responsiveInput {
+  flex: 1;
+
+  :global(.MuiInputBase-root) {
+    width: 140px;
+    height: 32px;
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: var(--d8x-color-action);
+  }
+}
+
+@media screen and ($d8x-breakpoint-max-xs) {
+  .priceOptions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: $d8x-spacing;
+    flex-wrap: wrap;
+    height: auto;
+
+    :global(.MuiButtonBase-root) {
+      min-width: 48px;
+      height: 32px;
+    }
+  }
+
+  .priceCustomization {
+    flex-direction: column;
+    gap: 4 * $d8x-spacing;
+  }
+
+  .responsiveInput {
+    :global(.MuiInputBase-root) {
+      width: 100%;
+    }
+  }
 }

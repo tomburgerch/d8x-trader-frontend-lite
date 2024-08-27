@@ -124,8 +124,8 @@ export const theme = createTheme({
     MuiContainer: {
       styleOverrides: {
         root: {
-          paddingLeft: '20px',
-          paddingRight: '20px',
+          paddingLeft: '24px',
+          paddingRight: '24px',
         },
       },
     },

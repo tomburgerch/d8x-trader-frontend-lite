@@ -1,20 +1,22 @@
 import classnames from 'classnames';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { useStopLoss } from 'components/order-block/elements/stop-loss-selector/useStopLoss';
+import { useTakeProfit } from 'components/order-block/elements/take-profit-selector/useTakeProfit';
+import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { TradingViewChart } from 'components/trading-view-chart/TradingViewChart';
+import { calculateStepSize } from 'helpers/calculateStepSize';
 import { stopLossModalOpenAtom, takeProfitModalOpenAtom } from 'store/global-modals.store';
 import {
   stopLossAtom,
   stopLossInputPriceAtom,
-  stopLossPriceAtom,
   takeProfitAtom,
   takeProfitInputPriceAtom,
-  takeProfitPriceAtom,
 } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import { StopLossE, TakeProfitE } from 'types/enums';
@@ -28,13 +30,14 @@ export const CustomPriceModal = () => {
 
   const [isStopLossModalOpen, setStopLossModalOpen] = useAtom(stopLossModalOpenAtom);
   const [isTakeProfitModalOpen, setTakeProfitModalOpen] = useAtom(takeProfitModalOpenAtom);
-  const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
-  const [stopLossInputPrice, setStopLossInputPrice] = useAtom(stopLossInputPriceAtom);
-  const [takeProfit, setTakeProfit] = useAtom(takeProfitAtom);
-  const [takeProfitInputPrice, setTakeProfitInputPrice] = useAtom(takeProfitInputPriceAtom);
+  const stopLoss = useAtomValue(stopLossAtom);
+  const stopLossInputPrice = useAtomValue(stopLossInputPriceAtom);
+  const takeProfit = useAtomValue(takeProfitAtom);
+  const takeProfitInputPrice = useAtomValue(takeProfitInputPriceAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
-  const setStopLossPrice = useSetAtom(stopLossPriceAtom);
-  const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
+
+  const { handleStopLossPriceChange, handleStopLossChange, validateStopLossPrice } = useStopLoss();
+  const { handleTakeProfitPriceChange, handleTakeProfitChange, validateTakeProfitPrice } = useTakeProfit();
 
   const QuoteCurrencyIcon = useMemo(() => {
     if (!selectedPerpetual) {
@@ -43,17 +46,7 @@ export const CustomPriceModal = () => {
     return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
   }, [selectedPerpetual]);
 
-  const handleStopLossChange = (stopLossValue: StopLossE) => {
-    setStopLossPrice(null);
-    setStopLossInputPrice(null);
-    setStopLoss(stopLossValue);
-  };
-
-  const handleTakeProfitChange = (takeProfitValue: TakeProfitE) => {
-    setTakeProfitPrice(null);
-    setTakeProfitInputPrice(null);
-    setTakeProfit(takeProfitValue);
-  };
+  const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
 
   const handleOnClose = () => {
     setTakeProfitModalOpen(false);
@@ -123,38 +116,62 @@ export const CustomPriceModal = () => {
         </div>
         <div className={styles.actionHolder}>
           {isStopLossModalOpen && (
-            <div className={styles.priceOptions}>
-              {Object.values(StopLossE).map((key) => (
-                <Button
-                  key={key}
-                  variant="outlined"
-                  className={classnames({ [styles.selected]: key === stopLoss })}
-                  onClick={() => handleStopLossChange(key)}
-                >
-                  {stopLossTranslationMap[key]}
-                </Button>
-              ))}
+            <div className={styles.priceCustomization}>
+              <div className={styles.priceOptions}>
+                {Object.values(StopLossE).map((key) => (
+                  <Button
+                    key={key}
+                    variant="outlined"
+                    className={classnames({ [styles.selected]: key === stopLoss })}
+                    onClick={() => handleStopLossChange(key)}
+                  >
+                    {stopLossTranslationMap[key]}
+                  </Button>
+                ))}
+              </div>
+              <ResponsiveInput
+                id="stop-loss-price"
+                className={styles.responsiveInput}
+                inputValue={stopLossInputPrice != null ? stopLossInputPrice : ''}
+                placeholder="-"
+                step={stepSize}
+                min={0}
+                setInputValue={handleStopLossPriceChange}
+                handleInputBlur={validateStopLossPrice}
+              />
             </div>
           )}
           {isTakeProfitModalOpen && (
-            <div className={styles.priceOptions}>
-              {Object.values(TakeProfitE).map((key) => (
-                <Button
-                  key={key}
-                  variant="outlined"
-                  className={classnames({ [styles.selected]: key === takeProfit })}
-                  onClick={() => handleTakeProfitChange(key)}
-                >
-                  {takeProfitTranslationMap[key]}
-                </Button>
-              ))}
+            <div className={styles.priceCustomization}>
+              <div className={styles.priceOptions}>
+                {Object.values(TakeProfitE).map((key) => (
+                  <Button
+                    key={key}
+                    variant="outlined"
+                    className={classnames({ [styles.selected]: key === takeProfit })}
+                    onClick={() => handleTakeProfitChange(key)}
+                  >
+                    {takeProfitTranslationMap[key]}
+                  </Button>
+                ))}
+              </div>
+              <ResponsiveInput
+                id="take-profit-price"
+                className={styles.responsiveInput}
+                inputValue={takeProfitInputPrice != null ? takeProfitInputPrice : ''}
+                placeholder="-"
+                step={stepSize}
+                min={0}
+                setInputValue={handleTakeProfitPriceChange}
+                handleInputBlur={validateTakeProfitPrice}
+              />
             </div>
           )}
         </div>
       </DialogContent>
       <DialogActions className={styles.dialogAction}>
         <Button onClick={handleOnClose} variant="secondary">
-          {t('common.deposit-modal.done-button')}
+          {t('common.info-modal.close')}
         </Button>
       </DialogActions>
     </Dialog>

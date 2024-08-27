@@ -2,7 +2,7 @@
 @import '~styles/theme/utils.scss';
 
 .root {
-  margin-bottom: 8 * $d8x-spacing;
+  margin-bottom: 6 * $d8x-spacing;
 
   :global(.MuiPaper-root) {
     height: 80px;

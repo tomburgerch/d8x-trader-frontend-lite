@@ -1,14 +1,15 @@
 import classnames from 'classnames';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAccount } from 'wagmi';
 
 import { ArrowForward } from '@mui/icons-material';
 import { Card, CardContent, Link } from '@mui/material';
-import { useAccount } from 'wagmi';
 
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { orderTypeAtom } from 'store/order-block.store';
+import { OrderTypeE } from 'types/enums';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { Separator } from '../separator/Separator';
@@ -25,7 +26,6 @@ import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSe
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
 
 import styles from './OrderBlock.module.scss';
-import { OrderTypeE } from '../../types/enums';
 
 export const OrderBlock = memo(() => {
   const { t } = useTranslation();

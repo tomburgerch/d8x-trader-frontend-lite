@@ -8,19 +8,19 @@ import { CustomPriceModal } from 'components/custom-price-modal/CustomPriceModal
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { calculateProbability } from 'helpers/calculateProbability';
 import { takeProfitModalOpenAtom } from 'store/global-modals.store';
 import { orderInfoAtom, takeProfitAtom, takeProfitInputPriceAtom, takeProfitPriceAtom } from 'store/order-block.store';
-import { selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
-import { OrderBlockE, OrderTypeE, TakeProfitE } from 'types/enums';
+import { selectedPerpetualAtom } from 'store/pools.store';
+import { OrderTypeE, TakeProfitE } from 'types/enums';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
+
+import { useTakeProfit } from './useTakeProfit';
 
 import styles from './TakeProfitSelector.module.scss';
 
 export const TakeProfitSelector = memo(() => {
   const { t } = useTranslation();
 
-  const traderAPI = useAtomValue(traderAPIAtom);
   const orderInfo = useAtomValue(orderInfoAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setTakeProfitPrice = useSetAtom(takeProfitPriceAtom);
@@ -33,85 +33,9 @@ export const TakeProfitSelector = memo(() => {
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const handleTakeProfitPriceChange = (takeProfitPriceValue: string) => {
-    if (takeProfitPriceValue !== '') {
-      setTakeProfitInputPrice(+takeProfitPriceValue);
-      setTakeProfit(null);
-    } else {
-      setTakeProfitInputPrice(null);
-    }
-  };
-
-  const handleTakeProfitChange = (takeProfitValue: TakeProfitE) => {
-    setTakeProfitPrice(null);
-    setTakeProfitInputPrice(null);
-    setTakeProfit(takeProfitValue);
-  };
-
-  const [midPrice, isPredictionMarket] = useMemo(() => {
-    if (!!traderAPI && !!orderInfo) {
-      try {
-        const predMarket = traderAPI?.isPredictionMarket(orderInfo.symbol);
-        return [
-          predMarket
-            ? calculateProbability(orderInfo.midPrice, orderInfo.orderBlock === OrderBlockE.Short)
-            : orderInfo.midPrice,
-          predMarket,
-        ];
-      } catch (error) {
-        // skip
-      }
-    }
-    return [orderInfo?.midPrice, false];
-  }, [orderInfo, traderAPI]);
-
-  const minTakeProfitPrice = useMemo(() => {
-    if (midPrice && orderInfo?.orderBlock === OrderBlockE.Long) {
-      return midPrice;
-    } else if (midPrice && orderInfo?.orderBlock === OrderBlockE.Short) {
-      return isPredictionMarket ? midPrice : 0.000000001;
-    }
-    return 0.000000001;
-  }, [midPrice, orderInfo?.orderBlock, isPredictionMarket]);
-
-  const maxTakeProfitPrice = useMemo(() => {
-    if (midPrice && orderInfo?.orderBlock === OrderBlockE.Short) {
-      return isPredictionMarket ? undefined : midPrice;
-    }
-    return undefined;
-  }, [midPrice, orderInfo?.orderBlock, isPredictionMarket]);
+  const { handleTakeProfitPriceChange, handleTakeProfitChange, validateTakeProfitPrice, midPrice } = useTakeProfit();
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
-
-  const validateTakeProfitPrice = useCallback(() => {
-    if (takeProfitInputPrice === null) {
-      setTakeProfitPrice(null);
-      setTakeProfit(TakeProfitE.None);
-      return;
-    }
-
-    if (maxTakeProfitPrice && takeProfitInputPrice > maxTakeProfitPrice) {
-      const maxTakeProfitPriceRounded = +maxTakeProfitPrice;
-      setTakeProfitPrice(maxTakeProfitPriceRounded);
-      setTakeProfitInputPrice(maxTakeProfitPriceRounded);
-      return;
-    }
-    if (takeProfitInputPrice < minTakeProfitPrice) {
-      const minTakeProfitPriceRounded = +minTakeProfitPrice;
-      setTakeProfitPrice(minTakeProfitPriceRounded);
-      setTakeProfitInputPrice(minTakeProfitPriceRounded);
-      return;
-    }
-
-    setTakeProfitPrice(takeProfitInputPrice);
-  }, [
-    minTakeProfitPrice,
-    maxTakeProfitPrice,
-    takeProfitInputPrice,
-    setTakeProfit,
-    setTakeProfitPrice,
-    setTakeProfitInputPrice,
-  ]);
 
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {

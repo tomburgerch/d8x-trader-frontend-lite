@@ -37,7 +37,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $d8x-spacing * 2.5;
+  gap: $d8x-spacing * 6;
   overflow-x: hidden;
 }
 
@@ -45,7 +45,7 @@
   flex: 1;
   max-width: 410px;
   min-width: 410px;
-  margin-left: $d8x-spacing * 2.5;
+  margin-left: $d8x-spacing * 6;
   display: flex;
   gap: 10px;
   flex-direction: column;
