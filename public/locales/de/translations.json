@@ -188,6 +188,7 @@
       },
       "history-table": {
         "table-title": "Handelshistorie",
+        "body": "",
         "table-header": {
           "time": "Zeit",
           "perpetual": "Perpetual",
@@ -747,6 +748,7 @@
     "deposit-gas": "Gas deponieren",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "Alle ansehen",
     "max": "Max:",
     "copied": "Kopiert",
     "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",

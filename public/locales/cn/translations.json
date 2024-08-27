@@ -188,6 +188,7 @@
       },
       "history-table": {
         "table-title": "交易历史",
+        "body": "",
         "table-header": {
           "time": "时间",
           "perpetual": "永续",
@@ -747,6 +748,7 @@
     "deposit-gas": "存入燃料",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "看全部",
     "max": "最大：",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",

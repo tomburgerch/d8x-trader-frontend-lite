@@ -48,6 +48,7 @@ import { CandlesWebSocketListener } from './components/candles-webSocket-listene
 import { TableDataFetcher } from './components/table-data-refetcher/TableDataFetcher';
 
 import styles from './TraderPage.module.scss';
+import { TradeHistoryBlock } from '../../components/trade-history-block/TradeHistoryBlock';
 
 const MIN_REQUIRED_USDC = 20;
 
@@ -206,13 +207,19 @@ export const TraderPage = () => {
     [positions, openOrders, t]
   );
 
-  const historyItems: SelectorItemI[] = useMemo(
+  const tradeHistoryItems: SelectorItemI[] = useMemo(
     () => [
       {
         label: `${t('pages.trade.history-table.table-title')}`,
         item: <TradeHistoryTable />,
         tableType: TableTypeE.TRADE_HISTORY,
       },
+    ],
+    [t]
+  );
+
+  const fundingItems: SelectorItemI[] = useMemo(
+    () => [
       {
         label: `${t('pages.trade.funding-table.table-title')}`,
         item: <FundingTable />,
@@ -222,9 +229,19 @@ export const TraderPage = () => {
     [t]
   );
 
+  const historyItems: SelectorItemI[] = useMemo(
+    () => [...tradeHistoryItems, ...fundingItems],
+    [tradeHistoryItems, fundingItems]
+  );
+
   const selectorForAllItems: SelectorItemI[] = useMemo(
     () => [...positionItems, ...historyItems],
     [positionItems, historyItems]
+  );
+
+  const selectorForDesktopItems: SelectorItemI[] = useMemo(
+    () => [...positionItems, ...fundingItems],
+    [positionItems, fundingItems]
   );
 
   const handleActiveAllIndex = (index: number) => {
@@ -296,13 +313,14 @@ export const TraderPage = () => {
                 </div>
                 <ChartHolder />
                 <TableSelector
-                  selectorItems={selectorForAllItems}
+                  selectorItems={selectorForDesktopItems}
                   activeIndex={activeAllIndex}
                   setActiveIndex={handleActiveAllIndex}
                 />
               </div>
               <div className={styles.rightBlock}>
                 <OrderBlock />
+                <TradeHistoryBlock />
               </div>
             </Container>
           )}

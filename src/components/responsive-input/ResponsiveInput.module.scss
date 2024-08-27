@@ -32,6 +32,10 @@
     background-color: transparent !important;
   }
 
+  :global(.MuiInputBase-root) {
+    width: 100%;
+  }
+
   :global(.MuiInputAdornment-root) {
     margin-left: 0;
     margin-right: $d8x-spacing;

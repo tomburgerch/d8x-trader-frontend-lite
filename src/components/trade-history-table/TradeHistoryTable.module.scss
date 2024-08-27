@@ -22,6 +22,14 @@
 
   :global(.MuiTypography-root) {
     color: var(--d8x-color-text-table-cell);
+
+    &.buy {
+      color: var(--d8x-color-text-buy);
+    }
+
+    &.sell {
+      color: var(--d8x-color-text-sell);
+    }
   }
 
   tr {

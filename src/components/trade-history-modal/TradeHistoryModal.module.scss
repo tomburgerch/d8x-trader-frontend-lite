@@ -1,0 +1,20 @@
+.dialog {
+  :global(.MuiPaper-root) {
+    width: 100%;
+    max-width: 900px;
+  }
+}
+
+.dialogContent {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.dialogAction {
+  justify-content: center;
+}
+
+.actionButton {
+  height: 48px;
+  font-size: 16px;
+}

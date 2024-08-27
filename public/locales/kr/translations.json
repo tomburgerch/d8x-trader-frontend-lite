@@ -184,6 +184,7 @@
       },
       "history-table": {
         "table-title": "Trade History",
+        "body": "",
         "table-header": {
           "time": "Time",
           "perpetual": "Perpetual",
@@ -729,6 +730,7 @@
     "deposit-gas": "Deposit gas",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "모두 보기",
     "max": "Max:",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",

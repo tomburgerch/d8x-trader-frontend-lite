@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { format } from 'date-fns';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,8 @@ import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
+
+import styles from '../TradeHistoryTable.module.scss';
 
 interface TradeHistoryRowPropsI {
   headers: TableHeaderI<TradeHistoryWithSymbolDataI>[];
@@ -39,8 +42,14 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
         <Typography variant="cellSmall">{tradeHistory.symbol}</Typography>
       </TableCell>
       <TableCell align={headers[2].align}>
-        <Typography variant="cellSmall">
-          {tradeHistory.side === 'BUY'
+        <Typography
+          variant="cellSmall"
+          className={classnames({
+            [styles.buy]: tradeHistory.side.indexOf('BUY') > -1,
+            [styles.sell]: tradeHistory.side.indexOf('SELL') > -1,
+          })}
+        >
+          {tradeHistory.side.indexOf('BUY') > -1
             ? t('pages.trade.positions-table.table-content.buy')
             : t('pages.trade.positions-table.table-content.sell')}
         </Typography>
