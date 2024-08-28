@@ -7,7 +7,7 @@
   width: 100%;
 }
 
-.expiryOptions {
+.slippageOptions {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -22,7 +22,7 @@
   :global(.MuiButtonBase-root) {
     flex: 1;
     border-radius: $d8x-button-border-radius;
-    min-width: 50px;
+    min-width: 35px;
 
     &.selected {
       border: 1px solid transparent;

@@ -4,67 +4,68 @@ import { ChangeEvent, memo, useState } from 'react';
 
 import { Button, InputAdornment, OutlinedInput, Typography } from '@mui/material';
 
-import { expireDaysAtom, orderTypeAtom } from 'store/order-block.store';
-import { ExpiryE, OrderTypeE } from 'types/enums';
+import { orderTypeAtom, slippageSliderAtom } from 'store/order-block.store';
+import { OrderTypeE } from 'types/enums';
 
-import styles from './ExpirySelector.module.scss';
+import styles from './SlippageSelector.module.scss';
 
-const MIN_EXPIRE = 1;
-const MAX_EXPIRE = 365;
+const MIN_SLIPPAGE = 0.5;
+const MAX_SLIPPAGE = 100;
+const MULTIPLIERS = [0.5, 1, 2, 5];
 
-export const ExpirySelector = memo(() => {
+export const SlippageSelector = memo(() => {
   const orderType = useAtomValue(orderTypeAtom);
-  const [expireDays, setExpireDays] = useAtom(expireDaysAtom);
+  const [slippage, setSlippage] = useAtom(slippageSliderAtom);
 
-  const [inputValue, setInputValue] = useState(`${expireDays}`);
+  const [inputValue, setInputValue] = useState(`${slippage}`);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const targetValue = event.target.value;
     if (targetValue) {
       const valueNumber = Number(targetValue);
       let valueToSet;
-      if (valueNumber < MIN_EXPIRE) {
-        valueToSet = MIN_EXPIRE;
-      } else if (valueNumber > MAX_EXPIRE) {
-        valueToSet = MAX_EXPIRE;
+      if (valueNumber < MIN_SLIPPAGE) {
+        valueToSet = MIN_SLIPPAGE;
+      } else if (valueNumber > MAX_SLIPPAGE) {
+        valueToSet = MAX_SLIPPAGE;
       } else {
         valueToSet = valueNumber;
       }
-      setExpireDays(valueToSet);
+      setSlippage(valueToSet);
       setInputValue(`${valueToSet}`);
     } else {
-      setExpireDays(MIN_EXPIRE);
+      setSlippage(MIN_SLIPPAGE);
       setInputValue('');
     }
   };
 
-  if (orderType === OrderTypeE.Market) {
+  if (orderType !== OrderTypeE.Market) {
     return null;
   }
 
   return (
     <div className={styles.root}>
-      <div className={styles.expiryOptions}>
-        {[ExpiryE['30D'], ExpiryE['90D'], ExpiryE['180D']].map((key) => (
+      <div className={styles.slippageOptions}>
+        {MULTIPLIERS.map((key) => (
           <Button
             key={key}
             variant="outlined"
-            className={classnames({ [styles.selected]: Number(key) === expireDays })}
+            className={classnames({ [styles.selected]: key === slippage })}
             onClick={() => {
-              setExpireDays(Number(key));
-              setInputValue(key);
+              setSlippage(key);
+              setInputValue(`${key}`);
             }}
           >
-            {key}
+            {key}x
           </Button>
         ))}
         <OutlinedInput
           type="number"
-          inputProps={{ min: MIN_EXPIRE, max: MAX_EXPIRE, step: 1 }}
+          inputProps={{ min: MIN_SLIPPAGE, max: MAX_SLIPPAGE, step: 0.5 }}
           className={styles.input}
           endAdornment={
             <InputAdornment position="end">
-              <Typography variant="adornment">D</Typography>
+              <Typography variant="adornment">x</Typography>
             </InputAdornment>
           }
           onChange={handleInputChange}

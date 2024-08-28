@@ -27,8 +27,6 @@ export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
 
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
 
-  console.log({ side: tradeHistory.side });
-
   return (
     <div className={styles.root}>
       <div className={styles.iconsHolder}>

@@ -6,8 +6,10 @@
 }
 
 .paper {
-  width: 270px;
-  background: black;
+  width: 300px;
+  background-color: transparent;
+  border-radius: $d8x-border-radius;
+  box-shadow: 0 2px 10px var(--d8x-color-box-shadow);
 }
 
 .iconButton {

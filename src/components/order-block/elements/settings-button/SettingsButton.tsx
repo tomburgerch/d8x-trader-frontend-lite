@@ -26,33 +26,33 @@ export const SettingsButton = memo(() => {
   }, []);
 
   return (
-    <ClickAwayListener onClickAway={handleClose} disableReactTree={true}>
-      <div className={styles.root}>
-        <TooltipMobile tooltip={t('common.settings.title')}>
-          <Button onClick={handlePopperToggle} className={styles.iconButton} variant="primary" ref={buttonRef}>
-            <Settings className={styles.icon} />
-          </Button>
-        </TooltipMobile>
+    <div className={styles.root}>
+      <TooltipMobile tooltip={t('common.settings.title')}>
+        <Button onClick={handlePopperToggle} className={styles.iconButton} variant="primary" ref={buttonRef}>
+          <Settings className={styles.icon} />
+        </Button>
+      </TooltipMobile>
 
-        <Popper
-          sx={{
-            zIndex: 1,
-          }}
-          open={isPopperOpen}
-          anchorEl={buttonRef.current}
-          placement="bottom-end"
-          transition
-          disablePortal
-        >
-          {({ TransitionProps }) => (
+      <Popper
+        sx={{
+          zIndex: 1,
+        }}
+        open={isPopperOpen}
+        anchorEl={buttonRef.current}
+        placement="bottom-end"
+        transition
+        disablePortal
+      >
+        {({ TransitionProps }) => (
+          <ClickAwayListener onClickAway={handleClose}>
             <Fade {...TransitionProps} timeout={350}>
               <Paper className={styles.paper}>
                 <SettingsBlock />
               </Paper>
             </Fade>
-          )}
-        </Popper>
-      </div>
-    </ClickAwayListener>
+          </ClickAwayListener>
+        )}
+      </Popper>
+    </div>
   );
 });

@@ -1,8 +1,13 @@
 @import '~styles/theme/theme.scss';
 
 .root {
-  border-radius: 4px;
-  border: 1px solid #eeeded;
+  display: flex;
+  flex-direction: column;
+  gap: 3 * $d8x-spacing;
+  margin-top: 2 * $d8x-spacing;
+  border-radius: $d8x-border-radius;
+  background: var(--d8x-color-background-paper);
+  padding: 3 * $d8x-spacing;
 }
 
 .labelRow {
@@ -18,7 +23,10 @@
   justify-content: space-between;
   align-items: center;
   color: var(--d8x-color-text-main);
-  padding: $d8x-spacing * 1.5 $d8x-spacing * 2;
+}
+
+.setting {
+  font-size: 14px;
 }
 
 .label {
@@ -33,10 +41,6 @@
 
 @media screen and ($d8x-breakpoint-max-md) {
   .label {
-    font-size: 14px;
-  }
-
-  .setting {
     font-size: 14px;
   }
 }

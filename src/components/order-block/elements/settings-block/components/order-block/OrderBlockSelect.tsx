@@ -2,10 +2,12 @@ import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DropDownMenuItem } from 'components/dropdown-select/components/DropDownMenuItem';
-import { DropDownSelect } from 'components/dropdown-select/DropDownSelect';
+import { ButtonSelect } from 'components/button-select/ButtonSelect';
+import { ButtonMenuItem } from 'components/button-select/elements/ButtonMenuItem';
 import { orderBlockPositionAtom } from 'store/app.store';
 import { OrderBlockPositionE } from 'types/enums';
+
+import styles from './OrderBlockSelect.module.scss';
 
 const optionsArray = Object.values(OrderBlockPositionE);
 
@@ -17,14 +19,16 @@ export const OrderBlockSelect = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   return (
-    <DropDownSelect
-      id="order-block-dropdown"
-      selectedValue={t(`common.settings.ui-settings.order-block.${orderBlockPosition}`)}
+    <ButtonSelect
+      id="order-block-select"
+      selectedValue={
+        <span className={styles.value}>{t(`common.settings.ui-settings.order-block.${orderBlockPosition}`)}</span>
+      }
       anchorEl={anchorEl}
       setAnchorEl={setAnchorEl}
     >
       {optionsArray.map((option) => (
-        <DropDownMenuItem
+        <ButtonMenuItem
           key={option}
           option={t(`common.settings.ui-settings.order-block.${option}`)}
           isActive={option === orderBlockPosition}
@@ -34,6 +38,6 @@ export const OrderBlockSelect = () => {
           }}
         />
       ))}
-    </DropDownSelect>
+    </ButtonSelect>
   );
 };

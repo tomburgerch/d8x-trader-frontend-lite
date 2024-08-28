@@ -24,6 +24,8 @@ import {
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { DefaultCurrencyE, OrderBlockE } from 'types/enums';
+import type { TemporaryAnyT } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -41,8 +43,6 @@ import {
 } from './store';
 
 import styles from './OrderSize.module.scss';
-import { getDynamicLogo } from '../../../../utils/getDynamicLogo';
-import type { TemporaryAnyT } from '../../../../types/types';
 
 const roundMaxOrderSize = (value: number) => {
   const numberDigits = valueToFractionDigits(value);

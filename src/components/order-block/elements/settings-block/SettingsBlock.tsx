@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { OrderSettings } from '../order-settings/OrderSettings';
-import { DarkModeSelect } from './components/dark-mode/DarkModeSelect';
 import { DefaultCurrencySelect } from './components/default-currency/DefaultCurrencySelect';
 import { OrderBlockSelect } from './components/order-block/OrderBlockSelect';
 
@@ -19,6 +18,7 @@ export const SettingsBlock = memo(() => {
   return (
     <Box className={styles.root}>
       <OrderSettings />
+
       {isBigScreen && (
         <Box className={styles.optionRow}>
           <Typography variant="bodyMedium" className={styles.setting}>
@@ -27,12 +27,7 @@ export const SettingsBlock = memo(() => {
           <OrderBlockSelect />
         </Box>
       )}
-      <Box className={styles.optionRow}>
-        <Typography variant="bodyMedium" className={styles.setting}>
-          {t('common.settings.ui-settings.theme.title')}
-        </Typography>
-        <DarkModeSelect />
-      </Box>
+
       <Box className={styles.optionRow}>
         <Typography variant="bodyMedium" className={styles.setting}>
           {t('common.settings.ui-settings.default-currency.title')}
