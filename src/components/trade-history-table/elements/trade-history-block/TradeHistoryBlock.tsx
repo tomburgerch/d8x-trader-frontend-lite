@@ -76,15 +76,15 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           rightSideStyles={styles.dataValue}
         />
         <SidesRow
-          leftSide={headers[4].label}
-          leftSideTooltip={headers[4].tooltip}
+          leftSide={headers[5].label}
+          leftSideTooltip={headers[5].tooltip}
           rightSide={perpetual ? formatToCurrency(tradeHistory.quantity, perpetual.baseCurrency, true) : ''}
           leftSideStyles={styles.dataLabel}
           rightSideStyles={styles.dataValue}
         />
         <SidesRow
-          leftSide={headers[5].label}
-          leftSideTooltip={headers[5].tooltip}
+          leftSide={headers[6].label}
+          leftSideTooltip={headers[6].tooltip}
           rightSide={
             perpetual
               ? formatToCurrency(
@@ -98,8 +98,8 @@ export const TradeHistoryBlock = ({ headers, tradeHistory }: TradeHistoryRowProp
           rightSideStyles={styles.dataValue}
         />
         <SidesRow
-          leftSide={headers[6].label}
-          leftSideTooltip={headers[6].tooltip}
+          leftSide={headers[7].label}
+          leftSideTooltip={headers[7].tooltip}
           rightSide={
             perpetual
               ? formatToCurrency(

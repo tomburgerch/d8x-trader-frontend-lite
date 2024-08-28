@@ -17,11 +17,11 @@ interface TradeHistoryItemPropsI {
 export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
   const { t } = useTranslation();
 
-  const BaseIconComponent = useMemo(() => {
+  const BaseCurrencyIcon = useMemo(() => {
     return getDynamicLogo(tradeHistory.perpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
   }, [tradeHistory.perpetual?.baseCurrency]);
 
-  const QuoteIconComponent = useMemo(() => {
+  const QuoteCurrencyIcon = useMemo(() => {
     return getDynamicLogo(tradeHistory.perpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
   }, [tradeHistory.perpetual?.quoteCurrency]);
 
@@ -32,12 +32,12 @@ export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
       <div className={styles.iconsHolder}>
         <div className={styles.baseIcon}>
           <Suspense fallback={null}>
-            <BaseIconComponent />
+            <BaseCurrencyIcon />
           </Suspense>
         </div>
         <div className={styles.quoteIcon}>
           <Suspense fallback={null}>
-            <QuoteIconComponent />
+            <QuoteCurrencyIcon />
           </Suspense>
         </div>
       </div>

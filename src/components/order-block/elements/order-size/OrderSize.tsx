@@ -256,33 +256,23 @@ export const OrderSize = memo(() => {
   );
 
   const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
+    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.quoteCurrency]);
 
   const BaseCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.baseCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
+    return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.baseCurrency]);
 
   const SettleCurrencyIcon = useMemo(() => {
-    if (!selectedPool || !selectedPerpetual) {
-      return () => null;
-    }
-
+    let currency = '';
     if (
-      !selectedPool.settleSymbol ||
-      selectedPool.settleSymbol === selectedPerpetual.quoteCurrency ||
-      selectedPool.settleSymbol === selectedPerpetual.baseCurrency
+      selectedPool?.settleSymbol &&
+      selectedPool.settleSymbol !== selectedPerpetual?.quoteCurrency &&
+      selectedPool.settleSymbol !== selectedPerpetual?.baseCurrency
     ) {
-      return () => null;
+      currency = selectedPool.settleSymbol;
     }
-
-    return getDynamicLogo(selectedPool.settleSymbol.toLowerCase()) as TemporaryAnyT;
+    return getDynamicLogo(currency.toLowerCase()) as TemporaryAnyT;
   }, [selectedPool, selectedPerpetual]);
 
   return (

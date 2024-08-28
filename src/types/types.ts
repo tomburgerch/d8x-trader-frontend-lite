@@ -299,6 +299,7 @@ export interface TableHeaderI<T> {
   align: AlignE;
   field?: keyof T;
   fieldType?: FieldTypeE;
+  hidden?: boolean;
 }
 
 export interface TvChartCandleI {

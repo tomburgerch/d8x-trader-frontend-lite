@@ -80,6 +80,7 @@ export const TradeHistoryTable = memo(() => {
         label: t('pages.trade.history-table.table-header.time'),
         align: AlignE.Left,
         fieldType: FieldTypeE.Date,
+        hidden: true,
       },
       {
         field: 'symbol',
@@ -92,24 +93,36 @@ export const TradeHistoryTable = memo(() => {
         label: t('pages.trade.history-table.table-header.side'),
         align: AlignE.Left,
         fieldType: FieldTypeE.String,
+        hidden: true,
+      },
+      {
+        field: 'quantity',
+        label: t('pages.trade.history-table.table-header.quantity'),
+        align: AlignE.Left,
+        fieldType: FieldTypeE.Number,
+      },
+      {
+        field: 'price',
+        label: `${t('pages.trade.history-table.table-header.price')}/${t(
+          'pages.trade.history-table.table-header.fee'
+        )}`,
+        // label: t('pages.trade.history-table.table-header.price'),
+        align: AlignE.Left,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'price',
         label: t('pages.trade.history-table.table-header.price'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
-      },
-      {
-        field: 'quantity',
-        label: t('pages.trade.history-table.table-header.quantity'),
-        align: AlignE.Right,
-        fieldType: FieldTypeE.Number,
+        hidden: true,
       },
       {
         field: 'fee',
         label: t('pages.trade.history-table.table-header.fee'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
+        hidden: true,
       },
       {
         field: 'realizedPnl',
@@ -147,6 +160,8 @@ export const TradeHistoryTable = memo(() => {
     [address, filteredRows, order, orderBy, page, rowsPerPage]
   );
 
+  const onlyTableHeaders = tradeHistoryHeaders.filter(({ hidden }) => !hidden);
+
   return (
     <div className={styles.root} ref={ref}>
       {width && width >= MIN_WIDTH_FOR_TABLE && (
@@ -155,7 +170,7 @@ export const TradeHistoryTable = memo(() => {
             <TableHead className={styles.tableHead}>
               <TableRow>
                 <SortableHeaders<TradeHistoryWithSymbolDataI>
-                  headers={tradeHistoryHeaders}
+                  headers={onlyTableHeaders}
                   order={order}
                   orderBy={orderBy}
                   setOrder={setOrder}
@@ -166,15 +181,11 @@ export const TradeHistoryTable = memo(() => {
             <TableBody className={styles.tableBody}>
               {address &&
                 visibleRows.map((tradeHistory) => (
-                  <TradeHistoryRow
-                    key={tradeHistory.orderId}
-                    headers={tradeHistoryHeaders}
-                    tradeHistory={tradeHistory}
-                  />
+                  <TradeHistoryRow key={tradeHistory.orderId} headers={onlyTableHeaders} tradeHistory={tradeHistory} />
                 ))}
               {(!address || tradesHistory.length === 0) && (
                 <EmptyRow
-                  colSpan={tradeHistoryHeaders.length}
+                  colSpan={onlyTableHeaders.length}
                   text={
                     !address
                       ? t('pages.trade.history-table.table-content.connect')
