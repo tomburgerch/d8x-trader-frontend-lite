@@ -271,14 +271,14 @@ export const OrderSize = memo(() => {
 
   const SettleCurrencyIcon = useMemo(() => {
     if (!selectedPool || !selectedPerpetual) {
-      return null;
+      return () => null;
     }
 
     if (
       selectedPool.settleSymbol === selectedPerpetual.quoteCurrency ||
       selectedPool.settleSymbol === selectedPerpetual.baseCurrency
     ) {
-      return null;
+      return () => null;
     }
 
     return getDynamicLogo(selectedPool.settleSymbol.toLowerCase()) as TemporaryAnyT;
