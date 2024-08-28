@@ -41,7 +41,7 @@ export const TokenSelect = () => {
     }
 
     const currencies = [selectedPerpetual.baseCurrency, selectedPerpetual.quoteCurrency];
-    if (!currencies.includes(selectedPool.settleSymbol)) {
+    if (selectedPool.settleSymbol && !currencies.includes(selectedPool.settleSymbol)) {
       currencies.push(selectedPool.settleSymbol);
     }
     return currencies;

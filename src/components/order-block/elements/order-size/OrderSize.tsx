@@ -275,6 +275,7 @@ export const OrderSize = memo(() => {
     }
 
     if (
+      !selectedPool.settleSymbol ||
       selectedPool.settleSymbol === selectedPerpetual.quoteCurrency ||
       selectedPool.settleSymbol === selectedPerpetual.baseCurrency
     ) {
