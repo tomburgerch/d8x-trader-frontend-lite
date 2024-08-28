@@ -669,7 +669,10 @@
         "confirm-modal": {
           "title": "Salir de la estrategia",
           "text": "¿Estás seguro de que quieres salir?",
-          "confirm-button": "Salida"
+          "title-claim": "Retirar tu dinero",
+          "text-claim": "¿Quieres retirar tu dinero?",
+          "confirm-button": "Salida",
+          "confirm-button-claim": "Retirar"
         },
         "toasts": {
           "tx-submitted": {
@@ -687,6 +690,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Reclamar fondos",
         "toasts": {
           "tx-submitted": {
             "title": "Sus fondos se reclamaron exitosamente",
