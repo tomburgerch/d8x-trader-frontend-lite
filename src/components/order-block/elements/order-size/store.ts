@@ -76,7 +76,6 @@ export const maxOrderSizeAtom = atom((get) => {
       indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0); // default of 10_000 to make initial load faster
     personalMax = (((poolTokenBalanceOrDefault + currentCashCC) * collToQuoteIndexPrice) / buffer) * 0.99;
   }
-  console.log({ personalMax, maxTraderOrderSize });
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 

@@ -198,16 +198,6 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
           (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
           1 / leverage
         ) * 1e4; // in bps
-      console.log({
-        longBC: perpetualState.longBC,
-        shortBC: perpetualState.shortBC,
-        maintenanceMarginRate: perpetualStaticInfo.maintenanceMarginRate,
-        markPrice: perpetualStatistics.markPrice,
-        tradeAmount: size,
-        curPos: (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
-        tradeMarginRate: leverage,
-        tradingFee,
-      });
     }
     // baseFee stays null
   } else {

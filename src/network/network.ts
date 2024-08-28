@@ -90,7 +90,6 @@ export async function getPerpetualStaticInfo(
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
     // console.log('perpStaticInfo via SDK', { chainId, symbol });
     const info = traderAPI.getPerpetualStaticInfo(symbol);
-    console.log(info);
     return { type: 'perpetual-static-info', msg: '', data: info };
   } else {
     // console.log('perpStaticInfo via BE');
@@ -112,11 +111,11 @@ export async function getPositionRisk(
   }
 
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    console.log(`positionRisk via SDK`);
+    // console.log(`positionRisk via SDK`);
     const data = await traderAPI.positionRisk(traderAddr);
     return { type: 'position-risk', msg: '', data };
   } else {
-    console.log(`positionRisk via BE`);
+    // console.log(`positionRisk via BE`);
     return fetchUrl(`position-risk?${params}`, chainId);
   }
 }
@@ -235,11 +234,10 @@ export function getMaxOrderSizeForTrader(
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    console.log('getMaxOrderSizeForTrader via sdk');
+    // console.log('getMaxOrderSizeForTrader via sdk');
     return traderAPI
       .maxOrderSizeForTrader(traderAddr, symbol)
       .then(({ buy, sell }) => {
-        console.log({ buy, sell });
         return {
           type: 'max-order-size-for-trader',
           msg: '',
@@ -251,7 +249,7 @@ export function getMaxOrderSizeForTrader(
         throw new Error(error);
       });
   } else {
-    console.log('getMaxOrderSizeForTrader via BE');
+    // console.log('getMaxOrderSizeForTrader via BE');
     const params = new URLSearchParams({
       symbol,
       traderAddr,
