@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 
-import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ExpirySelector } from 'components/order-block/elements/expiry-selector/ExpirySelector';
 import { SlippageSelector } from 'components/order-block/elements/slippage-selector/SlippageSelector';
 import { createSymbol } from 'helpers/createSymbol';
@@ -36,8 +35,7 @@ export const OrderSettings = memo(() => {
 
       return !!positions.find((position) => position.symbol === symbol && position.side != side);
     }
-    return true;
-    // return false;
+    return false;
   }, [perpetualStatistics, positions, orderInfo]);
 
   useEffect(() => {
@@ -78,12 +76,7 @@ export const OrderSettings = memo(() => {
 
       {orderType === OrderTypeE.Market && (
         <div className={styles.settings}>
-          <div className={styles.label}>
-            <InfoLabelBlock
-              title={t('pages.trade.order-block.slippage.title')}
-              content={<Typography>{t('pages.trade.order-block.slippage.body')}</Typography>}
-            />
-          </div>
+          <div className={styles.label}>{t('pages.trade.order-block.slippage.title')}</div>
           <div className={styles.options}>
             <SlippageSelector />
           </div>
@@ -91,6 +84,12 @@ export const OrderSettings = memo(() => {
       )}
       {orderType !== OrderTypeE.Market && (
         <>
+          <div className={styles.settings}>
+            <div className={styles.label}>{t('pages.trade.order-block.expiry.title')}</div>
+            <div className={styles.options}>
+              <ExpirySelector />
+            </div>
+          </div>
           {isReduceOnlyEnabled && (
             <div className={styles.settings}>
               <FormControlLabel
@@ -104,17 +103,6 @@ export const OrderSettings = memo(() => {
               />
             </div>
           )}
-          <div className={styles.settings}>
-            <div className={styles.label}>
-              <InfoLabelBlock
-                title={t('pages.trade.order-block.expiry.title')}
-                content={<Typography>{t('pages.trade.order-block.expiry.body')}</Typography>}
-              />
-            </div>
-            <div className={styles.options}>
-              <ExpirySelector />
-            </div>
-          </div>
         </>
       )}
     </div>
