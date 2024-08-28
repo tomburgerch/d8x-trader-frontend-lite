@@ -223,8 +223,8 @@
           "short": "Short"
         },
         "prediction": {
-          "yes": "YES",
-          "no": "NO"
+          "yes": "Yes",
+          "no": "No"
         },
         "order-type": {
           "market": "시장",
@@ -733,6 +733,8 @@
     "offramp-button": "Deposit from CEX",
     "view-all": "모두 보기",
     "max": "Max:",
+    "yes": "Yes",
+    "no": "No",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",
     "page-reload": {

@@ -754,6 +754,8 @@
     "offramp-button": "Deposit from CEX",
     "view-all": "Ver todo",
     "max": "Max:",
+    "yes": "Sí",
+    "no": "No",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",
     "page-reload": {

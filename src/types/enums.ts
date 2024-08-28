@@ -31,6 +31,11 @@ export enum OrderValueTypeE {
   None = 'none',
 }
 
+export enum YesNoE {
+  Yes = 'yes',
+  No = 'no',
+}
+
 export enum OrderBlockPositionE {
   Left = 'left',
   Right = 'right',
