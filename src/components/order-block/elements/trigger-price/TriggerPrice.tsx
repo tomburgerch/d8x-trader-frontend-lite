@@ -33,8 +33,8 @@ export const TriggerPrice = memo(() => {
   const inputValueChangedRef = useRef(false);
 
   const stepSize = useMemo(
-    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.markPrice))}`,
-    [selectedPerpetual?.markPrice]
+    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.indexPrice))}`,
+    [selectedPerpetual?.indexPrice]
   );
 
   const handleTriggerPriceChange = useCallback(

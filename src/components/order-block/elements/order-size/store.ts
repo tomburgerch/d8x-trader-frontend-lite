@@ -1,4 +1,4 @@
-import { roundToLotString, TraderInterface } from '@d8x/perpetuals-sdk';
+import { BUY_SIDE, pmFindMaxPersonalTradeSizeAtLeverage, roundToLotString, TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
 
 import { calculateProbability } from 'helpers/calculateProbability';
@@ -23,42 +23,59 @@ export const maxTraderOrderSizeAtom = atom<number | undefined>(undefined);
 
 export const maxOrderSizeAtom = atom((get) => {
   const selectedPool = get(selectedPoolAtom);
-  const poolTokenBalance = get(poolTokenBalanceAtom);
   const selectedPerpetual = get(selectedPerpetualAtom);
   const maxTraderOrderSize = get(maxTraderOrderSizeAtom);
   const orderType = get(orderTypeAtom);
   const orderInfo = get(orderInfoAtom);
-  const slippage = orderType === 'Market' ? get(slippageSliderAtom) / 100 : 0.01;
+  const leverage = get(leverageAtom);
+  const orderBlock = get(orderBlockAtom);
+  const poolTokenBalance = get(poolTokenBalanceAtom);
+  const positions = get(positionsAtom);
 
   if (!selectedPool || !selectedPerpetual || maxTraderOrderSize === undefined) {
     return;
   }
 
-  const leverage = get(leverageAtom);
-  const orderBlock = get(orderBlockAtom);
-  const orderFeeBps = orderInfo?.tradingFee || 0;
-
   const { collToQuoteIndexPrice, indexPrice, markPrice } = selectedPerpetual;
-  let collateralCC = 0;
-
-  const positions = get(positionsAtom);
-  const selectedPerpetualSymbol = `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`;
-  const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
   const orderBlockSide = orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell;
-
-  if (openPosition && openPosition.side !== orderBlockSide) {
-    collateralCC = openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY / collToQuoteIndexPrice;
-  }
+  const slippage = orderType === 'Market' ? get(slippageSliderAtom) / 100 : 0.01;
   const direction = orderBlock === OrderBlockE.Long ? 1 : -1;
   const limitPrice = indexPrice * (1 + direction * slippage);
-  const buffer =
-    indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0);
-
   const poolTokenBalanceOrDefault =
     poolTokenBalance !== null && poolTokenBalance !== undefined ? poolTokenBalance : 10_000;
-  // default of 10_000 to make initial load faster
+  const selectedPerpetualSymbol = `${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`;
+  const openPosition = positions.find((position) => position.symbol === selectedPerpetualSymbol);
+  const currentPosition = (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1);
+  const currentCashCC =
+    openPosition && openPosition.side !== orderBlockSide
+      ? openPosition.collateralCC + openPosition.unrealizedPnlQuoteCCY / collToQuoteIndexPrice
+      : 0;
+  const currentLockedInValue = (openPosition?.entryPrice ?? 0) * currentPosition;
+  const orderFeeBps = orderInfo?.tradingFee || 0;
 
-  const personalMax = (((poolTokenBalanceOrDefault + collateralCC) * collToQuoteIndexPrice) / buffer) * 0.99;
+  let personalMax: number;
+  if (orderInfo?.isPredictionMarket) {
+    personalMax = pmFindMaxPersonalTradeSizeAtLeverage(
+      direction,
+      leverage,
+      poolTokenBalanceOrDefault,
+      slippage,
+      currentPosition,
+      currentCashCC,
+      currentLockedInValue,
+      indexPrice,
+      markPrice,
+      collToQuoteIndexPrice,
+      selectedPerpetual.longBC,
+      selectedPerpetual.shortBC,
+      maxTraderOrderSize,
+      maxTraderOrderSize
+    );
+  } else {
+    const buffer =
+      indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0); // default of 10_000 to make initial load faster
+    personalMax = (((poolTokenBalanceOrDefault + currentCashCC) * collToQuoteIndexPrice) / buffer) * 0.99;
+  }
   return personalMax > maxTraderOrderSize ? maxTraderOrderSize : personalMax;
 });
 

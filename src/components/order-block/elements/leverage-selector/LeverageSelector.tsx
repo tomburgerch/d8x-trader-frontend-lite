@@ -7,12 +7,15 @@ import { Button, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
-import { perpetualStaticInfoAtom } from 'store/pools.store';
+import { perpetualStaticInfoAtom, perpetualStatisticsAtom } from 'store/pools.store';
 import type { MarkI } from 'types/types';
 
 import { inputValueAtom, leverageAtom, setLeverageAtom } from './store';
 
 import styles from './LeverageSelector.module.scss';
+import { orderInfoAtom } from 'store/order-block.store';
+import { pmInitialMarginRate } from '@d8x/perpetuals-sdk';
+import { OrderBlockE } from 'types/enums';
 
 const multipliers = [0.2, 0.4, 0.6, 0.8, 1];
 
@@ -21,15 +24,20 @@ export const LeverageSelector = memo(() => {
 
   const leverage = useAtomValue(leverageAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const inputValue = useAtomValue(inputValueAtom);
+  const orderInfo = useAtomValue(orderInfoAtom);
   const setLeverage = useSetAtom(setLeverageAtom);
 
   const maxLeverage = useMemo(() => {
-    if (perpetualStaticInfo?.initialMarginRate) {
-      return Math.round(1 / perpetualStaticInfo.initialMarginRate);
+    if (orderInfo && perpetualStaticInfo?.initialMarginRate && perpetualStatistics?.markPrice) {
+      const initialMarginRate = orderInfo.isPredictionMarket
+        ? pmInitialMarginRate(orderInfo.orderBlock === OrderBlockE.Long ? 1 : -1, perpetualStatistics.markPrice)
+        : perpetualStaticInfo?.initialMarginRate;
+      return Math.round(1 / initialMarginRate);
     }
     return 10;
-  }, [perpetualStaticInfo?.initialMarginRate]);
+  }, [orderInfo, perpetualStaticInfo?.initialMarginRate, perpetualStatistics?.markPrice]);
 
   const marks = useMemo(() => {
     const newMarks: MarkI[] = [];

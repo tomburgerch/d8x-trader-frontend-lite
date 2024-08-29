@@ -19,7 +19,6 @@ import type {
   PerpetualPriceI,
   PerpetualStaticInfoI,
   ValidatedResponseI,
-  TemporaryAnyT,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -89,14 +88,12 @@ export async function getPerpetualStaticInfo(
   symbol: string
 ): Promise<ValidatedResponseI<PerpetualStaticInfoI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
-    // console.log('perpStaticInfo via SDK');
+    // console.log('perpStaticInfo via SDK', { chainId, symbol });
     const info = traderAPI.getPerpetualStaticInfo(symbol);
     return { type: 'perpetual-static-info', msg: '', data: info };
   } else {
-    // TODO: legacy, remove error when new BEs are live
-    throw new Error(`Unable to fetch perpetual static info for symbol ${symbol}`);
     // console.log('perpStaticInfo via BE');
-    // return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
+    return fetchUrl(`perpetual-static-info?symbol=${symbol}`, chainId);
   }
 }
 
@@ -123,14 +120,13 @@ export async function getPositionRisk(
   }
 }
 
-// TODO: VOV: this function to be adjusted/reviewed/revisited.
 export function positionRiskOnTrade(
   _chainId: number,
   traderAPI: TraderInterface,
   order: OrderI,
   traderAddr: string,
-  _curAccount: MarginAccountI | undefined,
-  tradingFeeTbps: number | undefined
+  signedPositionNotionalBaseCCY: number,
+  tradingFeeTbps: number
 ): Promise<
   ValidatedResponseI<{
     newPositionRisk: MarginAccountI;
@@ -140,7 +136,7 @@ export function positionRiskOnTrade(
   }>
 > {
   return traderAPI
-    .positionRiskOnTrade(traderAddr, order, undefined as TemporaryAnyT, tradingFeeTbps || 0)
+    .positionRiskOnTrade(traderAddr, order, signedPositionNotionalBaseCCY, tradingFeeTbps)
     .then((data) => {
       return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;
@@ -238,13 +234,14 @@ export function getMaxOrderSizeForTrader(
   timestamp?: number
 ): Promise<ValidatedResponseI<MaxOrderSizeResponseI>> {
   if (traderAPI && Number(traderAPI.chainId) === chainId) {
+    // console.log('getMaxOrderSizeForTrader via sdk');
     return traderAPI
       .maxOrderSizeForTrader(traderAddr, symbol)
       .then(({ buy, sell }) => {
         return {
           type: 'max-order-size-for-trader',
           msg: '',
-          data: { buy: buy, sell: sell },
+          data: { buy: Math.abs(buy), sell: Math.abs(sell) },
         } as ValidatedResponseI<MaxOrderSizeResponseI>;
       })
       .catch((error) => {
@@ -252,6 +249,7 @@ export function getMaxOrderSizeForTrader(
         throw new Error(error);
       });
   } else {
+    // console.log('getMaxOrderSizeForTrader via BE');
     const params = new URLSearchParams({
       symbol,
       traderAddr,

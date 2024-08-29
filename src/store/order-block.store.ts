@@ -1,4 +1,4 @@
-import { TraderInterface } from '@d8x/perpetuals-sdk';
+import { BUY_SIDE, TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
 
 import { leverageAtom, setLeverageAtom } from 'components/order-block/elements/leverage-selector/store';
@@ -18,6 +18,8 @@ import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   poolFeeAtom,
+  positionsAtom,
+  selectedPerpetualAtom,
 } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
@@ -131,6 +133,7 @@ export const triggerPriceAtom = atom(
 
 export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const perpetualStatistics = get(perpetualStatisticsAtom);
+  const perpetualState = get(selectedPerpetualAtom);
   if (!perpetualStatistics) {
     return null;
   }
@@ -164,12 +167,15 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const stopLossCustomPrice = get(stopLossPriceAtom); // in probability if prediction market
   const takeProfit = get(takeProfitAtom);
   const takeProfitCustomPrice = get(takeProfitPriceAtom); // in probability if prediction market
+  const positions = get(positionsAtom);
 
   const symbol = createSymbol({
     baseCurrency: perpetualStatistics.baseCurrency,
     quoteCurrency: perpetualStatistics.quoteCurrency,
     poolSymbol: perpetualStatistics.poolName,
   });
+
+  const openPosition = positions.find((position) => position.symbol === symbol);
 
   // const positionBySymbol = positions.find((position) => position.symbol === symbol);
 
@@ -182,22 +188,36 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   }
 
   let tradingFee = null;
-  if (poolFee) {
-    tradingFee = poolFee / 10;
-    if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
-      tradingFee = tradingFee * 3;
-    } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
-      tradingFee = tradingFee * 2;
-    }
-  }
-
   let baseFee = null;
-  if (addr0Fee) {
-    baseFee = addr0Fee / 10;
-    if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
-      baseFee = baseFee * 3;
-    } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
-      baseFee = baseFee * 2;
+  if (isPredictionMarket) {
+    if (perpetualState && perpetualStaticInfo?.maintenanceMarginRate) {
+      tradingFee =
+        TraderInterface.exchangeFeePrdMkts(
+          perpetualState,
+          perpetualStaticInfo.maintenanceMarginRate,
+          perpetualStatistics.markPrice,
+          size,
+          (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
+          1 / leverage
+        ) * 1e4; // in bps
+    }
+    // baseFee stays null
+  } else {
+    if (poolFee) {
+      tradingFee = poolFee / 10;
+      if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
+        tradingFee = tradingFee * 3;
+      } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
+        tradingFee = tradingFee * 2;
+      }
+    }
+    if (addr0Fee) {
+      baseFee = addr0Fee / 10;
+      if (stopLoss !== StopLossE.None && takeProfit !== TakeProfitE.None) {
+        baseFee = baseFee * 3;
+      } else if (stopLoss !== StopLossE.None || takeProfit !== TakeProfitE.None) {
+        baseFee = baseFee * 2;
+      }
     }
   }
 

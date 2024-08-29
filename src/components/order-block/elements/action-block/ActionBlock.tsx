@@ -1,4 +1,4 @@
-import { TraderInterface } from '@d8x/perpetuals-sdk';
+import { BUY_SIDE, pmInitialMarginRate, TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -197,25 +197,36 @@ export const ActionBlock = memo(() => {
     setMaxOrderSize(undefined);
 
     const mainOrder = createMainOrder(orderInfo);
+    const position = positions?.find((pos) => pos.symbol === orderInfo.symbol);
     const positionRiskOnTradePromise = positionRiskOnTrade(
       chainId,
       traderAPI,
       mainOrder,
       address,
-      positions?.find((pos) => pos.symbol === orderInfo.symbol),
+      (position?.positionNotionalBaseCCY ?? 0) * (position?.side === BUY_SIDE ? 1 : -1),
       poolFee
     )
       .then((data) => {
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
-        if (perpetualStaticInfo && data.data.newPositionRisk.leverage > 1 / perpetualStaticInfo.initialMarginRate) {
+        const initialMarginRate = orderInfo.isPredictionMarket
+          ? pmInitialMarginRate(orderInfo.orderBlock === OrderBlockE.Long ? 1 : -1, data.data.newPositionRisk.markPrice)
+          : perpetualStaticInfo?.initialMarginRate;
+
+        if (initialMarginRate && data.data.newPositionRisk.leverage > 1 / initialMarginRate) {
+          console.log({
+            prod: data.data.newPositionRisk.leverage * initialMarginRate,
+            newPositionRisk,
+            perpetualStaticInfo,
+          });
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
             maxShort = 0;
           }
         }
+        console.log({ maxBuy: maxLong, maxSell: maxShort });
         setMaxOrderSize({ maxBuy: maxLong, maxSell: maxShort });
       })
       .catch(console.error);
@@ -545,6 +556,7 @@ export const ActionBlock = memo(() => {
       isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
+      console.log(orderInfo.size, maxOrderSize);
       return ValidityCheckE.OrderTooLarge;
     }
     const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < perpetualStaticInfo.lotSizeBC;

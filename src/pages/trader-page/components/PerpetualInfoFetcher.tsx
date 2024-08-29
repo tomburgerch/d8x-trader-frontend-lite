@@ -18,7 +18,7 @@ export const PerpetualInfoFetcher = () => {
   const requestSentRef = useRef(false);
 
   const symbol = useMemo(() => {
-    if (selectedPool && selectedPerpetual) {
+    if (selectedPool?.poolSymbol && selectedPerpetual?.baseCurrency && selectedPerpetual?.quoteCurrency) {
       return createSymbol({
         baseCurrency: selectedPerpetual.baseCurrency,
         quoteCurrency: selectedPerpetual.quoteCurrency,
@@ -26,7 +26,7 @@ export const PerpetualInfoFetcher = () => {
       });
     }
     return '';
-  }, [selectedPool, selectedPerpetual]);
+  }, [selectedPool?.poolSymbol, selectedPerpetual?.baseCurrency, selectedPerpetual?.quoteCurrency]);
 
   useEffect(() => {
     if (requestSentRef.current || !traderAPI) {

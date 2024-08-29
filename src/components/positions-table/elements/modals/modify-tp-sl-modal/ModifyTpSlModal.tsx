@@ -34,6 +34,7 @@ import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
 import styles from '../Modal.module.scss';
+import { BUY_SIDE } from '@d8x/perpetuals-sdk';
 
 interface ModifyModalPropsI {
   isOpen: boolean;
@@ -98,7 +99,14 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
     validityCheckRef.current = true;
 
     const mainOrder = createMainOrder(selectedPosition);
-    positionRiskOnTrade(chainId, traderAPI, mainOrder, address, selectedPosition, poolFee)
+    positionRiskOnTrade(
+      chainId,
+      traderAPI,
+      mainOrder,
+      address,
+      selectedPosition.positionNotionalBaseCCY * (selectedPosition.side === BUY_SIDE ? 1 : -1),
+      poolFee
+    )
       .then((data) => {
         setCollateralDeposit(data.data.orderCost);
       })
