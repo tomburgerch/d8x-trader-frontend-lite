@@ -34,7 +34,7 @@ import { StopLossSelector } from './components/StopLossSelector';
 import { TakeProfitSelector } from './components/TakeProfitSelector';
 
 import styles from '../Modal.module.scss';
-import { BUY_SIDE } from '@d8x/perpetuals-sdk';
+import { BUY_SIDE, SELL_SIDE } from '@d8x/perpetuals-sdk';
 
 interface ModifyModalPropsI {
   isOpen: boolean;
@@ -48,7 +48,7 @@ function createMainOrder(position: MarginAccountWithAdditionalDataI) {
 
   return {
     symbol: position.symbol,
-    side: position.side,
+    side: position.side === BUY_SIDE ? SELL_SIDE : BUY_SIDE,
     type: OrderTypeE.Market,
     // limitPrice: undefined,
     // stopPrice: undefined,
