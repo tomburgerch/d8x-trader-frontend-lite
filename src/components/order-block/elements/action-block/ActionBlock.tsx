@@ -591,7 +591,7 @@ export const ActionBlock = memo(() => {
       } else {
         isSlippageTooLarge = orderInfo.maxMinEntryPrice > perpetualPrice;
       }
-      if (isSlippageTooLarge) {
+      if (isSlippageTooLarge && !isPredictionMarket) {
         return ValidityCheckE.SlippageTooLarge;
       }
     }
