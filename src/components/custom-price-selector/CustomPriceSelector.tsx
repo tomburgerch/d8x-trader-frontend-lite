@@ -1,15 +1,13 @@
-// import classnames from 'classnames';
+import classnames from 'classnames';
 // import { type ReactNode, Suspense, useMemo } from 'react';
 import { type ReactNode } from 'react';
 
 // import { Button } from '@mui/material';
-
 import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { genericMemo } from 'helpers/genericMemo';
 // import { getDynamicLogo } from 'utils/getDynamicLogo';
 // import type { TemporaryAnyT } from 'types/types';
-
 import styles from './CustomPriceSelector.module.scss';
 
 interface CustomPriceSelectorPropsI<T extends string> {
@@ -25,6 +23,7 @@ interface CustomPriceSelectorPropsI<T extends string> {
   currency?: string;
   stepSize: string;
   disabled?: boolean;
+  inline?: boolean;
   percentComponent?: ReactNode;
 }
 
@@ -42,6 +41,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
     // currency,
     stepSize,
     disabled = false,
+    inline = false,
     percentComponent,
   } = props;
 
@@ -53,7 +53,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
   // }, [currency]);
 
   return (
-    <div className={styles.root}>
+    <div className={classnames(styles.root, { [styles.inline]: inline })}>
       <div className={styles.labelHolder}>{label}</div>
       <div className={styles.inputHolder}>
         <ResponsiveInput
@@ -66,7 +66,7 @@ function CustomPriceSelectorComponent<T extends string>(props: CustomPriceSelect
           setInputValue={handleInputPriceChange}
           handleInputBlur={validateInputPrice}
           disabled={disabled}
-          type={InputE.Outlined}
+          type={inline ? InputE.Regular : InputE.Outlined}
         />
         {percentComponent}
       </div>

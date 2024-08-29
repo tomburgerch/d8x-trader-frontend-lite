@@ -2,6 +2,7 @@
 
 .root {
   flex: 1;
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: $d8x-spacing * 2;
@@ -15,6 +16,21 @@
   &:hover {
     border: 1px solid var(--d8x-color-action);
     padding: calc(3 * $d8x-spacing - 1px);
+  }
+
+  &.inline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: $d8x-spacing * 3 0;
+
+    .active,
+    &:focus,
+    &:focus-within,
+    &:hover {
+      border: none;
+      padding: $d8x-spacing * 3 0;
+    }
   }
 }
 
@@ -36,6 +52,14 @@
 
   :global(.MuiInputBase-root) {
     width: 120px;
+  }
+}
+
+.inline {
+  .responsiveInput {
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: var(--d8x-color-action);
+    }
   }
 }
 

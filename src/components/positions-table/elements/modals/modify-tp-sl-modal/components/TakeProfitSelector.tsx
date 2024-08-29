@@ -1,8 +1,9 @@
+import classnames from 'classnames';
 import { useAtomValue } from 'jotai';
 import { type Dispatch, memo, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
@@ -14,6 +15,8 @@ import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 import { mapTakeProfitToNumber } from 'utils/mapTakeProfitToNumber';
 import { traderAPIAtom } from 'store/pools.store';
+
+import styles from './Selectors.module.scss';
 
 interface TakeProfitSelectorPropsI {
   setTakeProfitPrice: Dispatch<SetStateAction<number | null | undefined>>;
@@ -141,30 +144,46 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled
   };
 
   return (
-    <CustomPriceSelector<TakeProfitE>
-      id="custom-take-profit-price"
-      label={
-        <InfoLabelBlock
-          title={t('pages.trade.order-block.take-profit.title')}
-          content={
-            <>
-              <Typography>{t('pages.trade.order-block.take-profit.body1')}</Typography>
-              <Typography>{t('pages.trade.order-block.take-profit.body2')}</Typography>
-              <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
-            </>
-          }
-        />
-      }
-      options={Object.values(TakeProfitE)}
-      translationMap={translationMap}
-      handlePriceChange={handleTakeProfitChange}
-      handleInputPriceChange={handleTakeProfitPriceChange}
-      validateInputPrice={validateTakeProfitPrice}
-      selectedInputPrice={takeProfit !== TakeProfitE.None ? takeProfitInputPrice : null}
-      selectedPrice={takeProfit}
-      currency={parsedSymbol?.quoteCurrency}
-      stepSize={stepSize}
-      disabled={disabled}
-    />
+    <div className={styles.root}>
+      <CustomPriceSelector<TakeProfitE>
+        id="custom-take-profit-price"
+        label={
+          <InfoLabelBlock
+            title={t('pages.trade.order-block.take-profit.title')}
+            content={
+              <>
+                <Typography>{t('pages.trade.order-block.take-profit.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.take-profit.body3')}</Typography>
+              </>
+            }
+          />
+        }
+        options={Object.values(TakeProfitE)}
+        translationMap={translationMap}
+        handlePriceChange={handleTakeProfitChange}
+        handleInputPriceChange={handleTakeProfitPriceChange}
+        validateInputPrice={validateTakeProfitPrice}
+        selectedInputPrice={takeProfit !== TakeProfitE.None ? takeProfitInputPrice : null}
+        selectedPrice={takeProfit}
+        currency={parsedSymbol?.quoteCurrency}
+        stepSize={stepSize}
+        disabled={disabled}
+        inline={true}
+      />
+      <div className={styles.priceOptions}>
+        {Object.values(TakeProfitE).map((key) => (
+          <Button
+            key={key}
+            variant="outlined"
+            className={classnames({ [styles.selected]: key === takeProfit })}
+            onClick={() => handleTakeProfitChange(key)}
+            disabled={disabled}
+          >
+            {translationMap[key]}
+          </Button>
+        ))}
+      </div>
+    </div>
   );
 });
