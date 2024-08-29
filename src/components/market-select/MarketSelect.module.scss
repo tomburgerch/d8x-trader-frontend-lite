@@ -231,7 +231,7 @@
 
     .selectedMarketPerpetual {
       font-size: 16px;
-      margin-top: $d8x-spacing / 2;
+      margin-top: calc($d8x-spacing / 2);
     }
   }
 
