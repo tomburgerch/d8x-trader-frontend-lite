@@ -280,10 +280,10 @@ export const MarketSelect = memo(() => {
           </div>
           {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
             <TooltipMobile tooltip={midPrice.tooltip}>
-              <div className={classnames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+              <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
             </TooltipMobile>
           ) : (
-            <div className={classnames(styles.statMainValue, midPrice.className)}>$ {midPrice.numberOnly}</div>
+            <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
           )}
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
