@@ -17,7 +17,7 @@ import { orderInfoAtom } from 'store/order-block.store';
 import { pmInitialMarginRate } from '@d8x/perpetuals-sdk';
 import { OrderBlockE } from 'types/enums';
 
-const multipliers = [0.2, 0.4, 0.6, 0.8, 1];
+const markCount = 5;
 
 export const LeverageSelector = memo(() => {
   const { t } = useTranslation();
@@ -41,12 +41,25 @@ export const LeverageSelector = memo(() => {
 
   const marks = useMemo(() => {
     const newMarks: MarkI[] = [];
-    multipliers.forEach((multiplier) =>
-      newMarks.push({
-        value: multiplier * maxLeverage,
-        // label: `${multiplier * maxLeverage}x`
-      })
-    );
+
+    if (maxLeverage <= 5) {
+      const step = (maxLeverage - 1) / (markCount - 1);
+      for (let i = 0; i < markCount; i++) {
+        const value = 1 + i * step;
+        newMarks.push({
+          value: parseFloat(value.toFixed(2)),
+        });
+      }
+    } else {
+      const step = maxLeverage / markCount;
+      for (let i = 1; i <= markCount; i++) {
+        const value = Math.round(i * step);
+        newMarks.push({
+          value: value,
+        });
+      }
+    }
+
     return newMarks;
   }, [maxLeverage]);
 

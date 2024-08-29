@@ -43,8 +43,8 @@
 
 .markButton {
   padding: 0;
-  width: 40px;
-  min-width: 40px;
+  width: 45px;
+  min-width: 45px;
   height: 32px;
   font-size: 14px;
   font-weight: 400;
@@ -58,7 +58,7 @@
 
 .inputHolder {
   :global(.MuiInputBase-root) {
-    width: 124px;
+    width: 100px;
     padding-right: 0;
 
     input {
