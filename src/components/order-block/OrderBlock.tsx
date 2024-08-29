@@ -101,15 +101,19 @@ export const OrderBlock = memo(() => {
       <CardContent className={styles.card}>
         <LeverageSelector />
         <OrderSize />
-        <div className={classnames(styles.additionalPrices, { [styles.hidden]: orderType === OrderTypeE.Market })}>
-          <LimitPrice />
-          <TriggerPrice />
-        </div>
+        {!isPredictionMarket && (
+          <div className={classnames(styles.additionalPrices, { [styles.hidden]: orderType === OrderTypeE.Market })}>
+            <LimitPrice />
+            <TriggerPrice />
+          </div>
+        )}
       </CardContent>
-      <CardContent className={classnames(styles.card, styles.selectors)}>
-        <StopLossSelector />
-        <TakeProfitSelector />
-      </CardContent>
+      {!isPredictionMarket && (
+        <CardContent className={classnames(styles.card, styles.selectors)}>
+          <StopLossSelector />
+          <TakeProfitSelector />
+        </CardContent>
+      )}
       <CardContent className={classnames(styles.card, styles.bottomCard)}>
         <InfoBlock />
         <ActionBlock />

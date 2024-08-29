@@ -112,7 +112,7 @@ export const CustomPriceModal = () => {
           </div>
         </div>
         <div className={styles.chartHolder}>
-          <TradingViewChart onlyChart height={450} />
+          <TradingViewChart onlyChart height={350} />
         </div>
         <div className={styles.actionHolder}>
           {isStopLossModalOpen && (
