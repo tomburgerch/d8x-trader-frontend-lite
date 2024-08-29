@@ -56,7 +56,7 @@ export const SlippageSelector = memo(() => {
               setInputValue(`${key}`);
             }}
           >
-            {key}x
+            {key}%
           </Button>
         ))}
         <OutlinedInput
@@ -65,7 +65,7 @@ export const SlippageSelector = memo(() => {
           className={styles.input}
           endAdornment={
             <InputAdornment position="end">
-              <Typography variant="adornment">x</Typography>
+              <Typography variant="adornment">%</Typography>
             </InputAdornment>
           }
           onChange={handleInputChange}
