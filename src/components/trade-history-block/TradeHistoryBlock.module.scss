@@ -25,6 +25,11 @@
   }
 }
 
+.noData {
+  padding: 4 * $d8x-spacing 4 * $d8x-spacing $d8x-spacing;
+  text-align: center;
+}
+
 .viewAllLabel {
   cursor: pointer;
   color: var(--d8x-color-action);

@@ -85,15 +85,19 @@ export const TradeHistoryBlock = () => {
             title={t('pages.trade.history-table.table-title')}
             content={<Typography>{t('pages.trade.history-table.body')}</Typography>}
           />
-          <Typography variant="bodySmall" className={styles.viewAllLabel} onClick={handleViewAllClick}>
-            {t('common.view-all')}
-          </Typography>
+          {tradesHistoryWithSymbol.length > 0 && (
+            <Typography variant="bodySmall" className={styles.viewAllLabel} onClick={handleViewAllClick}>
+              {t('common.view-all')}
+            </Typography>
+          )}
         </CardContent>
         <Separator className={styles.separator} />
         <CardContent className={classnames(styles.card, styles.itemsHolder)}>
-          {tradesHistoryWithSymbol.map((trade) => (
-            <TradeHistoryItem key={trade.orderId} tradeHistory={trade} />
-          ))}
+          {tradesHistoryWithSymbol.length > 0 &&
+            tradesHistoryWithSymbol.map((trade) => <TradeHistoryItem key={trade.orderId} tradeHistory={trade} />)}
+          {tradesHistoryWithSymbol.length === 0 && (
+            <div className={styles.noData}>{t('pages.trade.history-table.table-content.no-open')}</div>
+          )}
         </CardContent>
       </Card>
 

@@ -227,6 +227,8 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "Marché de prédiction",
+          "note": "Sélectionnez votre stratégie de trading et commencez à trader des options en tant qu'utilisateur Lite!",
           "yes": "Oui",
           "no": "Non",
           "bet": "Parie"

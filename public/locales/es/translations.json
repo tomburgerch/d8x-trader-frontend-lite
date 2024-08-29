@@ -227,6 +227,8 @@
           "short": "Venta"
         },
         "prediction": {
+          "title": "Mercado de predicciones",
+          "note": "¡Seleccione su estrategia comercial y comience a operar con opciones como usuario Lite!",
           "yes": "Si",
           "no": "No",
           "bet": "Apuesta"

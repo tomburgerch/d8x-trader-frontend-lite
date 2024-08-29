@@ -117,8 +117,8 @@
   --d8x-button-outlined-background-hover: rgba(var(--d8x-color-action-rgb), 0.2);
   --d8x-button-outlined-background-selected: var(--d8x-button-outlined-background-hover);
   --d8x-button-outlined-background-disabled: transparent;
-  --d8x-button-outlined-border-color: transparent;
-  --d8x-button-outlined-border-color-hover: transparent;
+  --d8x-button-outlined-border-color: rgba(var(--d8x-color-action-rgb), 0.2);
+  --d8x-button-outlined-border-color-hover: var(--d8x-color-action);
   --d8x-button-outlined-border-color-selected: var(--d8x-button-outlined-border-color-hover);
   --d8x-button-outlined-border-color-disabled: transparent;
   --d8x-slider-thumb-background: var(--d8x-color-background-items);

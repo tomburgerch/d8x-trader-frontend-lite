@@ -85,11 +85,17 @@ export const OrderBlock = memo(() => {
         </CardContent>
       )}
       {isPredictionMarket && (
-        <CardContent className={classnames(styles.card, styles.header)}>Prediction Market</CardContent>
+        <CardContent className={classnames(styles.card, styles.predictionHeader)}>
+          <div className={styles.heading}>
+            <div className={styles.main}>{t('pages.trade.order-block.prediction.title')}</div>
+            <div className={styles.name}>&bull; {selectedPerpetual?.baseCurrency}</div>
+          </div>
+          <div className={styles.note}>{t('pages.trade.order-block.prediction.note')}</div>
+        </CardContent>
       )}
       <Separator className={styles.separator} />
       <CardContent className={classnames(styles.card, styles.orders)}>
-        {isPredictionMarket && <div>{predictionQuestion}</div>}
+        {isPredictionMarket && <div className={styles.predictionQuestion}>{predictionQuestion}</div>}
         <OrderSelector />
       </CardContent>
       <CardContent className={styles.card}>

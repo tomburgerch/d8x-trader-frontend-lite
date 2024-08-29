@@ -223,8 +223,11 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "예측 시장",
+          "note": "거래 전략을 선택하고 라이트 사용자로서 옵션 거래를 시작하세요!",
           "yes": "Yes",
-          "no": "No"
+          "no": "No",
+          "bet": "Bet"
         },
         "order-type": {
           "market": "시장",

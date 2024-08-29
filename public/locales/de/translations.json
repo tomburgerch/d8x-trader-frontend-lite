@@ -227,6 +227,8 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "Prognosemarkt",
+          "note": "Wählen Sie Ihre Handelsstrategie und beginnen Sie als Lite-Benutzer mit dem Optionshandel!",
           "yes": "Ja",
           "no": "Nein",
           "bet": "Wette"
