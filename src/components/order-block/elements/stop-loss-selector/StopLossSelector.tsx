@@ -82,15 +82,15 @@ export const StopLossSelector = memo(() => {
   }, [setStopLossModalOpen]);
 
   const calculatedPercent = useMemo(() => {
-    if (stopLossInputPrice === null || !midPrice) {
+    if (stopLossInputPrice === null || !midPrice || orderInfo?.leverage === undefined) {
       return '--';
     }
-    let percent = stopLossInputPrice / midPrice - 1;
+    let percent = (stopLossInputPrice / midPrice - 1) * orderInfo?.leverage;
     if (percent > -0.005) {
       percent = 0;
     }
     return `${Math.round(100 * percent)}%`;
-  }, [midPrice, stopLossInputPrice]);
+  }, [midPrice, stopLossInputPrice, orderInfo?.leverage]);
 
   const translationMap: Record<StopLossE, string> = {
     [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),

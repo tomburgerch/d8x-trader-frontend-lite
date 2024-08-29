@@ -84,15 +84,15 @@ export const TakeProfitSelector = memo(() => {
   }, [setTakeProfitModalOpen]);
 
   const calculatedPercent = useMemo(() => {
-    if (takeProfitInputPrice === null || !midPrice) {
+    if (takeProfitInputPrice === null || !midPrice || orderInfo?.leverage === undefined) {
       return '--';
     }
-    let percent = takeProfitInputPrice / midPrice - 1;
+    let percent = (takeProfitInputPrice / midPrice - 1) * orderInfo?.leverage;
     if (percent < 0.005) {
       percent = 0;
     }
     return `${Math.round(100 * percent)}%`;
-  }, [midPrice, takeProfitInputPrice]);
+  }, [midPrice, takeProfitInputPrice, orderInfo?.leverage]);
 
   const translationMap: Record<TakeProfitE, string> = {
     [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
