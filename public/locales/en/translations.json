@@ -228,7 +228,7 @@
         },
         "prediction": {
           "title": "Prediction Market",
-          "note": "Select your trade strategy and begin trading options as a lite user!",
+          "note": "Predict the outcome and start betting on it now!",
           "yes": "Yes",
           "no": "No",
           "bet": "Bet"
