@@ -19,6 +19,7 @@ import type {
   PerpetualPriceI,
   PerpetualStaticInfoI,
   ValidatedResponseI,
+  TemporaryAnyT,
 } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -122,12 +123,13 @@ export async function getPositionRisk(
   }
 }
 
+// TODO: VOV: this function to be adjusted/reviewed/revisited.
 export function positionRiskOnTrade(
   _chainId: number,
   traderAPI: TraderInterface,
   order: OrderI,
   traderAddr: string,
-  curAccount: MarginAccountI | undefined,
+  _curAccount: MarginAccountI | undefined,
   tradingFeeTbps: number | undefined
 ): Promise<
   ValidatedResponseI<{
@@ -138,7 +140,7 @@ export function positionRiskOnTrade(
   }>
 > {
   return traderAPI
-    .positionRiskOnTrade(traderAddr, order, curAccount, undefined, { tradingFeeTbps: tradingFeeTbps })
+    .positionRiskOnTrade(traderAddr, order, undefined as TemporaryAnyT, tradingFeeTbps || 0)
     .then((data) => {
       return { type: 'position-risk-on-trade', msg: '', data: data } as ValidatedResponseI<{
         newPositionRisk: MarginAccountI;

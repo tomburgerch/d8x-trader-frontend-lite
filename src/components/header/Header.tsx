@@ -138,7 +138,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             let isPredictionMarket = false;
             try {
               const sInfo = traderAPI?.getPerpetualStaticInfo(symbol);
-              isPredictionMarket = sInfo !== undefined && TraderInterface.isPredictionMarket(sInfo);
+              isPredictionMarket = sInfo !== undefined && TraderInterface.isPredictionMarketStatic(sInfo);
             } catch {
               // skip
             }

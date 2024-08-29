@@ -45,7 +45,7 @@ export const TriggerPrice = memo(() => {
       } else {
         const initialTrigger = perpetualStatistics?.markPrice === undefined ? -1 : perpetualStatistics?.markPrice;
         const userTrigger =
-          perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)
+          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
             ? calculateProbability(initialTrigger, orderBlock === OrderBlockE.Short)
             : initialTrigger;
         setTriggerPrice(`${userTrigger}`);

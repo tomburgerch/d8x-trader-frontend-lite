@@ -1,5 +1,5 @@
-@import '~styles/theme/theme';
-@import '~styles/theme/utils';
+@import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .holderRoot {
   display: flex;
@@ -52,6 +52,44 @@
     &:active {
       z-index: 3;
     }
+  }
+
+  &.oneCurrency {
+    width: 45px;
+
+    .quoteIcon {
+      display: none;
+    }
+  }
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  border-radius: 2 * $d8x-border-radius;
+  padding: 2px 8px 1px;
+  margin-left: 2 * $d8x-spacing;
+  margin-top: calc($d8x-spacing / -2);
+
+  &.crypto {
+    color: var(--d8x-badge-crypto-color);
+    background-color: var(--d8x-badge-crypto-background);
+  }
+
+  &.prediction {
+    color: var(--d8x-badge-prediction-color);
+    background-color: var(--d8x-badge-prediction-background);
+  }
+
+  &.fx {
+    color: var(--d8x-badge-fx-color);
+    background-color: var(--d8x-badge-fx-background);
+  }
+
+  &.commodity {
+    color: var(--d8x-badge-commodity-color);
+    background-color: var(--d8x-badge-commodity-background);
   }
 }
 

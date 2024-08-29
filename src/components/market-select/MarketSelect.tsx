@@ -209,7 +209,7 @@ export const MarketSelect = memo(() => {
     if (!!perpetualStatistics && !!perpetualStaticInfo) {
       let isPredictionMarket = false;
       try {
-        isPredictionMarket = TraderInterface.isPredictionMarket(perpetualStaticInfo);
+        isPredictionMarket = TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
       } catch {
         // skip
       }
@@ -253,7 +253,7 @@ export const MarketSelect = memo(() => {
 
   return (
     <div className={styles.holderRoot}>
-      <div className={styles.iconsWrapper}>
+      <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
         <div className={styles.baseIcon}>
           <Suspense fallback={null}>
             <BaseIconComponent />
@@ -273,7 +273,10 @@ export const MarketSelect = memo(() => {
                 ? cutBaseCurrency(selectedPerpetual?.baseCurrency)
                 : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
             </Typography>
-            <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>
+            {!isPredictionMarket && <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>}
+            {isPredictionMarket && (
+              <span className={classnames(styles.badge, { [styles.prediction]: true })}>&bull; Prediction</span>
+            )}
           </div>
           {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
             <TooltipMobile tooltip={midPrice.tooltip}>

@@ -79,7 +79,7 @@ export const currencyMultiplierAtom = atom((get) => {
 
   let isPredictionMarket = false;
   try {
-    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
   } catch {
     // skip
   }

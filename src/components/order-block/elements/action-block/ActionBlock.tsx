@@ -223,7 +223,7 @@ export const ActionBlock = memo(() => {
     const getPerpetualPricePromise = getPerpetualPrice(mainOrder.quantity, mainOrder.symbol, traderAPI)
       .then((data) => {
         const perpPrice =
-          perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)
+          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
             ? calculateProbability(data.data.price, orderInfo.orderBlock === OrderBlockE.Short)
             : data.data.price;
         setPerpetualPrice(perpPrice);
@@ -506,7 +506,7 @@ export const ActionBlock = memo(() => {
       } else if (orderInfo.orderType === OrderTypeE.Stop && orderInfo.triggerPrice) {
         price = orderInfo.triggerPrice;
       }
-      if (perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)) {
+      if (perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)) {
         price = calculateProbability(price, orderInfo.orderBlock === OrderBlockE.Short);
       }
       return formatToCurrency(price, orderInfo.quoteCurrency);

@@ -1,14 +1,16 @@
 import classnames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { ArrowForward } from '@mui/icons-material';
 import { Card, CardContent, Link } from '@mui/material';
 
+import { createSymbol } from 'helpers/createSymbol';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { orderTypeAtom } from 'store/order-block.store';
+import { selectedPerpetualAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -32,17 +34,62 @@ export const OrderBlock = memo(() => {
 
   const orderType = useAtomValue(orderTypeAtom);
   const setDepositModalOpen = useSetAtom(depositModalOpenAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
 
   const { chainId, isConnected } = useAccount();
 
+  const [predictionQuestion, setPredictionQuestion] = useState('');
+
+  const isPredictionMarket = useMemo(() => {
+    if (!selectedPerpetual || !selectedPool) {
+      return false;
+    }
+    try {
+      return traderAPI?.isPredictionMarket(
+        createSymbol({
+          poolSymbol: selectedPool.poolSymbol,
+          baseCurrency: selectedPerpetual.baseCurrency,
+          quoteCurrency: selectedPerpetual.quoteCurrency,
+        })
+      );
+    } catch (error) {
+      // skip
+    }
+    return false;
+  }, [traderAPI, selectedPerpetual, selectedPool]);
+
+  useEffect(() => {
+    if (!isPredictionMarket || !traderAPI) {
+      setPredictionQuestion('');
+      return;
+    }
+    if (!selectedPerpetual || !selectedPool) {
+      setPredictionQuestion('');
+      return;
+    }
+    traderAPI
+      .fetchPrdMktQuestion(`${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`)
+      .then((value) => {
+        setPredictionQuestion(value);
+      });
+  }, [isPredictionMarket, traderAPI, selectedPerpetual, selectedPool]);
+
   return (
     <Card className={styles.root}>
-      <CardContent className={classnames(styles.card, styles.header)}>
-        <OrderTypeSelector />
-        <SettingsButton />
-      </CardContent>
+      {!isPredictionMarket && (
+        <CardContent className={classnames(styles.card, styles.header)}>
+          <OrderTypeSelector />
+          <SettingsButton />
+        </CardContent>
+      )}
+      {isPredictionMarket && (
+        <CardContent className={classnames(styles.card, styles.header)}>Prediction Market</CardContent>
+      )}
       <Separator className={styles.separator} />
       <CardContent className={classnames(styles.card, styles.orders)}>
+        {isPredictionMarket && <div>{predictionQuestion}</div>}
         <OrderSelector />
       </CardContent>
       <CardContent className={styles.card}>
