@@ -264,15 +264,19 @@ export const OrderSize = memo(() => {
   }, [selectedPerpetual?.baseCurrency]);
 
   const SettleCurrencyIcon = useMemo(() => {
-    let currency = '';
-    if (
-      selectedPool?.settleSymbol &&
-      selectedPool.settleSymbol !== selectedPerpetual?.quoteCurrency &&
-      selectedPool.settleSymbol !== selectedPerpetual?.baseCurrency
-    ) {
-      currency = selectedPool.settleSymbol;
+    if (!selectedPool || !selectedPerpetual) {
+      return () => null;
     }
-    return getDynamicLogo(currency.toLowerCase()) as TemporaryAnyT;
+
+    if (
+      !selectedPool?.settleSymbol ||
+      selectedPool.settleSymbol === selectedPerpetual.quoteCurrency ||
+      selectedPool.settleSymbol === selectedPerpetual.baseCurrency
+    ) {
+      return () => null;
+    }
+
+    return getDynamicLogo(selectedPool.settleSymbol.toLowerCase()) as TemporaryAnyT;
   }, [selectedPool, selectedPerpetual]);
 
   return (
