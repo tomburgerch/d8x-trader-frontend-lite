@@ -7,7 +7,7 @@ import { IconButton, Typography } from '@mui/material';
 import { ModeEditOutlineOutlined } from '@mui/icons-material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { perpetualStaticInfoAtom } from 'store/pools.store';
+import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderSideE, OrderValueTypeE } from 'types/enums';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -48,8 +48,24 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
   const { t } = useTranslation();
 
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const perpetualState = useAtomValue(selectedPerpetualAtom);
 
   const parsedSymbol = parseSymbol(position.symbol);
+
+  const isPredictionMarket = useMemo(() => {
+    try {
+      return !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
+    } catch {
+      // skip
+    }
+  }, [perpetualStaticInfo]);
+
+  const isSettlementInProgress = useMemo(() => {
+    return (
+      perpetualState?.state === 'CLEARED' ||
+      (isPredictionMarket && (perpetualState?.isMarketClosed || perpetualState?.state === 'EMERGENCY'))
+    );
+  }, [isPredictionMarket, perpetualState]);
 
   const openOrdersData: OpenOrdersDataI = useMemo(() => {
     const ordersData = {
@@ -60,14 +76,6 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
         ...defaultOpenOrdersData.stopLoss,
       },
     };
-
-    let isPredictionMarket = false;
-    try {
-      isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
-    } catch {
-      // skip
-    }
-
     if (position.takeProfit.valueType !== OrderValueTypeE.None) {
       ordersData.takeProfit.className = styles.tpValue;
       if (TEXTUAL_VALUE_TYPES.includes(position.takeProfit.valueType)) {
@@ -99,7 +107,7 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
     }
 
     return ordersData;
-  }, [t, position, parsedSymbol, perpetualStaticInfo]);
+  }, [t, position, parsedSymbol, isPredictionMarket]);
 
   return (
     <div className={styles.root}>
@@ -117,6 +125,7 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
           title={t('pages.trade.positions-table.table-content.modify')}
           onClick={() => handleTpSlModify(position)}
           className={styles.iconButton}
+          disabled={isSettlementInProgress}
         >
           <ModeEditOutlineOutlined className={styles.actionIcon} />
         </IconButton>

@@ -8,7 +8,7 @@ import { Box, IconButton, Typography } from '@mui/material';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI, TableHeaderI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -39,27 +39,26 @@ export const PositionBlock = memo(
 
     const c2s = useAtomValue(collateralToSettleConversionAtom);
     const traderAPI = useAtomValue(traderAPIAtom);
+    const perpetualState = useAtomValue(selectedPerpetualAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
+    const isPredictionMarket = traderAPI?.isPredictionMarket(position.symbol);
     const pnlColor = position.unrealizedPnlQuoteCCY >= 0 ? styles.green : styles.red;
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
 
     const [displayEntryPrice, displayLiqPrice, displayCcy] = useMemo(() => {
-      if (!!traderAPI && !!parsedSymbol) {
-        try {
-          return traderAPI?.isPredictionMarket(position.symbol)
-            ? [
-                calculateProbability(position.entryPrice, position.side === OrderSideE.Sell),
-                calculateProbability(position.liqPrice, position.side === OrderSideE.Sell),
-                parsedSymbol.quoteCurrency,
-              ]
-            : [position.entryPrice, position.liqPrice, parsedSymbol.quoteCurrency];
-        } catch (error) {
-          // skip
-        }
-      }
-      return [position.entryPrice, position.liqPrice, parsedSymbol?.quoteCurrency];
-    }, [position, parsedSymbol, traderAPI]);
+      return isPredictionMarket
+        ? [
+            calculateProbability(position.entryPrice, position.side === OrderSideE.Sell),
+            calculateProbability(position.liqPrice, position.side === OrderSideE.Sell),
+            parsedSymbol?.quoteCurrency,
+          ]
+        : [position.entryPrice, position.liqPrice, parsedSymbol?.quoteCurrency];
+    }, [position, parsedSymbol, isPredictionMarket]);
+
+    const isSettlementInProgress = useMemo(() => {
+      return perpetualState?.state === 'CLEARED' || (perpetualState?.isMarketClosed && isPredictionMarket);
+    }, [isPredictionMarket, perpetualState]);
 
     return (
       <Box className={styles.root}>
@@ -76,6 +75,7 @@ export const PositionBlock = memo(
             aria-label={t('pages.trade.positions-table.table-content.modify')}
             title={t('pages.trade.positions-table.table-content.modify')}
             onClick={() => handlePositionModify(position)}
+            disabled={isSettlementInProgress}
           >
             <ModeEditOutlineOutlined className={styles.actionIcon} />
           </IconButton>
@@ -83,6 +83,7 @@ export const PositionBlock = memo(
             aria-label={t('pages.trade.positions-table.table-content.modify')}
             title={t('pages.trade.positions-table.modify-modal.close')}
             onClick={() => handlePositionClose(position)}
+            disabled={isSettlementInProgress}
           >
             <DeleteForeverOutlined className={styles.actionIcon} />
           </IconButton>
@@ -120,45 +121,58 @@ export const PositionBlock = memo(
             leftSideStyles={styles.dataLabel}
             rightSideStyles={styles.dataValue}
           />
-          <SidesRow
-            leftSide={headers[4].label}
-            leftSideTooltip={headers[4].tooltip}
-            rightSide={
-              position.liqPrice < 0
-                ? `- ${parsedSymbol?.quoteCurrency}`
-                : formatToCurrency(displayLiqPrice, displayCcy, true)
-            }
-            leftSideStyles={styles.dataLabel}
-            rightSideStyles={styles.dataValue}
-          />
-          <SidesRow
-            leftSide={headers[5].label}
-            leftSideTooltip={headers[5].tooltip}
-            rightSide={`${
-              collToSettleInfo
-                ? formatToCurrency(position.collateralCC * collToSettleInfo.value, collToSettleInfo.settleSymbol, true)
-                : '-'
-            } (${Math.round(position.leverage * 100) / 100}x)`}
-            leftSideStyles={styles.dataLabel}
-            rightSideStyles={styles.dataValue}
-          />
-          <SidesRow
-            leftSide={headers[6].label}
-            leftSideTooltip={headers[6].tooltip}
-            rightSide={`${formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency, true)} ${
-              position.unrealizedPnlQuoteCCY
-                ? `(${Math.round((position.unrealizedPnlQuoteCCY / (position.collateralCC * position.collToQuoteConversion)) * 10000) / 100}%)`
-                : '(0%)'
-            }`}
-            leftSideStyles={styles.dataLabel}
-            rightSideStyles={pnlColor}
-          />
+          {!isSettlementInProgress && (
+            <>
+              <SidesRow
+                leftSide={headers[4].label}
+                leftSideTooltip={headers[4].tooltip}
+                rightSide={
+                  position.liqPrice < 0
+                    ? `- ${parsedSymbol?.quoteCurrency}`
+                    : formatToCurrency(displayLiqPrice, displayCcy, true)
+                }
+                leftSideStyles={styles.dataLabel}
+                rightSideStyles={styles.dataValue}
+              />
+              <SidesRow
+                leftSide={headers[5].label}
+                leftSideTooltip={headers[5].tooltip}
+                rightSide={`${
+                  collToSettleInfo
+                    ? formatToCurrency(
+                        position.collateralCC * collToSettleInfo.value,
+                        collToSettleInfo.settleSymbol,
+                        true
+                      )
+                    : '-'
+                } (${Math.round(position.leverage * 100) / 100}x)`}
+                leftSideStyles={styles.dataLabel}
+                rightSideStyles={styles.dataValue}
+              />
+              <SidesRow
+                leftSide={headers[6].label}
+                leftSideTooltip={headers[6].tooltip}
+                rightSide={`${formatToCurrency(position.unrealizedPnlQuoteCCY, parsedSymbol?.quoteCurrency, true)} ${
+                  position.unrealizedPnlQuoteCCY
+                    ? `(${Math.round((position.unrealizedPnlQuoteCCY / (position.collateralCC * position.collToQuoteConversion)) * 10000) / 100}%)`
+                    : '(0%)'
+                }`}
+                leftSideStyles={styles.dataLabel}
+                rightSideStyles={pnlColor}
+              />
+            </>
+          )}
           <SidesRow
             leftSide={headers[7].label}
             leftSideTooltip={headers[7].tooltip}
             rightSide={<TpSlValue position={position} handleTpSlModify={handleTpSlModify} />}
           />
         </Box>
+        {isSettlementInProgress && (
+          <Typography variant="bodySmall" align={'center'} component="p" className={styles.symbol}>
+            Settlement in progress...
+          </Typography>
+        )}
       </Box>
     );
   }

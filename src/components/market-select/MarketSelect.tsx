@@ -123,7 +123,7 @@ export const MarketSelect = memo(() => {
       .forEach((pool) =>
         marketsList.push(
           ...pool.perpetuals
-            .filter((perpetual) => perpetual.state === 'NORMAL')
+            .filter((perpetual) => !['INVALID', 'INITIALIZING'].includes(perpetual.state))
             .map((perpetual) => {
               const pairId = `${perpetual.baseCurrency}-${perpetual.quoteCurrency}`.toLowerCase();
               let marketData = marketsData.find((market) => market.symbol === pairId);
@@ -168,7 +168,13 @@ export const MarketSelect = memo(() => {
             })
         )
       );
-    return marketsList;
+    return marketsList.filter((market) => {
+      return (
+        market.item.state === 'NORMAL' ||
+        (market.item.marketData?.assetType === AssetTypeE.Prediction &&
+          ['NORMAL', 'EMERGENCY', 'CLEARED'].includes(market.item.state))
+      );
+    });
   }, [pools, marketsData, orderBlock, traderAPI]);
 
   const filteredMarkets = useMarketsFilter(markets);
