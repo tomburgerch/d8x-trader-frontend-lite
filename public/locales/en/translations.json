@@ -869,7 +869,7 @@
         "crypto": "Crypto",
         "fx": "FX",
         "all": "All",
-        "prediction": "Prediction",
+        "polymarket": "Prediction",
         "metal": "Commodity",
         "closed": "Closed"
       },

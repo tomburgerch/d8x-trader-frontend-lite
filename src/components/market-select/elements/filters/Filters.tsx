@@ -23,7 +23,7 @@ export const Filters = memo(() => {
       value: AssetTypeE.Crypto,
     },
     {
-      label: t('common.select.market.prediction'),
+      label: t('common.select.market.polymarket'),
       value: AssetTypeE.Prediction,
     },
     {
