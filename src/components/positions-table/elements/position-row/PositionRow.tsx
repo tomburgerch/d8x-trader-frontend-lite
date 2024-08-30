@@ -54,7 +54,7 @@ export const PositionRow = memo(
 
     const isSettlementInProgress = useMemo(() => {
       return (
-        perpetualState?.state === 'CLEARED' ||
+        perpetualState?.state === 'SETTLE' ||
         (isPredictionMarket && (perpetualState?.isMarketClosed || perpetualState?.state === 'EMERGENCY'))
       );
     }, [isPredictionMarket, perpetualState]);

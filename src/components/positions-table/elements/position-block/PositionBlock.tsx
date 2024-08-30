@@ -57,7 +57,7 @@ export const PositionBlock = memo(
     }, [position, parsedSymbol, isPredictionMarket]);
 
     const isSettlementInProgress = useMemo(() => {
-      return perpetualState?.state === 'CLEARED' || (perpetualState?.isMarketClosed && isPredictionMarket);
+      return perpetualState?.state === 'SETTLE' || (perpetualState?.isMarketClosed && isPredictionMarket);
     }, [isPredictionMarket, perpetualState]);
 
     return (
