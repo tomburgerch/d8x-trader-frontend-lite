@@ -2,13 +2,14 @@ import classnames from 'classnames';
 import { Suspense, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { MenuItem, Typography } from '@mui/material';
 
+import type { SelectItemI } from 'components/header/elements/header-select/types';
 import { AssetTypeE } from 'types/enums';
 import { TemporaryAnyT } from 'types/types';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
-import type { SelectItemI } from '../../../header/elements/header-select/types';
 import type { PerpetualWithPoolAndMarketI } from '../../types';
 
 import styles from './MarketOption.module.scss';
@@ -22,10 +23,14 @@ interface MarketOptionPropsI {
 export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionPropsI) => {
   const { t } = useTranslation();
 
-  const IconComponent = useMemo(
+  const BaseCurrencyIcon = useMemo(
     () => getDynamicLogo(option.item.baseCurrency.toLowerCase()) as TemporaryAnyT,
     [option.item.baseCurrency]
   );
+
+  const QuoteCurrencyIcon = useMemo(() => {
+    return getDynamicLogo(option.item.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [option.item.quoteCurrency]);
 
   const marketData = option.item.marketData;
 
@@ -33,15 +38,28 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
     <MenuItem
       value={option.value}
       selected={isSelected}
-      className={classnames({ [styles.selectedOption]: isSelected })}
+      className={classnames(styles.root, { [styles.selected]: isSelected })}
       onClick={onClick}
     >
       <div className={styles.optionHolder}>
         <div className={styles.optionLeftBlock}>
-          <div className={styles.iconHolder}>
-            <Suspense fallback={null}>
-              <IconComponent width={24} height={24} />
-            </Suspense>
+          <div
+            className={classnames(styles.iconsHolder, {
+              [styles.prediction]: marketData?.assetType === AssetTypeE.Prediction,
+            })}
+          >
+            <div className={styles.baseIcon}>
+              <Suspense fallback={null}>
+                <BaseCurrencyIcon />
+              </Suspense>
+            </div>
+            {marketData?.assetType !== AssetTypeE.Prediction && (
+              <div className={styles.quoteIcon}>
+                <Suspense fallback={null}>
+                  <QuoteCurrencyIcon />
+                </Suspense>
+              </div>
+            )}
           </div>
           <Typography variant="bodySmall" className={styles.label}>
             {option.item.baseCurrency}/{option.item.quoteCurrency}
@@ -52,8 +70,8 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
         </div>
         <div className={styles.optionRightBlock}>
           {marketData && marketData.isOpen ? (
-            <>
-              <Typography variant="bodySmall" className={styles.value}>
+            <div className={styles.priceData}>
+              <Typography variant="bodySmall" className={styles.price}>
                 {marketData.currentPx.toFixed(2)}
               </Typography>
               {marketData.assetType !== AssetTypeE.Prediction && (
@@ -64,10 +82,13 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
                     [styles.sellPrice]: marketData.ret24hPerc < 0,
                   })}
                 >
-                  {marketData.ret24hPerc.toFixed(2)}%
+                  <span>{marketData.ret24hPerc.toFixed(2)}%</span>
+                  <span className={styles.arrow}>
+                    {marketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}
+                  </span>
                 </Typography>
               )}
-            </>
+            </div>
           ) : (
             <Typography variant="bodySmall" className={styles.status}>
               {marketData ? t('common.select.market.closed') : ''}

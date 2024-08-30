@@ -163,17 +163,30 @@
   }
 }
 
-.statMainValue {
-  font-size: 24px;
-  font-weight: 600;
+.midPrice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4 * $d8x-spacing;
 
-  &.positive {
+  .positive {
     color: var(--d8x-color-text-buy);
   }
 
-  &.negative {
+  .negative {
     color: var(--d8x-color-text-sell);
   }
+}
+
+.priceChange {
+  display: flex;
+  align-items: center;
+  margin-top: -$d8x-spacing;
+}
+
+.statMainValue {
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .collateralFilter {
@@ -187,38 +200,22 @@
 
   :global(.MuiPaper-root) {
     width: 100%;
-    max-width: 450px;
+    max-width: 620px;
   }
 }
 
 .optionList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3 * $d8x-spacing;
   overflow-y: scroll;
+  padding: 4 * $d8x-spacing;
 }
 
 .dialogAction {
   margin-top: $d8x-spacing * 6;
   justify-content: center;
-}
-
-.optionsHeader {
-  display: block;
-  padding: 12px;
-
-  .header {
-    color: var(--d8x-color-text-main);
-    text-align: center;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 32px;
-  }
-}
-
-.controlsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 8px 16px;
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {

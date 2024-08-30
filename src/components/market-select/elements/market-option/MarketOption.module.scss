@@ -1,0 +1,128 @@
+@import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
+
+.root {
+  flex: 1;
+  min-width: 250px;
+  padding: 3 * $d8x-spacing;
+  border-radius: $d8x-border-radius;
+  border: 1px solid var(--d8x-color-action);
+
+  &:hover,
+  &.selected {
+    background-color: var(--d8x-color-background-items-selected);
+  }
+}
+
+.iconsHolder {
+  position: relative;
+  width: 50px;
+  height: 30px;
+
+  .baseIcon,
+  .quoteIcon {
+    @include flex-center;
+
+    position: absolute;
+    inset: 0;
+    width: 30px;
+    height: 30px;
+    border: 1.5px solid var(--d8x-color-action);
+    background-color: var(--d8x-color-background-icon);
+    border-radius: 50%;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .baseIcon {
+    right: inherit;
+    z-index: 2;
+  }
+
+  .quoteIcon {
+    left: inherit;
+    z-index: 1;
+
+    &:hover,
+    &:focus,
+    &:active {
+      z-index: 3;
+    }
+  }
+
+  &.prediction {
+    .baseIcon {
+      left: 10px;
+    }
+  }
+}
+
+.optionHolder {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: $d8x-spacing;
+
+  .label {
+    font-weight: bold;
+  }
+
+  .value {
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-weight: bold;
+  }
+}
+
+.optionLeftBlock {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .iconHolder {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.optionRightBlock {
+  display: flex;
+  align-items: center;
+}
+
+.priceData {
+  text-align: right;
+}
+
+.price {
+  display: block;
+}
+
+.priceChange {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  font-weight: bold;
+  font-size: 0.625rem;
+
+  .arrow {
+    width: 16px;
+  }
+
+  &.buyPrice {
+    color: var(--d8x-color-buy-rgba);
+  }
+
+  &.sellPrice {
+    color: var(--d8x-color-sell-rgba);
+  }
+}

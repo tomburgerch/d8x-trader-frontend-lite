@@ -32,32 +32,12 @@ import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
-import { CollateralFilter } from './components/collateral-filter/CollateralFilter';
-import { Filters } from './components/filters/Filters';
-import { MarketOption } from './components/market-option/MarketOption';
-import { SearchInput } from './components/search-input/SearchInput';
+import { MarketOption } from './elements/market-option/MarketOption';
+import { OptionsHeader } from './elements/options-header/OptionsHeader';
 import { PerpetualWithPoolAndMarketI } from './types';
 import { useMarketsFilter } from './useMarketsFilter';
 
 import styles from './MarketSelect.module.scss';
-
-const OptionsHeader = () => {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      <div className={styles.optionsHeader}>
-        <div className={styles.header}>{t('common.select.market.header')}</div>
-      </div>
-      <Separator />
-      <div className={styles.controlsContainer}>
-        <SearchInput />
-        <CollateralFilter />
-        <Filters />
-      </div>
-    </>
-  );
-};
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
@@ -251,6 +231,13 @@ export const MarketSelect = memo(() => {
     return false;
   }, [traderAPI, selectedPerpetual, selectedPool]);
 
+  const currencyMarketData = useMemo(() => {
+    if (selectedPerpetual && markets.length > 0) {
+      return markets.find((market) => market.value === `${selectedPerpetual.id}`)?.item.marketData ?? null;
+    }
+    return null;
+  }, [selectedPerpetual, markets]);
+
   return (
     <div className={styles.holderRoot}>
       <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
@@ -278,13 +265,26 @@ export const MarketSelect = memo(() => {
               <span className={classnames(styles.badge, { [styles.prediction]: true })}>&bull; Prediction</span>
             )}
           </div>
-          {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
-            <TooltipMobile tooltip={midPrice.tooltip}>
+          <div className={styles.midPrice}>
+            {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
+              <TooltipMobile tooltip={midPrice.tooltip}>
+                <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
+              </TooltipMobile>
+            ) : (
               <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-            </TooltipMobile>
-          ) : (
-            <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-          )}
+            )}
+            {!isPredictionMarket && currencyMarketData && (
+              <div
+                className={classnames(styles.priceChange, {
+                  [styles.positive]: currencyMarketData.ret24hPerc >= 0,
+                  [styles.negative]: currencyMarketData.ret24hPerc < 0,
+                })}
+              >
+                <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
+                <span>{currencyMarketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
       </Button>

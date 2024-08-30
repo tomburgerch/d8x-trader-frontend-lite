@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { useAtom } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,11 +49,9 @@ export const Filters = memo(() => {
       {options.map((option) => (
         <div
           key={option.value}
-          className={
-            groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All)
-              ? styles.active
-              : styles.inactive
-          }
+          className={classnames(styles.option, {
+            [styles.active]: groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All),
+          })}
           onClick={() => handleClick(option.value)}
         >
           {option.label}

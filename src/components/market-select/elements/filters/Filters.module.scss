@@ -1,0 +1,23 @@
+@import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
+
+.container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2 * $d8x-spacing;
+}
+
+.option {
+  @include transition(background-color);
+
+  padding: $d8x-spacing $d8x-spacing * 3;
+  border-radius: $d8x-button-border-radius;
+  border: 1px solid var(--d8x-color-action);
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover,
+  &.active {
+    background-color: var(--d8x-color-action-secondary);
+  }
+}

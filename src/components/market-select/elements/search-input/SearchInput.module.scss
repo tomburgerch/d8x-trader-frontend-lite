@@ -4,16 +4,17 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .searchRaw {
   width: 100%;
   background-color: var(--d8x-color-background);
   color: var(--d8x-color-text-main);
-  border: none;
-  padding: 12px 8px 12px 40px;
-  border-radius: 8px;
-  min-height: 48px;
+  border: 1px solid var(--d8x-color-input-border);
+  padding: 8px 8px 8px 40px;
+  border-radius: $d8x-button-border-radius;
+  height: 32px;
 }
 
 .searchIcon {
