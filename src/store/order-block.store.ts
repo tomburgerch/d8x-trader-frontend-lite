@@ -196,11 +196,14 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
           perpetualState,
           perpetualStaticInfo.maintenanceMarginRate,
           perpetualStatistics.markPrice,
-          size,
+          size * (OrderBlockE.Short === orderBlock ? -1 : 1),
           (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
           1 / leverage
         ) * 1e4; // in bps
     }
+
+    console.log(size * (OrderBlockE.Short === orderBlock ? -1 : 1));
+
     // baseFee stays null
   } else {
     if (poolFee) {
