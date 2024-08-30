@@ -1,9 +1,12 @@
 @import '~styles/theme/theme.scss';
 
 .menuItem {
-  color: var(--d8x-color-text-main);
+  font-size: 12px;
+  color: var(--d8x-button-select-color);
+  border-radius: $d8x-border-radius-medium;
+  padding: 2 * $d8x-spacing;
 
   &.selected {
-    background-color: var(--d8x-color-background-items-selected);
+    background-color: var(--d8x-button-select-background);
   }
 }

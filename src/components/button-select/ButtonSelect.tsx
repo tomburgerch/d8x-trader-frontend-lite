@@ -39,7 +39,7 @@ export const ButtonSelect = ({
       <Button
         onClick={(event) => setAnchorEl(event.currentTarget)}
         className={classnames(styles.button, className, { [styles.fullWidth]: fullWidth })}
-        variant="primary"
+        variant="select"
         disabled={disabled}
       >
         <Typography variant="bodySmall" className={styles.selectedValue}>

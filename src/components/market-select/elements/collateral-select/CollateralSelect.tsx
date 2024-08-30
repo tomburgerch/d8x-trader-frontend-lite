@@ -84,7 +84,7 @@ export const CollateralSelect = () => {
         <ButtonMenuItem
           key={option}
           option={<OptionTitle option={option} />}
-          isActive={option === collateralFilter}
+          isActive={option === collateralFilter || (option === '' && collateralFilter === null)}
           onClick={() => {
             setCollateralFilter(option === '' ? null : option);
             setAnchorEl(null);

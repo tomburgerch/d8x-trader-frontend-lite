@@ -69,6 +69,7 @@ declare module '@mui/material/Button' {
   interface ButtonPropsVariantOverrides {
     primary: true;
     secondary: true;
+    select: true;
     success: true;
     warning: true;
     action: true;
@@ -232,6 +233,26 @@ export const theme = createTheme({
               backgroundColor: 'var(--d8x-button-secondary-background-disabled)',
               color: 'var(--d8x-button-secondary-color-disabled)',
               borderColor: 'var(--d8x-button-secondary-border-color-disabled)',
+            },
+          },
+        },
+        {
+          props: { variant: 'select' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-button-select-background)',
+            border: '1px solid var(--d8x-button-select-border-color)',
+            color: 'var(--d8x-button-select-color)',
+            fontSize: '12px',
+            ':hover': {
+              backgroundColor: 'var(--d8x-button-select-background-hover)',
+              color: 'var(--d8x-button-select-color-hover)',
+              borderColor: 'var(--d8x-button-select-border-color-hover)',
+            },
+            ':disabled': {
+              backgroundColor: 'var(--d8x-button-select-background-disabled)',
+              color: 'var(--d8x-button-select-color-disabled)',
+              borderColor: 'var(--d8x-button-select-border-color-disabled)',
             },
           },
         },
