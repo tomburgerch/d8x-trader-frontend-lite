@@ -66,6 +66,11 @@
   width: 100%;
   gap: $d8x-spacing;
 
+  .currencyData {
+    display: flex;
+    flex-direction: column;
+  }
+
   .label {
     font-weight: bold;
   }

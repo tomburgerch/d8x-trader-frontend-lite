@@ -13,6 +13,7 @@ import { getDynamicLogo } from 'utils/getDynamicLogo';
 import type { PerpetualWithPoolAndMarketI } from '../../types';
 
 import styles from './MarketOption.module.scss';
+import { CurrencyBadge } from '../../../currency-badge/CurrencyBadge';
 
 interface MarketOptionPropsI {
   isSelected: boolean;
@@ -61,12 +62,17 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
               </div>
             )}
           </div>
-          <Typography variant="bodySmall" className={styles.label}>
-            {option.item.baseCurrency}/{option.item.quoteCurrency}
-            <Typography variant="bodyTiny" component="div">
-              {option.item.settleSymbol}
+          <div className={styles.currencyData}>
+            <Typography variant="bodySmall" className={styles.label}>
+              {option.item.baseCurrency}/{option.item.quoteCurrency}/{option.item.settleSymbol}
             </Typography>
-          </Typography>
+            <div>
+              <CurrencyBadge
+                assetType={marketData?.assetType}
+                label={t(`common.select.market.${marketData?.assetType}`)}
+              />
+            </div>
+          </div>
         </div>
         <div className={styles.optionRightBlock}>
           {marketData && marketData.isOpen ? (

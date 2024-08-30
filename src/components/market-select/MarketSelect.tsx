@@ -38,6 +38,7 @@ import { PerpetualWithPoolAndMarketI } from './types';
 import { useMarketsFilter } from './useMarketsFilter';
 
 import styles from './MarketSelect.module.scss';
+import { CurrencyBadge } from '../currency-badge/CurrencyBadge';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
@@ -261,9 +262,12 @@ export const MarketSelect = memo(() => {
                 : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
             </Typography>
             {!isPredictionMarket && <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>}
-            {isPredictionMarket && (
-              <span className={classnames(styles.badge, { [styles.prediction]: true })}>&bull; Prediction</span>
-            )}
+            <CurrencyBadge
+              className={styles.badge}
+              assetType={currencyMarketData?.assetType}
+              label={t(`common.select.market.${currencyMarketData?.assetType}`)}
+              withPoint={true}
+            />
           </div>
           <div className={styles.midPrice}>
             {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
