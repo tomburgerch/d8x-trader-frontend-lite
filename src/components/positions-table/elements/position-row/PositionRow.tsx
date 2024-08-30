@@ -7,7 +7,7 @@ import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
 
 import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom, selectedPerpetualAtom, traderAPIAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, perpetualsAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
 import type { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -36,11 +36,12 @@ export const PositionRow = memo(
 
     const c2s = useAtomValue(collateralToSettleConversionAtom);
     const traderAPI = useAtomValue(traderAPIAtom);
-    const perpetualState = useAtomValue(selectedPerpetualAtom);
+    const perpetuals = useAtomValue(perpetualsAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
     const isPredictionMarket = traderAPI?.isPredictionMarket(position.symbol);
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
+    const perpetualState = perpetuals.find(({ symbol }) => symbol === position.symbol);
 
     const [displayEntryPrice, displayLiqPrice, displayCcy] = useMemo(() => {
       return isPredictionMarket
@@ -53,10 +54,8 @@ export const PositionRow = memo(
     }, [position, parsedSymbol, isPredictionMarket]);
 
     const isSettlementInProgress = useMemo(() => {
-      return (
-        perpetualState?.state === 'CLEARED' ||
-        (isPredictionMarket && (perpetualState?.isMarketClosed || perpetualState?.state === 'EMERGENCY'))
-      );
+      console.log(perpetualState?.baseCurrency, perpetualState?.state);
+      return perpetualState?.state === 'SETTLE' || (isPredictionMarket && perpetualState?.state === 'EMERGENCY');
     }, [isPredictionMarket, perpetualState]);
 
     return (

@@ -149,6 +149,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               quoteCurrency: perpetual.quoteCurrency,
               symbol,
               isPredictionMarket,
+              state: perpetual.state,
             };
           })
         );
