@@ -201,9 +201,6 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
           1 / leverage
         ) * 1e4; // in bps
     }
-
-    console.log(size * (OrderBlockE.Short === orderBlock ? -1 : 1));
-
     // baseFee stays null
   } else {
     if (poolFee) {
