@@ -37,6 +37,7 @@ export interface PerpetualDataI {
   quoteCurrency: string;
   symbol: string;
   isPredictionMarket: boolean;
+  state: string;
 }
 
 export interface SymbolDataI {
