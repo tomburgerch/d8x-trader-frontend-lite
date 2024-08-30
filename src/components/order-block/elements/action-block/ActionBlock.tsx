@@ -87,7 +87,7 @@ function createMainOrder(orderInfo: OrderInfoI) {
     symbol: orderInfo.symbol,
     side: orderInfo.orderBlock === OrderBlockE.Long ? OrderSideE.Buy : OrderSideE.Sell,
     type: orderType,
-    limitPrice: limitPrice !== null && limitPrice > -1 ? limitPrice : undefined,
+    limitPrice: limitPrice !== null && limitPrice > -1 && !isPredictionMarket ? limitPrice : undefined,
     stopPrice: stopPrice !== null ? stopPrice : undefined,
     quantity: orderInfo.size,
     leverage: orderInfo.leverage,
