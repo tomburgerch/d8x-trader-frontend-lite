@@ -175,8 +175,8 @@
 .menuButton {
   margin-left: $d8x-spacing * 4;
   padding: 0;
-  min-width: 48px;
-  height: 48px;
+  min-width: 40px;
+  height: 40px;
 }
 
 .logoLink {
@@ -187,26 +187,26 @@
 .walletConnect {
   justify-content: right;
   display: flex;
-  height: 48px;
+  height: 40px;
   gap: 15px;
 }
 
 .buttonsHolder {
   display: flex;
   gap: $d8x-spacing * 4;
-  height: 48px;
+  height: 40px;
 }
 
 .settingButtonsHolder {
   display: flex;
   margin-left: $d8x-spacing * 2;
   gap: $d8x-spacing * 2;
-  height: 48px;
+  height: 40px;
 }
 
 .modalButton {
   min-width: 195px;
-  height: 48px;
+  height: 40px;
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {
@@ -222,7 +222,7 @@
   .modalButton {
     padding-left: 20px;
     padding-right: 20px;
-    min-width: 48px;
+    min-width: 40px;
   }
 }
 

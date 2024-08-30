@@ -1,7 +1,8 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
 
-import { DarkMode, LightMode } from '@mui/icons-material';
+import DarkMode from 'assets/icons/darkModeIcon.svg?react';
+import LightMode from 'assets/icons/lightModeIcon.svg?react';
 
 import { enabledDarkModeAtom } from 'store/app.store';
 
