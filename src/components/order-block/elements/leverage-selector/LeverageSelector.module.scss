@@ -48,11 +48,18 @@
   height: 32px;
   font-size: 14px;
   font-weight: 400;
+  background-color: var(--d8x-button-select-secondary-background);
+  color: var(--d8x-button-select-secondary-color);
+  border: 1px solid transparent;
+
+  &:hover {
+    border: 1px solid var(--d8x-button-select-secondary-border-color-hover);
+    color: var(--d8x-button-select-secondary-color);
+  }
 
   &.selected {
-    background-color: var(--d8x-button-primary-background-selected);
-    border-color: var(--d8x-button-primary-border-color-selected);
-    color: var(--d8x-button-primary-color-selected);
+    background-color: var(--d8x-button-select-secondary-background-selected);
+    color: var(--d8x-button-select-secondary-color-selected);
   }
 }
 
@@ -60,9 +67,12 @@
   :global(.MuiInputBase-root) {
     width: 100px;
     padding-right: 0;
+    background-color: transparent;
+    height: 32px;
 
     input {
       width: 45%;
+      font-size: 14px;
     }
   }
 
@@ -72,7 +82,13 @@
   }
 
   :global(.MuiOutlinedInput-notchedOutline) {
-    border-color: var(--d8x-color-action);
+    border-color: var(--d8x-color-border);
+  }
+
+  &:hover {
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: var(--d8x-color-action);
+    }  
   }
 }
 

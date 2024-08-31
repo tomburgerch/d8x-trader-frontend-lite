@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { InfoOutlined } from '@mui/icons-material';
+import { Info } from '@mui/icons-material';
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
@@ -35,7 +35,7 @@ export const InfoLabelBlock = ({
       <div className={classnames(styles.label, labelClassname)}>
         {titlePrefix && <span>{titlePrefix}</span>}
         <span className={classnames(styles.iconHolder, iconHolderClassname)}>
-          <InfoOutlined onClick={() => setModalOpen(true)} className={styles.actionIcon} />
+          <Info onClick={() => setModalOpen(true)} className={styles.actionIcon} />
         </span>
         <span className={classnames(styles.title, titleClassname)}>{title}</span>
       </div>

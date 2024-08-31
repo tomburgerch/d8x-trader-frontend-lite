@@ -90,7 +90,7 @@ const MuiButtonSharedStyle = {
   transition: 'ease-in 300ms',
   borderRadius: '8px',
   padding: '10px 20px 8px',
-  fontSize: '18px',
+  fontSize: '14px',
   fontWeight: 700,
 };
 
@@ -522,18 +522,18 @@ export const theme = createTheme({
           padding: '14px 0 !important',
         },
         thumb: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         track: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         rail: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         markLabel: {
           fontSize: '12px',
           lineHeight: '16px',
-          color: 'var(--d8x-color-text-main)',
+          color: 'var(--d8x-color-text-label-one)',
           top: '36px !important',
         },
       },

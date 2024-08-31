@@ -145,7 +145,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.fees')}
         </Typography>
-        <Typography variant="bodySmallSB" className={styles.infoText}>
+        <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
             <>
               <span style={{ textDecoration: 'line-through' }}>
@@ -185,7 +185,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.execution-fees')}
         </Typography>
-        <Typography variant="bodySmallSB" className={styles.infoText}>
+        <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
           {perpetualStaticInfo && selectedPool
             ? formatToCurrency(
                 perpetualStaticInfo.referralRebate * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
@@ -199,7 +199,7 @@ export const InfoBlock = memo(() => {
           <Typography variant="bodySmallPopup" className={styles.infoText}>
             {t('pages.trade.order-block.info.gas')}
           </Typography>
-          <Typography variant="bodySmallSB" className={styles.infoText}>
+          <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
             {'77% '}
             {t('pages.trade.order-block.info.rebate')}
           </Typography>
@@ -209,7 +209,7 @@ export const InfoBlock = memo(() => {
         <Typography variant="bodySmallPopup" className={styles.infoText}>
           {t('pages.trade.order-block.info.approx-deposit')}
         </Typography>
-        <Typography variant="bodySmallSB" className={styles.infoText}>
+        <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
           {approxDepositFromWallet === undefined || !selectedPool
             ? '-'
             : formatToCurrency(

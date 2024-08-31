@@ -50,7 +50,7 @@
   --d8x-color-background-table-even-row: var(--d8x-color-background-items);
   --d8x-color-text-table-header: var(--d8x-color-text-main);
   --d8x-color-text-table-cell: var(--d8x-color-text-highlight);
-  --d8x-color-action-icon: var(--d8x-color-action);
+  --d8x-color-action-icon: #1c1c1c;
   --d8x-color-background-primary: var(--d8x-color-action);
   --d8x-color-background-primary-hover: rgba(var(--d8x-color-action-rgb), 0.6);
   --d8x-color-background-primary-disabled: rgba(var(--d8x-color-background-buy-inactive-rgb), 0.5);
@@ -93,7 +93,7 @@
   --d8x-button-primary-background-hover: var(--d8x-color-background-primary-hover);
   --d8x-button-primary-background-selected: var(--d8x-button-primary-background-hover);
   --d8x-button-primary-background-disabled: var(--d8x-color-background-primary-disabled);
-  --d8x-button-primary-border-color: var(--d8x-color-action);
+  --d8x-button-primary-border-color: var(--d8x-color-border);
   --d8x-button-primary-border-color-hover: var(--d8x-color-action);
   --d8x-button-primary-border-color-selected: var(--d8x-button-primary-border-color-hover);
   --d8x-button-primary-border-color-disabled: var(--d8x-color-action);
@@ -121,6 +121,18 @@
   --d8x-button-select-border-color-hover: var(--d8x-button-select-border-color);
   --d8x-button-select-border-color-selected: var(--d8x-button-select-border-color-hover);
   --d8x-button-select-border-color-disabled: var(--d8x-button-select-border-color);
+  --d8x-button-select-secondary-color: var(--d8x-color-action);
+  --d8x-button-select-secondary-color-hover: var(--d8x-button-secondary-color);
+  --d8x-button-select-secondary-color-selected: var(--d8x-color-text-secondary);
+  --d8x-button-select-secondary-color-disabled: var(--d8x-button-secondary-color);
+  --d8x-button-select-secondary-background: #e1e4fe;
+  --d8x-button-select-secondary-background-hover: var(--d8x-color-background-table);
+  --d8x-button-select-secondary-background-selected: var(--d8x-color-action);
+  --d8x-button-select-secondary-background-disabled: var(--d8x-color-background-items);
+  --d8x-button-select-secondary-border-color: var(--d8x-color-action);
+  --d8x-button-select-secondary-border-color-hover: var(--d8x-button-secondary-border-color);
+  --d8x-button-select-secondary-border-color-selected: var(--d8x-button-secondary-border-color-hover);
+  --d8x-button-select-secondary-border-color-disabled: var(--d8x-color-action);
   --d8x-button-outlined-color: var(--d8x-color-text-main);
   --d8x-button-outlined-color-hover: var(--d8x-button-outlined-color);
   --d8x-button-outlined-color-selected: var(--d8x-button-outlined-color-hover);

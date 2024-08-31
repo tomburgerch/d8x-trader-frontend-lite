@@ -11,7 +11,7 @@
 .actionIcon {
   @include transition(opacity);
 
-  color: var(--d8x-color-action-icon);
+  color: var(--d8x-color-action);
   position: relative;
   bottom: 2px;
 

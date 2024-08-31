@@ -23,7 +23,9 @@
   .icon {
     @include transition(color);
 
-    color: var(--d8x-color-action);
+    stroke: var(--d8x-color-icon-theme);
+    color: none;
+    height: 16px;
   }
 
   &:hover {
