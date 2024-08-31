@@ -370,6 +370,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
   return (
     <Dialog
       open={isOpen}
+      onClose={closeModal}
       onCloseClick={closeModal}
       className={classnames(styles.root, styles.wide)}
       dialogTitle={t('pages.trade.positions-table.modify-modal.tp-sl-title')}
