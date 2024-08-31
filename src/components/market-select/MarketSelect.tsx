@@ -5,9 +5,10 @@ import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
 
+import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
+import ArrowUpIcon from 'assets/icons/new/arrowUp.svg?react';
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
 import { Dialog } from 'components/dialog/Dialog';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
@@ -292,12 +293,20 @@ export const MarketSelect = memo(() => {
                 })}
               >
                 <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
-                <span>{currencyMarketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}</span>
+                <span>
+                  {currencyMarketData.ret24hPerc >= 0 ? (
+                    <ArrowUpIcon width={20} height={20} />
+                  ) : (
+                    <ArrowDownIcon width={20} height={20} />
+                  )}
+                </span>
               </div>
             )}
           </div>
         </div>
-        <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
+        <div className={styles.arrowDropDown}>
+          {isModalOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
+        </div>
       </Button>
 
       <Dialog

@@ -1,8 +1,10 @@
 import classnames from 'classnames';
 import { type Dispatch, type PropsWithChildren, type ReactNode, type SetStateAction } from 'react';
 
-import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Menu, Typography } from '@mui/material';
+
+import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
+import ArrowUpIcon from 'assets/icons/new/arrowUp.svg?react';
 
 import styles from './DropDownSelect.module.scss';
 
@@ -47,7 +49,7 @@ export const DropDownSelect = ({
         </Typography>
         {hasArrow && (
           <div className={classnames(styles.arrowDropDown, { [styles.disabledHandle]: disabled })}>
-            {isOpen ? <ArrowDropUp /> : <ArrowDropDown />}
+            {isOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
           </div>
         )}
       </Button>
