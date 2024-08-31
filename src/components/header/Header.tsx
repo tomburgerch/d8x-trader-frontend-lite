@@ -374,7 +374,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               <div className={styles.leftSide}>
                 <Typography variant="h6" component="div" className={styles.mainLogoHolder}>
                   <a href="/" className={styles.logoLink}>
-                    <LogoWithText width={86} height={20} />
+                    <LogoWithText width={60} height={13.95} />
                   </a>
                 </Typography>
                 {!isUpToLargeScreen && (

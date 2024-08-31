@@ -203,7 +203,7 @@ export const theme = createTheme({
             backgroundColor: 'var(--d8x-button-primary-background)',
             border: '1px solid var(--d8x-button-primary-border-color)',
             color: 'var(--d8x-button-primary-color)',
-            fontSize: '16px',
+            fontSize: '14px',
             ':hover': {
               backgroundColor: 'var(--d8x-button-primary-background-hover)',
               color: 'var(--d8x-button-primary-color-hover)',
@@ -223,7 +223,7 @@ export const theme = createTheme({
             backgroundColor: 'var(--d8x-button-secondary-background)',
             border: '1px solid var(--d8x-button-secondary-border-color)',
             color: 'var(--d8x-button-secondary-color)',
-            fontSize: '16px',
+            fontSize: '14px',
             ':hover': {
               backgroundColor: 'var(--d8x-button-secondary-background-hover)',
               color: 'var(--d8x-button-secondary-color-hover)',
@@ -372,7 +372,7 @@ export const theme = createTheme({
           style: {
             ...MuiButtonSharedStyle,
             padding: '9px 40px 7px',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 'normal',
             minWidth: '50px',
           },

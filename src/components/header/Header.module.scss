@@ -45,12 +45,12 @@
 .leftSide {
   display: flex;
   flex: 1;
-  gap: 8 * $d8x-spacing;
+  gap: 12 * $d8x-spacing;
   align-items: center;
 
   .navWrapper {
     display: flex;
-    gap: 8 * $d8x-spacing;
+    gap: 10 * $d8x-spacing;
 
     > a {
       @include transition(color);
@@ -199,13 +199,13 @@
 
 .settingButtonsHolder {
   display: flex;
-  margin-left: $d8x-spacing * 2;
-  gap: $d8x-spacing * 2;
+  margin-left: $d8x-spacing * 2 + 2;
+  gap: $d8x-spacing * 2 + 2;
   height: 40px;
 }
 
 .modalButton {
-  min-width: 195px;
+  min-width: 156px;
   height: 40px;
 }
 

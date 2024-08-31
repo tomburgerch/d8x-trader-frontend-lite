@@ -13,12 +13,13 @@
 
 .buttonsHolder {
   display: flex;
-  gap: $d8x-spacing * 4;
+  gap: $d8x-spacing * 2 + 2;
   height: 40px;
+
 }
 
 .connectWalletButton {
-  min-width: 195px;
+  width: 195px;
   height: 40px;
 }
 
@@ -31,8 +32,8 @@
   padding: 0;
 
   img {
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    height: 20px;
   }
 }
 
