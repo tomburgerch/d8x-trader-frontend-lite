@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import { useAtom } from 'jotai';
 
-import DarkMode from 'assets/icons/darkModeIcon.svg?react';
-import LightMode from 'assets/icons/lightModeIcon.svg?react';
+import DarkMode from 'assets/icons/new/darkMode.svg?react';
+import LightMode from 'assets/icons/new/lightMode.svg?react';
 
 import { enabledDarkModeAtom } from 'store/app.store';
 
