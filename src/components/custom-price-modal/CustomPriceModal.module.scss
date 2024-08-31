@@ -7,25 +7,6 @@
   }
 }
 
-.dialogContent {
-  font-size: 16px;
-  line-height: 24px;
-}
-
-.dialogAction {
-  justify-content: center;
-}
-
-.closeButton {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
 .actionButton {
   height: 48px;
   font-size: 16px;
@@ -118,10 +99,6 @@
   align-items: center;
   gap: $d8x-spacing;
   margin-bottom: 2 * $d8x-spacing;
-}
-
-.separator {
-  padding: 0;
 }
 
 .priceOptions {

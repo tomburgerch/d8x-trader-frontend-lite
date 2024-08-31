@@ -3,9 +3,8 @@ import { useAtom, useAtomValue } from 'jotai';
 import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button } from '@mui/material';
 
-import { Separator } from 'components/separator/Separator';
 import { Dialog } from 'components/dialog/Dialog';
 import { useStopLoss } from 'components/order-block/elements/stop-loss-selector/useStopLoss';
 import { useTakeProfit } from 'components/order-block/elements/take-profit-selector/useTakeProfit';
@@ -81,99 +80,96 @@ export const CustomPriceModal = () => {
   };
 
   return (
-    <Dialog open={isStopLossModalOpen || isTakeProfitModalOpen} onClose={handleOnClose} className={styles.dialog}>
-      <DialogTitle>
-        {t(`pages.trade.order-block.${isStopLossModalOpen ? 'stop-loss' : 'take-profit'}.title`)}
-        <Button className={styles.closeButton} onClick={handleOnClose} variant="secondary">
-          {'x'}
-        </Button>
-      </DialogTitle>
-      <Separator className={styles.separator} />
-      <DialogContent className={styles.dialogContent}>
-        <div className={styles.customPrices}>
-          <div
-            className={classnames(styles.stopLoss, { [styles.active]: isStopLossModalOpen })}
-            onClick={handleStopLossClick}
-          >
-            <span className={styles.price}>
-              <Suspense fallback={null}>
-                <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
-              </Suspense>
-              <span>{stopLossInputPrice || '--'}</span>
-            </span>
-            <span className={styles.label}>{t('pages.trade.order-block.stop-loss.title')}</span>
-          </div>
-          <div
-            className={classnames(styles.takeProfit, { [styles.active]: isTakeProfitModalOpen })}
-            onClick={handleTakeProfitClick}
-          >
-            <span className={styles.price}>
-              <Suspense fallback={null}>
-                <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
-              </Suspense>
-              <span>{takeProfitInputPrice || '--'}</span>
-            </span>
-            <span className={styles.label}>{t('pages.trade.order-block.take-profit.title')}</span>
-          </div>
+    <Dialog
+      open={isStopLossModalOpen || isTakeProfitModalOpen}
+      onClose={handleOnClose}
+      onCloseClick={handleOnClose}
+      className={styles.dialog}
+      dialogTitle={t(`pages.trade.order-block.${isStopLossModalOpen ? 'stop-loss' : 'take-profit'}.title`)}
+    >
+      <div className={styles.customPrices}>
+        <div
+          className={classnames(styles.stopLoss, { [styles.active]: isStopLossModalOpen })}
+          onClick={handleStopLossClick}
+        >
+          <span className={styles.price}>
+            <Suspense fallback={null}>
+              <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
+            </Suspense>
+            <span>{stopLossInputPrice || '--'}</span>
+          </span>
+          <span className={styles.label}>{t('pages.trade.order-block.stop-loss.title')}</span>
         </div>
-        <div className={styles.chartHolder}>
-          <TradingViewChart onlyChart height={350} />
+        <div
+          className={classnames(styles.takeProfit, { [styles.active]: isTakeProfitModalOpen })}
+          onClick={handleTakeProfitClick}
+        >
+          <span className={styles.price}>
+            <Suspense fallback={null}>
+              <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
+            </Suspense>
+            <span>{takeProfitInputPrice || '--'}</span>
+          </span>
+          <span className={styles.label}>{t('pages.trade.order-block.take-profit.title')}</span>
         </div>
-        <div className={styles.actionHolder}>
-          {isStopLossModalOpen && (
-            <div className={styles.priceCustomization}>
-              <div className={styles.priceOptions}>
-                {Object.values(StopLossE).map((key) => (
-                  <Button
-                    key={key}
-                    variant="outlined"
-                    className={classnames(styles.markButton, { [styles.selected]: key === stopLoss })}
-                    onClick={() => handleStopLossChange(key)}
-                  >
-                    {stopLossTranslationMap[key]}
-                  </Button>
-                ))}
-              </div>
-              <ResponsiveInput
-                id="stop-loss-price"
-                className={styles.responsiveInput}
-                inputValue={stopLossInputPrice != null ? stopLossInputPrice : ''}
-                placeholder="-"
-                step={stepSize}
-                min={0}
-                setInputValue={handleStopLossPriceChange}
-                handleInputBlur={validateStopLossPrice}
-              />
+      </div>
+      <div className={styles.chartHolder}>
+        <TradingViewChart onlyChart height={350} />
+      </div>
+      <div className={styles.actionHolder}>
+        {isStopLossModalOpen && (
+          <div className={styles.priceCustomization}>
+            <div className={styles.priceOptions}>
+              {Object.values(StopLossE).map((key) => (
+                <Button
+                  key={key}
+                  variant="outlined"
+                  className={classnames(styles.markButton, { [styles.selected]: key === stopLoss })}
+                  onClick={() => handleStopLossChange(key)}
+                >
+                  {stopLossTranslationMap[key]}
+                </Button>
+              ))}
             </div>
-          )}
-          {isTakeProfitModalOpen && (
-            <div className={styles.priceCustomization}>
-              <div className={styles.priceOptions}>
-                {Object.values(TakeProfitE).map((key) => (
-                  <Button
-                    key={key}
-                    variant="outlined"
-                    className={classnames(styles.markButton, { [styles.selected]: key === takeProfit })}
-                    onClick={() => handleTakeProfitChange(key)}
-                  >
-                    {takeProfitTranslationMap[key]}
-                  </Button>
-                ))}
-              </div>
-              <ResponsiveInput
-                id="take-profit-price"
-                className={styles.responsiveInput}
-                inputValue={takeProfitInputPrice != null ? takeProfitInputPrice : ''}
-                placeholder="-"
-                step={stepSize}
-                min={0}
-                setInputValue={handleTakeProfitPriceChange}
-                handleInputBlur={validateTakeProfitPrice}
-              />
+            <ResponsiveInput
+              id="stop-loss-price"
+              className={styles.responsiveInput}
+              inputValue={stopLossInputPrice != null ? stopLossInputPrice : ''}
+              placeholder="-"
+              step={stepSize}
+              min={0}
+              setInputValue={handleStopLossPriceChange}
+              handleInputBlur={validateStopLossPrice}
+            />
+          </div>
+        )}
+        {isTakeProfitModalOpen && (
+          <div className={styles.priceCustomization}>
+            <div className={styles.priceOptions}>
+              {Object.values(TakeProfitE).map((key) => (
+                <Button
+                  key={key}
+                  variant="outlined"
+                  className={classnames(styles.markButton, { [styles.selected]: key === takeProfit })}
+                  onClick={() => handleTakeProfitChange(key)}
+                >
+                  {takeProfitTranslationMap[key]}
+                </Button>
+              ))}
             </div>
-          )}
-        </div>
-      </DialogContent>
+            <ResponsiveInput
+              id="take-profit-price"
+              className={styles.responsiveInput}
+              inputValue={takeProfitInputPrice != null ? takeProfitInputPrice : ''}
+              placeholder="-"
+              step={stepSize}
+              min={0}
+              setInputValue={handleTakeProfitPriceChange}
+              handleInputBlur={validateTakeProfitPrice}
+            />
+          </div>
+        )}
+      </div>
     </Dialog>
   );
 };

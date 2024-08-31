@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { type Address } from 'viem';
 import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
-import { Button, CircularProgress, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 
 import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
@@ -686,8 +686,22 @@ export const ActionBlock = memo(() => {
         </Button>
       )}
       {orderInfo && isEnabledChain(chainId) && (
-        <Dialog open={showReviewOrderModal} className={styles.dialog}>
-          <DialogTitle className={styles.dialogTitle}> {t('pages.trade.action-block.review.title')} </DialogTitle>
+        <Dialog
+          open={showReviewOrderModal}
+          className={styles.dialog}
+          onCloseClick={closeReviewOrderModal}
+          dialogTitle={t('pages.trade.action-block.review.title')}
+          footerActions={
+            <>
+              <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
+                {t('pages.trade.action-block.review.cancel')}
+              </Button>
+              <Button onClick={handleOrderConfirm} variant="primary" size="small" disabled={isConfirmButtonDisabled}>
+                {t('pages.trade.action-block.review.confirm')}
+              </Button>
+            </>
+          }
+        >
           <div className={styles.emphasis}>
             <SidesRow
               leftSide={
@@ -705,202 +719,198 @@ export const ActionBlock = memo(() => {
               }
             />
           </div>
-          <DialogContent>
-            <div className={styles.orderDetails}>
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.deposit')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && collateralDeposit >= 0 && selectedPool
-                    ? formatToCurrency(
-                        collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                        selectedPool.settleSymbol
-                      )
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.balance')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && poolTokenBalance && poolTokenBalance >= 0
-                    ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.fee')}{' '}
-                  </Typography>
-                }
-                rightSide={feePct ? formatToCurrency(feePct, '%', false, 3) : '-'}
-                rightSideStyles={styles.rightSide}
-              />
+          <div className={styles.orderDetails}>
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.deposit')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && collateralDeposit >= 0 && selectedPool
+                  ? formatToCurrency(
+                      collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.balance')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && poolTokenBalance && poolTokenBalance >= 0
+                  ? formatToCurrency(poolTokenBalance, selectedPool?.settleSymbol)
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.fee')}{' '}
+                </Typography>
+              }
+              rightSide={feePct ? formatToCurrency(feePct, '%', false, 3) : '-'}
+              rightSideStyles={styles.rightSide}
+            />
 
-              {orderInfo.maxMinEntryPrice !== null && (
-                <SidesRow
-                  leftSide={
-                    <Typography variant="bodySmallPopup" className={styles.left}>
-                      {isPredictionMarket || orderInfo.orderBlock === OrderBlockE.Long
-                        ? t('pages.trade.action-block.review.max')
-                        : t('pages.trade.action-block.review.min')}
-                    </Typography>
-                  }
-                  rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
-                  rightSideStyles={styles.rightSide}
-                />
-              )}
-              {perpetualPrice !== null && (
-                <SidesRow
-                  leftSide={
-                    <Typography variant="bodySmallPopup" className={styles.left}>
-                      {' '}
-                      {t('pages.trade.action-block.review.estimated-price')}{' '}
-                    </Typography>
-                  }
-                  rightSide={formatToCurrency(perpetualPrice, orderInfo.quoteCurrency)}
-                  rightSideStyles={styles.rightSide}
-                />
-              )}
-              {orderInfo.triggerPrice !== null && (
-                <SidesRow
-                  leftSide={
-                    <Typography variant="bodySmallPopup" className={styles.left}>
-                      {' '}
-                      {t('pages.trade.action-block.review.trigger-price')}{' '}
-                    </Typography>
-                  }
-                  rightSide={formatToCurrency(orderInfo.triggerPrice, orderInfo.quoteCurrency)}
-                  rightSideStyles={styles.rightSide}
-                />
-              )}
-              {orderInfo.limitPrice !== null && (
-                <SidesRow
-                  leftSide={
-                    <Typography variant="bodySmallPopup" className={styles.left}>
-                      {' '}
-                      {t('pages.trade.action-block.review.limit-price')}{' '}
-                    </Typography>
-                  }
-                  rightSide={
-                    orderInfo.limitPrice > -1 && orderInfo.limitPrice < Infinity
-                      ? formatToCurrency(orderInfo.limitPrice, orderInfo.quoteCurrency)
-                      : '-'
-                  }
-                  rightSideStyles={styles.rightSide}
-                />
-              )}
+            {orderInfo.maxMinEntryPrice !== null && (
+              <SidesRow
+                leftSide={
+                  <Typography variant="bodySmallPopup" className={styles.left}>
+                    {isPredictionMarket || orderInfo.orderBlock === OrderBlockE.Long
+                      ? t('pages.trade.action-block.review.max')
+                      : t('pages.trade.action-block.review.min')}
+                  </Typography>
+                }
+                rightSide={formatToCurrency(orderInfo.maxMinEntryPrice, orderInfo.quoteCurrency)}
+                rightSideStyles={styles.rightSide}
+              />
+            )}
+            {perpetualPrice !== null && (
               <SidesRow
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    {t('pages.trade.action-block.review.stop-loss')}{' '}
+                    {t('pages.trade.action-block.review.estimated-price')}{' '}
                   </Typography>
                 }
-                rightSide={
-                  orderInfo.stopLossPrice && orderInfo.stopLossPrice > 0
-                    ? formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
-                    : '-'
-                }
+                rightSide={formatToCurrency(perpetualPrice, orderInfo.quoteCurrency)}
                 rightSideStyles={styles.rightSide}
               />
+            )}
+            {orderInfo.triggerPrice !== null && (
               <SidesRow
                 leftSide={
                   <Typography variant="bodySmallPopup" className={styles.left}>
                     {' '}
-                    {t('pages.trade.action-block.review.take-profit')}{' '}
+                    {t('pages.trade.action-block.review.trigger-price')}{' '}
+                  </Typography>
+                }
+                rightSide={formatToCurrency(orderInfo.triggerPrice, orderInfo.quoteCurrency)}
+                rightSideStyles={styles.rightSide}
+              />
+            )}
+            {orderInfo.limitPrice !== null && (
+              <SidesRow
+                leftSide={
+                  <Typography variant="bodySmallPopup" className={styles.left}>
+                    {' '}
+                    {t('pages.trade.action-block.review.limit-price')}{' '}
                   </Typography>
                 }
                 rightSide={
-                  orderInfo.takeProfitPrice && orderInfo.takeProfitPrice > 0
-                    ? formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                  orderInfo.limitPrice > -1 && orderInfo.limitPrice < Infinity
+                    ? formatToCurrency(orderInfo.limitPrice, orderInfo.quoteCurrency)
                     : '-'
                 }
                 rightSideStyles={styles.rightSide}
               />
-            </div>
-          </DialogContent>
+            )}
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.stop-loss')}{' '}
+                </Typography>
+              }
+              rightSide={
+                orderInfo.stopLossPrice && orderInfo.stopLossPrice > 0
+                  ? formatToCurrency(orderInfo.stopLossPrice, orderInfo.quoteCurrency)
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.take-profit')}{' '}
+                </Typography>
+              }
+              rightSide={
+                orderInfo.takeProfitPrice && orderInfo.takeProfitPrice > 0
+                  ? formatToCurrency(orderInfo.takeProfitPrice, orderInfo.quoteCurrency)
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+          </div>
           <Separator />
-          <DialogContent>
-            <div className={styles.newPositionHeader}>
-              <Typography variant="bodyMediumPopup" className={styles.bold}>
-                {t('pages.trade.action-block.review.details')}
-              </Typography>
-            </div>
-            <div className={styles.newPositionDetails}>
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.size')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && newPositionRisk
-                    ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.margin')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
-                    ? formatToCurrency(
-                        newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                        selectedPool.settleSymbol
-                      )
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.leverage')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && newPositionRisk && newPositionRisk.leverage > 0 && newPositionRisk.leverage < Infinity
-                    ? `${formatNumber(newPositionRisk.leverage)}x`
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-              <SidesRow
-                leftSide={
-                  <Typography variant="bodySmallPopup" className={styles.left}>
-                    {' '}
-                    {t('pages.trade.action-block.review.liq-price')}{' '}
-                  </Typography>
-                }
-                rightSide={
-                  isOrderValid && newPositionRisk && liqPrice > 0 && liqPrice < Infinity
-                    ? formatToCurrency(liqPrice ?? 0, orderInfo.quoteCurrency)
-                    : '-'
-                }
-                rightSideStyles={styles.rightSide}
-              />
-            </div>
-          </DialogContent>
+          <div className={styles.newPositionHeader}>
+            <Typography variant="bodyMediumPopup" className={styles.bold}>
+              {t('pages.trade.action-block.review.details')}
+            </Typography>
+          </div>
+          <div className={styles.newPositionDetails}>
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.size')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && newPositionRisk
+                  ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.margin')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && newPositionRisk && newPositionRisk.collateralCC >= 0 && selectedPool
+                  ? formatToCurrency(
+                      newPositionRisk.collateralCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                      selectedPool.settleSymbol
+                    )
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.leverage')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && newPositionRisk && newPositionRisk.leverage > 0 && newPositionRisk.leverage < Infinity
+                  ? `${formatNumber(newPositionRisk.leverage)}x`
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+            <SidesRow
+              leftSide={
+                <Typography variant="bodySmallPopup" className={styles.left}>
+                  {' '}
+                  {t('pages.trade.action-block.review.liq-price')}{' '}
+                </Typography>
+              }
+              rightSide={
+                isOrderValid && newPositionRisk && liqPrice > 0 && liqPrice < Infinity
+                  ? formatToCurrency(liqPrice ?? 0, orderInfo.quoteCurrency)
+                  : '-'
+              }
+              rightSideStyles={styles.rightSide}
+            />
+          </div>
           <div className={styles.emphasis}>
             <SidesRow
               leftSide={
@@ -929,36 +939,24 @@ export const ActionBlock = memo(() => {
               }
             />
           </div>
-          <DialogContent>
-            {isValidityCheckDone ? (
-              <div className={styles.goMessage}>
-                <Typography variant="bodySmallPopup" className={styles.centered} style={{ color: validityColor }}>
-                  {validityCheckText}
-                </Typography>
-              </div>
-            ) : (
-              ''
-            )}
-          </DialogContent>
-          {hasTpSlOrders && (
-            <DialogContent>
-              <Typography
-                variant="bodySmallPopup"
-                className={styles.centered}
-                style={{ color: 'var(--d8x-color-warning-secondary)' }}
-              >
-                {t('pages.trade.action-block.validity.verify-tp-sl-orders')}
+          {isValidityCheckDone ? (
+            <div className={styles.goMessage}>
+              <Typography variant="bodySmallPopup" className={styles.centered} style={{ color: validityColor }}>
+                {validityCheckText}
               </Typography>
-            </DialogContent>
+            </div>
+          ) : (
+            ''
           )}
-          <DialogActions className={styles.dialogActions}>
-            <Button onClick={closeReviewOrderModal} variant="secondary" size="small">
-              {t('pages.trade.action-block.review.cancel')}
-            </Button>
-            <Button onClick={handleOrderConfirm} variant="primary" size="small" disabled={isConfirmButtonDisabled}>
-              {t('pages.trade.action-block.review.confirm')}
-            </Button>
-          </DialogActions>
+          {hasTpSlOrders && (
+            <Typography
+              variant="bodySmallPopup"
+              className={styles.centered}
+              style={{ color: 'var(--d8x-color-warning-secondary)' }}
+            >
+              {t('pages.trade.action-block.validity.verify-tp-sl-orders')}
+            </Typography>
+          )}
         </Dialog>
       )}
     </div>

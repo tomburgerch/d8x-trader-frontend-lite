@@ -1,16 +1,16 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
-import { Button, DialogActions, DialogContent, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
+import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
 import { Dialog } from 'components/dialog/Dialog';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
-import { Separator } from 'components/separator/Separator';
 import type { StatDataI } from 'components/stats-line/types';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { createSymbol } from 'helpers/createSymbol';
@@ -38,7 +38,6 @@ import { PerpetualWithPoolAndMarketI } from './types';
 import { useMarketsFilter } from './useMarketsFilter';
 
 import styles from './MarketSelect.module.scss';
-import { CurrencyBadge } from '../currency-badge/CurrencyBadge';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
@@ -245,6 +244,8 @@ export const MarketSelect = memo(() => {
     return null;
   }, [selectedPerpetual, markets]);
 
+  const handleClose = useCallback(() => setModalOpen(false), []);
+
   return (
     <div className={styles.holderRoot}>
       <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
@@ -299,10 +300,15 @@ export const MarketSelect = memo(() => {
         <div className={styles.arrowDropDown}>{isModalOpen ? <ArrowDropUp /> : <ArrowDropDown />}</div>
       </Button>
 
-      <Dialog open={isModalOpen} className={styles.dialog} onClose={() => setModalOpen(false)} scroll="paper">
+      <Dialog
+        open={isModalOpen}
+        className={styles.dialog}
+        onClose={handleClose}
+        onCloseClick={handleClose}
+        scroll="paper"
+        dialogTitle={t('common.select.market.header')}
+      >
         <OptionsHeader />
-        <Separator />
-        <DialogContent />
         <div className={styles.optionList}>
           {filteredMarkets.map((market) => (
             <MarketOption
@@ -313,11 +319,6 @@ export const MarketSelect = memo(() => {
             />
           ))}
         </div>
-        <DialogActions className={styles.dialogAction}>
-          <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
-            {t('common.info-modal.close')}
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );

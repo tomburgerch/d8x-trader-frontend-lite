@@ -1,9 +1,7 @@
 import classnames from 'classnames';
-import { type ReactNode, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { type ReactNode, useCallback, useState } from 'react';
 
 import { Info } from '@mui/icons-material';
-import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 
@@ -26,9 +24,11 @@ export const InfoLabelBlock = ({
   titleClassname,
   iconHolderClassname,
 }: InfoBlockPropsI) => {
-  const { t } = useTranslation();
-
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setModalOpen(false);
+  }, []);
 
   return (
     <>
@@ -39,14 +39,15 @@ export const InfoLabelBlock = ({
         </span>
         <span className={classnames(styles.title, titleClassname)}>{title}</span>
       </div>
-      <Dialog open={isModalOpen} className={styles.dialog} onClose={() => setModalOpen(false)}>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent className={styles.dialogContent}>{content}</DialogContent>
-        <DialogActions className={styles.dialogAction}>
-          <Button onClick={() => setModalOpen(false)} variant="secondary" size="small">
-            {t('common.info-modal.close')}
-          </Button>
-        </DialogActions>
+
+      <Dialog
+        open={isModalOpen}
+        onClose={handleClose}
+        onCloseClick={handleClose}
+        className={styles.dialog}
+        dialogTitle={title}
+      >
+        {content}
       </Dialog>
     </>
   );

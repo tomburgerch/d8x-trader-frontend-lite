@@ -185,12 +185,7 @@
   justify-content: space-between;
   gap: 3 * $d8x-spacing;
   overflow-y: scroll;
-  padding: 4 * $d8x-spacing;
-}
-
-.dialogAction {
-  margin-top: $d8x-spacing * 6;
-  justify-content: center;
+  padding: 4 * $d8x-spacing 0 0;
 }
 
 @media screen and ($d8x-breakpoint-max-lg) {

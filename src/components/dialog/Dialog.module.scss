@@ -15,6 +15,21 @@
   }
 
   :global(.MuiDialog-paper) {
-    border-radius: $d8x-border-radius;
+    border-radius: $d8x-border-radius-large;
   }
+}
+
+.closeButton {
+  padding: 0;
+  min-width: unset;
+}
+
+.dialogContent {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.dialogAction {
+  justify-content: center;
+  padding: 4 * $d8x-spacing 5 * $d8x-spacing;
 }

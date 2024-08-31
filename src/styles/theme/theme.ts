@@ -567,11 +567,15 @@ export const theme = createTheme({
     MuiDialogTitle: {
       styleOverrides: {
         root: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
           fontSize: '16px',
           lineHeight: '20px',
-          fontWeight: '600',
+          fontWeight: '500',
           textAlign: 'left',
-          padding: '16px',
+          padding: '16px 16px 12px 16px',
         },
       },
     },
