@@ -161,13 +161,13 @@ export const PositionBlock = memo(
                 leftSideStyles={styles.dataLabel}
                 rightSideStyles={pnlColor}
               />
+              <SidesRow
+                leftSide={headers[7].label}
+                leftSideTooltip={headers[7].tooltip}
+                rightSide={<TpSlValue position={position} handleTpSlModify={handleTpSlModify} />}
+              />
             </>
           )}
-          <SidesRow
-            leftSide={headers[7].label}
-            leftSideTooltip={headers[7].tooltip}
-            rightSide={<TpSlValue position={position} handleTpSlModify={handleTpSlModify} />}
-          />
         </Box>
         {isSettlementInProgress && (
           <Typography variant="bodySmall" align={'center'} component="p" className={styles.symbol}>

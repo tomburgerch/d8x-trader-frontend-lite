@@ -7,7 +7,7 @@ import { IconButton, Typography } from '@mui/material';
 import { ModeEditOutlineOutlined } from '@mui/icons-material';
 
 import { parseSymbol } from 'helpers/parseSymbol';
-import { perpetualStaticInfoAtom, selectedPerpetualAtom } from 'store/pools.store';
+import { perpetualStaticInfoAtom } from 'store/pools.store';
 import { OrderSideE, OrderValueTypeE } from 'types/enums';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
@@ -48,7 +48,6 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
   const { t } = useTranslation();
 
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
-  const perpetualState = useAtomValue(selectedPerpetualAtom);
 
   const parsedSymbol = parseSymbol(position.symbol);
 
@@ -59,13 +58,6 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
       // skip
     }
   }, [perpetualStaticInfo]);
-
-  const isSettlementInProgress = useMemo(() => {
-    return (
-      perpetualState?.state === 'SETTLE' ||
-      (isPredictionMarket && (perpetualState?.isMarketClosed || perpetualState?.state === 'EMERGENCY'))
-    );
-  }, [isPredictionMarket, perpetualState]);
 
   const openOrdersData: OpenOrdersDataI = useMemo(() => {
     const ordersData = {
@@ -125,7 +117,6 @@ export const TpSlValue = memo(({ position, handleTpSlModify }: TpSlValuePropsI) 
           title={t('pages.trade.positions-table.table-content.modify')}
           onClick={() => handleTpSlModify(position)}
           className={styles.iconButton}
-          disabled={isSettlementInProgress}
         >
           <ModeEditOutlineOutlined className={styles.actionIcon} />
         </IconButton>

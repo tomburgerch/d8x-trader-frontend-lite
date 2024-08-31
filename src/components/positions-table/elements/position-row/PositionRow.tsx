@@ -81,9 +81,20 @@ export const PositionRow = memo(
           <Typography variant="cellSmall">{formatToCurrency(displayEntryPrice, displayCcy, true)}</Typography>
         </TableCell>
         {isSettlementInProgress ? (
-          <TableCell align="center" colSpan={3}>
-            <Typography variant="cellSmall">Settlement in progress...</Typography>
-          </TableCell>
+          <>
+            <TableCell align="center" colSpan={4}>
+              <Typography variant="cellSmall">Settlement in progress...</Typography>
+            </TableCell>
+            <TableCell>
+              <IconButton
+                aria-label={t('pages.trade.positions-table.table-content.share')}
+                title={t('pages.trade.positions-table.modify-modal.share')}
+                onClick={() => handlePositionShare(position)}
+              >
+                <ShareOutlined className={styles.actionIcon} />
+              </IconButton>
+            </TableCell>
+          </>
         ) : (
           <>
             <TableCell align="right">
@@ -116,36 +127,35 @@ export const PositionRow = memo(
                   : ' (0%)'}
               </Typography>
             </TableCell>
+            <TableCell align="right" className={styles.tpSlCell}>
+              <TpSlValue position={position} handleTpSlModify={handleTpSlModify} />
+            </TableCell>
+            <TableCell align="center">
+              <IconButton
+                aria-label={t('pages.trade.positions-table.table-content.modify')}
+                title={t('pages.trade.positions-table.table-content.modify')}
+                onClick={() => handlePositionModify(position)}
+              >
+                <ModeEditOutlineOutlined className={styles.actionIcon} />
+              </IconButton>
+              <IconButton
+                aria-label={t('pages.trade.positions-table.table-content.close')}
+                title={t('pages.trade.positions-table.modify-modal.close')}
+                onClick={() => handlePositionClose(position)}
+              >
+                <DeleteForeverOutlined className={styles.actionIcon} />
+              </IconButton>
+
+              <IconButton
+                aria-label={t('pages.trade.positions-table.table-content.share')}
+                title={t('pages.trade.positions-table.modify-modal.share')}
+                onClick={() => handlePositionShare(position)}
+              >
+                <ShareOutlined className={styles.actionIcon} />
+              </IconButton>
+            </TableCell>
           </>
         )}
-        <TableCell align="right" className={styles.tpSlCell}>
-          <TpSlValue position={position} handleTpSlModify={handleTpSlModify} />
-        </TableCell>
-        <TableCell align="center">
-          <IconButton
-            aria-label={t('pages.trade.positions-table.table-content.modify')}
-            title={t('pages.trade.positions-table.table-content.modify')}
-            onClick={() => handlePositionModify(position)}
-            disabled={isSettlementInProgress}
-          >
-            <ModeEditOutlineOutlined className={styles.actionIcon} />
-          </IconButton>
-          <IconButton
-            aria-label={t('pages.trade.positions-table.table-content.close')}
-            title={t('pages.trade.positions-table.modify-modal.close')}
-            onClick={() => handlePositionClose(position)}
-            disabled={isSettlementInProgress}
-          >
-            <DeleteForeverOutlined className={styles.actionIcon} />
-          </IconButton>
-          <IconButton
-            aria-label={t('pages.trade.positions-table.table-content.share')}
-            title={t('pages.trade.positions-table.modify-modal.share')}
-            onClick={() => handlePositionShare(position)}
-          >
-            <ShareOutlined className={styles.actionIcon} />
-          </IconButton>
-        </TableCell>
       </TableRow>
     );
   }
