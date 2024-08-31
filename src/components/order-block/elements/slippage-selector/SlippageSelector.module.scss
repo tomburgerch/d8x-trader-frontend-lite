@@ -22,7 +22,8 @@
   :global(.MuiButtonBase-root) {
     flex: 1;
     border-radius: $d8x-button-border-radius;
-    min-width: 35px;
+    min-width: 37px;
+    line-height: 12px;
 
     &.selected {
       border: 1px solid transparent;
@@ -33,7 +34,7 @@
 }
 
 .input {
-  width: 100%;
+  width: 100px;
 
   :global(.MuiInputAdornment-root) {
     min-width: 10px;

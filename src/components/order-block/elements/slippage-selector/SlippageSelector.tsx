@@ -9,9 +9,9 @@ import { OrderTypeE } from 'types/enums';
 
 import styles from './SlippageSelector.module.scss';
 
-const MIN_SLIPPAGE = 0.5;
+const MIN_SLIPPAGE = 0.01;
 const MAX_SLIPPAGE = 100;
-const MULTIPLIERS = [0.5, 1, 2, 5];
+const MULTIPLIERS = [1, 2, 3, 5];
 
 export const SlippageSelector = memo(() => {
   const orderType = useAtomValue(orderTypeAtom);
@@ -61,7 +61,7 @@ export const SlippageSelector = memo(() => {
         ))}
         <OutlinedInput
           type="number"
-          inputProps={{ min: MIN_SLIPPAGE, max: MAX_SLIPPAGE, step: 0.5 }}
+          inputProps={{ min: MIN_SLIPPAGE, max: MAX_SLIPPAGE, step: 0.1 }}
           className={styles.input}
           endAdornment={
             <InputAdornment position="end">

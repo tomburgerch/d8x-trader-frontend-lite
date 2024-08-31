@@ -8,7 +8,7 @@
 .rootOptions {
   display: flex;
   justify-content: space-between;
-  gap: $d8x-spacing * 2;
+  gap: $d8x-spacing * 4;
 
   :global(.MuiButtonBase-root) {
     @include transition(opacity);

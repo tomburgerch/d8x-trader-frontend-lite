@@ -3,9 +3,9 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 3 * $d8x-spacing;
+  gap: 6 * $d8x-spacing;
   margin-top: 2 * $d8x-spacing;
-  border-radius: $d8x-border-radius;
+  border-radius: $d8x-border-radius-medium;
   background: var(--d8x-color-background-paper);
   padding: 3 * $d8x-spacing;
 }

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
+import { Separator } from 'components/separator/Separator';
 import { Dialog } from 'components/dialog/Dialog';
 import { useStopLoss } from 'components/order-block/elements/stop-loss-selector/useStopLoss';
 import { useTakeProfit } from 'components/order-block/elements/take-profit-selector/useTakeProfit';
@@ -83,7 +84,11 @@ export const CustomPriceModal = () => {
     <Dialog open={isStopLossModalOpen || isTakeProfitModalOpen} onClose={handleOnClose} className={styles.dialog}>
       <DialogTitle>
         {t(`pages.trade.order-block.${isStopLossModalOpen ? 'stop-loss' : 'take-profit'}.title`)}
+        <Button className={styles.closeButton} onClick={handleOnClose} variant="secondary">
+          {'x'}
+        </Button>
       </DialogTitle>
+      <Separator className={styles.separator} />
       <DialogContent className={styles.dialogContent}>
         <div className={styles.customPrices}>
           <div
@@ -122,7 +127,7 @@ export const CustomPriceModal = () => {
                   <Button
                     key={key}
                     variant="outlined"
-                    className={classnames({ [styles.selected]: key === stopLoss })}
+                    className={classnames(styles.markButton, { [styles.selected]: key === stopLoss })}
                     onClick={() => handleStopLossChange(key)}
                   >
                     {stopLossTranslationMap[key]}
@@ -148,7 +153,7 @@ export const CustomPriceModal = () => {
                   <Button
                     key={key}
                     variant="outlined"
-                    className={classnames({ [styles.selected]: key === takeProfit })}
+                    className={classnames(styles.markButton, { [styles.selected]: key === takeProfit })}
                     onClick={() => handleTakeProfitChange(key)}
                   >
                     {takeProfitTranslationMap[key]}
@@ -169,11 +174,6 @@ export const CustomPriceModal = () => {
           )}
         </div>
       </DialogContent>
-      <DialogActions className={styles.dialogAction}>
-        <Button onClick={handleOnClose} variant="secondary">
-          {t('common.info-modal.close')}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

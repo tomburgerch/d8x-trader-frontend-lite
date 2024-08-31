@@ -567,11 +567,11 @@ export const theme = createTheme({
     MuiDialogTitle: {
       styleOverrides: {
         root: {
-          fontSize: '24px',
-          lineHeight: '32px',
+          fontSize: '16px',
+          lineHeight: '20px',
           fontWeight: '600',
-          textAlign: 'center',
-          padding: '48px 32px 32px 32px',
+          textAlign: 'left',
+          padding: '16px',
         },
       },
     },
@@ -587,7 +587,7 @@ export const theme = createTheme({
     MuiDialogContent: {
       styleOverrides: {
         root: {
-          padding: '0px 32px 0px 32px',
+          padding: '16px',
         },
       },
     },

@@ -4,7 +4,7 @@
 .root {
   display: flex;
   justify-content: flex-start;
-  gap: $d8x-spacing * 8;
+  gap: $d8x-spacing * 4;
 }
 
 .type {
@@ -16,14 +16,15 @@
   font-weight: 500;
   padding-bottom: $d8x-spacing;
   padding-top: 2 * $d8x-spacing;
+  color: var(--d8x-color-text-label-two);
 
   &::after {
     @include transition(opacity);
 
     content: ' ';
     position: absolute;
-    left: -($d8x-spacing * 2);
-    right: -($d8x-spacing * 2);
+    left: -($d8x-spacing * 0.5);
+    right: -($d8x-spacing * 1);
     bottom: -($d8x-spacing * 3.5);
     top: inherit;
     border-bottom: 2px solid var(--d8x-color-action);

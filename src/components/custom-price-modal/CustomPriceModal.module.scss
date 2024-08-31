@@ -3,8 +3,7 @@
 
 .dialog {
   :global(.MuiPaper-root) {
-    width: 100%;
-    max-width: 620px;
+    width: 509px;
   }
 }
 
@@ -17,6 +16,16 @@
   justify-content: center;
 }
 
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 .actionButton {
   height: 48px;
   font-size: 16px;
@@ -27,6 +36,28 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4 * $d8x-spacing;
+}
+
+.markButton {
+  padding: 0;
+  width: 45px;
+  min-width: 45px;
+  height: 32px;
+  font-size: 14px;
+  font-weight: 400;
+  background-color: var(--d8x-button-select-secondary-background);
+  color: var(--d8x-button-select-secondary-color);
+  border: 1px solid transparent;
+
+  &:hover {
+    border: 1px solid var(--d8x-button-select-secondary-border-color-hover);
+    color: var(--d8x-button-select-secondary-color);
+  }
+
+  &.selected {
+    background-color: var(--d8x-button-select-secondary-background-selected);
+    color: var(--d8x-button-select-secondary-color-selected);
+  }
 }
 
 .takeProfit,
@@ -87,6 +118,10 @@
   align-items: center;
   gap: $d8x-spacing;
   margin-bottom: 2 * $d8x-spacing;
+}
+
+.separator {
+  padding: 0;
 }
 
 .priceOptions {
