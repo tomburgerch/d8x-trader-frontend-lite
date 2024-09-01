@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +29,12 @@ export const SettingsButton = memo(() => {
   return (
     <div className={styles.root}>
       <TooltipMobile tooltip={t('common.settings.title')}>
-        <Button onClick={handlePopperToggle} className={styles.iconButton} variant="primary" ref={buttonRef}>
+        <Button
+          onClick={handlePopperToggle}
+          className={classnames(styles.iconButton, { [styles.active]: isPopperOpen })}
+          variant="outlined"
+          ref={buttonRef}
+        >
           <Settings className={styles.icon} />
         </Button>
       </TooltipMobile>

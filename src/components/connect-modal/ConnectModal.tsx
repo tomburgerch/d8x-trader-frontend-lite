@@ -10,6 +10,7 @@ import { Typography } from '@mui/material';
 import { Web3AuthConnectButton } from 'components/web3auth-connect-button/Web3AuthConnectButton';
 import { WalletConnectButtonHolder } from 'components/wallet-connect-button/WalletConnectButtonHolder';
 import { Dialog } from 'components/dialog/Dialog';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { OrSeparator } from 'components/separator/OrSeparator';
 import { connectModalOpenAtom } from 'store/global-modals.store';
 import { Web3SignInMethodE } from 'types/enums';
@@ -43,7 +44,7 @@ export const ConnectModal = () => {
           <div className={styles.actionButtonsContainer}>
             <Web3AuthConnectButton buttonClassName={styles.connectButton} signInMethod={Web3SignInMethodE.X} />
             <Web3AuthConnectButton buttonClassName={styles.connectButton} signInMethod={Web3SignInMethodE.Google} />
-            <OrSeparator />
+            <OrSeparator separatorType={SeparatorTypeE.Modal} />
             <WalletConnectButtonHolder
               connectButtonLabel={
                 <>

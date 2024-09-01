@@ -48,7 +48,7 @@ export const ExpirySelector = memo(() => {
         {[ExpiryE['30D'], ExpiryE['90D'], ExpiryE['180D']].map((key) => (
           <Button
             key={key}
-            variant="outlined"
+            variant="secondary"
             className={classnames({ [styles.selected]: Number(key) === expireDays })}
             onClick={() => {
               setExpireDays(Number(key));

@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   width: 100%;
@@ -32,27 +33,20 @@
   display: flex;
   gap: $d8x-spacing;
   width: 100%;
-}
 
-.markButton {
-  padding: 0;
-  width: 45px;
-  min-width: 45px;
-  height: 32px;
-  font-size: 14px;
-  font-weight: 400;
-  background-color: var(--d8x-button-select-secondary-background);
-  color: var(--d8x-button-select-secondary-color);
-  border: 1px solid transparent;
+  :global(.MuiButtonBase-root) {
+    padding: 0;
+    width: 45px;
+    min-width: 45px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 400;
 
-  &:hover {
-    border: 1px solid var(--d8x-button-select-secondary-border-color-hover);
-    color: var(--d8x-button-select-secondary-color);
-  }
-
-  &.selected {
-    background-color: var(--d8x-button-select-secondary-background-selected);
-    color: var(--d8x-button-select-secondary-color-selected);
+    &.selected {
+      color: var(--d8x-button-select-secondary-color-selected);
+      border-color: var(--d8x-button-secondary-border-color-selected);
+      background-color: var(--d8x-button-select-secondary-background-selected);
+    }
   }
 }
 
@@ -60,28 +54,31 @@
   :global(.MuiInputBase-root) {
     width: 100px;
     padding-right: 0;
-    background-color: transparent;
     height: 32px;
-
-    input {
-      width: 45%;
-      font-size: 14px;
-    }
   }
 
   :global(.MuiInputAdornment-root) {
     margin-top: 4px;
     margin-left: 0;
   }
+}
+
+.input {
+  @include transition(background-color);
+
+  width: 45%;
+  font-size: 14px;
 
   :global(.MuiOutlinedInput-notchedOutline) {
-    border-color: var(--d8x-color-border);
+    @include transition(border-color);
   }
 
-  &:hover {
+  &:global(.Mui-focused),
+  &:hover,
+  &:focus {
     :global(.MuiOutlinedInput-notchedOutline) {
       border-color: var(--d8x-color-action);
-    }  
+    }
   }
 }
 

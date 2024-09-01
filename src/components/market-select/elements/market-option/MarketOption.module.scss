@@ -2,48 +2,47 @@
 @import '~styles/theme/utils.scss';
 
 .root {
+  @include transition(border-color);
+
   flex: 1;
   min-width: 250px;
   padding: 3 * $d8x-spacing;
   border-radius: $d8x-border-radius;
-  border: 1px solid var(--d8x-color-action);
+  border: 1px solid var(--d8x-market-option-border-color);
+  background-color: transparent;
 
   &:hover,
   &.selected {
-    background-color: var(--d8x-color-background-items-selected);
+    border-color: var(--d8x-market-option-border-color-selected);
+    background-color: transparent !important;
   }
 }
 
 .iconsHolder {
-  position: relative;
-  width: 50px;
-  height: 30px;
+  display: flex;
 
   .baseIcon,
   .quoteIcon {
     @include flex-center;
 
-    position: absolute;
-    inset: 0;
-    width: 30px;
-    height: 30px;
-    border: 1.5px solid var(--d8x-color-action);
-    background-color: var(--d8x-color-background-icon);
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid var(--d8x-currency-icon-color);
+    background-color: var(--d8x-currency-icon-background-color);
     border-radius: 50%;
 
     svg {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
     }
   }
 
   .baseIcon {
-    right: inherit;
     z-index: 2;
   }
 
   .quoteIcon {
-    left: inherit;
+    margin-left: -4 * $d8x-spacing;
     z-index: 1;
 
     &:hover,
@@ -54,8 +53,11 @@
   }
 
   &.prediction {
-    .baseIcon {
-      left: 10px;
+    min-width: 60px;
+    justify-content: center;
+
+    .quoteIcon {
+      display: none;
     }
   }
 }

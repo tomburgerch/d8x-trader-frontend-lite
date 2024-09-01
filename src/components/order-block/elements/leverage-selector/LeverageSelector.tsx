@@ -94,8 +94,8 @@ export const LeverageSelector = memo(() => {
           {marks.map((mark) => (
             <Button
               key={mark.value}
-              className={classnames(styles.markButton, { [styles.selected]: mark.value === leverage })}
-              variant={mark.value === leverage ? 'primary' : 'outlined'}
+              variant="secondary"
+              className={classnames({ [styles.selected]: mark.value === leverage })}
               size="small"
               onClick={() => setLeverage(mark.value)}
             >
@@ -106,6 +106,7 @@ export const LeverageSelector = memo(() => {
         <ResponsiveInput
           id="leverage"
           className={styles.inputHolder}
+          inputClassName={styles.input}
           inputValue={inputValue}
           setInputValue={handleLeverageInputChange}
           handleInputBlur={handleInputBlur}

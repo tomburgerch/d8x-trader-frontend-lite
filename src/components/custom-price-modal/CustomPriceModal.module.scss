@@ -19,28 +19,6 @@
   margin-bottom: 4 * $d8x-spacing;
 }
 
-.markButton {
-  padding: 0;
-  width: 45px;
-  min-width: 45px;
-  height: 32px;
-  font-size: 14px;
-  font-weight: 400;
-  background-color: var(--d8x-button-select-secondary-background);
-  color: var(--d8x-button-select-secondary-color);
-  border: 1px solid transparent;
-
-  &:hover {
-    border: 1px solid var(--d8x-button-select-secondary-border-color-hover);
-    color: var(--d8x-button-select-secondary-color);
-  }
-
-  &.selected {
-    background-color: var(--d8x-button-select-secondary-background-selected);
-    color: var(--d8x-button-select-secondary-color-selected);
-  }
-}
-
 .takeProfit,
 .stopLoss {
   @include transition(opacity);
@@ -117,29 +95,40 @@
 
   :global(.MuiButtonBase-root) {
     flex: 1;
-    border-radius: 8px;
+    padding: 2.25 * $d8x-spacing 0 1.25 * $d8x-spacing;
     min-width: inherit;
-    padding: $d8x-spacing 0 0.5 * $d8x-spacing;
-    height: 32px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
 
     &.selected {
-      border: 1px solid transparent;
-      background-color: var(--d8x-color-action);
-      color: var(--d8x-color-text-secondary);
+      color: var(--d8x-button-select-secondary-color-selected);
+      border-color: var(--d8x-button-secondary-border-color-selected);
+      background-color: var(--d8x-button-select-secondary-background-selected);
     }
   }
 }
 
 .responsiveInput {
   flex: 1;
+}
 
-  :global(.MuiInputBase-root) {
-    width: 140px;
-    height: 32px;
-  }
+.input {
+  @include transition(background-color);
+
+  width: 140px;
+  height: 32px;
 
   :global(.MuiOutlinedInput-notchedOutline) {
-    border-color: var(--d8x-color-action);
+    @include transition(border-color);
+  }
+
+  &:global(.Mui-focused),
+  &:hover,
+  &:focus {
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: var(--d8x-color-action);
+    }
   }
 }
 

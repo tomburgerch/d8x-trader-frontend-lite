@@ -5,6 +5,7 @@ import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
 
 import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
@@ -248,66 +249,61 @@ export const MarketSelect = memo(() => {
   const handleClose = useCallback(() => setModalOpen(false), []);
 
   return (
-    <div className={styles.holderRoot}>
-      <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
-        <div className={styles.baseIcon}>
-          <Suspense fallback={null}>
-            <BaseIconComponent />
-          </Suspense>
-        </div>
-        <div className={styles.quoteIcon}>
-          <Suspense fallback={null}>
-            <QuoteIconComponent />
-          </Suspense>
-        </div>
-      </div>
-      <Button onClick={() => setModalOpen(true)} className={styles.marketSelectButton} variant="outlined">
-        <div className={styles.selectedMarketBlock}>
-          <div className={styles.selectedMarketValue}>
-            <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
-              {isPredictionMarket
-                ? cutBaseCurrency(selectedPerpetual?.baseCurrency)
-                : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
-            </Typography>
-            {!isPredictionMarket && <Typography variant="bodyTiny">{selectedPool?.settleSymbol}</Typography>}
-            <CurrencyBadge
-              className={styles.badge}
-              assetType={currencyMarketData?.assetType}
-              label={t(`common.select.market.${currencyMarketData?.assetType}`)}
-              withPoint={true}
-            />
+    <>
+      <div className={styles.holderRoot} onClick={() => setModalOpen(true)}>
+        <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
+          <div className={styles.baseIcon}>
+            <Suspense fallback={null}>
+              <BaseIconComponent />
+            </Suspense>
           </div>
-          <div className={styles.midPrice}>
-            {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
-              <TooltipMobile tooltip={midPrice.tooltip}>
+          <div className={styles.quoteIcon}>
+            <Suspense fallback={null}>
+              <QuoteIconComponent />
+            </Suspense>
+          </div>
+        </div>
+        <Button className={styles.marketSelectButton} variant="outlined">
+          <div className={styles.selectedMarketBlock}>
+            <div className={styles.selectedMarketValue}>
+              <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
+                {isPredictionMarket
+                  ? cutBaseCurrency(selectedPerpetual?.baseCurrency)
+                  : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
+              </Typography>
+              <CurrencyBadge
+                className={styles.badge}
+                assetType={currencyMarketData?.assetType}
+                label={t(`common.select.market.${currencyMarketData?.assetType}`)}
+                withPoint={true}
+              />
+            </div>
+            <div className={styles.midPrice}>
+              {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
+                <TooltipMobile tooltip={midPrice.tooltip}>
+                  <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
+                </TooltipMobile>
+              ) : (
                 <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-              </TooltipMobile>
-            ) : (
-              <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-            )}
-            {!isPredictionMarket && currencyMarketData && (
-              <div
-                className={classnames(styles.priceChange, {
-                  [styles.positive]: currencyMarketData.ret24hPerc >= 0,
-                  [styles.negative]: currencyMarketData.ret24hPerc < 0,
-                })}
-              >
-                <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
-                <span>
-                  {currencyMarketData.ret24hPerc >= 0 ? (
-                    <ArrowUpIcon width={20} height={20} />
-                  ) : (
-                    <ArrowDownIcon width={20} height={20} />
-                  )}
-                </span>
-              </div>
-            )}
+              )}
+              {!isPredictionMarket && currencyMarketData && (
+                <div
+                  className={classnames(styles.priceChange, {
+                    [styles.positive]: currencyMarketData.ret24hPerc >= 0,
+                    [styles.negative]: currencyMarketData.ret24hPerc < 0,
+                  })}
+                >
+                  <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
+                  <span>{currencyMarketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-        <div className={styles.arrowDropDown}>
-          {isModalOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
-        </div>
-      </Button>
+          <div className={styles.arrowDropDown}>
+            {isModalOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
+          </div>
+        </Button>
+      </div>
 
       <Dialog
         open={isModalOpen}
@@ -329,6 +325,6 @@ export const MarketSelect = memo(() => {
           ))}
         </div>
       </Dialog>
-    </div>
+    </>
   );
 });

@@ -123,8 +123,8 @@ export const CustomPriceModal = () => {
               {Object.values(StopLossE).map((key) => (
                 <Button
                   key={key}
-                  variant="outlined"
-                  className={classnames(styles.markButton, { [styles.selected]: key === stopLoss })}
+                  variant="secondary"
+                  className={classnames({ [styles.selected]: key === stopLoss })}
                   onClick={() => handleStopLossChange(key)}
                 >
                   {stopLossTranslationMap[key]}
@@ -134,6 +134,7 @@ export const CustomPriceModal = () => {
             <ResponsiveInput
               id="stop-loss-price"
               className={styles.responsiveInput}
+              inputClassName={styles.input}
               inputValue={stopLossInputPrice != null ? stopLossInputPrice : ''}
               placeholder="-"
               step={stepSize}
@@ -149,8 +150,8 @@ export const CustomPriceModal = () => {
               {Object.values(TakeProfitE).map((key) => (
                 <Button
                   key={key}
-                  variant="outlined"
-                  className={classnames(styles.markButton, { [styles.selected]: key === takeProfit })}
+                  variant="secondary"
+                  className={classnames({ [styles.selected]: key === takeProfit })}
                   onClick={() => handleTakeProfitChange(key)}
                 >
                   {takeProfitTranslationMap[key]}

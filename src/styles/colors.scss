@@ -74,17 +74,33 @@
   --d8x-color-text-pumpstation-overview: #fff;
   --d8x-color-text-warning: #1c1c1c;
 
+  //--Colors for Market select component and it elements
+  --d8x-market-select-border-color: transparent;
+  --d8x-market-select-border-color-hover: var(--d8x-color-action);
+  --d8x-market-select-currency-color: #6e6e6e;
+  --d8x-market-option-border-color: #e9e8e8;
+  --d8x-market-option-border-color-hover: var(--d8x-color-action);
+  --d8x-market-option-border-color-selected: var(--d8x-market-option-border-color-hover);
+
+  //--Colors for currency icons
+  --d8x-currency-icon-color: #e9e8e8;
+  --d8x-currency-icon-background-color: #fff;
+
   //--Badges
   --d8x-badge-crypto-color: #027bf5;
   --d8x-badge-crypto-background: rgba(6, 107, 240, 0.1);
   --d8x-badge-prediction-color: #6649df;
-  --d8x-badge-prediction-background: rgba(102, 73, 223, 0.15);
+  --d8x-badge-prediction-background: #e1e4fe;
   --d8x-badge-fx-color: #23ba97;
   --d8x-badge-fx-background: rgba(35, 186, 151, 0.1);
-  --d8x-badge-commodity-color: #e9e8e8;
-  --d8x-badge-commodity-background: rgba(233, 232, 232, 0.15);
+  --d8x-badge-commodity-color: #1c1c1c;
+  --d8x-badge-commodity-background: #e9e8e8;
 
-  //--New design colors
+  //--New design colors for modals
+  --d8x-modal-text-color: var(--d8x-color-text-main);
+  --d8x-modal-background-color: #fff;
+
+  //--New design colors for buttons
   --d8x-button-primary-color: var(--d8x-color-text-secondary);
   --d8x-button-primary-color-hover: var(--d8x-color-text-secondary);
   --d8x-button-primary-color-selected: var(--d8x-button-primary-color-hover);
@@ -93,20 +109,20 @@
   --d8x-button-primary-background-hover: var(--d8x-color-background-primary-hover);
   --d8x-button-primary-background-selected: var(--d8x-button-primary-background-hover);
   --d8x-button-primary-background-disabled: var(--d8x-color-background-primary-disabled);
-  --d8x-button-primary-border-color: var(--d8x-color-border);
+  --d8x-button-primary-border-color: var(--d8x-color-action);
   --d8x-button-primary-border-color-hover: var(--d8x-color-action);
   --d8x-button-primary-border-color-selected: var(--d8x-button-primary-border-color-hover);
   --d8x-button-primary-border-color-disabled: var(--d8x-color-action);
   --d8x-button-secondary-color: var(--d8x-color-action);
-  --d8x-button-secondary-color-hover: var(--d8x-button-secondary-color);
+  --d8x-button-secondary-color-hover: #fff;
   --d8x-button-secondary-color-selected: var(--d8x-button-secondary-color-hover);
   --d8x-button-secondary-color-disabled: var(--d8x-button-secondary-color);
-  --d8x-button-secondary-background: var(--d8x-color-background-items);
-  --d8x-button-secondary-background-hover: var(--d8x-color-background-table);
-  --d8x-button-secondary-background-selected: var(--d8x-color-action);
+  --d8x-button-secondary-background: #e1e4fe;
+  --d8x-button-secondary-background-hover: var(--d8x-color-action);
+  --d8x-button-secondary-background-selected: var(--d8x-button-secondary-background-hover);
   --d8x-button-secondary-background-disabled: var(--d8x-color-background-items);
-  --d8x-button-secondary-border-color: var(--d8x-color-action);
-  --d8x-button-secondary-border-color-hover: var(--d8x-button-secondary-border-color);
+  --d8x-button-secondary-border-color: #e1e4fe;
+  --d8x-button-secondary-border-color-hover: var(--d8x-color-action);
   --d8x-button-secondary-border-color-selected: var(--d8x-button-secondary-border-color-hover);
   --d8x-button-secondary-border-color-disabled: var(--d8x-color-action);
   --d8x-button-select-color: #1c1c1c;

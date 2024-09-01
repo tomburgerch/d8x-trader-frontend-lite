@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 
 import CloseIcon from 'assets/icons/new/close.svg?react';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 
 import { ErrorDialog } from './ErrorDialog';
@@ -50,7 +51,7 @@ export const Dialog = ({
           </Button>
         )}
       </DialogTitle>
-      <Separator />
+      <Separator separatorType={SeparatorTypeE.Modal} />
       {loading && (
         <Box className={styles.loaderWrapper}>
           <CircularProgress />

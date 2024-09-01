@@ -226,13 +226,13 @@ export const theme = createTheme({
             fontSize: '14px',
             ':hover': {
               backgroundColor: 'var(--d8x-button-secondary-background-hover)',
-              color: 'var(--d8x-button-secondary-color-hover)',
               borderColor: 'var(--d8x-button-secondary-border-color-hover)',
+              color: 'var(--d8x-button-secondary-color-hover)',
             },
             ':disabled': {
               backgroundColor: 'var(--d8x-button-secondary-background-disabled)',
-              color: 'var(--d8x-button-secondary-color-disabled)',
               borderColor: 'var(--d8x-button-secondary-border-color-disabled)',
+              color: 'var(--d8x-button-secondary-color-disabled)',
             },
           },
         },
@@ -561,6 +561,15 @@ export const theme = createTheme({
         selectIcon: {
           color: 'var(--d8x-color-text-main)',
           top: 0,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          color: 'var(--d8x-modal-text-color)',
+          backgroundColor: 'var(--d8x-modal-background-color)',
+          borderRadius: '16px',
         },
       },
     },

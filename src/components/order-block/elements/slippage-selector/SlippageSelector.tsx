@@ -49,7 +49,7 @@ export const SlippageSelector = memo(() => {
         {MULTIPLIERS.map((key) => (
           <Button
             key={key}
-            variant="outlined"
+            variant="secondary"
             className={classnames({ [styles.selected]: key === slippage })}
             onClick={() => {
               setSlippage(key);

@@ -17,7 +17,7 @@ export const PeriodSelector = memo(() => {
       {Object.values(TvChartPeriodE).map((value) => (
         <Button
           key={value}
-          variant={value === period ? 'primary' : 'outlined'}
+          variant="outlined"
           className={classnames({ [styles.selected]: value === period })}
           onClick={() => setPeriod(value)}
         >

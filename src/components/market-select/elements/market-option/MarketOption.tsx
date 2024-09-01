@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { MenuItem, Typography } from '@mui/material';
 
+import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
 import { AssetTypeE } from 'types/enums';
 import { TemporaryAnyT } from 'types/types';
@@ -13,7 +14,6 @@ import { getDynamicLogo } from 'utils/getDynamicLogo';
 import type { PerpetualWithPoolAndMarketI } from '../../types';
 
 import styles from './MarketOption.module.scss';
-import { CurrencyBadge } from '../../../currency-badge/CurrencyBadge';
 
 interface MarketOptionPropsI {
   isSelected: boolean;

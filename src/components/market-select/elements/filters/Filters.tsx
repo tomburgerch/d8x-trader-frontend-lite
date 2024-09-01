@@ -3,6 +3,8 @@ import { useAtom } from 'jotai';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Button } from '@mui/material';
+
 import { AssetTypeE } from 'types/enums';
 
 import { assetTypeFilterAtom } from '../../collaterals.store';
@@ -47,15 +49,16 @@ export const Filters = memo(() => {
   return (
     <div className={styles.container}>
       {options.map((option) => (
-        <div
+        <Button
           key={option.value}
-          className={classnames(styles.option, {
+          variant="outlined"
+          className={classnames({
             [styles.active]: groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All),
           })}
           onClick={() => handleClick(option.value)}
         >
           {option.label}
-        </div>
+        </Button>
       ))}
     </div>
   );

@@ -24,13 +24,16 @@
     @include transition(color);
 
     stroke: var(--d8x-color-icon-theme);
-    color: none;
+    color: transparent;
     height: 16px;
   }
 
-  &:hover {
+  &:hover,
+  &.active {
+    border-color: var(--d8x-button-primary-border-color);
+
     .icon {
-      color: var(--d8x-color-text-secondary);
+      color: var(--d8x-color-action);
     }
   }
 }
