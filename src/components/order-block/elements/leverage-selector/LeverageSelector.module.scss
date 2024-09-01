@@ -43,9 +43,9 @@
     font-weight: 400;
 
     &.selected {
-      color: var(--d8x-button-select-secondary-color-selected);
+      color: var(--d8x-button-secondary-color-selected);
       border-color: var(--d8x-button-secondary-border-color-selected);
-      background-color: var(--d8x-button-select-secondary-background-selected);
+      background-color: var(--d8x-button-secondary-background-selected);
     }
   }
 }

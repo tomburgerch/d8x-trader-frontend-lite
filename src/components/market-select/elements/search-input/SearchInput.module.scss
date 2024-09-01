@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  max-width: 490px;
 }
 
 .searchRaw {
@@ -20,7 +21,7 @@
 .searchIcon {
   position: absolute;
   margin-left: 8px;
-}
+  }
 
 .closeIcon {
   position: absolute;

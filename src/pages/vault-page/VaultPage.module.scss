@@ -29,7 +29,9 @@
     background-color: var(--d8x-color-background-items);
     border-radius: $d8x-spacing * 3;
     padding: $d8x-spacing * 2;
-    max-height: 72px;
+    max-height: 90px;
+    display: flex;
+    align-items: center;
   }
 }
 

@@ -169,7 +169,7 @@
 
   :global(.MuiPaper-root) {
     width: 100%;
-    max-width: 620px;
+    max-width: 652px;
   }
 }
 
@@ -178,6 +178,5 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 3 * $d8x-spacing;
-  overflow-y: scroll;
   padding: 4 * $d8x-spacing 0 0;
 }
