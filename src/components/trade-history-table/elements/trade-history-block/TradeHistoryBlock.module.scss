@@ -32,6 +32,14 @@
 
 .dataValue {
   color: var(--d8x-color-text-highlight);
+
+  &.buy {
+    color: var(--d8x-color-text-buy);
+  }
+
+  &.sell {
+    color: var(--d8x-color-text-sell);
+  }
 }
 
 .green {

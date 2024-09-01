@@ -1,10 +1,10 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
-import { Button, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import { CopyInput } from 'components/copy-input/CopyInput';
 import { CopyLink } from 'components/copy-link/CopyLink';
@@ -64,71 +64,65 @@ export const DepositModal = () => {
   }
 
   return (
-    <Dialog open={isDepositModalOpen} onClose={handleOnClose} className={styles.dialog}>
-      <DialogTitle>{t('common.deposit-modal.title')}</DialogTitle>
-      <DialogContent className={styles.dialogContent}>
-        <div className={styles.section}>
-          <CurrencySelect />
-        </div>
-        <Separator />
-        <OKXConvertor />
-        <div className={styles.section}>
-          {activatedOneClickTrading ? (
-            <Typography variant="bodyMedium" className={styles.noteText}>
-              {t('common.deposit-modal.important-notice.0')}
-            </Typography>
+    <Dialog
+      open={isDepositModalOpen}
+      onClose={handleOnClose}
+      onCloseClick={handleOnClose}
+      className={styles.dialog}
+      dialogTitle={t('common.deposit-modal.title')}
+    >
+      <div className={styles.section}>
+        <CurrencySelect />
+      </div>
+      <Separator />
+      <OKXConvertor />
+      <div className={styles.section}>
+        {activatedOneClickTrading ? (
+          <Typography variant="bodyMedium" className={styles.noteText}>
+            {t('common.deposit-modal.important-notice.0')}
+          </Typography>
+        ) : (
+          <div>{/* empty block */}</div>
+        )}
+        <Typography variant="bodySmall" className={styles.noteText}>
+          <Translate
+            i18nKey="common.deposit-modal.important-notice.1"
+            values={{ currencyName: selectedCurrency?.settleToken }}
+          />{' '}
+          {poolAddress && (
+            <>
+              {t('common.deposit-modal.important-notice.2')}
+              <CopyLink elementToShow={cutAddress(poolAddress)} textToCopy={poolAddress} classname={styles.copyText} />
+              {t('common.deposit-modal.important-notice.3')}{' '}
+            </>
+          )}
+          {t('common.deposit-modal.important-notice.4')}{' '}
+          <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
+        </Typography>
+      </div>
+      <div className={styles.section}>
+        <CopyInput id="address" textToCopy={targetAddress || ''} />
+      </div>
+      {(isCedeEnabled || isLiFiEnabled || isOwltoEnabled) && (
+        <div className={classnames(styles.section, styles.widgetButtons)}>
+          {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
+            <div>
+              {isLiFiEnabled && <LiFiWidgetButton />}
+              {isOwltoEnabled && <OwltoButton />}
+            </div>
           ) : (
             <div>{/* empty block */}</div>
           )}
-          <Typography variant="bodySmall" className={styles.noteText}>
-            <Translate
-              i18nKey="common.deposit-modal.important-notice.1"
-              values={{ currencyName: selectedCurrency?.settleToken }}
-            />{' '}
-            {poolAddress && (
-              <>
-                {t('common.deposit-modal.important-notice.2')}
-                <CopyLink
-                  elementToShow={cutAddress(poolAddress)}
-                  textToCopy={poolAddress}
-                  classname={styles.copyText}
-                />
-                {t('common.deposit-modal.important-notice.3')}{' '}
-              </>
-            )}
-            {t('common.deposit-modal.important-notice.4')}{' '}
-            <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
-          </Typography>
+          {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
         </div>
-        <div className={styles.section}>
-          <CopyInput id="address" textToCopy={targetAddress || ''} />
-        </div>
-        {(isCedeEnabled || isLiFiEnabled || isOwltoEnabled) && (
-          <div className={classNames(styles.section, styles.widgetButtons)}>
-            {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
-              <div>
-                {isLiFiEnabled && <LiFiWidgetButton />}
-                {isOwltoEnabled && <OwltoButton />}
-              </div>
-            ) : (
-              <div>{/* empty block */}</div>
-            )}
-            {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
-          </div>
-        )}
-        <Separator />
-        <div className={styles.section}>
-          <WalletBalances />
-          <Typography variant="bodyTiny" className={styles.noteText}>
-            <Translate i18nKey="common.deposit-modal.deposit-note" values={{ currencyName: gasTokenSymbol }} />
-          </Typography>
-        </div>
-      </DialogContent>
-      <DialogActions className={styles.dialogAction}>
-        <Button onClick={handleOnClose} variant="secondary">
-          {t('common.deposit-modal.done-button')}
-        </Button>
-      </DialogActions>
+      )}
+      <Separator />
+      <div className={styles.section}>
+        <WalletBalances />
+        <Typography variant="bodyTiny" className={styles.noteText}>
+          <Translate i18nKey="common.deposit-modal.deposit-note" values={{ currencyName: gasTokenSymbol }} />
+        </Typography>
+      </div>
     </Dialog>
   );
 };

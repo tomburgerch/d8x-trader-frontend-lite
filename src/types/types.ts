@@ -1,4 +1,4 @@
-import { PerpetualStaticInfo, TraderInterface } from '@d8x/perpetuals-sdk';
+import { PerpetualState, PerpetualStaticInfo, TraderInterface } from '@d8x/perpetuals-sdk';
 import type { ReactElement, ReactNode } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,19 +28,7 @@ export interface AppDimensionsI {
   height?: number;
 }
 
-export interface PerpetualI {
-  id: number;
-  state: string;
-  baseCurrency: string;
-  quoteCurrency: string;
-  indexPrice: number;
-  collToQuoteIndexPrice: number;
-  markPrice: number;
-  midPrice: number;
-  currentFundingRateBps: number;
-  openInterestBC: number;
-  isMarketClosed: boolean;
-}
+export interface PerpetualI extends PerpetualState {}
 
 export interface PerpetualDataI {
   id: number;
@@ -49,6 +37,7 @@ export interface PerpetualDataI {
   quoteCurrency: string;
   symbol: string;
   isPredictionMarket: boolean;
+  state: string;
 }
 
 export interface SymbolDataI {
@@ -299,6 +288,7 @@ export interface TableHeaderI<T> {
   align: AlignE;
   field?: keyof T;
   fieldType?: FieldTypeE;
+  hidden?: boolean;
 }
 
 export interface TvChartCandleI {

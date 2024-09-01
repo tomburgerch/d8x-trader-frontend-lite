@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .root {
   :global(.MuiOutlinedInput-input) {
@@ -19,10 +20,44 @@
 .decreaseButton,
 .increaseButton {
   display: none;
-  color: var(--d8x-color-action-icon);
+  color: var(--d8x-color-action);
 }
 
-.inputAdornment {
+.outlined {
+  padding-left: 0;
+  margin-left: 0;
+
+  &:hover,
+  &:focus-within {
+    background-color: transparent !important;
+  }
+
+  :global(.MuiInputBase-root) {
+    width: 100%;
+  }
+
+  :global(.MuiInputAdornment-root) {
+    margin-left: 0;
+    margin-right: $d8x-spacing;
+  }
+
+  :global(.MuiOutlinedInput-notchedOutline) {
+    border-color: transparent !important;
+  }
+
+  :global(.MuiInputBase-input) {
+    background-color: transparent !important;
+    font-size: 24px;
+    font-weight: 500;
+    padding: 0;
+  }
+}
+
+.inputStartAdornment {
+  color: var(--d8x-color-text-label-one);
+}
+
+.inputEndAdornment {
   color: var(--d8x-color-text-label-one);
 
   :global(.MuiPaper-root) {
@@ -32,7 +67,7 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
-  .inputAdornment {
+  .inputEndAdornment {
     color: var(--d8x-color-text-main);
     min-width: 65px;
   }
@@ -76,15 +111,20 @@
       }
     }
 
+    :global(.MuiOutlinedInput-notchedOutline) {
+      border-color: var(--d8x-color-action);
+    }
+
     .decreaseButton,
     .increaseButton {
+      @include transition(opacity);
+
       display: inline-block;
       padding: 0;
       border: none;
       min-width: auto;
       line-height: 0.5;
       background: none !important;
-      transition: opacity 0.3s linear;
 
       &:hover {
         opacity: 0.7;

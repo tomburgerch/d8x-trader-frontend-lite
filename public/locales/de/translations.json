@@ -188,6 +188,7 @@
       },
       "history-table": {
         "table-title": "Handelshistorie",
+        "body": "",
         "table-header": {
           "time": "Zeit",
           "perpetual": "Perpetual",
@@ -226,6 +227,8 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "Prognosemarkt",
+          "note": "Sagen Sie das Ergebnis voraus und fangen Sie jetzt an, darauf zu wetten!",
           "yes": "Ja",
           "no": "Nein",
           "bet": "Wette"
@@ -751,7 +754,10 @@
     "deposit-gas": "Gas deponieren",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "Alle ansehen",
     "max": "Max:",
+    "yes": "Ja",
+    "no": "Nein",
     "copied": "Kopiert",
     "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",
     "page-reload": {
@@ -863,8 +869,8 @@
         "crypto": "Krypto",
         "fx": "Devisen",
         "all": "Alle",
-        "prediction": "Vorhersage",
-        "commodity": "Rohstoffe",
+        "polymarket": "Vorhersage",
+        "metal": "Rohstoffe",
         "closed": "Geschlossen"
       },
       "search": "Suchen...",

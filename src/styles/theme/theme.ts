@@ -69,6 +69,7 @@ declare module '@mui/material/Button' {
   interface ButtonPropsVariantOverrides {
     primary: true;
     secondary: true;
+    select: true;
     success: true;
     warning: true;
     action: true;
@@ -86,10 +87,10 @@ declare module '@mui/material/Button' {
 
 const MuiButtonSharedStyle = {
   minWidth: '140px',
-  transition: 'ease-in-out 250ms',
+  transition: 'ease-in 300ms',
   borderRadius: '8px',
   padding: '10px 20px 8px',
-  fontSize: '18px',
+  fontSize: '14px',
   fontWeight: 700,
 };
 
@@ -124,8 +125,8 @@ export const theme = createTheme({
     MuiContainer: {
       styleOverrides: {
         root: {
-          paddingLeft: '20px',
-          paddingRight: '20px',
+          paddingLeft: '24px',
+          paddingRight: '24px',
         },
       },
     },
@@ -199,17 +200,19 @@ export const theme = createTheme({
           props: { variant: 'primary' },
           style: {
             ...MuiButtonSharedStyle,
-            backgroundColor: 'var(--d8x-color-background-primary)',
-            border: '1px solid var(--d8x-color-action)',
-            color: 'var(--d8x-color-text-secondary)',
-            fontSize: '16px',
+            backgroundColor: 'var(--d8x-button-primary-background)',
+            border: '1px solid var(--d8x-button-primary-border-color)',
+            color: 'var(--d8x-button-primary-color)',
+            fontSize: '14px',
             ':hover': {
-              backgroundColor: 'var(--d8x-color-background-primary-hover)',
+              backgroundColor: 'var(--d8x-button-primary-background-hover)',
+              color: 'var(--d8x-button-primary-color-hover)',
+              borderColor: 'var(--d8x-button-primary-border-color-hover)',
             },
             ':disabled': {
-              backgroundColor: 'var(--d8x-color-background-primary-disabled)',
-              color: 'var(--d8x-color-text-secondary)',
-              borderColor: 'transparent',
+              backgroundColor: 'var(--d8x-button-primary-background-disabled)',
+              color: 'var(--d8x-button-primary-color-disabled)',
+              borderColor: 'var(--d8x-button-primary-border-color-disabled)',
             },
           },
         },
@@ -217,12 +220,39 @@ export const theme = createTheme({
           props: { variant: 'secondary' },
           style: {
             ...MuiButtonSharedStyle,
-            backgroundColor: 'var(--d8x-color-background-items)',
-            border: '1px solid var(--d8x-color-action)',
-            color: 'var(--d8x-color-action)',
-            fontSize: '16px',
+            backgroundColor: 'var(--d8x-button-secondary-background)',
+            border: '1px solid var(--d8x-button-secondary-border-color)',
+            color: 'var(--d8x-button-secondary-color)',
+            fontSize: '14px',
             ':hover': {
-              backgroundColor: 'var(--d8x-color-background-table)',
+              backgroundColor: 'var(--d8x-button-secondary-background-hover)',
+              borderColor: 'var(--d8x-button-secondary-border-color-hover)',
+              color: 'var(--d8x-button-secondary-color-hover)',
+            },
+            ':disabled': {
+              backgroundColor: 'var(--d8x-button-secondary-background-disabled)',
+              borderColor: 'var(--d8x-button-secondary-border-color-disabled)',
+              color: 'var(--d8x-button-secondary-color-disabled)',
+            },
+          },
+        },
+        {
+          props: { variant: 'select' },
+          style: {
+            ...MuiButtonSharedStyle,
+            backgroundColor: 'var(--d8x-button-select-background)',
+            border: '1px solid var(--d8x-button-select-border-color)',
+            color: 'var(--d8x-button-select-color)',
+            fontSize: '12px',
+            ':hover': {
+              backgroundColor: 'var(--d8x-button-select-background-hover)',
+              color: 'var(--d8x-button-select-color-hover)',
+              borderColor: 'var(--d8x-button-select-border-color-hover)',
+            },
+            ':disabled': {
+              backgroundColor: 'var(--d8x-button-select-background-disabled)',
+              color: 'var(--d8x-button-select-color-disabled)',
+              borderColor: 'var(--d8x-button-select-border-color-disabled)',
             },
           },
         },
@@ -317,19 +347,22 @@ export const theme = createTheme({
         {
           props: { variant: 'outlined' },
           style: {
+            transition: 'ease-in 300ms',
             borderRadius: '8px',
-            borderWidth: '1px',
             padding: '7px 8px',
             fontSize: '12px',
-            color: 'var(--d8x-color-text-main)',
-            borderColor: 'var(--d8x-color-border)',
+            backgroundColor: 'var(--d8x-button-outlined-background)',
+            border: '1px solid var(--d8x-button-outlined-border-color)',
+            color: 'var(--d8x-button-outlined-color)',
             '&:hover': {
-              backgroundColor: 'rgba(var(--d8x-color-action-rgb), 0.2)',
-              borderColor: 'transparent',
+              backgroundColor: 'var(--d8x-button-outlined-background-hover)',
+              borderColor: 'var(--d8x-button-outlined-border-color-hover)',
+              color: 'var(--d8x-button-outlined-color-hover)',
             },
             ':disabled': {
-              borderColor: 'var(--d8x-color-border)',
-              color: 'var(--d8x-color-text-secondary)',
+              backgroundColor: 'var(--d8x-button-outlined-background-disabled)',
+              borderColor: 'var(--d8x-button-outlined-border-color-disabled)',
+              color: 'var(--d8x-button-outlined-color-disabled)',
               opacity: '0.3',
             },
           },
@@ -339,7 +372,7 @@ export const theme = createTheme({
           style: {
             ...MuiButtonSharedStyle,
             padding: '9px 40px 7px',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 'normal',
             minWidth: '50px',
           },
@@ -489,18 +522,18 @@ export const theme = createTheme({
           padding: '14px 0 !important',
         },
         thumb: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         track: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         rail: {
-          color: 'var(--d8x-color-action-icon)',
+          color: 'var(--d8x-color-action)',
         },
         markLabel: {
           fontSize: '12px',
           lineHeight: '16px',
-          color: 'var(--d8x-color-text-main)',
+          color: 'var(--d8x-color-text-label-one)',
           top: '36px !important',
         },
       },
@@ -531,14 +564,27 @@ export const theme = createTheme({
         },
       },
     },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          color: 'var(--d8x-modal-text-color)',
+          backgroundColor: 'var(--d8x-modal-background-color)',
+          borderRadius: '16px',
+        },
+      },
+    },
     MuiDialogTitle: {
       styleOverrides: {
         root: {
-          fontSize: '24px',
-          lineHeight: '32px',
-          fontWeight: '600',
-          textAlign: 'center',
-          padding: '48px 32px 32px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          fontSize: '16px',
+          lineHeight: '20px',
+          fontWeight: '500',
+          textAlign: 'left',
+          padding: '16px 16px 12px 16px',
         },
       },
     },
@@ -554,7 +600,7 @@ export const theme = createTheme({
     MuiDialogContent: {
       styleOverrides: {
         root: {
-          padding: '0px 32px 0px 32px',
+          padding: '16px',
         },
       },
     },

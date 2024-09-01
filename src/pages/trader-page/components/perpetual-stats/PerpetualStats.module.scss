@@ -1,4 +1,5 @@
 @import '~styles/theme/theme.scss';
+@import '~styles/theme/utils.scss';
 
 .statContainer {
   flex: 1;
@@ -35,14 +36,15 @@
   }
 
   .viewChartIcon {
-    transition: opacity 0.3s linear;
+    @include transition(opacity);
+
     margin-right: -$d8x-spacing * 5;
     margin-left: 0;
     padding: $d8x-spacing $d8x-spacing * 3 $d8x-spacing $d8x-spacing;
     width: 60px;
     height: 24px;
     margin-bottom: 2px;
-    color: var(--d8x-color-action-icon);
+    color: var(--d8x-color-action);
 
     &:hover {
       opacity: 0.7;
@@ -57,50 +59,10 @@
   margin-bottom: calc($d8x-spacing / 2);
 }
 
-.statMainValuePositiveMobile {
-  font-size: 1.3rem;
-  color: var(--d8x-color-text-buy);
-  white-space: nowrap;
-  font-weight: 600;
-}
-
-.statMainValueNegativeMobile {
-  font-size: 1.3rem;
-  color: var(--d8x-color-text-sell);
-  white-space: nowrap;
-  font-weight: 600;
-}
-
-.statMainValuePositive {
-  font-size: 32px;
-  color: var(--d8x-color-text-buy);
-  font-weight: 600;
-}
-
-.statMainValueNegative {
-  font-size: 32px;
-  color: var(--d8x-color-text-sell);
-  font-weight: 600;
-}
-
-.statMainValuePositiveTablet {
-  font-size: 28px;
-  color: var(--d8x-color-text-buy);
-  font-weight: 600;
-  line-height: 24px;
-}
-
-.statMainValueNegativeTablet {
-  font-size: 28px;
-  color: var(--d8x-color-text-sell);
-  font-weight: 600;
-  line-height: 24px;
-}
-
 .statsBlock {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end; 
+  align-items: flex-end;
 }
 
 .statLabel {

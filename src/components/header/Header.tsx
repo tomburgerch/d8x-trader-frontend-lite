@@ -1,3 +1,4 @@
+import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import { Container } from 'components/container/Container';
 import { DepositModal } from 'components/deposit-modal/DepositModal';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
 import { Separator } from 'components/separator/Separator';
+import { ThemeSwitcher } from 'components/theme-switcher/ThemeSwitcher';
 import { WalletConnectButtonHolder } from 'components/wallet-connect-button/WalletConnectButtonHolder';
 import { WalletConnectedButtons } from 'components/wallet-connect-button/WalletConnectedButtons';
 import { web3AuthConfig } from 'config';
@@ -40,13 +42,10 @@ import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
-import { collateralsAtom } from './elements/market-select/collaterals.store';
-import { SettingsBlock } from './elements/settings-block/SettingsBlock';
-import { SettingsButton } from './elements/settings-button/SettingsButton';
+import { collateralsAtom } from '../market-select/collaterals.store';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
-import { TraderInterface } from '@d8x/perpetuals-sdk';
 
 interface HeaderPropsI {
   /**
@@ -63,9 +62,9 @@ const MAX_RETRIES = 3;
 
 export const Header = memo(({ window }: HeaderPropsI) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isTabletScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isUpToLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isUpToTabletScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { t } = useTranslation();
 
@@ -139,7 +138,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             let isPredictionMarket = false;
             try {
               const sInfo = traderAPI?.getPerpetualStaticInfo(symbol);
-              isPredictionMarket = sInfo !== undefined && TraderInterface.isPredictionMarket(sInfo);
+              isPredictionMarket = sInfo !== undefined && TraderInterface.isPredictionMarketStatic(sInfo);
             } catch {
               // skip
             }
@@ -150,6 +149,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               quoteCurrency: perpetual.quoteCurrency,
               symbol,
               isPredictionMarket,
+              state: perpetual.state,
             };
           })
         );
@@ -344,14 +344,14 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           </NavLink>
         ))}
       </nav>
-      {isTabletScreen && (
+      {isUpToTabletScreen && (
         <>
           <Divider />
-          <div className={styles.settings}>
-            <SettingsBlock />
-          </div>
           <div className={styles.languageSwitcher}>
             <LanguageSwitcher />
+          </div>
+          <div className={styles.themeSwitcher}>
+            <ThemeSwitcher />
           </div>
         </>
       )}
@@ -374,10 +374,10 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               <div className={styles.leftSide}>
                 <Typography variant="h6" component="div" className={styles.mainLogoHolder}>
                   <a href="/" className={styles.logoLink}>
-                    <LogoWithText width={86} height={20} />
+                    <LogoWithText width={60} height={13.95} />
                   </a>
                 </Typography>
-                {!isSmallScreen && (
+                {!isUpToLargeScreen && (
                   <nav className={styles.navWrapper}>
                     {availablePages.map((page) => (
                       <NavLink
@@ -392,8 +392,8 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                   </nav>
                 )}
               </div>
-              {(!isMobileScreen || !isConnected) && (
-                <Typography variant="h6" component="div" className={styles.walletConnect}>
+              {(!isUpToMobileScreen || !isConnected) && (
+                <div className={styles.walletConnect}>
                   {web3AuthConfig.isEnabled && !isConnected && (
                     <Button onClick={() => setConnectModalOpen(true)} className={styles.modalButton} variant="primary">
                       <span className={styles.modalButtonText}>{t('common.wallet-connect')}</span>
@@ -405,16 +405,21 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                       <WalletConnectedButtons />
                     </>
                   )}
-                </Typography>
+                </div>
               )}
-              {!isTabletScreen && <SettingsButton />}
-              {isSmallScreen && (
+              {!isUpToTabletScreen && (
+                <div className={styles.settingButtonsHolder}>
+                  <ThemeSwitcher />
+                  <LanguageSwitcher isMini={true} />
+                </div>
+              )}
+              {isUpToLargeScreen && (
                 <Button onClick={handleDrawerToggle} variant="primary" className={styles.menuButton}>
                   <Menu />
                 </Button>
               )}
             </Toolbar>
-            {isMobileScreen && isConnected && (
+            {isUpToMobileScreen && isConnected && (
               <div className={styles.mobileButtonsBlock}>
                 <Separator />
                 <div className={styles.mobileWalletButtons}>
@@ -439,7 +444,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                 display: { md: 'block', lg: 'none' },
                 '& .MuiDrawer-paper': {
                   boxSizing: 'border-box',
-                  width: isMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
+                  width: isUpToMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
                   backgroundColor: 'var(--d8x-color-background)',
                 },
               }}

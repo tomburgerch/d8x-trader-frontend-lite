@@ -10,6 +10,7 @@ import { Table as MuiTable, TableBody, TableContainer, TableHead, TablePaginatio
 import { EmptyRow } from 'components/table/empty-row/EmptyRow';
 import { useFilter } from 'components/table/filter-modal/useFilter';
 import { FilterModal } from 'components/table/filter-modal/FilterModal';
+import { SortableHeaders } from 'components/table/sortable-header/SortableHeaders';
 import { getComparator, stableSort } from 'helpers/tableSort';
 import { getTradesHistory } from 'network/history';
 import { collateralToSettleConversionAtom, openOrdersAtom, perpetualsAtom, tradesHistoryAtom } from 'store/pools.store';
@@ -20,8 +21,6 @@ import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { TradeHistoryBlock } from './elements/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryRow } from './elements/TradeHistoryRow';
-
-import { SortableHeaders } from '../table/sortable-header/SortableHeaders';
 
 import styles from './TradeHistoryTable.module.scss';
 
@@ -81,6 +80,7 @@ export const TradeHistoryTable = memo(() => {
         label: t('pages.trade.history-table.table-header.time'),
         align: AlignE.Left,
         fieldType: FieldTypeE.Date,
+        hidden: true,
       },
       {
         field: 'symbol',
@@ -93,24 +93,36 @@ export const TradeHistoryTable = memo(() => {
         label: t('pages.trade.history-table.table-header.side'),
         align: AlignE.Left,
         fieldType: FieldTypeE.String,
+        hidden: true,
+      },
+      {
+        field: 'quantity',
+        label: t('pages.trade.history-table.table-header.quantity'),
+        align: AlignE.Left,
+        fieldType: FieldTypeE.Number,
+      },
+      {
+        field: 'price',
+        label: `${t('pages.trade.history-table.table-header.price')}/${t(
+          'pages.trade.history-table.table-header.fee'
+        )}`,
+        // label: t('pages.trade.history-table.table-header.price'),
+        align: AlignE.Left,
+        fieldType: FieldTypeE.Number,
       },
       {
         field: 'price',
         label: t('pages.trade.history-table.table-header.price'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
-      },
-      {
-        field: 'quantity',
-        label: t('pages.trade.history-table.table-header.quantity'),
-        align: AlignE.Right,
-        fieldType: FieldTypeE.Number,
+        hidden: true,
       },
       {
         field: 'fee',
         label: t('pages.trade.history-table.table-header.fee'),
         align: AlignE.Right,
         fieldType: FieldTypeE.Number,
+        hidden: true,
       },
       {
         field: 'realizedPnl',
@@ -148,6 +160,8 @@ export const TradeHistoryTable = memo(() => {
     [address, filteredRows, order, orderBy, page, rowsPerPage]
   );
 
+  const onlyTableHeaders = tradeHistoryHeaders.filter(({ hidden }) => !hidden);
+
   return (
     <div className={styles.root} ref={ref}>
       {width && width >= MIN_WIDTH_FOR_TABLE && (
@@ -156,7 +170,7 @@ export const TradeHistoryTable = memo(() => {
             <TableHead className={styles.tableHead}>
               <TableRow>
                 <SortableHeaders<TradeHistoryWithSymbolDataI>
-                  headers={tradeHistoryHeaders}
+                  headers={onlyTableHeaders}
                   order={order}
                   orderBy={orderBy}
                   setOrder={setOrder}
@@ -167,15 +181,11 @@ export const TradeHistoryTable = memo(() => {
             <TableBody className={styles.tableBody}>
               {address &&
                 visibleRows.map((tradeHistory) => (
-                  <TradeHistoryRow
-                    key={tradeHistory.orderId}
-                    headers={tradeHistoryHeaders}
-                    tradeHistory={tradeHistory}
-                  />
+                  <TradeHistoryRow key={tradeHistory.orderId} headers={onlyTableHeaders} tradeHistory={tradeHistory} />
                 ))}
               {(!address || tradesHistory.length === 0) && (
                 <EmptyRow
-                  colSpan={tradeHistoryHeaders.length}
+                  colSpan={onlyTableHeaders.length}
                   text={
                     !address
                       ? t('pages.trade.history-table.table-content.connect')

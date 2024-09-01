@@ -1,0 +1,40 @@
+@import '~styles/theme/theme.scss';
+
+.root {
+  width: 100%;
+  border-radius: $d8x-border-radius;
+  background-color: var(--d8x-color-background-order-block);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding-top: $d8x-spacing * 2;
+  padding-bottom: $d8x-spacing * 2;
+
+  &.header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: $d8x-spacing * 4;
+  }
+
+  &.itemsHolder {
+    overflow-y: auto;
+    gap: 2 * $d8x-spacing;
+  }
+}
+
+.noData {
+  padding: 4 * $d8x-spacing 4 * $d8x-spacing $d8x-spacing;
+  text-align: center;
+}
+
+.viewAllLabel {
+  cursor: pointer;
+  color: var(--d8x-color-action);
+}
+
+.separator {
+  background-color: var(--d8x-color-background-order-block);
+}

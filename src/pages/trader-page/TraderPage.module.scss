@@ -37,17 +37,17 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $d8x-spacing * 2.5;
+  gap: $d8x-spacing * 6;
   overflow-x: hidden;
 }
 
 .rightBlock {
   flex: 1;
-  max-width: 350px;
-  min-width: 350px;
-  margin-left: $d8x-spacing * 2.5;
+  max-width: 410px;
+  min-width: 410px;
+  margin-left: $d8x-spacing * 6;
   display: flex;
-  gap: 10px;
+  gap: $d8x-spacing * 6;
   flex-direction: column;
 }
 
@@ -68,8 +68,8 @@
 
 @media screen and ($d8x-breakpoint-max-lg) {
   .rightBlock {
-    max-width: 350px;
-    min-width: 350px;
+    max-width: 410px;
+    min-width: 410px;
   }
 }
 

@@ -1,8 +1,7 @@
 import { useAtom } from 'jotai';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
-
-import { Button } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { LiFiWidgetHolder } from 'components/li-fi-widget-modal/li-fi-widget/LiFiWidgetHolder';
@@ -17,22 +16,22 @@ export const LiFiWidgetModal = () => {
 
   const [isOpen, setOpen] = useAtom(lifiModalOpenAtom);
 
+  const onClose = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
   if (!isConnected) {
     return null;
   }
 
-  const onClose = () => setOpen(false);
-
   return (
-    <Dialog open={isOpen} onCloseClick={onClose}>
-      <div className={styles.dialogContent}>
-        {isOpen && <LiFiWidgetHolder />}
-        <div className={styles.buttonsBlock}>
-          <Button variant="secondary" className={styles.closeButton} onClick={onClose}>
-            {t('common.info-modal.close')}
-          </Button>
-        </div>
-      </div>
+    <Dialog
+      open={isOpen}
+      onCloseClick={onClose}
+      dialogTitle={t('common.swap-bridge')}
+      dialogContentClassName={styles.dialogContent}
+    >
+      {isOpen && <LiFiWidgetHolder />}
     </Dialog>
   );
 };

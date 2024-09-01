@@ -188,6 +188,7 @@
       },
       "history-table": {
         "table-title": "Historial de Órdenes",
+        "body": "",
         "table-header": {
           "time": "Fecha",
           "perpetual": "Perpetuo",
@@ -226,6 +227,8 @@
           "short": "Venta"
         },
         "prediction": {
+          "title": "Mercado de predicciones",
+          "note": "¡Predice el resultado y comienza a apostar ahora!",
           "yes": "Si",
           "no": "No",
           "bet": "Apuesta"
@@ -751,7 +754,10 @@
     "deposit-gas": "Deposite gasolina",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "Ver todo",
     "max": "Max:",
+    "yes": "Sí",
+    "no": "No",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",
     "page-reload": {
@@ -863,8 +869,8 @@
         "crypto": "Cripto",
         "fx": "FX",
         "all": "Todos",
-        "prediction": "Predicción",
-        "commodity": "Productos Basicos",
+        "polymarket": "Predicción",
+        "metal": "Productos Basicos",
         "closed": "Cerrado"
       },
       "search": "Buscar...",

@@ -3,35 +3,43 @@
 .root {
   width: 100%;
   display: flex;
-  gap: 3 * $d8x-spacing;
+  gap: 4 * $d8x-spacing;
 }
 
 .statContainer {
   flex: 1;
-  padding: $d8x-spacing * 4 $d8x-spacing * 6;
+  padding: 0 $d8x-spacing * 6;
   border-radius: $d8x-border-radius;
   background-color: var(--d8x-color-background-items);
-  height: 72px;
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   @include media-desktop {
-    height: 64px;
+    height: 72px;
   }
+}
+
+.statValueContainer {
+  display: flex;
+  align-items: center;
 }
 
 .midPriceContainer {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* Align the number at the bottom */
+  justify-content: flex-end;
 }
 
 .statLabel {
   display: block;
   white-space: nowrap;
-  margin-top: $d8x-spacing * 2;
-  margin-bottom: calc($d8x-spacing / 2);
+  margin-bottom: $d8x-spacing * 3;
   color: var(--d8x-color-text-label-one);
   min-width: 50px;
   line-height: 12px;
+  font-size: 14px;
 
   &.tooltip {
     cursor: pointer;
@@ -42,17 +50,17 @@
 
 .statValue {
   display: inline-block;
-  color: var(--d8x-color-text-highlight);
   white-space: nowrap;
   font-weight: 600;
+  font-size: 24px;
 }
 
 .statCurrency {
   display: inline-block;
-  color: var(--d8x-color-text-highlight);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 14px;
   margin-left: 4px;
+  text-align: center;
 }
 
 .iconButton {
@@ -73,12 +81,6 @@
   }
 }
 
-@media screen and ($d8x-breakpoint-min-sm) and ($d8x-breakpoint-max-lg) {
-  .statValue {
-    font-size: 16px;
-  }
-}
-
 @media screen and ($d8x-breakpoint-max-md) {
   .root {
     margin-top: $d8x-spacing * 3;
@@ -95,7 +97,7 @@
   }
 
   .statValue {
-    font-size: 14px;
+    font-size: 18px;
   }
 
   .statContainer {

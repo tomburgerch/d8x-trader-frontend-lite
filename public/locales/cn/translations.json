@@ -188,6 +188,7 @@
       },
       "history-table": {
         "table-title": "交易历史",
+        "body": "",
         "table-header": {
           "time": "时间",
           "perpetual": "永续",
@@ -226,6 +227,8 @@
           "short": "开空"
         },
         "prediction": {
+          "title": "預測市場",
+          "note": "预测结果并立即开始投注！",
           "yes": "是的",
           "no": "不",
           "bet": "Bet"
@@ -751,7 +754,10 @@
     "deposit-gas": "存入燃料",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "view-all": "看全部",
     "max": "最大：",
+    "yes": "是的",
+    "no": "不",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",
     "page-reload": {
@@ -863,8 +869,8 @@
         "crypto": "加密货币",
         "fx": "外汇",
         "all": "所有",
-        "prediction": "预测的过程",
-        "commodity": "大宗商品",
+        "polymarket": "预测的过程",
+        "metal": "大宗商品",
         "closed": "休市"
       },
       "search": " 搜索...",
