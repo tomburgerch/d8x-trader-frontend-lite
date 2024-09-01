@@ -9,7 +9,6 @@ import { CustomPriceSelector } from 'components/custom-price-selector/CustomPric
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { parseSymbol } from 'helpers/parseSymbol';
 import { OrderSideE, OrderValueTypeE, StopLossE } from 'types/enums';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
@@ -31,8 +30,6 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
 
   const [stopLoss, setStopLoss] = useState<StopLossE | null>(null);
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null | undefined>(undefined);
-
-  const parsedSymbol = parseSymbol(position.symbol);
 
   const handleStopLossPriceChange = (stopLossPriceValue: string) => {
     if (stopLossPriceValue !== '') {
@@ -145,7 +142,7 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
 
   return (
     <div className={styles.root}>
-      <CustomPriceSelector<StopLossE>
+      <CustomPriceSelector
         id="custom-stop-loss-price"
         label={
           <InfoLabelBlock
@@ -159,14 +156,9 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
             }
           />
         }
-        options={Object.values(StopLossE)}
-        translationMap={translationMap}
-        handlePriceChange={handleStopLossChange}
         handleInputPriceChange={handleStopLossPriceChange}
         validateInputPrice={validateStopLossPrice}
         selectedInputPrice={stopLoss !== StopLossE.None ? stopLossInputPrice : null}
-        selectedPrice={stopLoss}
-        currency={parsedSymbol?.quoteCurrency}
         stepSize={stepSize}
         disabled={disabled}
         inline={true}

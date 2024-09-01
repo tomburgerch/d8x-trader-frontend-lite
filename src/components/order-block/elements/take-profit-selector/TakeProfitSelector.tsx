@@ -33,7 +33,7 @@ export const TakeProfitSelector = memo(() => {
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const { handleTakeProfitPriceChange, handleTakeProfitChange, validateTakeProfitPrice, midPrice } = useTakeProfit();
+  const { handleTakeProfitPriceChange, validateTakeProfitPrice, midPrice } = useTakeProfit();
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
 
@@ -94,17 +94,9 @@ export const TakeProfitSelector = memo(() => {
     return `${Math.round(100 * percent)}%`;
   }, [midPrice, takeProfitInputPrice, orderInfo?.leverage]);
 
-  const translationMap: Record<TakeProfitE, string> = {
-    [TakeProfitE.None]: t('pages.trade.order-block.take-profit.none'),
-    [TakeProfitE['5%']]: '5%',
-    [TakeProfitE['50%']]: '50%',
-    [TakeProfitE['100%']]: '100%',
-    [TakeProfitE['500%']]: '500%',
-  };
-
   return (
     <>
-      <CustomPriceSelector<TakeProfitE>
+      <CustomPriceSelector
         id="custom-take-profit-price"
         label={
           <InfoLabelBlock
@@ -118,13 +110,9 @@ export const TakeProfitSelector = memo(() => {
             }
           />
         }
-        options={Object.values(TakeProfitE)}
-        translationMap={translationMap}
-        handlePriceChange={handleTakeProfitChange}
         handleInputPriceChange={handleTakeProfitPriceChange}
         validateInputPrice={validateTakeProfitPrice}
         selectedInputPrice={takeProfitInputPrice}
-        selectedPrice={takeProfit}
         stepSize={stepSize}
         disabled={isDisabled}
         percentComponent={

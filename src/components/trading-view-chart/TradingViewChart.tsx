@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { type CandlestickData, type ISeriesApi, type Time } from 'lightweight-charts';
+import { type CandlestickData, IPriceLine, type ISeriesApi, type Time } from 'lightweight-charts';
 import { memo, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material';
@@ -18,94 +19,160 @@ import styles from './TradingViewChart.module.scss';
 interface TradingViewChartPropsI {
   onlyChart?: boolean;
   height?: number;
+  takeProfitPrice?: number | null;
+  stopLossPrice?: number | null;
 }
 
-export const TradingViewChart = memo(({ onlyChart = false, height }: TradingViewChartPropsI) => {
-  const theme = useTheme();
-  const isUpFromMobileScreen = useMediaQuery(theme.breakpoints.up('sm'));
+export const TradingViewChart = memo(
+  ({ onlyChart = false, height, takeProfitPrice, stopLossPrice }: TradingViewChartPropsI) => {
+    const { t } = useTranslation();
 
-  const candles = useAtomValue(candlesAtom);
-  const isCandleDataReady = useAtomValue(candlesDataReadyAtom);
-  const [newCandle, setNewCandle] = useAtom(newCandleAtom);
+    const theme = useTheme();
+    const isUpFromMobileScreen = useMediaQuery(theme.breakpoints.up('sm'));
 
-  const seriesRef = useRef<ISeriesApi<'Candlestick'>>(null);
-  const latestCandleTimeRef = useRef<Time>();
+    const candles = useAtomValue(candlesAtom);
+    const isCandleDataReady = useAtomValue(candlesDataReadyAtom);
+    const [newCandle, setNewCandle] = useAtom(newCandleAtom);
 
-  const { width, ref } = useResizeDetector();
+    const takeProfitPriceLineRef = useRef<IPriceLine | null>(null);
+    const stopLossPriceLineRef = useRef<IPriceLine | null>(null);
+    const seriesRef = useRef<ISeriesApi<'Candlestick'>>(null);
+    const latestCandleTimeRef = useRef<Time>();
 
-  const candlesWithLocalTime: CandlestickData[] = useMemo(
-    () =>
-      candles.map((candle) => ({
-        ...candle,
-        start: candle.start + TIMEZONE_OFFSET * ONE_MINUTE_TIME,
-        time: (candle.time + TIMEZONE_OFFSET * ONE_MINUTE_SECONDS) as Time,
-      })),
-    [candles]
-  );
+    const { width, ref } = useResizeDetector();
 
-  useEffect(() => {
-    if (newCandle == null || !seriesRef.current || !latestCandleTimeRef.current) {
-      return;
-    }
+    const candlesWithLocalTime: CandlestickData[] = useMemo(
+      () =>
+        candles.map((candle) => ({
+          ...candle,
+          start: candle.start + TIMEZONE_OFFSET * ONE_MINUTE_TIME,
+          time: (candle.time + TIMEZONE_OFFSET * ONE_MINUTE_SECONDS) as Time,
+        })),
+      [candles]
+    );
 
-    const latestCandleTime = latestCandleTimeRef.current || 0;
-    const newCandleTime = (newCandle.time + TIMEZONE_OFFSET * ONE_MINUTE_SECONDS) as Time;
-    if (newCandleTime >= latestCandleTime) {
-      seriesRef.current.update({
-        ...newCandle,
-        time: newCandleTime,
+    const buyColor = useMemo(() => {
+      return getComputedStyle(document.documentElement).getPropertyValue('--d8x-color-text-buy') || '#089981';
+    }, []);
+
+    const sellColor = useMemo(() => {
+      return getComputedStyle(document.documentElement).getPropertyValue('--d8x-color-text-sell') || '#f23645';
+    }, []);
+
+    useEffect(() => {
+      if (newCandle == null || !seriesRef.current || !latestCandleTimeRef.current) {
+        return;
+      }
+
+      const latestCandleTime = latestCandleTimeRef.current || 0;
+      const newCandleTime = (newCandle.time + TIMEZONE_OFFSET * ONE_MINUTE_SECONDS) as Time;
+      if (newCandleTime >= latestCandleTime) {
+        seriesRef.current.update({
+          ...newCandle,
+          time: newCandleTime,
+        });
+        latestCandleTimeRef.current = newCandleTime;
+      }
+
+      setNewCandle(null);
+    }, [newCandle, setNewCandle]);
+
+    useEffect(() => {
+      if (!seriesRef.current) {
+        return;
+      }
+
+      if (takeProfitPriceLineRef.current) {
+        seriesRef.current.removePriceLine(takeProfitPriceLineRef.current);
+      }
+
+      if (takeProfitPrice) {
+        takeProfitPriceLineRef.current = seriesRef.current.createPriceLine({
+          price: takeProfitPrice,
+          color: buyColor,
+          lineWidth: 2,
+          axisLabelVisible: true,
+          title: t('pages.trade.order-block.take-profit.title'),
+        });
+      }
+
+      seriesRef.current.applyOptions({
+        lastValueVisible: false,
+        priceLineVisible: true,
       });
-      latestCandleTimeRef.current = newCandleTime;
-    }
+    }, [takeProfitPrice, buyColor, t]);
 
-    setNewCandle(null);
-  }, [newCandle, setNewCandle]);
+    useEffect(() => {
+      if (!seriesRef.current) {
+        return;
+      }
 
-  useEffect(() => {
-    if (candlesWithLocalTime.length > 0) {
-      latestCandleTimeRef.current = candlesWithLocalTime[candlesWithLocalTime.length - 1].time;
-    } else {
-      latestCandleTimeRef.current = undefined;
-    }
-  }, [candlesWithLocalTime]);
+      if (stopLossPriceLineRef.current) {
+        seriesRef.current.removePriceLine(stopLossPriceLineRef.current);
+      }
 
-  const precision = useMemo(() => {
-    let numberDigits;
-    if (candlesWithLocalTime.length > 0) {
-      const open = candlesWithLocalTime[0].open;
-      numberDigits = valueToFractionDigits(open);
-    } else {
-      numberDigits = 3;
-    }
-    return numberDigits;
-  }, [candlesWithLocalTime]);
+      if (stopLossPrice) {
+        stopLossPriceLineRef.current = seriesRef.current.createPriceLine({
+          price: stopLossPrice,
+          color: sellColor,
+          lineWidth: 2,
+          axisLabelVisible: true,
+          title: t('pages.trade.order-block.stop-loss.title'),
+        });
+      }
 
-  return (
-    <div className={styles.root} ref={ref}>
-      {!onlyChart && (
-        <div className={styles.heading}>
-          {isUpFromMobileScreen && (
-            <div className={styles.selectHolder}>
-              <MarketSelect />
+      seriesRef.current.applyOptions({
+        lastValueVisible: false,
+        priceLineVisible: true,
+      });
+    }, [stopLossPrice, sellColor, t]);
+
+    useEffect(() => {
+      if (candlesWithLocalTime.length > 0) {
+        latestCandleTimeRef.current = candlesWithLocalTime[candlesWithLocalTime.length - 1].time;
+      } else {
+        latestCandleTimeRef.current = undefined;
+      }
+    }, [candlesWithLocalTime]);
+
+    const precision = useMemo(() => {
+      let numberDigits;
+      if (candlesWithLocalTime.length > 0) {
+        const open = candlesWithLocalTime[0].open;
+        numberDigits = valueToFractionDigits(open);
+      } else {
+        numberDigits = 3;
+      }
+      return numberDigits;
+    }, [candlesWithLocalTime]);
+
+    return (
+      <div className={styles.root} ref={ref}>
+        {!onlyChart && (
+          <div className={styles.heading}>
+            {isUpFromMobileScreen && (
+              <div className={styles.selectHolder}>
+                <MarketSelect />
+              </div>
+            )}
+            <div className={styles.periodsHolder}>
+              <PeriodSelector />
             </div>
-          )}
-          <div className={styles.periodsHolder}>
-            <PeriodSelector />
           </div>
-        </div>
-      )}
-      <ChartBlock
-        width={width}
-        height={height}
-        candles={candlesWithLocalTime}
-        seriesRef={seriesRef}
-        numberDigits={precision}
-      />
-      {!isCandleDataReady && (
-        <div className={styles.loaderHolder}>
-          <CircularProgress color="primary" />
-        </div>
-      )}
-    </div>
-  );
-});
+        )}
+        <ChartBlock
+          width={width}
+          height={height}
+          candles={candlesWithLocalTime}
+          seriesRef={seriesRef}
+          numberDigits={precision}
+        />
+        {!isCandleDataReady && (
+          <div className={styles.loaderHolder}>
+            <CircularProgress color="primary" />
+          </div>
+        )}
+      </div>
+    );
+  }
+);

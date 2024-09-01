@@ -33,7 +33,7 @@ export const StopLossSelector = memo(() => {
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const { handleStopLossPriceChange, handleStopLossChange, validateStopLossPrice, midPrice } = useStopLoss();
+  const { handleStopLossPriceChange, validateStopLossPrice, midPrice } = useStopLoss();
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
 
@@ -92,17 +92,9 @@ export const StopLossSelector = memo(() => {
     return `${Math.round(100 * percent)}%`;
   }, [midPrice, stopLossInputPrice, orderInfo?.leverage]);
 
-  const translationMap: Record<StopLossE, string> = {
-    [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),
-    [StopLossE['5%']]: '5%',
-    [StopLossE['25%']]: '25%',
-    [StopLossE['50%']]: '50%',
-    [StopLossE['75%']]: '75%',
-  };
-
   return (
     <>
-      <CustomPriceSelector<StopLossE>
+      <CustomPriceSelector
         id="custom-stop-loss-price"
         label={
           <InfoLabelBlock
@@ -116,13 +108,9 @@ export const StopLossSelector = memo(() => {
             }
           />
         }
-        options={Object.values(StopLossE)}
-        translationMap={translationMap}
-        handlePriceChange={handleStopLossChange}
         handleInputPriceChange={handleStopLossPriceChange}
         validateInputPrice={validateStopLossPrice}
         selectedInputPrice={stopLossInputPrice}
-        selectedPrice={stopLoss}
         stepSize={stepSize}
         disabled={isDisabled}
         percentComponent={

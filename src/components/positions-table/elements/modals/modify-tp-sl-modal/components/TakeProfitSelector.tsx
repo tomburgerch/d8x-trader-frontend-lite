@@ -9,7 +9,6 @@ import { CustomPriceSelector } from 'components/custom-price-selector/CustomPric
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { parseSymbol } from 'helpers/parseSymbol';
 import { OrderSideE, OrderValueTypeE, TakeProfitE } from 'types/enums';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
@@ -31,8 +30,6 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled
 
   const [takeProfit, setTakeProfit] = useState<TakeProfitE | null>(null);
   const [takeProfitInputPrice, setTakeProfitInputPrice] = useState<number | null | undefined>(undefined);
-
-  const parsedSymbol = parseSymbol(position.symbol);
 
   const handleTakeProfitPriceChange = (takeProfitPriceValue: string) => {
     if (takeProfitPriceValue !== '') {
@@ -145,7 +142,7 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled
 
   return (
     <div className={styles.root}>
-      <CustomPriceSelector<TakeProfitE>
+      <CustomPriceSelector
         id="custom-take-profit-price"
         label={
           <InfoLabelBlock
@@ -159,14 +156,9 @@ export const TakeProfitSelector = memo(({ setTakeProfitPrice, position, disabled
             }
           />
         }
-        options={Object.values(TakeProfitE)}
-        translationMap={translationMap}
-        handlePriceChange={handleTakeProfitChange}
         handleInputPriceChange={handleTakeProfitPriceChange}
         validateInputPrice={validateTakeProfitPrice}
         selectedInputPrice={takeProfit !== TakeProfitE.None ? takeProfitInputPrice : null}
-        selectedPrice={takeProfit}
-        currency={parsedSymbol?.quoteCurrency}
         stepSize={stepSize}
         disabled={disabled}
         inline={true}
