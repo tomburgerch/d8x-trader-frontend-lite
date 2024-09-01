@@ -5,12 +5,20 @@
   display: flex;
   justify-content: flex-start;
   gap: 2 * $d8x-spacing;
+
+  :global(.MuiButtonBase-root) {
+    padding: $d8x-spacing * 2;
+    min-width: 1px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 400;
+  }
 }
 
 .option {
   @include transition(all);
 
-  padding: $d8x-spacing $d8x-spacing * 3;
+  padding: $d8x-spacing * 2;
   border-radius: $d8x-button-border-radius;
   border: 1px solid var(--d8x-color-action);
   font-size: 12px;
@@ -21,4 +29,10 @@
     background-color: var(--d8x-color-action-secondary);
     border-color: var(--d8x-color-action);
   }
+}
+
+.active {
+  color: var(--d8x-button-secondary-color-selected);
+  border-color: var(--d8x-button-secondary-border-color-selected);
+  background-color: var(--d8x-button-secondary-background-selected);
 }
