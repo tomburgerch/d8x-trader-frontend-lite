@@ -53,7 +53,8 @@ export const Filters = memo(() => {
           key={option.value}
           variant="outlined"
           className={classnames({
-            [styles.active]: groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All),
+            [styles.selected]:
+              groupFilter === option.value || (groupFilter === null && option.value === AssetTypeE.All),
           })}
           onClick={() => handleClick(option.value)}
         >

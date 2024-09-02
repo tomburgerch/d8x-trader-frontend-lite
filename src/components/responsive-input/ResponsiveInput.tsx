@@ -26,6 +26,7 @@ interface ResponsiveInputPropsI {
   adornmentAction?: ReactNode;
   disabled?: boolean;
   type?: InputE;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 export const ResponsiveInput = memo((props: ResponsiveInputPropsI) => {

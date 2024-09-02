@@ -41,6 +41,24 @@
   justify-content: space-between;
   align-items: center;
   gap: 4 * $d8x-spacing;
+
+  input[type='number'] {
+    -moz-appearance: auto !important;
+    -webkit-appearance: auto !important;
+    appearance: auto !important;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: auto !important;
+      margin: initial;
+    }
+
+    &::-moz-inner-spin-button,
+    &::-moz-outer-spin-button {
+      -moz-appearance: auto !important;
+      margin: initial;
+    }
+  }
 }
 
 .inputHolder {
