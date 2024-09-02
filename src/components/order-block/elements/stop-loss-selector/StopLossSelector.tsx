@@ -118,6 +118,7 @@ export const StopLossSelector = memo(() => {
             {calculatedPercent}
           </div>
         }
+        className={styles.customPriceSelector}
       />
 
       <CustomPriceModal />

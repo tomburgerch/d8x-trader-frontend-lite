@@ -79,6 +79,7 @@ export const CollateralSelect = () => {
       }
       anchorEl={anchorEl}
       setAnchorEl={setAnchorEl}
+      className={styles.collateralButton}
     >
       {currencyOptions.map((option) => (
         <ButtonMenuItem

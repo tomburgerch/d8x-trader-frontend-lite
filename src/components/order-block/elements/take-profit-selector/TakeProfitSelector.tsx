@@ -120,6 +120,7 @@ export const TakeProfitSelector = memo(() => {
             {calculatedPercent}
           </div>
         }
+        className={styles.customPriceSelector}
       />
 
       <CustomPriceModal />

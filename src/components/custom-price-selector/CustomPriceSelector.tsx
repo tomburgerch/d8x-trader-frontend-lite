@@ -16,6 +16,7 @@ interface CustomPriceSelectorPropsI {
   disabled?: boolean;
   inline?: boolean;
   percentComponent?: ReactNode;
+  className?: string;
 }
 
 export const CustomPriceSelector = ({
@@ -28,8 +29,9 @@ export const CustomPriceSelector = ({
   disabled = false,
   inline = false,
   percentComponent,
+  className,
 }: CustomPriceSelectorPropsI) => (
-  <div className={classnames(styles.root, { [styles.inline]: inline })}>
+  <div className={classnames(styles.root, className, { [styles.inline]: inline })}>
     <div className={styles.labelHolder}>{label}</div>
     <div className={styles.inputHolder}>
       <ResponsiveInput
