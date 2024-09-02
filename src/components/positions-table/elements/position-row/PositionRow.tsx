@@ -93,7 +93,7 @@ export const PositionRow = memo(
               </TableCell>
             )}
             {perpetualState?.state === 'CLEARED' && (
-              <TableCell>
+              <TableCell align="center" colSpan={4}>
                 <Button
                   onClick={() => handlePositionClaim(position)}
                   variant="secondary"
