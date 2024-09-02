@@ -144,7 +144,7 @@ export const OrderSize = memo(() => {
 
   const fetchMaxOrderSize = useCallback(
     async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
-      if (!traderAPI || fetchedMaxSizes.current) {
+      if (!traderAPI || fetchedMaxSizes.current || selectedPerpetual?.state !== 'NORMAL') {
         return;
       }
 
@@ -170,7 +170,7 @@ export const OrderSize = memo(() => {
       }
       return maxAmount < _lotSizeBC ? 0 : +roundToLotString(maxAmount, _lotSizeBC);
     },
-    [traderAPI]
+    [traderAPI, selectedPerpetual]
   );
 
   const refetchMaxOrderSize = useCallback(

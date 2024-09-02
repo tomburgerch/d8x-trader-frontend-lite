@@ -252,7 +252,7 @@ export const ActionBlock = memo(() => {
   };
 
   const isBuySellButtonActive = useMemo(() => {
-    if (!orderInfo || !address || !isEnabledChain(chainId)) {
+    if (!orderInfo || !address || !isEnabledChain(chainId) || selectedPerpetual?.state !== 'NORMAL') {
       return false;
     }
     if (!orderInfo.size || !perpetualStaticInfo?.lotSizeBC || orderInfo.size < perpetualStaticInfo.lotSizeBC) {
@@ -262,7 +262,7 @@ export const ActionBlock = memo(() => {
       return false;
     }
     return !(orderInfo.orderType === OrderTypeE.Stop && (!orderInfo.triggerPrice || orderInfo.triggerPrice <= 0));
-  }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC]);
+  }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC, selectedPerpetual?.state]);
 
   const validityCheckButtonType = useMemo(() => {
     if (!address || !orderInfo) {

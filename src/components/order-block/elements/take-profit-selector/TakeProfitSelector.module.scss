@@ -14,3 +14,7 @@
   background-color: rgba(var(--d8x-color-background-buy-rgb), 0.1);
   color: rgba(var(--d8x-color-background-buy-rgb), 1);
 }
+
+.customPriceSelector {
+  background-color: var(--d8x-color-background-card-overlay) !important;
+}

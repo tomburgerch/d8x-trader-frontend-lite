@@ -3,7 +3,7 @@ import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Button, Box, IconButton, Typography } from '@mui/material';
 
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { calculateProbability } from 'helpers/calculateProbability';
@@ -24,6 +24,7 @@ interface PositionRowPropsI {
   handlePositionModify: (position: MarginAccountWithAdditionalDataI) => void;
   handlePositionShare: (position: MarginAccountWithAdditionalDataI) => void;
   handleTpSlModify: (position: MarginAccountWithAdditionalDataI) => void;
+  handlePositionClaim: (position: MarginAccountWithAdditionalDataI) => void;
 }
 
 export const PositionBlock = memo(
@@ -34,6 +35,7 @@ export const PositionBlock = memo(
     handlePositionModify,
     handlePositionShare,
     handleTpSlModify,
+    handlePositionClaim,
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
@@ -58,7 +60,10 @@ export const PositionBlock = memo(
     }, [position, parsedSymbol, isPredictionMarket]);
 
     const isSettlementInProgress = useMemo(() => {
-      return perpetualState?.state === 'SETTLE' || (isPredictionMarket && perpetualState?.state === 'EMERGENCY');
+      return (
+        ['SETTLE', 'CLEARED'].includes(perpetualState?.state || '') ||
+        (isPredictionMarket && perpetualState?.state === 'EMERGENCY')
+      );
     }, [isPredictionMarket, perpetualState]);
 
     return (
@@ -170,9 +175,18 @@ export const PositionBlock = memo(
           )}
         </Box>
         {isSettlementInProgress && (
-          <Typography variant="bodySmall" align={'center'} component="p" className={styles.symbol}>
-            Settlement in progress...
-          </Typography>
+          <>
+            {perpetualState?.state !== 'CLEARED' && (
+              <Typography variant="bodySmall" align="center" component="p" className={styles.symbol}>
+                Settlement in progress...
+              </Typography>
+            )}
+            {perpetualState?.state === 'CLEARED' && (
+              <Button onClick={() => handlePositionClaim(position)} variant="secondary" className={styles.actionButton}>
+                {t('pages.trade.positions-table.modify-modal.claim')}
+              </Button>
+            )}
+          </>
         )}
       </Box>
     );

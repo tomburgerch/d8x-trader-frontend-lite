@@ -67,6 +67,8 @@
             "remove": "Retirer"
           },
           "close": "Fermer la position",
+          "claim": "Retirer votre argent",
+          "claim-details": "Ce marché est terminé et est en cours de règlement. Réclamez vos fonds maintenant.",
           "share": "Partager la position",
           "add": "Ajouter du collatéral",
           "remove": "Retirer du collatéral",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Soumission de l'ordre de clôture"
+          },
+          "submit-claim": {
+            "title": "Réclamation des fonds"
           },
           "submitted": {
             "title": "Ordre soumis",

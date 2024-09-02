@@ -173,7 +173,7 @@ export const MarketSelect = memo(() => {
       return (
         market.item.state === 'NORMAL' ||
         (market.item.marketData?.assetType === AssetTypeE.Prediction &&
-          ['NORMAL', 'EMERGENCY', 'SETTLE'].includes(market.item.state))
+          ['NORMAL', 'EMERGENCY', 'SETTLE', 'CLEARED'].includes(market.item.state))
       );
     });
   }, [pools, marketsData, orderBlock, traderAPI]);

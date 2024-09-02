@@ -67,6 +67,8 @@
             "remove": "Remover"
           },
           "close": "Cerrar Posición",
+          "claim": "Retirar tu dinero",
+          "claim-details": "Este mercado ha terminado y se está liquidando. Reclama tus fondos ahora.",
           "share": "Compartir posición",
           "add": "Añadir Margen",
           "remove": "Remover Margen",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Cerrando Posición"
+          },
+          "submit-claim": {
+            "title": "Reclamando fondos"
           },
           "submitted": {
             "title": "Orden Confirmada",
