@@ -67,6 +67,8 @@
             "remove": "减少"
           },
           "close": "关闭仓位",
+          "claim": "领取您的资金",
+          "claim-details": "该市场已结束并正在结算。立即领取您的资金。",
           "share": "分享仓位",
           "add": "增加抵押品",
           "remove": "减少抵押品",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "确认平仓"
+          },
+          "submit-claim": {
+            "title": "领取资金"
           },
           "submitted": {
             "title": "订单已提交",

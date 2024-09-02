@@ -67,6 +67,8 @@
             "remove": "Remove"
           },
           "close": "Close position",
+          "claim": "Claim funds",
+          "claim-details": "This market ended and is being settled. Claim your funds now.",
           "share": "Share position",
           "add": "Add collateral",
           "remove": "Remove collateral",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Submitting Closing Order"
+          },
+          "submit-claim": {
+            "title": "Claiming Funds"
           },
           "submitted": {
             "title": "Order Submitted",

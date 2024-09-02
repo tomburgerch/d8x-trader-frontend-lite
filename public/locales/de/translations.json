@@ -67,6 +67,8 @@
             "remove": "Entfernen"
           },
           "close": "Position schliessen",
+          "claim": "Geld abheben",
+          "claim-details": "Dieser Markt ist beendet und wird abgerechnet. Heben Sie jetzt Ihre Gelder ab.",
           "share": "Position teilen",
           "add": "Sicherheit hinzufügen",
           "remove": "Sicherheit entfernen",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Abschicken der Schliess Order"
+          },
+          "submit-claim": {
+            "title": "Einfordern von Geldern"
           },
           "submitted": {
             "title": "Order abgeschickt",

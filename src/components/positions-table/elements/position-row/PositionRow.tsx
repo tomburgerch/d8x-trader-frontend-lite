@@ -3,7 +3,7 @@ import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeleteForeverOutlined, ModeEditOutlineOutlined, ShareOutlined } from '@mui/icons-material';
-import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
+import { Button, IconButton, TableCell, TableRow, Typography } from '@mui/material';
 
 import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
@@ -22,6 +22,7 @@ interface PositionRowPropsI {
   handlePositionModify: (position: MarginAccountWithAdditionalDataI) => void;
   handlePositionShare: (position: MarginAccountWithAdditionalDataI) => void;
   handleTpSlModify: (position: MarginAccountWithAdditionalDataI) => void;
+  handlePositionClaim: (position: MarginAccountWithAdditionalDataI) => void;
 }
 
 export const PositionRow = memo(
@@ -31,6 +32,7 @@ export const PositionRow = memo(
     handlePositionModify,
     handlePositionShare,
     handleTpSlModify,
+    handlePositionClaim,
   }: PositionRowPropsI) => {
     const { t } = useTranslation();
 
@@ -85,15 +87,17 @@ export const PositionRow = memo(
             <TableCell align="center" colSpan={4}>
               <Typography variant="cellSmall">Settlement in progress...</Typography>
             </TableCell>
-            <TableCell>
-              <IconButton
-                aria-label={t('pages.trade.positions-table.table-content.share')}
-                title={t('pages.trade.positions-table.modify-modal.share')}
-                onClick={() => handlePositionShare(position)}
-              >
-                <ShareOutlined className={styles.actionIcon} />
-              </IconButton>
-            </TableCell>
+            {perpetualState?.state === 'SETTLE' && (
+              <TableCell>
+                <Button
+                  onClick={() => handlePositionClaim(position)}
+                  variant="secondary"
+                  className={styles.actionButton}
+                >
+                  {'Claim funds'}
+                </Button>
+              </TableCell>
+            )}
           </>
         ) : (
           <>
