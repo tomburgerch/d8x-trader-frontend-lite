@@ -87,7 +87,7 @@ declare module '@mui/material/Button' {
 
 const MuiButtonSharedStyle = {
   minWidth: '140px',
-  transition: 'ease-in 150ms',
+  transition: 'ease-in 125ms',
   borderRadius: '8px',
   padding: '10px 20px 8px',
   fontSize: '14px',
@@ -347,7 +347,7 @@ export const theme = createTheme({
         {
           props: { variant: 'outlined' },
           style: {
-            transition: 'ease-in 150ms',
+            transition: 'ease-in 125ms',
             borderRadius: '8px',
             padding: '7px 8px',
             fontSize: '12px',
