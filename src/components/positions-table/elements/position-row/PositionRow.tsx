@@ -99,7 +99,7 @@ export const PositionRow = memo(
                   variant="secondary"
                   className={styles.actionButton}
                 >
-                  {'Claim funds'}
+                  {t('pages.trade.positions-table.modify-modal.claim')}
                 </Button>
               </TableCell>
             )}

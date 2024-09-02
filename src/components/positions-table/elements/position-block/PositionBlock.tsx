@@ -183,7 +183,7 @@ export const PositionBlock = memo(
             )}
             {perpetualState?.state === 'CLEARED' && (
               <Button onClick={() => handlePositionClaim(position)} variant="secondary" className={styles.actionButton}>
-                {'Claim funds'}
+                {t('pages.trade.positions-table.modify-modal.claim')}
               </Button>
             )}
           </>
