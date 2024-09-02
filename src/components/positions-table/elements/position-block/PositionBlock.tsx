@@ -60,7 +60,10 @@ export const PositionBlock = memo(
     }, [position, parsedSymbol, isPredictionMarket]);
 
     const isSettlementInProgress = useMemo(() => {
-      return perpetualState?.state === 'SETTLE' || (isPredictionMarket && perpetualState?.state === 'EMERGENCY');
+      return (
+        ['SETTLE', 'CLEARED'].includes(perpetualState?.state || '') ||
+        (isPredictionMarket && perpetualState?.state === 'EMERGENCY')
+      );
     }, [isPredictionMarket, perpetualState]);
 
     return (
@@ -173,10 +176,12 @@ export const PositionBlock = memo(
         </Box>
         {isSettlementInProgress && (
           <>
-            <Typography variant="bodySmall" align="center" component="p" className={styles.symbol}>
-              Settlement in progress...
-            </Typography>
-            {perpetualState?.state === 'SETTLE' && (
+            {perpetualState?.state !== 'CLEARED' && (
+              <Typography variant="bodySmall" align="center" component="p" className={styles.symbol}>
+                Settlement in progress...
+              </Typography>
+            )}
+            {perpetualState?.state === 'CLEARED' && (
               <Button onClick={() => handlePositionClaim(position)} variant="secondary" className={styles.actionButton}>
                 {'Claim funds'}
               </Button>
