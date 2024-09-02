@@ -57,7 +57,10 @@ export const PositionRow = memo(
 
     const isSettlementInProgress = useMemo(() => {
       console.log(perpetualState?.baseCurrency, perpetualState?.state);
-      return perpetualState?.state === 'SETTLE' || (isPredictionMarket && perpetualState?.state === 'EMERGENCY');
+      return (
+        ['SETTLE', 'CLEARED'].includes(perpetualState?.state || '') ||
+        (isPredictionMarket && perpetualState?.state === 'EMERGENCY')
+      );
     }, [isPredictionMarket, perpetualState]);
 
     return (
@@ -84,10 +87,12 @@ export const PositionRow = memo(
         </TableCell>
         {isSettlementInProgress ? (
           <>
-            <TableCell align="center" colSpan={4}>
-              <Typography variant="cellSmall">Settlement in progress...</Typography>
-            </TableCell>
-            {perpetualState?.state === 'SETTLE' && (
+            {perpetualState?.state !== 'CLEARED' && (
+              <TableCell align="center" colSpan={4}>
+                <Typography variant="cellSmall">Settlement in progress...</Typography>
+              </TableCell>
+            )}
+            {perpetualState?.state === 'CLEARED' && (
               <TableCell>
                 <Button
                   onClick={() => handlePositionClaim(position)}
