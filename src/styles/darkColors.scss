@@ -11,10 +11,10 @@
   --d8x-color-text-buy: #089981;
   --d8x-color-text-sell: #f23645;
   --d8x-color-box-shadow: rgba(102, 74, 223, 0.1);
-  --d8x-color-background: #201b35;
+  --d8x-color-background: #0C0818;
   --d8x-color-background-paper: #100612;
-  --d8x-color-background-page-rgb: 102, 74, 223;
-  --d8x-color-background-items: #111216;
+  --d8x-color-background-page-rgb: 12, 8, 24, 1 ;
+  --d8x-color-background-items: #110E1D;
   --d8x-color-background-items-second: #7860e333;
   --d8x-color-background-items-selected: rgba(102, 74, 223, 0.1);
   --d8x-color-background-items-inactive: #2e2e2e;
@@ -50,7 +50,7 @@
   --d8x-color-background-table-even-row: var(--d8x-color-background-items);
   --d8x-color-text-table-header: var(--d8x-color-text-main);
   --d8x-color-text-table-cell: var(--d8x-color-text-highlight);
-  --d8x-color-action-icon: var(--d8x-color-action);
+  --d8x-color-action-icon: #fff;
   --d8x-color-background-primary: var(--d8x-color-action);
   --d8x-color-background-primary-hover: rgba(var(--d8x-color-action-rgb), 0.6);
   --d8x-color-background-primary-disabled: rgba(var(--d8x-color-background-buy-inactive-rgb), 0.5);
@@ -84,7 +84,7 @@
 
   //--Colors for currency icons
   --d8x-currency-icon-color: var(--d8x-color-action);
-  --d8x-currency-icon-background-color: #111216;
+  --d8x-currency-icon-background-color: #fff;
 
   //--Badges
   --d8x-badge-crypto-color: #027bf5;
@@ -113,12 +113,12 @@
   --d8x-button-primary-border-color-hover: var(--d8x-color-action);
   --d8x-button-primary-border-color-selected: var(--d8x-button-primary-border-color-hover);
   --d8x-button-primary-border-color-disabled: var(--d8x-color-action);
-  --d8x-button-secondary-color: var(--d8x-color-action);
-  --d8x-button-secondary-color-hover: var(--d8x-color-action);
+  --d8x-button-secondary-color: var(--d8x-color-text-secondary);
+  --d8x-button-secondary-color-hover: var(--d8x-color-text-secondary);
   --d8x-button-secondary-color-selected: var(--d8x-color-text-secondary);
   --d8x-button-secondary-color-disabled: var(--d8x-button-secondary-color);
-  --d8x-button-secondary-background: #e1e4fe;
-  --d8x-button-secondary-background-hover: #e1e4fe;
+  --d8x-button-secondary-background: #161123;
+  --d8x-button-secondary-background-hover: #161123;
   --d8x-button-secondary-background-selected: var(--d8x-color-action);
   --d8x-button-secondary-background-disabled: var(--d8x-color-background-items);
   --d8x-button-secondary-border-color: #e1e4fe;
@@ -142,7 +142,7 @@
   --d8x-button-outlined-color-selected: var(--d8x-button-outlined-color-hover);
   --d8x-button-outlined-color-disabled: var(--d8x-color-text-secondary);
   --d8x-button-outlined-background: rgba(var(--d8x-color-action-rgb), 0.2);
-  --d8x-button-outlined-background-hover: var(--d8x-color-action);
+  --d8x-button-outlined-background-hover: var(--d8x-button-outlined-background);
   --d8x-button-outlined-background-selected: var(--d8x-button-outlined-background-hover);
   --d8x-button-outlined-background-disabled: transparent;
   --d8x-button-outlined-border-color: rgba(var(--d8x-color-action-rgb), 0.2);
