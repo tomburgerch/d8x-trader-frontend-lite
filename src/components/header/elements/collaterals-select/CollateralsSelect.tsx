@@ -115,7 +115,7 @@ export const CollateralsSelect = memo(() => {
 
   return (
     <Box className={styles.holderRoot}>
-      <Box className={styles.iconWrapper}>
+      <Box className={styles.iconsWrapper}>
         <Suspense fallback={null}>
           <IconComponent />
         </Suspense>
