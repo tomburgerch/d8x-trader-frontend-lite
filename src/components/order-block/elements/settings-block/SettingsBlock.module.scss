@@ -6,6 +6,7 @@
   gap: 6 * $d8x-spacing;
   margin-top: 2 * $d8x-spacing;
   border-radius: $d8x-border-radius-medium;
+  border: 1px solid var(--d8x-block-border-color);
   background: var(--d8x-color-background-paper);
   padding: 3 * $d8x-spacing;
 }

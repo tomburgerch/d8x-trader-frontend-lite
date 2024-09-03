@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { ReactNode } from 'react';
 
 import {
   Box,
@@ -18,7 +19,6 @@ import { Separator } from 'components/separator/Separator';
 import { ErrorDialog } from './ErrorDialog';
 
 import styles from './Dialog.module.scss';
-import { ReactNode } from 'react';
 
 interface DialogPropsI extends DialogProps {
   dialogTitle: ReactNode;
@@ -63,7 +63,7 @@ export const Dialog = ({
           <DialogContent className={classnames(styles.dialogContent, dialogContentClassName)}>{children}</DialogContent>
           {footerActions && (
             <>
-              <Separator />
+              <Separator separatorType={SeparatorTypeE.Modal} />
               <DialogActions className={styles.dialogAction}>{footerActions}</DialogActions>
             </>
           )}

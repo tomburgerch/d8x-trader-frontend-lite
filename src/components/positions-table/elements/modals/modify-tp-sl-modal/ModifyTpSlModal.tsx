@@ -14,6 +14,7 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { ToastContent } from 'components/toast-content/ToastContent';
 import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
@@ -398,7 +399,7 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
           positionSize: formatToCurrency(selectedPosition.positionNotionalBaseCCY, parsedSymbol?.baseCurrency, true),
         })}
       </div>
-      <Separator />
+      <Separator separatorType={SeparatorTypeE.Modal} />
       <div className={styles.selectors}>
         <TakeProfitSelector setTakeProfitPrice={setTakeProfitPrice} position={selectedPosition} disabled={loading} />
         <StopLossSelector setStopLossPrice={setStopLossPrice} position={selectedPosition} disabled={loading} />
