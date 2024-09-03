@@ -11,10 +11,10 @@
   --d8x-color-text-buy: #089981;
   --d8x-color-text-sell: #f23645;
   --d8x-color-box-shadow: rgba(102, 74, 223, 0.1);
-  --d8x-color-background: #0C0818;
+  --d8x-color-background: #0c0818;
   --d8x-color-background-paper: #100612;
-  --d8x-color-background-page-rgb: 12, 8, 24, 1 ;
-  --d8x-color-background-items: #110E1D;
+  --d8x-color-background-page-rgb: 12, 8, 24, 1;
+  --d8x-color-background-items: #110e1d;
   --d8x-color-background-items-second: #7860e333;
   --d8x-color-background-items-selected: rgba(102, 74, 223, 0.1);
   --d8x-color-background-items-inactive: #2e2e2e;
@@ -29,7 +29,7 @@
   --d8x-color-icon-second: #383838;
   --d8x-color-icon-theme: #fff;
   --d8x-color-icon-theme-active: #666;
-  --d8x-color-separator-border: #666;
+  --d8x-color-separator-border: rgba(225, 228, 254, 0.1);
   --d8x-color-input-border: #666;
   --d8x-color-logo-second: white;
   --d8x-color-warning-main: #ffda9f;
@@ -73,6 +73,7 @@
   --d8x-color-background-pumpstation-overview: var(--d8x-color-action);
   --d8x-color-text-pumpstation-overview: #fff;
   --d8x-color-text-warning: #1c1c1c;
+  --d8x-block-border-color: rgba(225, 228, 254, 0.1);
 
   //--Colors for Market select component and it elements
   --d8x-market-select-border-color: transparent;

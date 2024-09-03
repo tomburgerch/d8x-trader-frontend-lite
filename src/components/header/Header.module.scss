@@ -3,6 +3,7 @@
 
 .root {
   margin-bottom: 6 * $d8x-spacing;
+  border-bottom: 1px solid var(--d8x-block-border-color);
 
   :global(.MuiPaper-root) {
     height: 80px;

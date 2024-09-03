@@ -569,6 +569,7 @@ export const theme = createTheme({
         paper: {
           color: 'var(--d8x-modal-text-color)',
           backgroundColor: 'var(--d8x-modal-background-color)',
+          border: '1px solid var(--d8x-block-border-color)',
           borderRadius: '16px',
         },
       },
