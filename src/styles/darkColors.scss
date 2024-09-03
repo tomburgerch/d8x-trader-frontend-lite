@@ -24,7 +24,7 @@
   --d8x-color-background-buy-rgb: 8, 153, 129;
   --d8x-color-background-sell-rgb: 242, 54, 69;
   --d8x-color-background-buy-inactive-rgb: 129, 129, 129;
-  --d8x-color-border: #e5e3e3;
+  --d8x-color-border: rgba(225, 228, 254, 0.2);
   --d8x-color-icon: #7860e3;
   --d8x-color-icon-second: #383838;
   --d8x-color-icon-theme: #fff;
@@ -46,11 +46,11 @@
   --d8x-color-background-card-overlay: var(--d8x-color-background);
   --d8x-color-background-table-holder: var(--d8x-color-background-items);
   --d8x-color-background-table-header: var(--d8x-color-background-items);
-  --d8x-color-background-table-row-default: var(--d8x-color-background-table-row);
+  --d8x-color-background-table-row-default: rgba(22, 17, 35, 1);
   --d8x-color-background-table-even-row: var(--d8x-color-background-items);
   --d8x-color-text-table-header: var(--d8x-color-text-main);
   --d8x-color-text-table-cell: var(--d8x-color-text-highlight);
-  --d8x-color-action-icon: #fff;
+  --d8x-color-action-icon: rgba(233, 232, 232, 1);
   --d8x-color-background-primary: var(--d8x-color-action);
   --d8x-color-background-primary-hover: rgba(var(--d8x-color-action-rgb), 0.6);
   --d8x-color-background-primary-disabled: rgba(var(--d8x-color-background-buy-inactive-rgb), 0.5);
@@ -108,7 +108,7 @@
   --d8x-button-primary-color-disabled: var(--d8x-color-text-secondary);
   --d8x-button-primary-background: var(--d8x-color-background-primary);
   --d8x-button-primary-background-hover: var(--d8x-color-action);
-  --d8x-button-primary-background-selected: var(--d8x-color-action);
+  --d8x-button-primary-background-selected: rgba(102, 73, 223, 1);
   --d8x-button-primary-background-disabled: var(--d8x-color-background-primary-disabled);
   --d8x-button-primary-border-color: var(--d8x-color-action);
   --d8x-button-primary-border-color-hover: var(--d8x-color-action);
@@ -120,9 +120,9 @@
   --d8x-button-secondary-color-disabled: var(--d8x-button-secondary-color);
   --d8x-button-secondary-background: #161123;
   --d8x-button-secondary-background-hover: #161123;
-  --d8x-button-secondary-background-selected: var(--d8x-color-action);
+  --d8x-button-secondary-background-selected: rgba(102, 73, 223, 1);
   --d8x-button-secondary-background-disabled: var(--d8x-color-background-items);
-  --d8x-button-secondary-border-color: #e1e4fe;
+  --d8x-button-secondary-border-color: rgba(225, 228, 254, 0.1);
   --d8x-button-secondary-border-color-hover: var(--d8x-color-action);
   --d8x-button-secondary-border-color-selected: var(--d8x-button-secondary-border-color-hover);
   --d8x-button-secondary-border-color-disabled: var(--d8x-color-action);
@@ -130,11 +130,11 @@
   --d8x-button-select-color-hover: var(--d8x-button-select-color);
   --d8x-button-select-color-selected: var(--d8x-button-select-color-hover);
   --d8x-button-select-color-disabled: var(--d8x-button-select-color);
-  --d8x-button-select-background: #080808;
+  --d8x-button-select-background: rgba(22, 17, 35, 1);
   --d8x-button-select-background-hover: var(--d8x-button-select-background);
   --d8x-button-select-background-selected: var(--d8x-button-select-background-hover);
   --d8x-button-select-background-disabled: var(--d8x-button-select-background);
-  --d8x-button-select-border-color: #E9E8E8;
+  --d8x-button-select-border-color: rgba(225, 228, 254, 0.1);
   --d8x-button-select-border-color-hover: var(--d8x-button-select-border-color);
   --d8x-button-select-border-color-selected: var(--d8x-button-select-border-color-hover);
   --d8x-button-select-border-color-disabled: var(--d8x-button-select-border-color);
@@ -144,7 +144,7 @@
   --d8x-button-outlined-color-disabled: var(--d8x-color-text-secondary);
   --d8x-button-outlined-background: rgba(var(--d8x-color-action-rgb), 0.2);
   --d8x-button-outlined-background-hover: var(--d8x-button-outlined-background);
-  --d8x-button-outlined-background-selected: var(--d8x-button-outlined-background-hover);
+  --d8x-button-outlined-background-selected: rgba(102, 73, 223, 1);
   --d8x-button-outlined-background-disabled: transparent;
   --d8x-button-outlined-border-color: rgba(var(--d8x-color-action-rgb), 0.2);
   --d8x-button-outlined-border-color-hover: var(--d8x-color-action);
