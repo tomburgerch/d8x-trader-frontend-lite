@@ -153,6 +153,11 @@
   --d8x-slider-thumb-background: var(--d8x-color-background-items);
   --d8x-slider-thumb-border-color: var(--d8x-color-action);
 
+  //--Toggle component colors
+  --d8x-toggle-background: var(--d8x-color-text-primarytab-inactive);
+  --d8x-toggle-background-active: var(--d8x-color-icon);
+  --d8x-toggle-handle-background: var(--d8x-color-background-paper);
+
   //--Override colors for toastify
   --toastify-color-progress-success: #664adf;
   --toastify-color-progress-error: #ffbdbd;

@@ -145,6 +145,17 @@
   }
 }
 
+@media screen and ($d8x-breakpoint-max-xs) {
+  .root {
+    flex-wrap: wrap;
+    gap: 3 * $d8x-spacing;
+  }
+
+  .statContainer {
+    min-width: 45%;
+  }
+}
+
 @media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
   screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) and ($d8x-breakpoint-max-lg) {
   .statContainer {

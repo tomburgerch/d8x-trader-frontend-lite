@@ -11,7 +11,6 @@ import { useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { FundingTable } from 'components/funding-table/FundingTable';
-import { MarketSelect } from 'components/market-select/MarketSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
@@ -43,9 +42,10 @@ import { OrderBlockE, OrderBlockPositionE, TableTypeE } from 'types/enums';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
+import { CandlesWebSocketListener } from './components/candles-webSocket-listener/CandlesWebSocketListener';
+import { MobileMarketSelect } from './components/mobile-market-select/MobileMarketSelect';
 import { PerpetualInfoFetcher } from './components/PerpetualInfoFetcher';
 import { PoolSubscription } from './components/PoolSubscription';
-import { CandlesWebSocketListener } from './components/candles-webSocket-listener/CandlesWebSocketListener';
 import { TableDataFetcher } from './components/table-data-refetcher/TableDataFetcher';
 
 import styles from './TraderPage.module.scss';
@@ -298,7 +298,7 @@ export const TraderPage = () => {
               <div className={styles.leftBlock}>
                 <PerpetualStats />
               </div>
-              <div className={styles.rightBlock}>{isUpToMobileScreen && <MarketSelect />}</div>
+              <div className={styles.rightBlock}>{isUpToMobileScreen && <MobileMarketSelect />}</div>
             </Container>
           )}
           {!isUpToLargeScreen && (

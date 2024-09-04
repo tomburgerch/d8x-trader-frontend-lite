@@ -100,6 +100,10 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
+  .root {
+    margin-top: $d8x-spacing * 2;
+  }
+
   .card {
     padding-bottom: $d8x-spacing * 3;
 

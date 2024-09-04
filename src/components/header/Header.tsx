@@ -13,6 +13,7 @@ import LogoWithText from 'assets/logoWithText.svg?react';
 import { Container } from 'components/container/Container';
 import { DepositModal } from 'components/deposit-modal/DepositModal';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
+import { collateralsAtom } from 'components/market-select-modal/collaterals.store';
 import { Separator } from 'components/separator/Separator';
 import { ThemeSwitcher } from 'components/theme-switcher/ThemeSwitcher';
 import { WalletConnectButtonHolder } from 'components/wallet-connect-button/WalletConnectButtonHolder';
@@ -41,8 +42,6 @@ import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 import { isEnabledChain } from 'utils/isEnabledChain';
-
-import { collateralsAtom } from '../market-select/collaterals.store';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';

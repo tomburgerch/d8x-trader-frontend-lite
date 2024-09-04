@@ -92,8 +92,17 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
   .headerContainer {
+    flex-direction: column;
+    gap: $d8x-spacing * 4;
+
+    .leftBlock {
+      margin-top: $d8x-spacing * 4;
+      margin-bottom: 0;
+    }
+
     .rightBlock {
-      width: 100%;
+      margin: 0 0 $d8x-spacing * 2;
+      align-items: flex-start;
       max-width: inherit;
       min-width: inherit;
     }
