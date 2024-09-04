@@ -101,8 +101,19 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
   .card {
-    &.selectors {
-      flex-direction: column;
+    padding-bottom: $d8x-spacing * 3;
+
+    &.header {
+      padding-bottom: $d8x-spacing * 2;
     }
+
+    &.selectors {
+      gap: $d8x-spacing * 3;
+    }
+  }
+
+  .additionalPrices {
+    gap: $d8x-spacing * 3;
+    margin-top: $d8x-spacing * 3;
   }
 }

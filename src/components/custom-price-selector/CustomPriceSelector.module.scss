@@ -45,6 +45,7 @@
   justify-content: space-between;
   align-items: center;
   gap: $d8x-spacing * 2;
+  width: 100%;
 }
 
 .responsiveInput {
@@ -64,6 +65,10 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
+  .root {
+    padding: $d8x-spacing * 2;
+  }
+
   .responsiveInput {
     :global(.MuiInputBase-root) {
       width: 140px;
