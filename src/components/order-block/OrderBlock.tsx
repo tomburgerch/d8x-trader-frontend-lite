@@ -25,6 +25,7 @@ import { OrderTypeSelector } from './elements/order-type-selector/OrderTypeSelec
 import { SettingsButton } from './elements/settings-button/SettingsButton';
 import { StopLossSelector } from './elements/stop-loss-selector/StopLossSelector';
 import { TakeProfitSelector } from './elements/take-profit-selector/TakeProfitSelector';
+import { TradeHistoryButton } from './elements/trade-history-button/TradeHistoryButton';
 import { TriggerPrice } from './elements/trigger-price/TriggerPrice';
 
 import styles from './OrderBlock.module.scss';
@@ -81,7 +82,10 @@ export const OrderBlock = memo(() => {
       {!isPredictionMarket && (
         <CardContent className={classnames(styles.card, styles.header)}>
           <OrderTypeSelector />
-          <SettingsButton />
+          <div className={styles.headerButtons}>
+            <TradeHistoryButton />
+            <SettingsButton />
+          </div>
         </CardContent>
       )}
       {isPredictionMarket && (

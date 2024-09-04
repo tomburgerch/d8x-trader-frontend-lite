@@ -8,6 +8,12 @@
   border: 1px solid var(--d8x-block-border-color);
 }
 
+.headerButtons {
+  display: flex;
+  gap: 2 * $d8x-spacing;
+  margin-left: 4 * $d8x-spacing;
+}
+
 .card {
   display: flex;
   flex-direction: column;

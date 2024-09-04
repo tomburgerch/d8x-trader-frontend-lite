@@ -3,6 +3,11 @@
 
 .root {
   position: relative;
+  display: none;
+
+  @include media-desktop {
+    display: inline-block;
+  }
 }
 
 .paper {
