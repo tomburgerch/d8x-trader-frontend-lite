@@ -20,6 +20,25 @@
   flex-direction: column;
 }
 
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+}
+
+.menuTitle {
+  font-size: 16px;
+  line-height: 19px;
+  color: var(--d8x-color-text-main);
+}
+
+.closeButton {
+  padding: 0;
+  min-width: 25px !important;
+}
+
 .mainLogoHolder,
 .drawerLogoHolder {
   display: flex;
@@ -98,7 +117,7 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  padding-top: $d8x-spacing * 10;
+  padding-top: $d8x-spacing * 6;
   padding-bottom: $d8x-spacing * 10;
   gap: $d8x-spacing * 6;
 }
@@ -141,8 +160,7 @@
   }
 
   &.active {
-    text-decoration: underline;
-    text-underline-offset: $d8x-spacing * 2;
+    text-decoration: none;
     padding: 12px;
     margin: -8px;
 
@@ -198,9 +216,8 @@
 .settingButtonsHolderMobile {
   display: flex;
   justify-content: center;
-  margin-left: $d8x-spacing * 2 + 2;
   gap: $d8x-spacing * 2 + 2;
-  padding: $d8x-spacing * 6 $d8x-spacing * 10;
+  padding: $d8x-spacing * 4 ;
 }
 
 .modalButton {
