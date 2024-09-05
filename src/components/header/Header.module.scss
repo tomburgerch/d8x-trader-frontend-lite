@@ -157,16 +157,6 @@
   padding-bottom: 0;
 }
 
-.languageSwitcher {
-  padding: $d8x-spacing * 6 $d8x-spacing * 10;
-}
-
-.themeSwitcher {
-  display: flex;
-  justify-content: center;
-  padding: $d8x-spacing * 6 $d8x-spacing * 10;
-}
-
 .closeAction {
   margin-top: auto;
   text-align: center;
@@ -203,6 +193,14 @@
   margin-left: $d8x-spacing * 2 + 2;
   gap: $d8x-spacing * 2 + 2;
   height: 40px;
+}
+
+.settingButtonsHolderMobile {
+  display: flex;
+  justify-content: center;
+  margin-left: $d8x-spacing * 2 + 2;
+  gap: $d8x-spacing * 2 + 2;
+  padding: $d8x-spacing * 6 $d8x-spacing * 10;
 }
 
 .modalButton {

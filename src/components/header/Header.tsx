@@ -346,11 +346,9 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       {isUpToTabletScreen && (
         <>
           <Divider />
-          <div className={styles.languageSwitcher}>
-            <LanguageSwitcher />
-          </div>
-          <div className={styles.themeSwitcher}>
+          <div className={styles.settingButtonsHolderMobile}>
             <ThemeSwitcher />
+            <LanguageSwitcher isMini={true} />
           </div>
         </>
       )}
