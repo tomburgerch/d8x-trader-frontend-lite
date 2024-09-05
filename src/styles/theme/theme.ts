@@ -28,6 +28,7 @@ declare module '@mui/material/styles' {
     bodySmallPopup: CSSProperties;
     bodySmallSB: CSSProperties;
     bodyTiny: CSSProperties;
+    fourteen: CSSProperties;
     adornment: CSSProperties;
     cellSmall: CSSProperties;
   }
@@ -43,6 +44,7 @@ declare module '@mui/material/styles' {
     bodySmallPopup?: CSSProperties;
     bodySmallSB?: CSSProperties;
     bodyTiny?: CSSProperties;
+    fourteen?: CSSProperties;
     adornment?: CSSProperties;
     cellSmall?: CSSProperties;
   }
@@ -60,6 +62,7 @@ declare module '@mui/material/Typography' {
     bodySmallPopup: true;
     bodySmallSB: true;
     bodyTiny: true;
+    fourteen: true;
     adornment: true;
     cellSmall: true;
   }
@@ -754,6 +757,12 @@ theme.typography.bodyTiny = {
   fontSize: 12,
   fontWeight: 400,
   lineHeight: '16px',
+};
+
+theme.typography.fourteen = {
+  fontSize: 14,
+  fontWeight: 400,
+  lineHeight: '20px',
 };
 
 theme.typography.adornment = {
