@@ -36,11 +36,11 @@
 .statLabel {
   display: block;
   white-space: nowrap;
-  margin-bottom: $d8x-spacing * 3;
+  margin-bottom: $d8x-spacing * 2;
   color: var(--d8x-color-text-label-one);
   min-width: 50px;
   line-height: 12px;
-  font-size: 14px;
+  font-size: 12px;
 
   &.tooltip {
     cursor: pointer;
@@ -102,7 +102,7 @@
   }
 
   .statContainer {
-    padding: $d8x-spacing * 2 $d8x-spacing * 4;
+    padding: $d8x-spacing * 4;
     max-height: 82px;
   }
 
@@ -159,6 +159,6 @@
 @media screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-max-xs),
   screen and ($d8x-breakpoint-height-max-md) and ($d8x-breakpoint-min-lg) and ($d8x-breakpoint-max-lg) {
   .statContainer {
-    height: 72px;
+    height: 76px;
   }
 }
