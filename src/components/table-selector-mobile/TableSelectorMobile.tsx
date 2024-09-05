@@ -26,7 +26,9 @@ export const TableSelectorMobile = ({ selectorItems }: TableSelectorMobilePropsI
 
   useEffect(() => {
     setSelectedIndex(2);
-    blockRef.current?.scrollIntoView();
+    blockRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
   }, [triggerScrollToTables]);
 
   return (
