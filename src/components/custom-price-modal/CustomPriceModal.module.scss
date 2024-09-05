@@ -5,6 +5,17 @@
   :global(.MuiPaper-root) {
     width: 509px;
   }
+
+  @include media-phone {
+    &:global(.MuiDialog-root) {
+      :global(.MuiDialog-container) {
+        :global(.MuiPaper-root) {
+          margin: 0;
+          max-height: 100%;
+        }
+      }
+    }
+  }
 }
 
 .actionButton {
