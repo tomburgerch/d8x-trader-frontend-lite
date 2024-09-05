@@ -205,7 +205,8 @@
         },
         "table-content": {
           "connect": "Please connect your wallet",
-          "no-open": "No trade history"
+          "no-open": "No Trading History Yet",
+          "no-open-note": "Start trading to view your history"
         },
         "history-block-mobile": {
           "symbol": "Symbol"

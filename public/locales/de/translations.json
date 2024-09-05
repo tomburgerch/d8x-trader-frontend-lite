@@ -205,7 +205,8 @@
         },
         "table-content": {
           "connect": "Verbinden Sie Ihre Wallet",
-          "no-open": "Keine Handelshistorie vorhanden"
+          "no-open": "Keine Handelshistorie vorhanden",
+          "no-open-note": "Beginnen Sie mit dem Handel, um Ihren Verlauf anzuzeigen"
         },
         "history-block-mobile": {
           "symbol": "Symbol"

@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 
 import { useMediaQuery, useTheme } from '@mui/material';
 
-import ViewChartIcon from 'assets/icons/viewChart.svg?react';
+import ViewChartIcon from 'assets/icons/new/graph.svg?react';
 import { MarketSelect } from 'components/market-select/MarketSelect';
 import { ToggleButton } from 'components/toggle-button/ToggleButton';
 import { showChartForMobileAtom } from 'store/pools.store';

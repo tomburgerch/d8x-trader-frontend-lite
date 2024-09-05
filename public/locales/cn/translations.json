@@ -205,7 +205,8 @@
         },
         "table-content": {
           "connect": "请连接钱包",
-          "no-open": "无交易历史"
+          "no-open": "目前尚無交易記錄",
+          "no-open-note": "開始交易以查看您的歷史記錄"
         },
         "history-block-mobile": {
           "symbol": "币对"

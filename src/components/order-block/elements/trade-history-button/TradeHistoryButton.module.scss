@@ -27,8 +27,8 @@
   .icon {
     @include transition(color);
 
-    stroke: var(--d8x-color-icon-theme);
-    color: transparent;
+    color: var(--d8x-color-icon-theme);
+    width: 16px;
     height: 16px;
   }
 
