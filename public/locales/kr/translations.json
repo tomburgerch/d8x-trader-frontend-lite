@@ -196,7 +196,8 @@
         },
         "table-content": {
           "connect": "지갑 연결",
-          "no-open": "No trade history"
+          "no-open": "아직 거래 내역이 없습니다",
+          "no-open-note": "거래를 시작하여 내역을 확인하세요"
         },
         "history-block-mobile": {
           "symbol": "Symbol"

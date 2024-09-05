@@ -205,7 +205,8 @@
         },
         "table-content": {
           "connect": "Veuillez connecter votre portefeuille",
-          "no-open": "Aucun historique des trades"
+          "no-open": "Pas encore d'historique de trading",
+          "no-open-note": "Commencez à trader pour consulter votre historique"
         },
         "history-block-mobile": {
           "symbol": "Symbole"

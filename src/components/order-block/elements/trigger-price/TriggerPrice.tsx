@@ -80,7 +80,7 @@ export const TriggerPrice = memo(() => {
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.label}>
+      <Box className={styles.labelHolder}>
         <InfoLabelBlock
           title={t('pages.trade.order-block.trigger-price.title')}
           content={

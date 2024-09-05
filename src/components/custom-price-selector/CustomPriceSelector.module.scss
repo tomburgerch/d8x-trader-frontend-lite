@@ -8,7 +8,7 @@
   gap: $d8x-spacing * 2;
   padding: $d8x-spacing * 3;
   border-radius: $d8x-border-radius;
-  background-color: none;
+  background-color: transparent;
 
   .active,
   &:focus,
@@ -45,6 +45,7 @@
   justify-content: space-between;
   align-items: center;
   gap: $d8x-spacing * 2;
+  width: 100%;
 }
 
 .responsiveInput {
@@ -64,6 +65,17 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
+  .root {
+    padding: 2 * $d8x-spacing;
+
+    .active,
+    &:focus,
+    &:focus-within,
+    &:hover {
+      padding: calc(2 * $d8x-spacing - 1px);
+    }
+  }
+
   .responsiveInput {
     :global(.MuiInputBase-root) {
       width: 140px;

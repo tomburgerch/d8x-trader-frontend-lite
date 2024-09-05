@@ -17,6 +17,13 @@
   &:hover {
     border-color: var(--d8x-market-select-border-color-hover);
   }
+
+  @include media-phone {
+    flex: 1;
+    min-width: 280px;
+    padding: 3 * $d8x-spacing;
+    gap: 3 * $d8x-spacing;
+  }
 }
 
 .iconsWrapper {
@@ -35,6 +42,16 @@
     svg {
       width: 30px;
       height: 30px;
+    }
+
+    @include media-phone {
+      width: 32px;
+      height: 32px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 
@@ -156,27 +173,4 @@
   font-size: 24px;
   font-weight: 600;
   line-height: 20px;
-}
-
-.collateralFilter {
-  width: 100%;
-}
-
-.dialog {
-  :global(.MuiDialog-container) {
-    align-items: flex-start;
-  }
-
-  :global(.MuiPaper-root) {
-    width: 100%;
-    max-width: 652px;
-  }
-}
-
-.optionList {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 3 * $d8x-spacing;
-  padding: 4 * $d8x-spacing 0 0;
 }

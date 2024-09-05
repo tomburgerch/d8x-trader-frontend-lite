@@ -7,11 +7,10 @@ import { MenuItem, Typography } from '@mui/material';
 
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
+import type { PerpetualWithPoolAndMarketI } from 'components/market-select-modal/types';
 import { AssetTypeE } from 'types/enums';
-import { TemporaryAnyT } from 'types/types';
+import type { TemporaryAnyT } from 'types/types';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
-
-import type { PerpetualWithPoolAndMarketI } from '../../types';
 
 import styles from './MarketOption.module.scss';
 

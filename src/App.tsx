@@ -10,6 +10,7 @@ import { CedeWidgetModal } from 'components/cede-widget-modal/CedeWidgetModal';
 import { ConnectModal } from 'components/connect-modal/ConnectModal';
 import { Footer } from 'components/footer/Footer';
 import { Header } from 'components/header/Header';
+import { MarketSelectModal } from 'components/market-select-modal/MarketSelectModal';
 import { ReferralConfirmModal } from 'components/referral-confirm-modal/ReferralConfirmModal';
 import { SDKLoader } from 'components/sdk-loader/SDKLoader';
 import { OneClickTradingModal } from 'components/wallet-connect-button/components/one-click-trading-modal/OneClickTradingModal';
@@ -87,6 +88,7 @@ export const App = memo(() => {
         <AtomsGlobalUpdates />
         <WelcomeModal />
         <ReferralConfirmModal />
+        <MarketSelectModal />
         <CedeWidgetModal />
         {!isSignedInSocially && isConnected && <OneClickTradingModal />}
         {web3AuthConfig.isEnabled && !isConnected && <ConnectModal />}

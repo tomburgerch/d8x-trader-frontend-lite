@@ -1,9 +1,9 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
@@ -11,14 +11,13 @@ import { Button, Typography } from '@mui/material';
 import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
 import ArrowUpIcon from 'assets/icons/new/arrowUp.svg?react';
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
-import { Dialog } from 'components/dialog/Dialog';
-import type { SelectItemI } from 'components/header/elements/header-select/types';
 import type { StatDataI } from 'components/stats-line/types';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { createSymbol } from 'helpers/createSymbol';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { calculateProbability } from 'helpers/calculateProbability';
-import { clearInputsDataAtom, orderBlockAtom } from 'store/order-block.store';
+import { marketSelectModalOpenAtom } from 'store/global-modals.store';
+import { orderBlockAtom } from 'store/order-block.store';
 import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
@@ -27,40 +26,34 @@ import {
   selectedPoolAtom,
   traderAPIAtom,
 } from 'store/pools.store';
-import { marketsDataAtom } from 'store/tv-chart.store';
-import { AssetTypeE, OrderBlockE } from 'types/enums';
+import { OrderBlockE } from 'types/enums';
 import type { TemporaryAnyT } from 'types/types';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
 
-import { MarketOption } from './elements/market-option/MarketOption';
-import { OptionsHeader } from './elements/options-header/OptionsHeader';
-import { PerpetualWithPoolAndMarketI } from './types';
-import { useMarketsFilter } from './useMarketsFilter';
+import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
 
 import styles from './MarketSelect.module.scss';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
 
-  const navigate = useNavigate();
   const location = useLocation();
 
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
-  const marketsData = useAtomValue(marketsDataAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
   const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
-  const clearInputsData = useSetAtom(clearInputsDataAtom);
-
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
 
   const urlChangesAppliedRef = useRef(false);
+
+  const markets = useMarkets();
 
   useEffect(() => {
     if (!location.hash || urlChangesAppliedRef.current || !pools.length) {
@@ -105,80 +98,6 @@ export const MarketSelect = memo(() => {
       });
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
-
-  const handleChange = (newItem: PerpetualWithPoolAndMarketI) => {
-    setSelectedPool(newItem.poolSymbol);
-    setSelectedPerpetual(newItem.id);
-
-    navigate(
-      `${location.pathname}${location.search}#${newItem.baseCurrency}-${newItem.quoteCurrency}-${newItem.poolSymbol}`
-    );
-    clearInputsData();
-    setModalOpen(false);
-  };
-
-  const markets = useMemo(() => {
-    const marketsList: SelectItemI<PerpetualWithPoolAndMarketI>[] = [];
-    pools
-      .filter((pool) => pool.isRunning)
-      .forEach((pool) =>
-        marketsList.push(
-          ...pool.perpetuals
-            .filter((perpetual) => !['INVALID', 'INITIALIZING'].includes(perpetual.state))
-            .map((perpetual) => {
-              const pairId = `${perpetual.baseCurrency}-${perpetual.quoteCurrency}`.toLowerCase();
-              let marketData = marketsData.find((market) => market.symbol === pairId);
-
-              const symbol = createSymbol({
-                poolSymbol: pool.poolSymbol,
-                baseCurrency: perpetual.baseCurrency,
-                quoteCurrency: perpetual.quoteCurrency,
-              });
-
-              let isPredictionMarket = false;
-              try {
-                isPredictionMarket = traderAPI?.isPredictionMarket(symbol) || false;
-              } catch (error) {
-                // skip
-              }
-
-              if (!marketData && isPredictionMarket) {
-                const currentPx = calculateProbability(perpetual.midPrice, orderBlock === OrderBlockE.Short);
-
-                marketData = {
-                  isOpen: !perpetual.isMarketClosed,
-                  symbol: pairId,
-                  assetType: AssetTypeE.Prediction,
-                  ret24hPerc: 0,
-                  currentPx,
-                  nextOpen: 0,
-                  nextClose: 0,
-                };
-              }
-
-              return {
-                value: perpetual.id.toString(),
-                item: {
-                  ...perpetual,
-                  poolSymbol: pool.poolSymbol,
-                  settleSymbol: pool.settleSymbol,
-                  symbol,
-                  marketData: marketData ?? null,
-                },
-              };
-            })
-        )
-      );
-    return marketsList.filter((market) => {
-      return (
-        market.item.state === 'NORMAL' ||
-        (market.item.marketData?.assetType === AssetTypeE.Prediction &&
-          ['NORMAL', 'EMERGENCY', 'SETTLE', 'CLEARED'].includes(market.item.state))
-      );
-    });
-  }, [pools, marketsData, orderBlock, traderAPI]);
-
-  const filteredMarkets = useMarketsFilter(markets);
 
   const BaseIconComponent = useMemo(() => {
     return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
@@ -246,85 +165,60 @@ export const MarketSelect = memo(() => {
     return null;
   }, [selectedPerpetual, markets]);
 
-  const handleClose = useCallback(() => setModalOpen(false), []);
-
   return (
-    <>
-      <div className={styles.holderRoot} onClick={() => setModalOpen(true)}>
-        <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
-          <div className={styles.baseIcon}>
-            <Suspense fallback={null}>
-              <BaseIconComponent />
-            </Suspense>
-          </div>
-          <div className={styles.quoteIcon}>
-            <Suspense fallback={null}>
-              <QuoteIconComponent />
-            </Suspense>
-          </div>
+    <div className={styles.holderRoot} onClick={() => setMarketSelectModalOpen(true)}>
+      <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
+        <div className={styles.baseIcon}>
+          <Suspense fallback={null}>
+            <BaseIconComponent />
+          </Suspense>
         </div>
-        <Button className={styles.marketSelectButton} variant="outlined">
-          <div className={styles.selectedMarketBlock}>
-            <div className={styles.selectedMarketValue}>
-              <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
-                {isPredictionMarket
-                  ? cutBaseCurrency(selectedPerpetual?.baseCurrency)
-                  : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
-              </Typography>
-              <CurrencyBadge
-                className={styles.badge}
-                assetType={currencyMarketData?.assetType}
-                label={t(`common.select.market.${currencyMarketData?.assetType}`)}
-                withPoint={true}
-              />
-            </div>
-            <div className={styles.midPrice}>
-              {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
-                <TooltipMobile tooltip={midPrice.tooltip}>
-                  <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-                </TooltipMobile>
-              ) : (
-                <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
-              )}
-              {!isPredictionMarket && currencyMarketData && (
-                <div
-                  className={classnames(styles.priceChange, {
-                    [styles.positive]: currencyMarketData.ret24hPerc >= 0,
-                    [styles.negative]: currencyMarketData.ret24hPerc < 0,
-                  })}
-                >
-                  <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
-                  <span>{currencyMarketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}</span>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className={styles.arrowDropDown}>
-            {isModalOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
-          </div>
-        </Button>
+        <div className={styles.quoteIcon}>
+          <Suspense fallback={null}>
+            <QuoteIconComponent />
+          </Suspense>
+        </div>
       </div>
-
-      <Dialog
-        open={isModalOpen}
-        className={styles.dialog}
-        onClose={handleClose}
-        onCloseClick={handleClose}
-        scroll="paper"
-        dialogTitle={t('common.select.market.header')}
-      >
-        <OptionsHeader />
-        <div className={styles.optionList}>
-          {filteredMarkets.map((market) => (
-            <MarketOption
-              key={market.value}
-              option={market}
-              isSelected={market.item.id === selectedPerpetual?.id}
-              onClick={() => handleChange(market.item)}
+      <Button className={styles.marketSelectButton} variant="outlined">
+        <div className={styles.selectedMarketBlock}>
+          <div className={styles.selectedMarketValue}>
+            <Typography variant="bodyBig" className={styles.selectedMarketPerpetual}>
+              {isPredictionMarket
+                ? cutBaseCurrency(selectedPerpetual?.baseCurrency)
+                : `${cutBaseCurrency(selectedPerpetual?.baseCurrency)}/${selectedPerpetual?.quoteCurrency}`}
+            </Typography>
+            <CurrencyBadge
+              className={styles.badge}
+              assetType={currencyMarketData?.assetType}
+              label={t(`common.select.market.${currencyMarketData?.assetType}`)}
+              withPoint={true}
             />
-          ))}
+          </div>
+          <div className={styles.midPrice}>
+            {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
+              <TooltipMobile tooltip={midPrice.tooltip}>
+                <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
+              </TooltipMobile>
+            ) : (
+              <div className={classnames(styles.statMainValue, midPrice.className)}>{midPrice.numberOnly}</div>
+            )}
+            {!isPredictionMarket && currencyMarketData && (
+              <div
+                className={classnames(styles.priceChange, {
+                  [styles.positive]: currencyMarketData.ret24hPerc >= 0,
+                  [styles.negative]: currencyMarketData.ret24hPerc < 0,
+                })}
+              >
+                <span>{currencyMarketData.ret24hPerc.toFixed(2)}%</span>
+                <span>{currencyMarketData.ret24hPerc >= 0 ? <ArrowDropUp /> : <ArrowDropDown />}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </Dialog>
-    </>
+        <div className={styles.arrowDropDown}>
+          {isMarketSelectModalOpen ? <ArrowUpIcon width={20} height={20} /> : <ArrowDownIcon width={20} height={20} />}
+        </div>
+      </Button>
+    </div>
   );
 });

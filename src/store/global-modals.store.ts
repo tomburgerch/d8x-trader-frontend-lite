@@ -14,4 +14,5 @@ export const extractSocialPKModalOpenAtom = atom(false);
 export const extractOctPKModalOpenAtom = atom(false);
 export const stopLossModalOpenAtom = atom(false);
 export const takeProfitModalOpenAtom = atom(false);
+export const marketSelectModalOpenAtom = atom(false);
 export const tradeHistoryModalOpenAtom = atom(false);

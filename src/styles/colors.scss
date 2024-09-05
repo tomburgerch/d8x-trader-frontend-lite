@@ -49,7 +49,7 @@
   --d8x-color-background-table-row-default: var(--d8x-color-background-table-row);
   --d8x-color-background-table-even-row: var(--d8x-color-background-items);
   --d8x-color-text-table-header: var(--d8x-color-text-main);
-  --d8x-color-text-table-cell: var(--d8x-color-text-highlight);
+  --d8x-color-text-table-cell: var(--d8x-color-text-label-one);
   --d8x-color-action-icon: #1c1c1c;
   --d8x-color-background-primary: var(--d8x-color-action);
   --d8x-color-background-primary-hover: rgba(var(--d8x-color-action-rgb), 0.6);
@@ -152,6 +152,11 @@
   --d8x-button-outlined-border-color-disabled: transparent;
   --d8x-slider-thumb-background: var(--d8x-color-background-items);
   --d8x-slider-thumb-border-color: var(--d8x-color-action);
+
+  //--Toggle component colors
+  --d8x-toggle-background: var(--d8x-color-text-primarytab-inactive);
+  --d8x-toggle-background-active: var(--d8x-color-icon);
+  --d8x-toggle-handle-background: var(--d8x-color-background-paper);
 
   //--Override colors for toastify
   --toastify-color-progress-success: #664adf;

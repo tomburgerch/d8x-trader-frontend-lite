@@ -205,7 +205,8 @@
         },
         "table-content": {
           "connect": "Por favor conecte su cartera",
-          "no-open": "No hay órdenes"
+          "no-open": "Aún no hay historial de operaciones",
+          "no-open-note": "Comience a operar para ver su historial"
         },
         "history-block-mobile": {
           "symbol": "Símbolo"

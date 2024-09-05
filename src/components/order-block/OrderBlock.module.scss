@@ -8,6 +8,12 @@
   border: 1px solid var(--d8x-block-border-color);
 }
 
+.headerButtons {
+  display: flex;
+  gap: 2 * $d8x-spacing;
+  margin-left: 4 * $d8x-spacing;
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -100,9 +106,24 @@
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
+  .root {
+    margin-top: $d8x-spacing * 2;
+  }
+
   .card {
-    &.selectors {
-      flex-direction: column;
+    padding-bottom: $d8x-spacing * 3;
+
+    &.header {
+      padding-bottom: $d8x-spacing * 2;
     }
+
+    &.selectors {
+      gap: $d8x-spacing * 3;
+    }
+  }
+
+  .additionalPrices {
+    gap: $d8x-spacing * 3;
+    margin-top: $d8x-spacing * 3;
   }
 }

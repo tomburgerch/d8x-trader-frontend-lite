@@ -84,11 +84,22 @@
 
 @media screen and ($d8x-breakpoint-max-xs) {
   .root {
-    justify-content: space-between;
+    padding: 4 * $d8x-spacing;
+    margin-bottom: 3 * $d8x-spacing;
   }
 
   .buttonsHolder {
-    display: none;
+    :global(.MuiButtonBase-root) {
+      flex: 1;
+      width: auto;
+      min-width: 35px;
+    }
+  }
+
+  .inputHolder {
+    :global(.MuiInputBase-root) {
+      width: 70px;
+    }
   }
 }
 

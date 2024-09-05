@@ -7,12 +7,21 @@ import { type Address, erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContracts } from 'wagmi';
 
 import { Menu } from '@mui/icons-material';
-import { Button, Divider, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
+import CloseIcon from 'assets/icons/new/close.svg?react';
+import { LiFiWidgetButton } from 'components/wallet-connect-button/LiFiWidgetButton';
+import { OneClickTradingButton } from 'components/wallet-connect-button/OneClickTradingButton';
+import { OwltoButton } from 'components/wallet-connect-button/OwltoButton';
+import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
+import { isLifiWidgetEnabled } from 'helpers/isLifiWidgetEnabled';
+import { isOwltoButtonEnabled } from 'helpers/isOwltoButtonEnabled';
+import { web3AuthIdTokenAtom } from 'store/web3-auth.store';
 
 import LogoWithText from 'assets/logoWithText.svg?react';
 import { Container } from 'components/container/Container';
 import { DepositModal } from 'components/deposit-modal/DepositModal';
 import { LanguageSwitcher } from 'components/language-switcher/LanguageSwitcher';
+import { collateralsAtom } from 'components/market-select-modal/collaterals.store';
 import { Separator } from 'components/separator/Separator';
 import { ThemeSwitcher } from 'components/theme-switcher/ThemeSwitcher';
 import { WalletConnectButtonHolder } from 'components/wallet-connect-button/WalletConnectButtonHolder';
@@ -41,8 +50,6 @@ import { triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
 import type { ExchangeInfoI, PerpetualDataI } from 'types/types';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
 import { isEnabledChain } from 'utils/isEnabledChain';
-
-import { collateralsAtom } from '../market-select/collaterals.store';
 
 import styles from './Header.module.scss';
 import { PageAppBar } from './Header.styles';
@@ -95,6 +102,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   const traderAPIRef = useRef(traderAPI);
   const poolTokenBalanceDefinedRef = useRef(false);
   const poolTokenBalanceRetriesCountRef = useRef(0);
+
+  const web3authIdToken = useAtomValue(web3AuthIdTokenAtom);
+  const isBridgeShownOnPage = useBridgeShownOnPage();
+  const isOwltoEnabled = isOwltoButtonEnabled(chainId);
+  const isLiFiEnabled = isLifiWidgetEnabled(isOwltoEnabled, chainId);
+  const isSignedInSocially = web3AuthConfig.isEnabled && web3authIdToken != '';
 
   // fetch the settle ccy fx -> save to atom
 
@@ -323,15 +336,26 @@ export const Header = memo(({ window }: HeaderPropsI) => {
 
   const drawer = (
     <>
-      <Typography
-        variant="h6"
-        sx={{ my: 2, textAlign: 'center' }}
-        onClick={handleDrawerToggle}
-        className={styles.drawerLogoHolder}
-      >
-        <LogoWithText width={86} height={20} />
-      </Typography>
-      <Divider />
+      <div className={styles.headerContainer}>
+        <div className={styles.menuTitle}>Menu</div>
+        {
+          <Button variant="outlined" className={styles.closeButton} onClick={handleDrawerToggle}>
+            <CloseIcon width="24px" height="24px" />
+          </Button>
+        }
+      </div>
+      <Separator />
+      {isUpToTabletScreen && (
+        <>
+          <div className={styles.settingButtonsHolderMobile}>
+            {!isSignedInSocially && <OneClickTradingButton />}
+            {isLiFiEnabled && isBridgeShownOnPage && <LiFiWidgetButton />}
+            {isOwltoEnabled && isBridgeShownOnPage && <OwltoButton />}
+            <ThemeSwitcher />
+            <LanguageSwitcher isMini={true} />
+          </div>
+        </>
+      )}
       <nav className={styles.navMobileWrapper} onClick={handleDrawerToggle}>
         {availablePages.map((page) => (
           <NavLink
@@ -344,22 +368,6 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           </NavLink>
         ))}
       </nav>
-      {isUpToTabletScreen && (
-        <>
-          <Divider />
-          <div className={styles.languageSwitcher}>
-            <LanguageSwitcher />
-          </div>
-          <div className={styles.themeSwitcher}>
-            <ThemeSwitcher />
-          </div>
-        </>
-      )}
-      <div className={styles.closeAction}>
-        <Button onClick={handleDrawerToggle} variant="secondary" size="small">
-          {t('common.info-modal.close')}
-        </Button>
-      </div>
     </>
   );
 
@@ -413,21 +421,20 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                   <LanguageSwitcher isMini={true} />
                 </div>
               )}
+              {isUpToMobileScreen && isConnected && (
+                <div className={styles.mobileButtonsBlock}>
+                  <div className={styles.mobileWalletButtons}>
+                    <WalletConnectButtonHolder />
+                    <WalletConnectedButtons mobile={true} />
+                  </div>
+                </div>
+              )}
               {isUpToLargeScreen && (
                 <Button onClick={handleDrawerToggle} variant="primary" className={styles.menuButton}>
                   <Menu />
                 </Button>
               )}
             </Toolbar>
-            {isUpToMobileScreen && isConnected && (
-              <div className={styles.mobileButtonsBlock}>
-                <Separator />
-                <div className={styles.mobileWalletButtons}>
-                  <WalletConnectButtonHolder />
-                  <WalletConnectedButtons />
-                </div>
-              </div>
-            )}
             {isConnected && <DepositModal />}
           </PageAppBar>
           <nav>
@@ -445,7 +452,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
                 '& .MuiDrawer-paper': {
                   boxSizing: 'border-box',
                   width: isUpToMobileScreen ? '100%' : DRAWER_WIDTH_FOR_TABLETS,
-                  backgroundColor: 'var(--d8x-color-background)',
+                  backgroundColor: 'var(--d8x-modal-background-color)',
                 },
               }}
             >
