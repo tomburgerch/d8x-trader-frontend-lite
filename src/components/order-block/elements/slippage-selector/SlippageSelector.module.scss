@@ -22,11 +22,10 @@
 
   :global(.MuiButtonBase-root) {
     flex: 1;
-    padding: 3px 0 0;
+    padding: 0;
     min-width: 37px;
     font-size: 14px;
     font-weight: 400;
-    line-height: 16px;
 
     &.selected {
       color: var(--d8x-button-secondary-color-selected);
