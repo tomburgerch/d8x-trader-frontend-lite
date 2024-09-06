@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { MenuItem } from '@mui/material';
 
@@ -9,35 +9,23 @@ import { Refresher } from 'components/table-selector/elements/refresher/Refreshe
 import { FilterModalProvider } from 'components/table/filter-modal/FilterModalContext';
 
 import styles from './TableSelectorMobile.module.scss';
-import { useAtomValue } from 'jotai';
-import { triggerScrollToTablesAtom } from '../../store/pools.store';
 
 interface TableSelectorMobilePropsI {
   selectorItems: SelectorItemI[];
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
 }
 
-export const TableSelectorMobile = ({ selectorItems }: TableSelectorMobilePropsI) => {
-  const triggerScrollToTables = useAtomValue(triggerScrollToTablesAtom);
-
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+export const TableSelectorMobile = ({ selectorItems, activeIndex, setActiveIndex }: TableSelectorMobilePropsI) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const blockRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setSelectedIndex(2);
-    blockRef.current?.scrollIntoView({
-      behavior: 'smooth',
-    });
-  }, [triggerScrollToTables]);
 
   return (
     <FilterModalProvider>
-      <div className={styles.root} ref={blockRef}>
+      <div className={styles.root}>
         <div className={styles.dropdownHolder}>
           <DropDownSelect
             id="table-selector-dropdown"
-            selectedValue={selectorItems[selectedIndex]?.label}
+            selectedValue={selectorItems[activeIndex]?.label}
             anchorEl={anchorEl}
             setAnchorEl={setAnchorEl}
             fullWidth
@@ -48,7 +36,7 @@ export const TableSelectorMobile = ({ selectorItems }: TableSelectorMobilePropsI
                 value={index}
                 className={styles.dropdown}
                 onClick={() => {
-                  setSelectedIndex(index);
+                  setActiveIndex(index);
                   setAnchorEl(null);
                 }}
               >
@@ -58,10 +46,10 @@ export const TableSelectorMobile = ({ selectorItems }: TableSelectorMobilePropsI
           </DropDownSelect>
         </div>
         <div className={styles.buttonsBlock}>
-          <Filter activeTableType={selectorItems[selectedIndex].tableType} />
-          <Refresher activeTableType={selectorItems[selectedIndex].tableType} />
+          <Filter activeTableType={selectorItems[activeIndex].tableType} />
+          <Refresher activeTableType={selectorItems[activeIndex].tableType} />
         </div>
-        <div>{selectorItems[selectedIndex].item}</div>
+        <div>{selectorItems[activeIndex].item}</div>
       </div>
     </FilterModalProvider>
   );

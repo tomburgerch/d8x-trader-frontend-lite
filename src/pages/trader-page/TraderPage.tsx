@@ -36,6 +36,7 @@ import {
   positionsAtom,
   selectedPoolAtom,
   traderAPIAtom,
+  executeScrollToTablesAtom,
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { OrderBlockE, OrderBlockPositionE, TableTypeE } from 'types/enums';
@@ -65,6 +66,7 @@ export const TraderPage = () => {
   const fetchPositionsRef = useRef(false);
   const fetchOrdersRef = useRef(false);
   const isPageUrlAppliedRef = useRef(false);
+  const blockRef = useRef<HTMLDivElement>(null);
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
@@ -75,6 +77,7 @@ export const TraderPage = () => {
   const selectedPool = useAtomValue(selectedPoolAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const [executeScrollToTables, setExecuteScrollToTables] = useAtom(executeScrollToTablesAtom);
   const [positions, setPositions] = useAtom(positionsAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
 
@@ -190,6 +193,19 @@ export const TraderPage = () => {
     fetchPositions(chainId, address).then();
     fetchOrders(chainId, address).then();
   }, [chainId, address, fetchPositions, fetchOrders]);
+
+  useEffect(() => {
+    if (!executeScrollToTables) {
+      return;
+    }
+
+    setActiveAllIndex(2);
+    setActiveHistoryIndex(0);
+    setExecuteScrollToTables(false);
+    blockRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, [executeScrollToTables, setExecuteScrollToTables]);
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [
@@ -329,7 +345,13 @@ export const TraderPage = () => {
               <ChartHolder />
               <OrderBlock />
               {isUpToMobileScreen ? (
-                <TableSelectorMobile selectorItems={selectorForAllItems} />
+                <div ref={blockRef}>
+                  <TableSelectorMobile
+                    selectorItems={selectorForAllItems}
+                    activeIndex={activeAllIndex}
+                    setActiveIndex={handleActiveAllIndex}
+                  />
+                </div>
               ) : (
                 <>
                   <TableSelector
@@ -337,11 +359,13 @@ export const TraderPage = () => {
                     activeIndex={activePositionIndex}
                     setActiveIndex={handlePositionsIndex}
                   />
-                  <TableSelector
-                    selectorItems={historyItems}
-                    activeIndex={activeHistoryIndex}
-                    setActiveIndex={handleHistoryIndex}
-                  />
+                  <div ref={blockRef}>
+                    <TableSelector
+                      selectorItems={historyItems}
+                      activeIndex={activeHistoryIndex}
+                      setActiveIndex={handleHistoryIndex}
+                    />
+                  </div>
                 </>
               )}
             </Container>
