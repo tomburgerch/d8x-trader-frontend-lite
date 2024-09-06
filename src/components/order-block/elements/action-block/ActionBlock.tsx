@@ -702,10 +702,10 @@ export const ActionBlock = memo(() => {
             </>
           }
         >
-          <div className={styles.emphasis}>
+          <div className={styles.newPositionHeader}>
             <SidesRow
               leftSide={
-                <Typography variant="bodyLargePopup" className={styles.semibold}>
+                <Typography variant="bodyLargePopup" className={styles.bold}>
                   {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''}{' '}
                   {!isPredictionMarket && t(orderTypeMap[orderInfo.orderType])}{' '}
                   {t(orderBlockMap[isPredictionMarket ? OrderBlockE.Long : orderInfo.orderBlock])}{' '}
@@ -713,7 +713,7 @@ export const ActionBlock = memo(() => {
                 </Typography>
               }
               rightSide={
-                <Typography variant="bodyLargePopup" className={styles.semibold}>
+                <Typography variant="bodyLargePopup" className={styles.bold}>
                   {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
                 </Typography>
               }

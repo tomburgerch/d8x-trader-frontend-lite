@@ -708,7 +708,7 @@ theme.typography.bodyLarge = {
 };
 
 theme.typography.bodyLargePopup = {
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: 400,
   lineHeight: '24px',
   [theme.breakpoints.down('sm')]: {
