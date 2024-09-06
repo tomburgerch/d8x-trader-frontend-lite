@@ -1,14 +1,15 @@
+import { useSetAtom } from 'jotai';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { Typography } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
 import { TradeHistoryBlockItems } from 'components/trade-history-block-items/TradeHistoryBlockItems';
 import { useTradesHistory } from 'components/trade-history-table/hooks/useTradesHistory';
+import { triggerScrollToTablesAtom } from 'store/pools.store';
 
 import styles from './TradeShortHistoryModal.module.scss';
-import { Typography } from '@mui/material';
-import { triggerScrollToTablesAtom } from '../../store/pools.store';
-import { useSetAtom } from 'jotai';
 
 interface TradeShortHistoryModalPropsI {
   isModalOpen: boolean;
