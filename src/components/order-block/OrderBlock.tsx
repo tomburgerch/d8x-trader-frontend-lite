@@ -1,17 +1,19 @@
 import classnames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { ArrowForward } from '@mui/icons-material';
 import { Card, CardContent, Link } from '@mui/material';
 
+import { Dialog } from 'components/dialog/Dialog';
 import { createSymbol } from 'helpers/createSymbol';
 import { depositModalOpenAtom } from 'store/global-modals.store';
 import { orderTypeAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom, traderAPIAtom } from 'store/pools.store';
 import { OrderTypeE } from 'types/enums';
+import { PredictionMarketMetaDataI } from 'types/types';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { Separator } from '../separator/Separator';
@@ -41,7 +43,8 @@ export const OrderBlock = memo(() => {
 
   const { chainId, isConnected } = useAccount();
 
-  const [predictionQuestion, setPredictionQuestion] = useState('');
+  const [predictionQuestion, setPredictionQuestion] = useState<PredictionMarketMetaDataI>();
+  const [isPredictionModalOpen, setPredictionModalOpen] = useState(false);
 
   const isPredictionMarket = useMemo(() => {
     if (!selectedPerpetual || !selectedPool) {
@@ -63,19 +66,23 @@ export const OrderBlock = memo(() => {
 
   useEffect(() => {
     if (!isPredictionMarket || !traderAPI) {
-      setPredictionQuestion('');
+      setPredictionQuestion(undefined);
       return;
     }
     if (!selectedPerpetual || !selectedPool) {
-      setPredictionQuestion('');
+      setPredictionQuestion(undefined);
       return;
     }
     traderAPI
-      .fetchPrdMktQuestion(`${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`)
+      .fetchPrdMktMetaData(`${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}`)
       .then((value) => {
-        setPredictionQuestion(value);
+        setPredictionQuestion(value as never as PredictionMarketMetaDataI);
       });
   }, [isPredictionMarket, traderAPI, selectedPerpetual, selectedPool]);
+
+  const handlePredictionModalClose = useCallback(() => {
+    setPredictionModalOpen(false);
+  }, []);
 
   return (
     <Card className={styles.root}>
@@ -99,7 +106,27 @@ export const OrderBlock = memo(() => {
       )}
       <Separator className={styles.separator} />
       <CardContent className={classnames(styles.card, styles.orders)}>
-        {isPredictionMarket && <div className={styles.predictionQuestion}>{predictionQuestion}</div>}
+        {isPredictionMarket && predictionQuestion && (
+          <>
+            <div className={styles.predictionQuestion}>
+              {predictionQuestion.question} (
+              <span onClick={() => setPredictionModalOpen(true)} className={styles.learnMore}>
+                {t('common.learn-more')}
+              </span>
+              )
+            </div>
+
+            <Dialog
+              open={isPredictionModalOpen}
+              onClose={handlePredictionModalClose}
+              onCloseClick={handlePredictionModalClose}
+              className={styles.dialog}
+              dialogTitle={predictionQuestion.question}
+            >
+              {predictionQuestion.description}
+            </Dialog>
+          </>
+        )}
         <OrderSelector />
       </CardContent>
       <CardContent className={styles.card}>
