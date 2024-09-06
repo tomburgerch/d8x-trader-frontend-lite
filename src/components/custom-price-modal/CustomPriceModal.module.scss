@@ -106,11 +106,12 @@
 
   :global(.MuiButtonBase-root) {
     flex: 1;
-    padding: 2.25 * $d8x-spacing 0 1.25 * $d8x-spacing;
+    padding: 2 * $d8x-spacing 3 * $d8x-spacing;
     min-width: inherit;
     font-size: 14px;
     font-weight: 400;
-    line-height: 16px;
+    line-height: 14px;
+    height: inherit;
 
     &.selected {
       color: var(--d8x-button-secondary-color-selected);
