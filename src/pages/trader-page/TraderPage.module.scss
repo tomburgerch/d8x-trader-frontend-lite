@@ -87,6 +87,10 @@
       align-items: center;
     }
   }
+  
+  .columnContainer {
+    gap: 16px;
+  }
 }
 
 @media screen and ($d8x-breakpoint-max-xs) {
@@ -104,5 +108,9 @@
       max-width: inherit;
       min-width: inherit;
     }
+  }
+
+  .columnContainer {
+    gap: 0;
   }
 }

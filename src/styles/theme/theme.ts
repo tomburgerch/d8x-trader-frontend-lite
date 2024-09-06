@@ -188,7 +188,7 @@ export const theme = createTheme({
           borderRadius: '8px',
           textTransform: 'none',
           color: 'var(--d8x-color-action)',
-          lineHeight: '1.5',
+          lineHeight: '1',
           padding: '7px 8px',
           whiteSpace: 'nowrap',
           borderColor: 'var(--d8x-color-action)',
