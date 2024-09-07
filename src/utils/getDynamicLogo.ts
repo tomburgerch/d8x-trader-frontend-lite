@@ -56,6 +56,27 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
         case 'pepe':
           localLogo = (await import('assets/crypto-icons/pepe.svg')).default;
           break;
+        case 'btlj':
+          localLogo = (await import('assets/crypto-icons/btlj.svg')).default;
+          break;
+        case 'shib':
+          localLogo = (await import('assets/crypto-icons/shib.svg')).default;
+          break;
+        case 'ton':
+          localLogo = (await import('assets/crypto-icons/ton.svg')).default;
+          break;
+        case 'walz':
+          localLogo = (await import('assets/crypto-icons/walz.svg')).default;
+          break;
+        case 'harris':
+          localLogo = (await import('assets/crypto-icons/harris.svg')).default;
+          break;
+        case '49ers':
+          localLogo = (await import('assets/crypto-icons/49ers.svg')).default;
+          break;
+        case 'insideout':
+          localLogo = (await import('assets/crypto-icons/insideout.svg')).default;
+          break;
         default:
           localLogo = (await import('assets/crypto-icons/generic.svg')).default;
       }
