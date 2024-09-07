@@ -137,7 +137,8 @@ export const PositionRow = memo(
               </Typography>
             </TableCell>
             <TableCell align="right" className={styles.tpSlCell}>
-              <TpSlValue position={position} handleTpSlModify={handleTpSlModify} />
+              {!isPredictionMarket && <TpSlValue position={position} handleTpSlModify={handleTpSlModify} />}
+              {isPredictionMarket && <Typography variant="cellSmall">-</Typography>}
             </TableCell>
             <TableCell align="center">
               <IconButton
