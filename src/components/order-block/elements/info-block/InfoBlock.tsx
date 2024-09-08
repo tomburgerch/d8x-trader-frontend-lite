@@ -201,19 +201,21 @@ export const InfoBlock = memo(() => {
           </Typography>
         </div>
       )}
-      <div className={styles.row}>
-        <Typography variant="bodySmallPopup" className={styles.infoText}>
-          {t('pages.trade.order-block.info.approx-deposit')}
-        </Typography>
-        <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
-          {approxDepositFromWallet === undefined || !selectedPool
-            ? '-'
-            : formatToCurrency(
-                approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
-                selectedPool.settleSymbol
-              )}
-        </Typography>
-      </div>
+      {orderInfo?.isPredictionMarket != true && (
+        <div className={styles.row}>
+          <Typography variant="bodySmallPopup" className={styles.infoText}>
+            {t('pages.trade.order-block.info.approx-deposit')}
+          </Typography>
+          <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
+            {approxDepositFromWallet === undefined || !selectedPool
+              ? '-'
+              : formatToCurrency(
+                  approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                  selectedPool.settleSymbol
+                )}
+          </Typography>
+        </div>
+      )}
     </div>
   );
 });
