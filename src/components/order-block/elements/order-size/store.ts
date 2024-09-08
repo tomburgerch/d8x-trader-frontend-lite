@@ -101,16 +101,16 @@ export const currencyMultiplierAtom = atom((get) => {
     // skip
   }
 
-  const { collToQuoteIndexPrice, indexPrice } = selectedPerpetual;
-  if (selectedCurrency === selectedPerpetual.quoteCurrency && indexPrice > 0) {
+  const { collToQuoteIndexPrice, midPrice } = selectedPerpetual;
+  if (selectedCurrency === selectedPerpetual.quoteCurrency && midPrice > 0) {
     currencyMultiplier = isPredictionMarket
-      ? calculateProbability(indexPrice, orderBlock === OrderBlockE.Short)
-      : indexPrice;
-  } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && indexPrice > 0) {
+      ? calculateProbability(midPrice, orderBlock === OrderBlockE.Short)
+      : midPrice;
+  } else if (selectedCurrency === selectedPool.settleSymbol && collToQuoteIndexPrice > 0 && midPrice > 0) {
     currencyMultiplier = isPredictionMarket
-      ? (calculateProbability(indexPrice, orderBlock === OrderBlockE.Short) / collToQuoteIndexPrice) *
+      ? (calculateProbability(midPrice, orderBlock === OrderBlockE.Short) / collToQuoteIndexPrice) *
         (c2s.get(selectedPool.poolSymbol)?.value ?? 1)
-      : (indexPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
+      : (midPrice / collToQuoteIndexPrice) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1);
   }
   return currencyMultiplier;
 });
