@@ -56,7 +56,6 @@ export const PositionRow = memo(
     }, [position, parsedSymbol, isPredictionMarket]);
 
     const isSettlementInProgress = useMemo(() => {
-      console.log(perpetualState?.baseCurrency, perpetualState?.state);
       return (
         ['SETTLE', 'CLEARED'].includes(perpetualState?.state || '') ||
         (isPredictionMarket && perpetualState?.state === 'EMERGENCY')
