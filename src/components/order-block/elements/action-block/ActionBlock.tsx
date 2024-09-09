@@ -204,11 +204,10 @@ export const ActionBlock = memo(() => {
       mainOrder,
       address,
       (position?.positionNotionalBaseCCY ?? 0) * (position?.side === BUY_SIDE ? 1 : -1),
-      10000 // For prediction markets we compute this with 0 fee and use it to show the margin the trader has to put down // isPredictionMarket && orderInfo.tradingFee ?  orderInfo.tradingFee * 100 : poolFee
+      isPredictionMarket && orderInfo.tradingFee ? orderInfo.tradingFee * 1e5 : poolFee
     )
       .then((data) => {
-        console.log('data pos risk', data);
-        console.log(orderInfo.tradingFee ? orderInfo.tradingFee * 10 : 0);
+        console.log(data);
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
@@ -870,10 +869,10 @@ export const ActionBlock = memo(() => {
                   rightSide={
                     isOrderValid && collateralDeposit >= 0 && selectedPool
                       ? formatToCurrency(
-                          collateralDeposit * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                          (collateralDeposit - (predFeeInCC ?? 0)) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                           selectedPool.settleSymbol
                         )
-                      : '-'
+                      : '-lala'
                   }
                   rightSideStyles={styles.rightSide}
                 />
