@@ -80,6 +80,7 @@ export const OrderSize = memo(() => {
   const maxOrderSizeRetriesCountRef = useRef(0);
   const maxOrderSizeRequestRef = useRef(false);
   const triggerBalancesUpdateRef = useRef(triggerBalancesUpdate);
+  const perpetualIdRef = useRef(selectedPerpetual?.id);
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
@@ -188,6 +189,7 @@ export const OrderSize = memo(() => {
       }
 
       maxOrderSizeRequestRef.current = true;
+      perpetualIdRef.current = perpetualStaticInfo.id;
 
       fetchMaxOrderSize(
         chainId,
@@ -197,8 +199,10 @@ export const OrderSize = memo(() => {
         orderBlock === OrderBlockE.Long
       )
         .then((result) => {
-          setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
-          maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
+          if (perpetualIdRef.current === perpetualStaticInfo.id) {
+            setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
+            maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -247,6 +251,7 @@ export const OrderSize = memo(() => {
     return () => {
       clearInterval(intervalId);
       maxOrderSizeRetriesCountRef.current = 0;
+      maxOrderSizeRequestRef.current = false;
     };
   }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize]);
 

@@ -207,7 +207,6 @@ export const ActionBlock = memo(() => {
       isPredictionMarket && orderInfo.tradingFee ? orderInfo.tradingFee * 1e5 : poolFee
     )
       .then((data) => {
-        console.log(data);
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
@@ -216,18 +215,12 @@ export const ActionBlock = memo(() => {
           : perpetualStaticInfo?.initialMarginRate;
 
         if (initialMarginRate && data.data.newPositionRisk.leverage > 1 / initialMarginRate) {
-          console.log({
-            prod: data.data.newPositionRisk.leverage * initialMarginRate,
-            newPositionRisk,
-            perpetualStaticInfo,
-          });
           if (orderInfo.orderBlock === OrderBlockE.Long) {
             maxLong = 0;
           } else {
             maxShort = 0;
           }
         }
-        console.log({ maxBuy: maxLong, maxSell: maxShort });
         setMaxOrderSize({ maxBuy: maxLong, maxSell: maxShort });
       })
       .catch(console.error);
