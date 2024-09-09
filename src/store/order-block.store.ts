@@ -19,7 +19,6 @@ import {
   perpetualStatisticsAtom,
   poolFeeAtom,
   positionsAtom,
-  selectedPerpetualAtom,
 } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
@@ -133,7 +132,6 @@ export const triggerPriceAtom = atom(
 
 export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   const perpetualStatistics = get(perpetualStatisticsAtom);
-  const perpetualState = get(selectedPerpetualAtom);
   if (!perpetualStatistics) {
     return null;
   }
@@ -190,16 +188,14 @@ export const orderInfoAtom = atom<OrderInfoI | null>((get) => {
   let tradingFee = null;
   let baseFee = null;
   if (isPredictionMarket) {
-    if (perpetualState && perpetualStaticInfo?.maintenanceMarginRate) {
-      tradingFee =
-        TraderInterface.exchangeFeePrdMkts(
-          perpetualState,
-          perpetualStaticInfo.maintenanceMarginRate,
-          perpetualStatistics.markPrice,
-          size * (OrderBlockE.Short === orderBlock ? -1 : 1),
-          (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
-          1 / leverage
-        ) * 1e4; // in bps
+    if (perpetualStaticInfo?.maintenanceMarginRate) {
+      tradingFee = TraderInterface.exchangeFeePrdMkts(
+        perpetualStaticInfo.maintenanceMarginRate,
+        perpetualStatistics.markPrice,
+        size * (OrderBlockE.Short === orderBlock ? -1 : 1),
+        (openPosition?.positionNotionalBaseCCY ?? 0) * (openPosition?.side === BUY_SIDE ? 1 : -1),
+        1 / leverage
+      );
     }
     // baseFee stays null
   } else {
