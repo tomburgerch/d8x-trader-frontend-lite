@@ -67,9 +67,7 @@ export const maxOrderSizeAtom = atom((get) => {
       markPrice,
       collToQuoteIndexPrice,
       selectedPerpetual.longBC,
-      selectedPerpetual.shortBC,
-      maxTraderOrderSize,
-      maxTraderOrderSize
+      selectedPerpetual.shortBC
     );
   } else {
     const buffer =
