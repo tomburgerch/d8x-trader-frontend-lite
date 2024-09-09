@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
 import { SelectItemI } from '../header/elements/header-select/types';
@@ -7,16 +7,16 @@ import { assetTypeFilterAtom, collateralFilterAtom } from './collaterals.store';
 import { PerpetualWithPoolAndMarketI } from './types';
 
 export const useMarketsFilter = (markets: SelectItemI<PerpetualWithPoolAndMarketI>[]) => {
-  const [collateralFilter] = useAtom(collateralFilterAtom);
-  const [searchFilter] = useAtom(searchFilterAtom);
-  const [assetTypeFilter] = useAtom(assetTypeFilterAtom);
+  const collateralFilter = useAtomValue(collateralFilterAtom);
+  const searchFilter = useAtomValue(searchFilterAtom);
+  const assetTypeFilter = useAtomValue(assetTypeFilterAtom);
 
   const filteredMarkets = useMemo(() => {
     let collateralFiltered;
     if (collateralFilter === null) {
       collateralFiltered = markets;
     } else {
-      collateralFiltered = markets.filter((market) => market.item.poolSymbol === collateralFilter);
+      collateralFiltered = markets.filter((market) => market.item.settleSymbol === collateralFilter);
     }
 
     if (assetTypeFilter === null) {

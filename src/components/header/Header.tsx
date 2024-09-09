@@ -137,7 +137,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
         });
       setPools(pools);
 
-      setCollaterals(pools.map((pool) => pool.poolSymbol));
+      setCollaterals(pools.map((pool) => pool.settleSymbol));
 
       const perpetuals: PerpetualDataI[] = [];
       data.pools.forEach((pool) => {

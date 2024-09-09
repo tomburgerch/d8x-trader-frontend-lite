@@ -49,7 +49,11 @@ export const CollateralSelect = () => {
 
   const currencyOptions = useMemo(() => {
     const currencies = [''];
-    currencies.push(...collaterals);
+    collaterals.forEach((collateral) => {
+      if (!currencies.includes(collateral)) {
+        currencies.push(collateral);
+      }
+    });
     return currencies;
   }, [collaterals]);
 
