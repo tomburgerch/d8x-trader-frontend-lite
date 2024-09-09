@@ -43,7 +43,7 @@ export const InfoBlock = memo(() => {
 
   const feeInCC = useMemo(() => {
     if (orderInfo?.isPredictionMarket && orderInfo?.tradingFee && selectedPerpetual?.collToQuoteIndexPrice) {
-      return (orderSize * orderInfo.tradingFee) / selectedPerpetual.collToQuoteIndexPrice / 1e4;
+      return (orderSize * orderInfo.tradingFee) / selectedPerpetual.collToQuoteIndexPrice;
     }
     if (!orderInfo?.tradingFee || !selectedPerpetual?.collToQuoteIndexPrice || !selectedPerpetual?.indexPrice) {
       return undefined;
