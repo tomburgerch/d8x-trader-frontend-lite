@@ -178,9 +178,9 @@ export const ActionBlock = memo(() => {
   const [requestSent, setRequestSent] = useState(false);
   const [maxOrderSize, setMaxOrderSize] = useState<{ maxBuy: number; maxSell: number }>();
   const [txHash, setTxHash] = useState<Address>();
+  const [validityCheck, setValidityCheck] = useState(false);
 
   const requestSentRef = useRef(false);
-  const validityCheckRef = useRef(false);
 
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
@@ -191,7 +191,7 @@ export const ActionBlock = memo(() => {
       return;
     }
 
-    validityCheckRef.current = true;
+    setValidityCheck(true);
     setShowReviewOrderModal(true);
     setNewPositionRisk(null);
     setMaxOrderSize(undefined);
@@ -236,7 +236,7 @@ export const ActionBlock = memo(() => {
       .catch(console.error);
 
     Promise.all([positionRiskOnTradePromise, getPerpetualPricePromise]).finally(() => {
-      validityCheckRef.current = false;
+      setValidityCheck(false);
     });
   };
 
@@ -543,7 +543,7 @@ export const ActionBlock = memo(() => {
   const validityCheckType = useMemo(() => {
     if (
       !showReviewOrderModal ||
-      validityCheckRef.current ||
+      validityCheck ||
       !maxOrderSize ||
       !orderInfo?.orderBlock ||
       !perpetualStaticInfo?.lotSizeBC
@@ -557,7 +557,6 @@ export const ActionBlock = memo(() => {
       isTooLarge = orderInfo.size > maxOrderSize.maxSell;
     }
     if (isTooLarge) {
-      console.log(orderInfo.size, maxOrderSize);
       return ValidityCheckE.OrderTooLarge;
     }
     const isOrderTooSmall = orderInfo.size > 0 && orderInfo.size < perpetualStaticInfo.lotSizeBC;
@@ -599,6 +598,7 @@ export const ActionBlock = memo(() => {
     return ValidityCheckE.GoodToGo;
   }, [
     maxOrderSize,
+    validityCheck,
     orderInfo?.size,
     orderInfo?.orderBlock,
     orderInfo?.orderType,
@@ -668,6 +668,12 @@ export const ActionBlock = memo(() => {
     newPositionRisk?.liquidationPrice?.[0] && isPredictionMarket
       ? calculateProbability(newPositionRisk.liquidationPrice[0], orderInfo?.orderBlock === OrderBlockE.Short)
       : newPositionRisk?.liquidationPrice?.[0] ?? 0;
+
+  console.log({
+    isOrderValid,
+    validityCheckType,
+    validityCheck,
+  });
 
   return (
     <div className={styles.root}>
@@ -865,7 +871,7 @@ export const ActionBlock = memo(() => {
                           (collateralDeposit - (predFeeInCC ?? 0)) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                           selectedPool.settleSymbol
                         )
-                      : '-lala'
+                      : '-'
                   }
                   rightSideStyles={styles.rightSide}
                 />
@@ -1009,9 +1015,7 @@ export const ActionBlock = memo(() => {
               }
               rightSide={
                 !isValidityCheckDone ? (
-                  <div>
-                    <CircularProgress color="primary" />
-                  </div>
+                  <CircularProgress color="primary" />
                 ) : (
                   <Typography variant="bodyMediumPopup" className={styles.bold} style={{ color: validityColor }}>
                     {validityCheckType !== ValidityCheckE.Empty
