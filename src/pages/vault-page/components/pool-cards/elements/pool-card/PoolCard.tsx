@@ -67,6 +67,10 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       .finally(() => {
         weeklyAPYRequestSentRef.current = false;
       });
+
+    return () => {
+      weeklyAPYRequestSentRef.current = false;
+    };
   }, [chainId, pool.poolSymbol, triggerUserStatsUpdate]);
 
   useEffect(() => {
@@ -86,6 +90,10 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       .finally(() => {
         stUsdAPYRequestSentRef.current = false;
       });
+
+    return () => {
+      stUsdAPYRequestSentRef.current = false;
+    };
   }, [pool.poolSymbol, triggerUserStatsUpdate]);
 
   useEffect(() => {
@@ -106,6 +114,10 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
       .finally(() => {
         weethAPYRequestSentRef.current = false;
       });
+
+    return () => {
+      weethAPYRequestSentRef.current = false;
+    };
   }, [pool.poolSymbol, triggerUserStatsUpdate]);
 
   const yieldData = useMemo(() => {

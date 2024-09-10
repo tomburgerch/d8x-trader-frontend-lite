@@ -58,6 +58,7 @@ export const ExitStrategy = ({
   const [currentPhaseKey, setCurrentPhaseKey] = useState('');
 
   const requestSentRef = useRef(false);
+  const claimRequestSentRef = useRef(false);
 
   const strategyAddress = useMemo(() => {
     return strategyAddresses.find(({ userAddress }) => userAddress === address?.toLowerCase())?.strategyAddress;
@@ -125,7 +126,6 @@ export const ExitStrategy = ({
     strategyAddressBalanceBigint,
   ]);
 
-  const claimRequestSentRef = useRef(false);
   const claimFunds = useCallback(
     (balance: bigint) => {
       if (
@@ -144,8 +144,6 @@ export const ExitStrategy = ({
       setShowConfirmModal(false);
       setRequestSent(true);
       setLoading(true);
-
-      console.log('claimStrategyFunds');
 
       claimStrategyFunds(
         {

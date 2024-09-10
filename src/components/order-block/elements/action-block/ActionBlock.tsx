@@ -669,12 +669,6 @@ export const ActionBlock = memo(() => {
       ? calculateProbability(newPositionRisk.liquidationPrice[0], orderInfo?.orderBlock === OrderBlockE.Short)
       : newPositionRisk?.liquidationPrice?.[0] ?? 0;
 
-  console.log({
-    isOrderValid,
-    validityCheckType,
-    validityCheck,
-  });
-
   return (
     <div className={styles.root}>
       {[ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (

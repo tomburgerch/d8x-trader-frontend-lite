@@ -51,6 +51,10 @@ export const PortfolioPage = () => {
         requestSentRef.current = false;
         setLoading(false);
       });
+
+    return () => {
+      requestSentRef.current = false;
+    };
   }, [openRewards, traderAPI, address, chainId, pools, fetchPortfolio]);
 
   if (isLoading) {

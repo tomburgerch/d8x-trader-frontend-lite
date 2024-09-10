@@ -101,6 +101,10 @@ export const SDKLoader = memo(() => {
         loadingAPIRef.current = false;
         setAPIBusy(false);
       });
+
+    return () => {
+      loadingAPIRef.current = false;
+    };
   }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
 
   useEffect(() => {

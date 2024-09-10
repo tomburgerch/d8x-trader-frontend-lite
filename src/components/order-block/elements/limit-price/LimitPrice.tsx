@@ -71,6 +71,9 @@ export const LimitPrice = memo(() => {
 
   useEffect(() => {
     orderBlockChangedRef.current = true;
+    return () => {
+      orderBlockChangedRef.current = false;
+    };
   }, [orderBlock]);
 
   useEffect(() => {

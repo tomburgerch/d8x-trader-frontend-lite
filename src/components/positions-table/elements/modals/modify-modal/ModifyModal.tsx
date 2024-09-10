@@ -220,6 +220,10 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const debouncedRemoveCollateral = useDebounce(removeCollateral, 500);
 
+  useEffect(() => {
+    isAPIBusyRef.current = isAPIBusy;
+  }, [isAPIBusy]);
+
   const handleRefreshPositionRisk = useCallback(() => {
     if (isAPIBusyRef.current || !selectedPosition || !address || !isEnabledChain(chainId)) {
       return;
