@@ -138,6 +138,7 @@ enum ValidityCheckButtonE {
   NoAmount = 'no-amount',
   NoLimitPrice = 'no-limit-price',
   NoTriggerPrice = 'no-trigger-price',
+  ClosedPrediction = 'closed-prediction',
 }
 
 export const ActionBlock = memo(() => {
@@ -185,6 +186,13 @@ export const ActionBlock = memo(() => {
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
   const isPredictionMarket = selectedPerpetualData?.isPredictionMarket ?? false;
+
+  const isMarketClosed = useDebounce(
+    useMemo(() => {
+      return selectedPerpetual?.isMarketClosed;
+    }, [selectedPerpetual]),
+    30_000
+  );
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI || !poolFee || !isEnabledChain(chainId)) {
@@ -266,6 +274,10 @@ export const ActionBlock = memo(() => {
   }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC, selectedPerpetual?.state]);
 
   const validityCheckButtonType = useMemo(() => {
+    if (isPredictionMarket && isMarketClosed) {
+      console.log('gugus');
+      return ValidityCheckButtonE.ClosedPrediction;
+    }
     if (!address || !orderInfo) {
       return ValidityCheckButtonE.NoAddress;
     }
@@ -288,10 +300,12 @@ export const ActionBlock = memo(() => {
       return ValidityCheckButtonE.NoTriggerPrice;
     }
     return ValidityCheckButtonE.GoodToGo;
-  }, [orderInfo, address, chainId, poolTokenBalance, hasEnoughGasForFee]);
+  }, [orderInfo, address, chainId, poolTokenBalance, hasEnoughGasForFee, isPredictionMarket, isMarketClosed]);
 
   const validityCheckButtonText = useMemo(() => {
-    if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
+    if (validityCheckButtonType === ValidityCheckButtonE.ClosedPrediction) {
+      return `${t('common.select.market.closed')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
       return `${t('pages.trade.action-block.validity.button-no-address')}`;
     } else if (validityCheckButtonType === ValidityCheckButtonE.WrongNetwork) {
       return `${t('error.wrong-network')}`;
@@ -526,13 +540,6 @@ export const ActionBlock = memo(() => {
     return '-';
   }, [orderInfo, perpetualStaticInfo]);
 
-  const isMarketClosed = useDebounce(
-    useMemo(() => {
-      return selectedPerpetual?.isMarketClosed;
-    }, [selectedPerpetual]),
-    30_000
-  );
-
   const positionToModify = useDebounce(
     useMemo(() => {
       return positions?.find((pos) => pos.symbol === orderInfo?.symbol);
@@ -577,7 +584,7 @@ export const ActionBlock = memo(() => {
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
       return ValidityCheckE.Undefined;
     }
-    if (isMarketClosed) {
+    if (isMarketClosed && !isPredictionMarket) {
       return ValidityCheckE.Closed;
     }
     if (
