@@ -272,7 +272,6 @@ export const ActionBlock = memo(() => {
 
   const validityCheckButtonType = useMemo(() => {
     if (isPredictionMarket && isMarketClosed) {
-      console.log('gugus');
       return ValidityCheckButtonE.ClosedPrediction;
     }
     if (!address || !orderInfo) {
