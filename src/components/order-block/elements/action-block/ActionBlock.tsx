@@ -1,6 +1,7 @@
 import { BUY_SIDE, pmInitialMarginRate, TraderInterface } from '@d8x/perpetuals-sdk';
+import classnames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type Address } from 'viem';
@@ -8,10 +9,12 @@ import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi
 
 import { Button, CircularProgress, Typography } from '@mui/material';
 
+import WalletIcon from 'assets/icons/new/wallet.svg?react';
 import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -41,9 +44,10 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { MethodE, OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import type { OrderI, OrderInfoI } from 'types/types';
+import type { OrderI, OrderInfoI, TemporaryAnyT } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useMinPositionString } from '../../hooks/useMinPositionString';
@@ -138,6 +142,7 @@ enum ValidityCheckButtonE {
   NoAmount = 'no-amount',
   NoLimitPrice = 'no-limit-price',
   NoTriggerPrice = 'no-trigger-price',
+  ClosedPrediction = 'closed-prediction',
 }
 
 export const ActionBlock = memo(() => {
@@ -185,6 +190,10 @@ export const ActionBlock = memo(() => {
   const { minPositionString } = useMinPositionString(currencyMultiplier, perpetualStaticInfo);
 
   const isPredictionMarket = selectedPerpetualData?.isPredictionMarket ?? false;
+
+  const isMarketClosed = useMemo(() => {
+    return selectedPerpetual?.isMarketClosed;
+  }, [selectedPerpetual?.isMarketClosed]);
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI || !poolFee || !isEnabledChain(chainId)) {
@@ -266,6 +275,9 @@ export const ActionBlock = memo(() => {
   }, [orderInfo, address, chainId, perpetualStaticInfo?.lotSizeBC, selectedPerpetual?.state]);
 
   const validityCheckButtonType = useMemo(() => {
+    if (isPredictionMarket && isMarketClosed) {
+      return ValidityCheckButtonE.ClosedPrediction;
+    }
     if (!address || !orderInfo) {
       return ValidityCheckButtonE.NoAddress;
     }
@@ -288,10 +300,12 @@ export const ActionBlock = memo(() => {
       return ValidityCheckButtonE.NoTriggerPrice;
     }
     return ValidityCheckButtonE.GoodToGo;
-  }, [orderInfo, address, chainId, poolTokenBalance, hasEnoughGasForFee]);
+  }, [orderInfo, address, chainId, poolTokenBalance, hasEnoughGasForFee, isPredictionMarket, isMarketClosed]);
 
   const validityCheckButtonText = useMemo(() => {
-    if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
+    if (validityCheckButtonType === ValidityCheckButtonE.ClosedPrediction) {
+      return `${t('common.select.market.closed')}`;
+    } else if (validityCheckButtonType === ValidityCheckButtonE.NoAddress) {
       return `${t('pages.trade.action-block.validity.button-no-address')}`;
     } else if (validityCheckButtonType === ValidityCheckButtonE.WrongNetwork) {
       return `${t('error.wrong-network')}`;
@@ -526,13 +540,6 @@ export const ActionBlock = memo(() => {
     return '-';
   }, [orderInfo, perpetualStaticInfo]);
 
-  const isMarketClosed = useDebounce(
-    useMemo(() => {
-      return selectedPerpetual?.isMarketClosed;
-    }, [selectedPerpetual]),
-    30_000
-  );
-
   const positionToModify = useDebounce(
     useMemo(() => {
       return positions?.find((pos) => pos.symbol === orderInfo?.symbol);
@@ -577,7 +584,7 @@ export const ActionBlock = memo(() => {
     if (orderInfo.takeProfitPrice !== null && orderInfo.takeProfitPrice <= 0) {
       return ValidityCheckE.Undefined;
     }
-    if (isMarketClosed) {
+    if (isMarketClosed && !isPredictionMarket) {
       return ValidityCheckE.Closed;
     }
     if (
@@ -623,6 +630,8 @@ export const ActionBlock = memo(() => {
       return `${t('pages.trade.action-block.validity.position-too-small', {
         minAmount: `${minPositionString} ${selectedCurrency}`,
       })}`;
+    } else if (validityCheckType === ValidityCheckE.GoodToGo) {
+      return '';
     }
     return t(`pages.trade.action-block.validity.${validityCheckType}`);
   }, [t, validityCheckType, poolTokenBalance, minPositionString, selectedCurrency]);
@@ -635,10 +644,6 @@ export const ActionBlock = memo(() => {
   const isConfirmButtonDisabled = useMemo(() => {
     return !isOrderValid || requestSentRef.current || requestSent;
   }, [isOrderValid, requestSent]);
-
-  const validityColor = [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].some((x) => x === validityCheckType)
-    ? 'var(--d8x-color-buy-rgba)'
-    : 'var(--d8x-color-sell-rgba)';
 
   useEffect(() => {
     if (validityCheckType === ValidityCheckE.GoodToGo) {
@@ -669,11 +674,10 @@ export const ActionBlock = memo(() => {
       ? calculateProbability(newPositionRisk.liquidationPrice[0], orderInfo?.orderBlock === OrderBlockE.Short)
       : newPositionRisk?.liquidationPrice?.[0] ?? 0;
 
-  console.log({
-    isOrderValid,
-    validityCheckType,
-    validityCheck,
-  });
+  const SelectedCurrencyIcon = useMemo(
+    () => getDynamicLogo(selectedCurrency.toLowerCase()) as TemporaryAnyT,
+    [selectedCurrency]
+  );
 
   return (
     <div className={styles.root}>
@@ -710,25 +714,25 @@ export const ActionBlock = memo(() => {
           }
         >
           <div className={styles.newPositionHeader}>
-            <SidesRow
-              leftSide={
-                <Typography variant="bodyLargePopup" className={styles.bold}>
-                  {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''}{' '}
-                  {!isPredictionMarket && t(orderTypeMap[orderInfo.orderType])}{' '}
-                  {t(orderBlockMap[isPredictionMarket ? OrderBlockE.Long : orderInfo.orderBlock])}{' '}
-                  {isPredictionMarket && t(predictionOrderBlockMap[orderInfo.orderBlock])}
-                </Typography>
-              }
-              rightSide={
-                <Typography variant="bodyLargePopup" className={styles.bold}>
-                  {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
-                </Typography>
-              }
-            />
+            <Typography variant="bodyLargePopup" component="div" className={styles.orderType}>
+              {orderInfo.leverage > 0 ? `${formatNumber(orderInfo.leverage)}x` : ''}{' '}
+              {!isPredictionMarket && t(orderTypeMap[orderInfo.orderType])}{' '}
+              {t(orderBlockMap[isPredictionMarket ? OrderBlockE.Long : orderInfo.orderBlock])}{' '}
+              {isPredictionMarket && t(predictionOrderBlockMap[orderInfo.orderBlock])}
+            </Typography>
+            <Typography variant="bodyLargePopup" component="div" className={styles.positionPrice}>
+              <Suspense>
+                <SelectedCurrencyIcon />
+              </Suspense>
+              <span>
+                {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
+              </span>
+            </Typography>
           </div>
+
           {!isPredictionMarket && (
-            <>
-              <div className={styles.orderDetails}>
+            <div className={styles.borderedBox}>
+              <div className={styles.boxContent}>
                 <SidesRow
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
@@ -853,11 +857,11 @@ export const ActionBlock = memo(() => {
                   rightSideStyles={styles.rightSide}
                 />
               </div>
-            </>
+            </div>
           )}
           {isPredictionMarket && (
-            <>
-              <div className={styles.orderDetails}>
+            <div className={styles.borderedBox}>
+              <div className={styles.boxContent}>
                 <SidesRow
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
@@ -902,31 +906,29 @@ export const ActionBlock = memo(() => {
                   />
                 )}
               </div>
-            </>
+            </div>
           )}
+
           {!isPredictionMarket && (
-            <>
-              <Separator />
-              <div className={styles.newPositionHeader}>
-                <Typography variant="bodyMediumPopup" className={styles.bold}>
-                  {t('pages.trade.action-block.review.details')}
+            <div className={styles.borderedBox}>
+              <div className={styles.boxContent}>
+                <Typography variant="bodyMediumPopup" component="div" className={styles.heading}>
+                  <WalletIcon width={14} height={14} />
+                  <span>{t('pages.trade.action-block.review.details')}</span>
+                </Typography>
+                <Typography variant="bodyMediumPopup" component="div" className={styles.positionSize}>
+                  <Suspense>
+                    <SelectedCurrencyIcon />
+                  </Suspense>
+                  <span>
+                    {isOrderValid && newPositionRisk
+                      ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
+                      : '-'}
+                  </span>
                 </Typography>
               </div>
-              <div className={styles.newPositionDetails}>
-                <SidesRow
-                  leftSide={
-                    <Typography variant="bodySmallPopup" className={styles.left}>
-                      {' '}
-                      {t('pages.trade.action-block.review.size')}{' '}
-                    </Typography>
-                  }
-                  rightSide={
-                    isOrderValid && newPositionRisk
-                      ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
-                      : '-'
-                  }
-                  rightSideStyles={styles.rightSide}
-                />
+              <Separator separatorType={SeparatorTypeE.Modal} lineClassName={styles.separator} />
+              <div className={styles.boxContent}>
                 <SidesRow
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
@@ -976,75 +978,59 @@ export const ActionBlock = memo(() => {
                   rightSideStyles={styles.rightSide}
                 />
               </div>
-            </>
+            </div>
           )}
-
           {isPredictionMarket && (
-            <>
-              <Separator />
-              <div className={styles.newPositionHeader}>
-                <Typography variant="bodyMediumPopup" className={styles.bold}>
-                  {'Comparision to Polymarket'}
+            <div className={styles.borderedBox}>
+              <div className={styles.boxContent}>
+                <Typography variant="bodyMediumPopup" component="div" className={styles.heading2}>
+                  {t('pages.trade.action-block.review.prediction-header')}
                 </Typography>
-              </div>
-              <div className={styles.newPositionHeader}>
-                <Typography variant="bodySmallPopup" className={styles.left}>
-                  {'Your order costs ' +
-                    formatToCurrency(predFeeInCC, selectedPool?.settleSymbol, false, 2) +
-                    '. In addition you deposit ' +
-                    formatToCurrency(collateralDeposit, selectedPool?.settleSymbol) +
-                    ' as margin, which you get back if you bet correctly. On Polymarket the same order costs ' +
-                    formatToCurrency(
+                <Typography variant="bodySmallPopup" component="div" className={styles.contentText}>
+                  {t('pages.trade.action-block.review.prediction-content', {
+                    predFeeInCC: formatToCurrency(predFeeInCC, selectedPool?.settleSymbol, false, 2),
+                    collateralDeposit: formatToCurrency(collateralDeposit, selectedPool?.settleSymbol),
+                    costs: formatToCurrency(
                       orderInfo.size *
                         calculateProbability(orderInfo.midPrice, orderInfo.orderBlock === OrderBlockE.Short),
                       selectedPool?.settleSymbol,
                       false,
                       2
-                    ) +
-                    '.'}
+                    ),
+                  })}
                 </Typography>
               </div>
-            </>
+            </div>
           )}
-          <div className={styles.emphasis}>
-            <SidesRow
-              leftSide={
-                <Typography variant="bodyMediumPopup" className={styles.semibold}>
-                  {t('pages.trade.action-block.review.validity-checks')}
-                </Typography>
-              }
-              rightSide={
-                !isValidityCheckDone ? (
-                  <CircularProgress color="primary" />
-                ) : (
-                  <Typography variant="bodyMediumPopup" className={styles.bold} style={{ color: validityColor }}>
-                    {validityCheckType !== ValidityCheckE.Empty
-                      ? t(
-                          `pages.trade.action-block.validity.${
-                            [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].some((x) => x === validityCheckType)
-                              ? 'pass'
-                              : 'fail'
-                          }`
-                        )
-                      : ' '}
-                  </Typography>
-                )
-              }
-            />
-          </div>
-          {isValidityCheckDone ? (
-            <div className={styles.goMessage}>
-              <Typography variant="bodySmallPopup" className={styles.centered} style={{ color: validityColor }}>
-                {validityCheckText}
+
+          <div
+            className={classnames(styles.borderedBox, styles.emphasis, {
+              [styles.success]:
+                isValidityCheckDone && [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
+              [styles.error]:
+                isValidityCheckDone && ![ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
+            })}
+          >
+            <div className={styles.boxContent}>
+              <Typography variant="bodyMediumPopup" className={styles.semibold}>
+                {t('pages.trade.action-block.review.validity-checks')}:{' '}
+                {!isValidityCheckDone && <CircularProgress color="primary" />}
+                {isValidityCheckDone &&
+                  (validityCheckType !== ValidityCheckE.Empty
+                    ? t(
+                        `pages.trade.action-block.validity.${
+                          [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType) ? 'pass' : 'fail'
+                        }`
+                      )
+                    : ' ')}
+                {isValidityCheckDone && validityCheckText !== '' && ` (${validityCheckText})`}
               </Typography>
             </div>
-          ) : (
-            ''
-          )}
+          </div>
           {hasTpSlOrders && (
             <Typography
               variant="bodySmallPopup"
-              className={styles.centered}
+              className={styles.tpSlNote}
               style={{ color: 'var(--d8x-color-warning-secondary)' }}
             >
               {t('pages.trade.action-block.validity.verify-tp-sl-orders')}

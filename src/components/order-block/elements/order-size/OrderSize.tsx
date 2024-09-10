@@ -75,7 +75,7 @@ export const OrderSize = memo(() => {
   const setInputFromOrderSize = useSetAtom(setInputFromOrderSizeAtom);
   const setOrderSize = useSetAtom(setOrderSizeAtom);
 
-  const fetchedMaxSizes = useRef(false);
+  const fetchedMaxSizesRef = useRef(false);
   const maxOrderSizeDefinedRef = useRef(false);
   const maxOrderSizeRetriesCountRef = useRef(0);
   const maxOrderSizeRequestRef = useRef(false);
@@ -145,7 +145,7 @@ export const OrderSize = memo(() => {
 
   const fetchMaxOrderSize = useCallback(
     async (_chainId: number, _address: string, _lotSizeBC: number, _perpId: number, _isLong: boolean) => {
-      if (!traderAPI || fetchedMaxSizes.current || selectedPerpetual?.state !== 'NORMAL') {
+      if (!traderAPI || fetchedMaxSizesRef.current || selectedPerpetual?.state !== 'NORMAL') {
         return;
       }
 
@@ -154,11 +154,11 @@ export const OrderSize = memo(() => {
         return;
       }
 
-      fetchedMaxSizes.current = true;
+      fetchedMaxSizesRef.current = true;
       const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
         console.error(err);
       });
-      fetchedMaxSizes.current = false;
+      fetchedMaxSizesRef.current = false;
       if (!data?.data) {
         return;
       }

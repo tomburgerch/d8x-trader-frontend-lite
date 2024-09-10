@@ -115,6 +115,10 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       .finally(() => {
         validityCheckRef.current = false;
       });
+
+    return () => {
+      validityCheckRef.current = false;
+    };
   }, [selectedPosition, address, traderAPI, chainId, poolFee]);
 
   const fetchPoolFee = useCallback((_chainId: number, _poolSymbol: string, _address: Address) => {
@@ -139,6 +143,10 @@ export const ModifyTpSlModal = memo(({ isOpen, selectedPosition, poolByPosition,
       return;
     }
     fetchPoolFee(chainId, poolByPosition.poolSymbol, address);
+
+    return () => {
+      fetchFeeRef.current = false;
+    };
   }, [chainId, poolByPosition?.poolSymbol, address, fetchPoolFee]);
 
   const { isSuccess, isError, isFetched } = useWaitForTransactionReceipt({

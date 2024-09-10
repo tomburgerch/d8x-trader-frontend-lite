@@ -192,6 +192,11 @@ export const TraderPage = () => {
     }
     fetchPositions(chainId, address).then();
     fetchOrders(chainId, address).then();
+
+    return () => {
+      fetchPositionsRef.current = false;
+      fetchOrdersRef.current = false;
+    };
   }, [chainId, address, fetchPositions, fetchOrders]);
 
   useEffect(() => {

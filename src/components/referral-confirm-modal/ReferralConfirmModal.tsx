@@ -99,6 +99,10 @@ export const ReferralConfirmModal = memo(() => {
       .finally(() => {
         activeCodeRequestRef.current = false;
       });
+
+    return () => {
+      activeCodeRequestRef.current = false;
+    };
   }, [refId, chainId, address]);
 
   useEffect(() => {
@@ -115,6 +119,10 @@ export const ReferralConfirmModal = memo(() => {
       .finally(() => {
         codeRebateRequestRef.current = false;
       });
+
+    return () => {
+      codeRebateRequestRef.current = false;
+    };
   }, [chainId, refId]);
 
   if (!refId) {

@@ -39,6 +39,10 @@ export const useTradesHistory = () => {
 
   useEffect(() => {
     refreshTradesHistory();
+
+    return () => {
+      updateTradesHistoryRef.current = false;
+    };
   }, [openOrders, refreshTradesHistory]);
 
   const tradesHistoryWithSymbol: TradeHistoryWithSymbolDataI[] = useMemo(() => {

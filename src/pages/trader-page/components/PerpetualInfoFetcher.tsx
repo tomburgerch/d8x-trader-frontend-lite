@@ -55,6 +55,10 @@ export const PerpetualInfoFetcher = () => {
       .finally(() => {
         requestSentRef.current = false;
       });
+
+    return () => {
+      requestSentRef.current = false;
+    };
   }, [chainId, symbol, setPerpetualStaticInfo, traderAPI]);
 
   return null;

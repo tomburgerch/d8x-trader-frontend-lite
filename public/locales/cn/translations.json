@@ -376,7 +376,9 @@
           "validity-checks": "有效性检查",
           "cancel": "取消",
           "confirm": "确认",
-          "estimated-price": "预计开盘价"
+          "estimated-price": "预计开盘价",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {

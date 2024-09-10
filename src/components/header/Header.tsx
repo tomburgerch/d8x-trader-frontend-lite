@@ -126,7 +126,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
             try {
               poolId = traderAPI.getPoolIdFromSymbol(pool.poolSymbol);
             } catch (error) {
-              console.log(error);
+              console.error(error);
             }
           }
 
@@ -201,7 +201,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }, [traderAPI, chainId]);
 
   useEffect(() => {
-    if (exchangeRequestRef.current) {
+    if (!chainId || exchangeRequestRef.current) {
       return;
     }
 
@@ -223,7 +223,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           retries = MAX_RETRIES;
         } catch (error) {
           console.error(error);
-          console.log(`ExchangeInfo attempt ${retries + 1} failed: ${error}`);
+          console.info(`ExchangeInfo attempt ${retries + 1} failed: ${error}`);
           retries++;
           if (retries === MAX_RETRIES) {
             // Throw the error if max retries reached

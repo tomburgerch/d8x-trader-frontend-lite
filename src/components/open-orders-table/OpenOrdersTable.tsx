@@ -129,6 +129,9 @@ export const OpenOrdersTable = memo(() => {
     setLoading(false);
     refreshOpenOrders().then();
     setLatestOrderSentTimestamp(Date.now());
+    return () => {
+      isAPIBusyRef.current = false;
+    };
   }, [isFetched, setTxHash, refreshOpenOrders, setLatestOrderSentTimestamp]);
 
   useEffect(() => {
@@ -242,6 +245,9 @@ export const OpenOrdersTable = memo(() => {
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
+    return () => {
+      isAPIBusyRef.current = false;
+    };
   }, [refreshOpenOrders, setTableRefreshHandlers]);
 
   const openOrdersHeaders: TableHeaderI<OrderWithIdI>[] = useMemo(

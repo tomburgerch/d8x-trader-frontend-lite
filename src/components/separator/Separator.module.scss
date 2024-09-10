@@ -3,11 +3,6 @@
 .root {
   padding: $d8x-spacing 0;
 
-  .line {
-    height: 0;
-    border-bottom: 1px solid var(--d8x-color-separator-border);
-  }
-
   &.block {
     background-color: var(--d8x-color-background-items);
   }
@@ -15,6 +10,11 @@
   &.modal {
     background-color: var(--d8x-modal-background-color);
   }
+}
+
+.line {
+  height: 0;
+  border-bottom: 1px solid var(--d8x-color-separator-border);
 }
 
 .orSeparator {

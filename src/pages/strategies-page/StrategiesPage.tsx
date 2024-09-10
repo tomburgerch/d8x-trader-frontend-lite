@@ -98,6 +98,10 @@ export const StrategiesPage = () => {
       .finally(() => {
         requestSentRef.current = false;
       });
+
+    return () => {
+      requestSentRef.current = false;
+    };
   }, [chainId, setStrategyPerpetualStaticInfo, traderAPI]);
 
   return (

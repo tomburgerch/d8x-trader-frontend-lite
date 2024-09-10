@@ -9,10 +9,11 @@ import styles from './Separator.module.scss';
 
 interface SeparatorPropsI {
   className?: string;
+  lineClassName?: string;
   separatorType?: SeparatorTypeE;
 }
 
-export const Separator = memo(({ className, separatorType = SeparatorTypeE.Block }: SeparatorPropsI) => {
+export const Separator = memo(({ className, lineClassName, separatorType = SeparatorTypeE.Block }: SeparatorPropsI) => {
   return (
     <Box
       className={classnames(styles.root, className, {
@@ -20,7 +21,7 @@ export const Separator = memo(({ className, separatorType = SeparatorTypeE.Block
         [styles.modal]: separatorType === SeparatorTypeE.Modal,
       })}
     >
-      <div className={styles.line}></div>
+      <div className={classnames(styles.line, lineClassName)}></div>
     </Box>
   );
 });

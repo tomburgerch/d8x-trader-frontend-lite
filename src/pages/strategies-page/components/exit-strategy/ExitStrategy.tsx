@@ -58,6 +58,7 @@ export const ExitStrategy = ({
   const [currentPhaseKey, setCurrentPhaseKey] = useState('');
 
   const requestSentRef = useRef(false);
+  const claimRequestSentRef = useRef(false);
 
   const strategyAddress = useMemo(() => {
     return strategyAddresses.find(({ userAddress }) => userAddress === address?.toLowerCase())?.strategyAddress;
@@ -125,7 +126,6 @@ export const ExitStrategy = ({
     strategyAddressBalanceBigint,
   ]);
 
-  const claimRequestSentRef = useRef(false);
   const claimFunds = useCallback(
     (balance: bigint) => {
       if (
@@ -145,8 +145,6 @@ export const ExitStrategy = ({
       setRequestSent(true);
       setLoading(true);
 
-      console.log('claimStrategyFunds');
-
       claimStrategyFunds(
         {
           chainId,
@@ -160,7 +158,7 @@ export const ExitStrategy = ({
         sendTransactionAsync
       )
         .then(({ hash }) => {
-          console.log({ hash });
+          // console.log({ hash });
           if (hash) {
             /// can't use setTxHash <- this is to trigger order status checks, not fund stuff
             // setTxHash(hash);

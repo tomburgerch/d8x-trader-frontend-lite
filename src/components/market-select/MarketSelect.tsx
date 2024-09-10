@@ -60,9 +60,11 @@ export const MarketSelect = memo(() => {
       return;
     }
 
-    urlChangesAppliedRef.current = true;
-
-    const symbolHash = location.hash.slice(1);
+    let symbolHash = location.hash.slice(1);
+    // Handle `=` in the URL, which magically appears there...
+    if (symbolHash.indexOf('=')) {
+      symbolHash = symbolHash.replaceAll('=', '');
+    }
     const result = parseSymbol(symbolHash);
 
     if (result) {
@@ -70,6 +72,9 @@ export const MarketSelect = memo(() => {
 
       const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
       if (!foundPool) {
+        if (pools.length > 0) {
+          urlChangesAppliedRef.current = true;
+        }
         return;
       }
 
@@ -80,6 +85,7 @@ export const MarketSelect = memo(() => {
       if (foundPerpetual) {
         setSelectedPerpetual(foundPerpetual.id);
       }
+      urlChangesAppliedRef.current = true;
     }
   }, [location.hash, selectedPool, setSelectedPool, setSelectedPerpetual, pools]);
 

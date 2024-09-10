@@ -1,3 +1,4 @@
+import { pmInitialMarginRate } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { memo, useCallback, useMemo } from 'react';
@@ -7,15 +8,14 @@ import { Button, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
+import { orderBlockAtom, orderInfoAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom } from 'store/pools.store';
+import { OrderBlockE } from 'types/enums';
 import type { MarkI } from 'types/types';
 
 import { inputValueAtom, leverageAtom, setLeverageAtom } from './store';
 
 import styles from './LeverageSelector.module.scss';
-import { orderInfoAtom } from 'store/order-block.store';
-import { pmInitialMarginRate } from '@d8x/perpetuals-sdk';
-import { OrderBlockE } from 'types/enums';
 
 const markCount = 5;
 
@@ -26,18 +26,28 @@ export const LeverageSelector = memo(() => {
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const inputValue = useAtomValue(inputValueAtom);
+  const orderBlock = useAtomValue(orderBlockAtom);
   const orderInfo = useAtomValue(orderInfoAtom);
   const setLeverage = useSetAtom(setLeverageAtom);
 
   const maxLeverage = useMemo(() => {
-    if (orderInfo && perpetualStaticInfo?.initialMarginRate && perpetualStatistics?.markPrice) {
+    if (
+      orderInfo?.isPredictionMarket !== undefined &&
+      perpetualStaticInfo?.initialMarginRate &&
+      perpetualStatistics?.markPrice
+    ) {
       const initialMarginRate = orderInfo.isPredictionMarket
-        ? pmInitialMarginRate(orderInfo.orderBlock === OrderBlockE.Long ? 1 : -1, perpetualStatistics.markPrice)
+        ? pmInitialMarginRate(orderBlock === OrderBlockE.Long ? 1 : -1, -10000, 0.1)
         : perpetualStaticInfo?.initialMarginRate;
       return Math.round(1 / initialMarginRate);
     }
     return 10;
-  }, [orderInfo, perpetualStaticInfo?.initialMarginRate, perpetualStatistics?.markPrice]);
+  }, [
+    orderInfo?.isPredictionMarket,
+    orderBlock,
+    perpetualStaticInfo?.initialMarginRate,
+    perpetualStatistics?.markPrice,
+  ]);
 
   const marks = useMemo(() => {
     const newMarks: MarkI[] = [];
