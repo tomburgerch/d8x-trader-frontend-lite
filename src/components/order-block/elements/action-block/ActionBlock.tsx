@@ -187,12 +187,9 @@ export const ActionBlock = memo(() => {
 
   const isPredictionMarket = selectedPerpetualData?.isPredictionMarket ?? false;
 
-  const isMarketClosed = useDebounce(
-    useMemo(() => {
-      return selectedPerpetual?.isMarketClosed;
-    }, [selectedPerpetual]),
-    30_000
-  );
+  const isMarketClosed = useMemo(() => {
+    return selectedPerpetual?.isMarketClosed;
+  }, [selectedPerpetual?.isMarketClosed]);
 
   const openReviewOrderModal = async () => {
     if (!orderInfo || !address || !traderAPI || !poolFee || !isEnabledChain(chainId)) {

@@ -4,11 +4,12 @@ import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizeDetector } from 'react-resize-detector';
 
-import { CircularProgress, useMediaQuery, useTheme } from '@mui/material';
+import { CircularProgress, useMediaQuery, useTheme, Typography } from '@mui/material';
 
 import { MarketSelect } from 'components/market-select/MarketSelect';
 import { candlesAtom, candlesDataReadyAtom, newCandleAtom } from 'store/tv-chart.store';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
+import { selectedPerpetualAtom, selectedPerpetualDataAtom } from 'store/pools.store';
 
 import { ONE_MINUTE_SECONDS, ONE_MINUTE_TIME, TIMEZONE_OFFSET } from './constants';
 import { ChartBlock } from './elements/chart-block/ChartBlock';
@@ -33,6 +34,8 @@ export const TradingViewChart = memo(
     const candles = useAtomValue(candlesAtom);
     const isCandleDataReady = useAtomValue(candlesDataReadyAtom);
     const [newCandle, setNewCandle] = useAtom(newCandleAtom);
+    const selectedPerpetualData = useAtomValue(selectedPerpetualDataAtom);
+    const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
 
     const takeProfitPriceLineRef = useRef<IPriceLine | null>(null);
     const stopLossPriceLineRef = useRef<IPriceLine | null>(null);
@@ -40,6 +43,12 @@ export const TradingViewChart = memo(
     const latestCandleTimeRef = useRef<Time>();
 
     const { width, ref } = useResizeDetector();
+
+    const isPredictionMarket = selectedPerpetualData?.isPredictionMarket ?? false;
+
+    const isMarketClosed = useMemo(() => {
+      return selectedPerpetual?.isMarketClosed;
+    }, [selectedPerpetual?.isMarketClosed]);
 
     const candlesWithLocalTime: CandlestickData[] = useMemo(
       () =>
@@ -171,6 +180,18 @@ export const TradingViewChart = memo(
           {!isCandleDataReady && (
             <div className={styles.loaderHolder}>
               <CircularProgress color="primary" />
+            </div>
+          )}
+          {isMarketClosed && isPredictionMarket && (
+            <div className={styles.loaderHolder}>
+              <div className={styles.textWrapper}>
+                <Typography variant="bodySmallPopup" className={styles.bold}>
+                  {'Market is closed'}
+                </Typography>
+                <Typography variant="bodySmallPopup" className={styles.italic}>
+                  {'Settlement in progress'}
+                </Typography>
+              </div>
             </div>
           )}
         </div>

@@ -26,6 +26,25 @@
   position: relative;
 }
 
+.bold {
+ font-size: 14px;
+ font-weight: 600;
+ line-height: 16px;
+}
+
+.italic {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+ }
+
+ .textWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+ }
+
 .loaderHolder {
   position: absolute;
   inset: 0;
