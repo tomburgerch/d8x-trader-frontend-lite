@@ -376,7 +376,9 @@
           "validity-checks": "Validity checks",
           "cancel": "Cancel",
           "confirm": "Confirm",
-          "estimated-price": "Estimated entry price"
+          "estimated-price": "Estimated entry price",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
