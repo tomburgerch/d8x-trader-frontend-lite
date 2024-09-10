@@ -22,6 +22,10 @@
   @include flex-center;
 }
 
+.chartWrapper {
+  position: relative;
+}
+
 .loaderHolder {
   position: absolute;
   inset: 0;

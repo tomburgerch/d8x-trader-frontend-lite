@@ -160,18 +160,20 @@ export const TradingViewChart = memo(
             </div>
           </div>
         )}
-        <ChartBlock
-          width={width}
-          height={height}
-          candles={candlesWithLocalTime}
-          seriesRef={seriesRef}
-          numberDigits={precision}
-        />
-        {!isCandleDataReady && (
-          <div className={styles.loaderHolder}>
-            <CircularProgress color="primary" />
-          </div>
-        )}
+        <div className={styles.chartWrapper}>
+          <ChartBlock
+            width={width}
+            height={height}
+            candles={candlesWithLocalTime}
+            seriesRef={seriesRef}
+            numberDigits={precision}
+          />
+          {!isCandleDataReady && (
+            <div className={styles.loaderHolder}>
+              <CircularProgress color="primary" />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
