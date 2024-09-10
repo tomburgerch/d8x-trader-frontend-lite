@@ -158,7 +158,7 @@ export const ExitStrategy = ({
         sendTransactionAsync
       )
         .then(({ hash }) => {
-          console.log({ hash });
+          // console.log({ hash });
           if (hash) {
             /// can't use setTxHash <- this is to trigger order status checks, not fund stuff
             // setTxHash(hash);
