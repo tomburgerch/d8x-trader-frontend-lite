@@ -20,6 +20,15 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 14px;
+
+  svg {
+    margin-bottom: -$d8x-spacing;
+    margin-right: $d8x-spacing;
+  }
+
+  .errorDetails {
+    margin-top: $d8x-spacing * 2;
+  }
 }
 
 .newPositionHeader {

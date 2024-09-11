@@ -9,7 +9,9 @@ import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi
 
 import { Button, CircularProgress, Typography } from '@mui/material';
 
-import WalletIcon from 'assets/icons/new/wallet.svg?react';
+import ActionErrorIcon from 'assets/icons/new/actionError.svg?react';
+import ActionSuccessIcon from 'assets/icons/new/actionSuccess.svg?react';
+import WalletContentIcon from 'assets/icons/new/walletContent.svg?react';
 import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
@@ -559,9 +561,9 @@ export const ActionBlock = memo(() => {
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isTooLarge = orderInfo.size > maxOrderSize.maxBuy;
+      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxBuy);
     } else {
-      isTooLarge = orderInfo.size > maxOrderSize.maxSell;
+      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxSell);
     }
     if (isTooLarge) {
       return ValidityCheckE.OrderTooLarge;
@@ -679,14 +681,25 @@ export const ActionBlock = memo(() => {
     [selectedCurrency]
   );
 
+  const isValiditySuccess = [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType);
+
   return (
     <div className={styles.root}>
       {[ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (
-        <Button variant={'buy'} onClick={() => setDepositModalOpen(true)} className={styles.buyButton}>
+        <Button variant="buy" onClick={() => setDepositModalOpen(true)} className={styles.buyButton}>
           {validityCheckButtonText}
         </Button>
       )}
-      {![ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (
+      {[ValidityCheckButtonE.ClosedPrediction].includes(validityCheckButtonType) && (
+        <Button variant="buy" className={styles.buyButton} disabled>
+          {validityCheckButtonText}
+        </Button>
+      )}
+      {![
+        ValidityCheckButtonE.NoFunds,
+        ValidityCheckButtonE.NoEnoughGas,
+        ValidityCheckButtonE.ClosedPrediction,
+      ].includes(validityCheckButtonType) && (
         <Button
           variant={orderInfo?.orderBlock === OrderBlockE.Short ? 'sell' : 'buy'}
           disabled={!isBuySellButtonActive}
@@ -872,7 +885,8 @@ export const ActionBlock = memo(() => {
                   rightSide={
                     isOrderValid && collateralDeposit >= 0 && selectedPool
                       ? formatToCurrency(
-                          (collateralDeposit - (predFeeInCC ?? 0)) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                          Math.max(collateralDeposit - (predFeeInCC ?? 0), 0) *
+                            (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                           selectedPool.settleSymbol
                         )
                       : '-'
@@ -913,7 +927,7 @@ export const ActionBlock = memo(() => {
             <div className={styles.borderedBox}>
               <div className={styles.boxContent}>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.heading}>
-                  <WalletIcon width={14} height={14} />
+                  <WalletContentIcon width={14} height={14} />
                   <span>{t('pages.trade.action-block.review.details')}</span>
                 </Typography>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.positionSize}>
@@ -989,7 +1003,10 @@ export const ActionBlock = memo(() => {
                 <Typography variant="bodySmallPopup" component="div" className={styles.contentText}>
                   {t('pages.trade.action-block.review.prediction-content', {
                     predFeeInCC: formatToCurrency(predFeeInCC, selectedPool?.settleSymbol, false, 2),
-                    collateralDeposit: formatToCurrency(collateralDeposit, selectedPool?.settleSymbol),
+                    collateralDeposit: formatToCurrency(
+                      Math.max(collateralDeposit - (predFeeInCC || 0), 0),
+                      selectedPool?.settleSymbol
+                    ),
                     costs: formatToCurrency(
                       orderInfo.size *
                         calculateProbability(orderInfo.midPrice, orderInfo.orderBlock === OrderBlockE.Short),
@@ -1005,16 +1022,20 @@ export const ActionBlock = memo(() => {
 
           <div
             className={classnames(styles.borderedBox, styles.emphasis, {
-              [styles.success]:
-                isValidityCheckDone && [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
-              [styles.error]:
-                isValidityCheckDone && ![ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
+              [styles.success]: isValidityCheckDone && isValiditySuccess,
+              [styles.error]: isValidityCheckDone && !isValiditySuccess,
             })}
           >
             <div className={styles.boxContent}>
               <Typography variant="bodyMediumPopup" className={styles.semibold}>
+                {isValidityCheckDone &&
+                  (isValiditySuccess ? (
+                    <ActionSuccessIcon width={18} height={18} />
+                  ) : (
+                    <ActionErrorIcon width={18} height={18} />
+                  ))}
                 {t('pages.trade.action-block.review.validity-checks')}:{' '}
-                {!isValidityCheckDone && <CircularProgress color="primary" />}
+                {!isValidityCheckDone && <CircularProgress color="primary" size="16px" />}
                 {isValidityCheckDone &&
                   (validityCheckType !== ValidityCheckE.Empty
                     ? t(
@@ -1023,7 +1044,9 @@ export const ActionBlock = memo(() => {
                         }`
                       )
                     : ' ')}
-                {isValidityCheckDone && validityCheckText !== '' && ` (${validityCheckText})`}
+                {isValidityCheckDone && validityCheckText !== '' && (
+                  <div className={styles.errorDetails}>{validityCheckText}</div>
+                )}
               </Typography>
             </div>
           </div>
