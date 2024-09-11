@@ -76,12 +76,9 @@ export const maxOrderSizeAtom = atom((get) => {
         indexPrice,
         markPrice,
         collToQuoteIndexPrice,
-        selectedPerpetual.shortBC,
-        selectedPerpetual.longBC
+        maxTraderOrderSize
       )
     );
-    console.log({ personalMax });
-    // console.log({ personalMax });
   } else {
     const buffer =
       indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0); // default of 10_000 to make initial load faster

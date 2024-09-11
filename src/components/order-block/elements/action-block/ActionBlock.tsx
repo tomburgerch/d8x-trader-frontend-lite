@@ -218,7 +218,6 @@ export const ActionBlock = memo(() => {
       isPredictionMarket && orderInfo.tradingFee ? orderInfo.tradingFee * 1e5 : poolFee
     )
       .then((data) => {
-        console.log('postion risk on trade', data);
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
@@ -562,9 +561,9 @@ export const ActionBlock = memo(() => {
     }
     let isTooLarge;
     if (orderInfo.orderBlock === OrderBlockE.Long) {
-      isTooLarge = orderInfo.size > maxOrderSize.maxBuy;
+      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxBuy);
     } else {
-      isTooLarge = orderInfo.size > maxOrderSize.maxSell;
+      isTooLarge = orderInfo.size > Math.abs(maxOrderSize.maxSell);
     }
     if (isTooLarge) {
       return ValidityCheckE.OrderTooLarge;

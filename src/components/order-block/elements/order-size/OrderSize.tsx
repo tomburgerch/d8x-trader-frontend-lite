@@ -153,7 +153,6 @@ export const OrderSize = memo(() => {
       if (!symbol) {
         return;
       }
-
       fetchedMaxSizesRef.current = true;
       const data = await getMaxOrderSizeForTrader(_chainId, traderAPI, _address, symbol).catch((err) => {
         console.error(err);
@@ -199,8 +198,6 @@ export const OrderSize = memo(() => {
         orderBlock === OrderBlockE.Long
       )
         .then((result) => {
-          console.log('gugus result', result);
-          console.log(orderBlock === OrderBlockE.Long);
           if (perpetualIdRef.current === perpetualStaticInfo.id) {
             setMaxOrderSize(result !== undefined && !isNaN(result) ? result * 0.995 : 10_000);
             maxOrderSizeDefinedRef.current = result !== undefined && !isNaN(result);
