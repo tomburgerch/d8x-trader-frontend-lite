@@ -682,11 +682,20 @@ export const ActionBlock = memo(() => {
   return (
     <div className={styles.root}>
       {[ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (
-        <Button variant={'buy'} onClick={() => setDepositModalOpen(true)} className={styles.buyButton}>
+        <Button variant="buy" onClick={() => setDepositModalOpen(true)} className={styles.buyButton}>
           {validityCheckButtonText}
         </Button>
       )}
-      {![ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (
+      {[ValidityCheckButtonE.ClosedPrediction].includes(validityCheckButtonType) && (
+        <Button variant="buy" className={styles.buyButton} disabled>
+          {validityCheckButtonText}
+        </Button>
+      )}
+      {![
+        ValidityCheckButtonE.NoFunds,
+        ValidityCheckButtonE.NoEnoughGas,
+        ValidityCheckButtonE.ClosedPrediction,
+      ].includes(validityCheckButtonType) && (
         <Button
           variant={orderInfo?.orderBlock === OrderBlockE.Short ? 'sell' : 'buy'}
           disabled={!isBuySellButtonActive}
