@@ -886,7 +886,8 @@ export const ActionBlock = memo(() => {
                   rightSide={
                     isOrderValid && collateralDeposit >= 0 && selectedPool
                       ? formatToCurrency(
-                          (collateralDeposit - (predFeeInCC ?? 0)) * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
+                          Math.max(collateralDeposit - (predFeeInCC ?? 0), 0) *
+                            (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                           selectedPool.settleSymbol
                         )
                       : '-'
@@ -1004,7 +1005,7 @@ export const ActionBlock = memo(() => {
                   {t('pages.trade.action-block.review.prediction-content', {
                     predFeeInCC: formatToCurrency(predFeeInCC, selectedPool?.settleSymbol, false, 2),
                     collateralDeposit: formatToCurrency(
-                      collateralDeposit - (predFeeInCC || 0),
+                      Math.max(collateralDeposit - (predFeeInCC || 0), 0),
                       selectedPool?.settleSymbol
                     ),
                     costs: formatToCurrency(
