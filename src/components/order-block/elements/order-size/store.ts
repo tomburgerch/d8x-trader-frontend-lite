@@ -80,6 +80,7 @@ export const maxOrderSizeAtom = atom((get) => {
         selectedPerpetual.longBC
       )
     );
+    console.log({ personalMax });
     // console.log({ personalMax });
   } else {
     const buffer =

@@ -216,6 +216,7 @@ export const ActionBlock = memo(() => {
       isPredictionMarket && orderInfo.tradingFee ? orderInfo.tradingFee * 1e5 : poolFee
     )
       .then((data) => {
+        console.log('postion risk on trade', data);
         setNewPositionRisk(data.data.newPositionRisk);
         setCollateralDeposit(data.data.orderCost);
         let [maxLong, maxShort] = [data.data.maxLongTrade, data.data.maxShortTrade];
