@@ -989,7 +989,10 @@ export const ActionBlock = memo(() => {
                 <Typography variant="bodySmallPopup" component="div" className={styles.contentText}>
                   {t('pages.trade.action-block.review.prediction-content', {
                     predFeeInCC: formatToCurrency(predFeeInCC, selectedPool?.settleSymbol, false, 2),
-                    collateralDeposit: formatToCurrency(collateralDeposit, selectedPool?.settleSymbol),
+                    collateralDeposit: formatToCurrency(
+                      collateralDeposit - (predFeeInCC || 0),
+                      selectedPool?.settleSymbol
+                    ),
                     costs: formatToCurrency(
                       orderInfo.size *
                         calculateProbability(orderInfo.midPrice, orderInfo.orderBlock === OrderBlockE.Short),
