@@ -9,7 +9,9 @@ import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi
 
 import { Button, CircularProgress, Typography } from '@mui/material';
 
-import WalletIcon from 'assets/icons/new/wallet.svg?react';
+import ActionErrorIcon from 'assets/icons/new/actionError.svg?react';
+import ActionSuccessIcon from 'assets/icons/new/actionSuccess.svg?react';
+import WalletContentIcon from 'assets/icons/new/walletContent.svg?react';
 import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
@@ -680,6 +682,8 @@ export const ActionBlock = memo(() => {
     [selectedCurrency]
   );
 
+  const isValiditySuccess = [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType);
+
   return (
     <div className={styles.root}>
       {[ValidityCheckButtonE.NoFunds, ValidityCheckButtonE.NoEnoughGas].includes(validityCheckButtonType) && (
@@ -923,7 +927,7 @@ export const ActionBlock = memo(() => {
             <div className={styles.borderedBox}>
               <div className={styles.boxContent}>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.heading}>
-                  <WalletIcon width={14} height={14} />
+                  <WalletContentIcon width={14} height={14} />
                   <span>{t('pages.trade.action-block.review.details')}</span>
                 </Typography>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.positionSize}>
@@ -1018,16 +1022,20 @@ export const ActionBlock = memo(() => {
 
           <div
             className={classnames(styles.borderedBox, styles.emphasis, {
-              [styles.success]:
-                isValidityCheckDone && [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
-              [styles.error]:
-                isValidityCheckDone && ![ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType),
+              [styles.success]: isValidityCheckDone && isValiditySuccess,
+              [styles.error]: isValidityCheckDone && !isValiditySuccess,
             })}
           >
             <div className={styles.boxContent}>
               <Typography variant="bodyMediumPopup" className={styles.semibold}>
+                {isValidityCheckDone &&
+                  (isValiditySuccess ? (
+                    <ActionSuccessIcon width={18} height={18} />
+                  ) : (
+                    <ActionErrorIcon width={18} height={18} />
+                  ))}
                 {t('pages.trade.action-block.review.validity-checks')}:{' '}
-                {!isValidityCheckDone && <CircularProgress color="primary" />}
+                {!isValidityCheckDone && <CircularProgress color="primary" size="16px" />}
                 {isValidityCheckDone &&
                   (validityCheckType !== ValidityCheckE.Empty
                     ? t(
@@ -1036,7 +1044,9 @@ export const ActionBlock = memo(() => {
                         }`
                       )
                     : ' ')}
-                {isValidityCheckDone && validityCheckText !== '' && ` (${validityCheckText})`}
+                {isValidityCheckDone && validityCheckText !== '' && (
+                  <div className={styles.errorDetails}>{validityCheckText}</div>
+                )}
               </Typography>
             </div>
           </div>
