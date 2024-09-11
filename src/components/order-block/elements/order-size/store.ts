@@ -55,6 +55,15 @@ export const maxOrderSizeAtom = atom((get) => {
 
   let personalMax: number;
   if (orderInfo?.isPredictionMarket) {
+    console.log({ direction, leverage, poolTokenBalanceOrDefault, slippage, currentPosition });
+    console.log({
+      currentCashCC,
+      currentLockedInValue,
+      indexPrice,
+      markPrice,
+      collToQuoteIndexPrice,
+      selectedPerpetual,
+    });
     personalMax = pmFindMaxPersonalTradeSizeAtLeverage(
       direction,
       leverage,
@@ -66,9 +75,10 @@ export const maxOrderSizeAtom = atom((get) => {
       indexPrice,
       markPrice,
       collToQuoteIndexPrice,
-      selectedPerpetual.longBC,
-      selectedPerpetual.shortBC
+      selectedPerpetual.shortBC,
+      selectedPerpetual.longBC
     );
+    console.log({ personalMax });
   } else {
     const buffer =
       indexPrice * (orderFeeBps / 10_000) + markPrice / leverage + Math.max(direction * (limitPrice - markPrice), 0); // default of 10_000 to make initial load faster
