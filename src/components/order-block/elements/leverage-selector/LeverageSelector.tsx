@@ -37,8 +37,8 @@ export const LeverageSelector = memo(() => {
       perpetualStatistics?.markPrice
     ) {
       const initialMarginRate = orderInfo.isPredictionMarket
-        ? pmInitialMarginRate(orderBlock === OrderBlockE.Long ? 1 : -1, -10000, 0.1)
-        : perpetualStaticInfo?.initialMarginRate;
+        ? pmInitialMarginRate(orderBlock === OrderBlockE.Long ? 1 : -1, perpetualStatistics.markPrice)
+        : perpetualStaticInfo.initialMarginRate;
       return Math.round(1 / initialMarginRate);
     }
     return 10;
