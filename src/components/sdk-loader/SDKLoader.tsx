@@ -65,7 +65,7 @@ export const SDKLoader = memo(() => {
           setTraderAPI(newTraderAPI);
         })
         .catch((e) => {
-          console.log('error loading SDK', e);
+          console.error('error loading SDK', e);
         });
     },
     [setTraderAPI, setSDKConnected]
@@ -101,6 +101,10 @@ export const SDKLoader = memo(() => {
         loadingAPIRef.current = false;
         setAPIBusy(false);
       });
+
+    return () => {
+      loadingAPIRef.current = false;
+    };
   }, [isConnected, publicClient, chainId, loadSDK, unloadSDK, setAPIBusy]);
 
   useEffect(() => {

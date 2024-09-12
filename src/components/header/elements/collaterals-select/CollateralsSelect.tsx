@@ -1,14 +1,12 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
+import { memo, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
 import { Box, MenuItem, useMediaQuery, useTheme } from '@mui/material';
 
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
-import { parseSymbol } from 'helpers/parseSymbol';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { getDynamicLogo } from 'utils/getDynamicLogo';
@@ -57,7 +55,6 @@ export const CollateralsSelect = memo(() => {
   const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { t } = useTranslation();
-  const location = useLocation();
 
   const { isConnected, send } = useWebSocketContext();
 
@@ -65,21 +62,6 @@ export const CollateralsSelect = memo(() => {
   const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
   const clearInputsData = useSetAtom(clearInputsDataAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
-
-  const urlChangesAppliedRed = useRef(false);
-
-  useEffect(() => {
-    if (!location.hash || urlChangesAppliedRed.current) {
-      return;
-    }
-
-    const symbolHash = location.hash.slice(1);
-    const result = parseSymbol(symbolHash);
-    urlChangesAppliedRed.current = true;
-    if (result && selectedPool?.poolSymbol !== result.poolSymbol) {
-      setSelectedPool(result.poolSymbol);
-    }
-  }, [location.hash, selectedPool, setSelectedPool]);
 
   useEffect(() => {
     if (selectedPool && isConnected) {
@@ -115,7 +97,7 @@ export const CollateralsSelect = memo(() => {
 
   return (
     <Box className={styles.holderRoot}>
-      <Box className={styles.iconWrapper}>
+      <Box className={styles.iconsWrapper}>
         <Suspense fallback={null}>
           <IconComponent />
         </Suspense>

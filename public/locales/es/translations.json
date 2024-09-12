@@ -67,6 +67,8 @@
             "remove": "Remover"
           },
           "close": "Cerrar Posición",
+          "claim": "Retirar tu dinero",
+          "claim-details": "Este mercado ha terminado y se está liquidando. Reclama tus fondos ahora.",
           "share": "Compartir posición",
           "add": "Añadir Margen",
           "remove": "Remover Margen",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Cerrando Posición"
+          },
+          "submit-claim": {
+            "title": "Reclamando fondos"
           },
           "submitted": {
             "title": "Orden Confirmada",
@@ -188,6 +193,7 @@
       },
       "history-table": {
         "table-title": "Historial de Órdenes",
+        "body": "",
         "table-header": {
           "time": "Fecha",
           "perpetual": "Perpetuo",
@@ -199,7 +205,8 @@
         },
         "table-content": {
           "connect": "Por favor conecte su cartera",
-          "no-open": "No hay órdenes"
+          "no-open": "Aún no hay historial de operaciones",
+          "no-open-note": "Comience a operar para ver su historial"
         },
         "history-block-mobile": {
           "symbol": "Símbolo"
@@ -226,6 +233,8 @@
           "short": "Venta"
         },
         "prediction": {
+          "title": "Mercado de predicciones",
+          "note": "¡Predice el resultado y comienza a apostar ahora!",
           "yes": "Si",
           "no": "No",
           "bet": "Apuesta"
@@ -367,7 +376,9 @@
           "validity-checks": "Comprobación de validez",
           "cancel": "Cancelar",
           "confirm": "Confirmar",
-          "estimated-price": "Precio de entrada estimado"
+          "estimated-price": "Precio de entrada estimado",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
@@ -750,8 +761,12 @@
     "address-label": "Direccion",
     "deposit-gas": "Deposite gasolina",
     "swap-bridge": "Swap/Bridge",
-    "offramp-button": "Deposit from CEX",
+    "offramp-button": "Depósito desde CEX",
+    "learn-more": "Más información...",
+    "view-all": "Ver todo",
     "max": "Max:",
+    "yes": "Sí",
+    "no": "No",
     "copied": "Copiado",
     "copy-error": "Apareció un error al copiar al portapapeles.",
     "page-reload": {
@@ -863,8 +878,8 @@
         "crypto": "Cripto",
         "fx": "FX",
         "all": "Todos",
-        "prediction": "Predicción",
-        "commodity": "Productos Basicos",
+        "polymarket": "Predicción",
+        "metal": "Productos Basicos",
         "closed": "Cerrado"
       },
       "search": "Buscar...",

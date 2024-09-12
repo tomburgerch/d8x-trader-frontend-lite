@@ -11,9 +11,6 @@ import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import {
   Button,
   CircularProgress,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Table as MuiTable,
   TableBody,
   TableContainer,
@@ -132,6 +129,9 @@ export const OpenOrdersTable = memo(() => {
     setLoading(false);
     refreshOpenOrders().then();
     setLatestOrderSentTimestamp(Date.now());
+    return () => {
+      isAPIBusyRef.current = false;
+    };
   }, [isFetched, setTxHash, refreshOpenOrders, setLatestOrderSentTimestamp]);
 
   useEffect(() => {
@@ -245,6 +245,9 @@ export const OpenOrdersTable = memo(() => {
 
   useEffect(() => {
     setTableRefreshHandlers((prev) => ({ ...prev, [TableTypeE.OPEN_ORDERS]: refreshOpenOrders }));
+    return () => {
+      isAPIBusyRef.current = false;
+    };
   }, [refreshOpenOrders, setTableRefreshHandlers]);
 
   const openOrdersHeaders: TableHeaderI<OrderWithIdI>[] = useMemo(
@@ -407,27 +410,31 @@ export const OpenOrdersTable = memo(() => {
 
       <FilterModal headers={openOrdersHeaders} filter={filter} setFilter={setFilter} />
       {isEnabledChain(chainId) && (
-        <Dialog open={isCancelModalOpen} className={styles.dialog}>
-          <DialogTitle>{t('pages.trade.orders-table.cancel-modal.title')}</DialogTitle>
-          <DialogContent className={styles.dialogContent}>
-            {t('pages.trade.orders-table.cancel-modal.content')}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeCancelModal} variant="secondary" size="small">
-              {t('pages.trade.orders-table.cancel-modal.back')}
-            </Button>
-            <GasDepositChecker>
-              <Button
-                onClick={handleCancelOrderConfirm}
-                variant="primary"
-                size="small"
-                disabled={loading || requestSent}
-              >
-                {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
-                {t('pages.trade.orders-table.cancel-modal.confirm')}
+        <Dialog
+          open={isCancelModalOpen}
+          onCloseClick={closeCancelModal}
+          className={styles.dialog}
+          dialogTitle={t('pages.trade.orders-table.cancel-modal.title')}
+          footerActions={
+            <>
+              <Button onClick={closeCancelModal} variant="secondary" size="small">
+                {t('pages.trade.orders-table.cancel-modal.back')}
               </Button>
-            </GasDepositChecker>
-          </DialogActions>
+              <GasDepositChecker>
+                <Button
+                  onClick={handleCancelOrderConfirm}
+                  variant="primary"
+                  size="small"
+                  disabled={loading || requestSent}
+                >
+                  {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+                  {t('pages.trade.orders-table.cancel-modal.confirm')}
+                </Button>
+              </GasDepositChecker>
+            </>
+          }
+        >
+          {t('pages.trade.orders-table.cancel-modal.content')}
         </Dialog>
       )}
     </div>

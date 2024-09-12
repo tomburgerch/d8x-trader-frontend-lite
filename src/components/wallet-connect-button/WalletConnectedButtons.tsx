@@ -24,7 +24,11 @@ import { OwltoButton } from './OwltoButton';
 
 import styles from './WalletConnectButton.module.scss';
 
-export const WalletConnectedButtons = memo(() => {
+interface WalletConnectedButtonsPropsI {
+  mobile?: boolean;
+}
+
+export const WalletConnectedButtons = memo(({ mobile = false }: WalletConnectedButtonsPropsI) => {
   const { t } = useTranslation();
 
   const setAccountModalOpen = useSetAtom(accountModalOpenAtom);
@@ -58,9 +62,9 @@ export const WalletConnectedButtons = memo(() => {
               return (
                 <>
                   <div className={styles.buttonsHolder}>
-                    {!isSignedInSocially && <OneClickTradingButton />}
-                    {isLiFiEnabled && isBridgeShownOnPage && <LiFiWidgetButton />}
-                    {isOwltoEnabled && isBridgeShownOnPage && <OwltoButton />}
+                    {!isSignedInSocially && !mobile && <OneClickTradingButton />}
+                    {isLiFiEnabled && isBridgeShownOnPage && !mobile && <LiFiWidgetButton />}
+                    {isOwltoEnabled && isBridgeShownOnPage && !mobile && <OwltoButton />}
                     <Button onClick={openChainModal} className={styles.chainButton} variant="primary">
                       <img src={chain.iconUrl} alt={chain.name} title={chain.name} />
                     </Button>

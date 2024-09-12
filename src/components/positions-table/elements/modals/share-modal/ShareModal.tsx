@@ -4,10 +4,9 @@ import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DownloadOutlined } from '@mui/icons-material';
-import { Button, DialogActions, DialogContent } from '@mui/material';
+import { Button, Dialog as MuiDialog, DialogActions, DialogContent } from '@mui/material';
 
 import LogoWithText from 'assets/logoWithText.svg?react';
-import { Dialog } from 'components/dialog/Dialog';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
@@ -63,7 +62,7 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
     (selectedPosition.unrealizedPnlQuoteCCY / (selectedPosition.collateralCC * selectedPosition.collToQuoteConversion));
 
   return (
-    <Dialog open={isOpen} onClose={closeModal} className={styles.dialog}>
+    <MuiDialog open={isOpen} onClose={closeModal} className={styles.dialog}>
       <DialogContent className={styles.contentBlock}>
         <div ref={statsRef} className={styles.statsContainer}>
           <Background />
@@ -116,6 +115,6 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
           {t('common.info-modal.close')}
         </Button>
       </DialogActions>
-    </Dialog>
+    </MuiDialog>
   );
 });

@@ -6,7 +6,7 @@ import { useAccount, useSendTransaction, useWalletClient } from 'wagmi';
 import { WalletClient } from 'viem';
 
 import { EmojiFoodBeverageOutlined } from '@mui/icons-material';
-import { Button, CircularProgress, DialogActions, DialogTitle, Typography } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 
 import { STRATEGY_SYMBOL } from 'appConstants';
 import { exitStrategy } from 'blockchain-api/contract-interactions/exitStrategy';
@@ -58,6 +58,7 @@ export const ExitStrategy = ({
   const [currentPhaseKey, setCurrentPhaseKey] = useState('');
 
   const requestSentRef = useRef(false);
+  const claimRequestSentRef = useRef(false);
 
   const strategyAddress = useMemo(() => {
     return strategyAddresses.find(({ userAddress }) => userAddress === address?.toLowerCase())?.strategyAddress;
@@ -125,7 +126,6 @@ export const ExitStrategy = ({
     strategyAddressBalanceBigint,
   ]);
 
-  const claimRequestSentRef = useRef(false);
   const claimFunds = useCallback(
     (balance: bigint) => {
       if (
@@ -145,8 +145,6 @@ export const ExitStrategy = ({
       setRequestSent(true);
       setLoading(true);
 
-      console.log('claimStrategyFunds');
-
       claimStrategyFunds(
         {
           chainId,
@@ -160,7 +158,7 @@ export const ExitStrategy = ({
         sendTransactionAsync
       )
         .then(({ hash }) => {
-          console.log({ hash });
+          // console.log({ hash });
           if (hash) {
             /// can't use setTxHash <- this is to trigger order status checks, not fund stuff
             // setTxHash(hash);
@@ -260,32 +258,37 @@ export const ExitStrategy = ({
         <span className={styles.modalButtonText}>{buttonLabel}</span>
       </Button>
 
-      <Dialog open={showConfirmModal} className={styles.dialog}>
-        <DialogTitle>{confirmTitle}</DialogTitle>
-        <div className={styles.dialogRoot}>
-          <Typography variant="bodyMedium" fontWeight={600}>
-            {confirmBody}
-          </Typography>
-        </div>
-        <DialogActions className={styles.dialogAction}>
-          <Button onClick={handleModalClose} variant="secondary">
-            {t('common.cancel-button')}
-          </Button>
-          <Button
-            onClick={handleClick}
-            variant="primary"
-            disabled={
-              requestSent ||
-              loading ||
-              !walletClient ||
-              !traderAPI ||
-              !isEnabledChain(chainId) ||
-              !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
-            }
-          >
-            {confirmButton}
-          </Button>
-        </DialogActions>
+      <Dialog
+        open={showConfirmModal}
+        onCloseClick={handleModalClose}
+        className={styles.dialog}
+        dialogTitle={confirmTitle}
+        dialogContentClassName={styles.content}
+        footerActions={
+          <>
+            <Button onClick={handleModalClose} variant="secondary">
+              {t('common.cancel-button')}
+            </Button>
+            <Button
+              onClick={handleClick}
+              variant="primary"
+              disabled={
+                requestSent ||
+                loading ||
+                !walletClient ||
+                !traderAPI ||
+                !isEnabledChain(chainId) ||
+                !pagesConfig.enabledStrategiesPageByChains.includes(chainId)
+              }
+            >
+              {confirmButton}
+            </Button>
+          </>
+        }
+      >
+        <Typography variant="bodyMedium" fontWeight={600}>
+          {confirmBody}
+        </Typography>
       </Dialog>
 
       {loading && (

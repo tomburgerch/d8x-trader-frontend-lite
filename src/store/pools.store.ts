@@ -40,6 +40,7 @@ export const tradesHistoryAtom = atom<TradeHistoryI[]>([]);
 export const fundingListAtom = atom<FundingI[]>([]);
 export const triggerPositionsUpdateAtom = atom(true);
 export const triggerBalancesUpdateAtom = atom(true);
+export const executeScrollToTablesAtom = atom(false);
 
 const perpetualsStatsAtom = atom<Record<string, MarginAccountI>>({});
 export const allPerpetualStatisticsPrimitiveAtom = atom<Record<string, PerpetualStatisticsI>>({});

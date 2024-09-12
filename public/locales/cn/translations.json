@@ -67,6 +67,8 @@
             "remove": "减少"
           },
           "close": "关闭仓位",
+          "claim": "领取您的资金",
+          "claim-details": "该市场已结束并正在结算。立即领取您的资金。",
           "share": "分享仓位",
           "add": "增加抵押品",
           "remove": "减少抵押品",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "确认平仓"
+          },
+          "submit-claim": {
+            "title": "领取资金"
           },
           "submitted": {
             "title": "订单已提交",
@@ -188,6 +193,7 @@
       },
       "history-table": {
         "table-title": "交易历史",
+        "body": "",
         "table-header": {
           "time": "时间",
           "perpetual": "永续",
@@ -199,7 +205,8 @@
         },
         "table-content": {
           "connect": "请连接钱包",
-          "no-open": "无交易历史"
+          "no-open": "目前尚無交易記錄",
+          "no-open-note": "開始交易以查看您的歷史記錄"
         },
         "history-block-mobile": {
           "symbol": "币对"
@@ -226,6 +233,8 @@
           "short": "开空"
         },
         "prediction": {
+          "title": "預測市場",
+          "note": "预测结果并立即开始投注！",
           "yes": "是的",
           "no": "不",
           "bet": "Bet"
@@ -367,7 +376,9 @@
           "validity-checks": "有效性检查",
           "cancel": "取消",
           "confirm": "确认",
-          "estimated-price": "预计开盘价"
+          "estimated-price": "预计开盘价",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
@@ -750,8 +761,12 @@
     "address-label": "地址",
     "deposit-gas": "存入燃料",
     "swap-bridge": "Swap/Bridge",
-    "offramp-button": "Deposit from CEX",
+    "offramp-button": "CEX 儲值",
+    "learn-more": "了解更多...",
+    "view-all": "看全部",
     "max": "最大：",
+    "yes": "是的",
+    "no": "不",
     "copied": "已复制",
     "copy-error": "复制到剪贴板时出现错误",
     "page-reload": {
@@ -863,8 +878,8 @@
         "crypto": "加密货币",
         "fx": "外汇",
         "all": "所有",
-        "prediction": "预测的过程",
-        "commodity": "大宗商品",
+        "polymarket": "预测的过程",
+        "metal": "大宗商品",
         "closed": "休市"
       },
       "search": " 搜索...",

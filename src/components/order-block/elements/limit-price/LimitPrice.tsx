@@ -1,17 +1,20 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
+import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { limitPriceAtom, orderBlockAtom, orderTypeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
+import type { TemporaryAnyT } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './LimitPrice.module.scss';
 
@@ -44,7 +47,7 @@ export const LimitPrice = memo(() => {
         if (orderType === OrderTypeE.Limit) {
           const initialLimit = perpetualStatistics?.midPrice === undefined ? -1 : perpetualStatistics.midPrice;
           const userLimit =
-            perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo) && initialLimit > 0
+            perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo) && initialLimit > 0
               ? calculateProbability(initialLimit, orderBlock === OrderBlockE.Short)
               : initialLimit;
           setLimitPrice(`${userLimit}`);
@@ -68,6 +71,9 @@ export const LimitPrice = memo(() => {
 
   useEffect(() => {
     orderBlockChangedRef.current = true;
+    return () => {
+      orderBlockChangedRef.current = false;
+    };
   }, [orderBlock]);
 
   useEffect(() => {
@@ -78,7 +84,7 @@ export const LimitPrice = memo(() => {
 
       let isPredictionMarket = false;
       try {
-        isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo);
+        isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
       } catch {
         // skip
       }
@@ -104,6 +110,13 @@ export const LimitPrice = memo(() => {
     setInputValue(limitPrice != null ? `${limitPrice}` : '');
   }, [limitPrice]);
 
+  const QuoteCurrencyIcon = useMemo(() => {
+    if (!selectedPerpetual) {
+      return null;
+    }
+    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
+  }, [selectedPerpetual]);
+
   if (orderType === OrderTypeE.Market) {
     return null;
   }
@@ -123,13 +136,19 @@ export const LimitPrice = memo(() => {
       </Box>
       <ResponsiveInput
         id="limit-size"
+        className={styles.responsiveInput}
         inputValue={inputValue}
         setInputValue={handleLimitPriceChange}
         handleInputBlur={handleInputBlur}
-        currency={selectedPerpetual?.quoteCurrency}
+        currency={
+          <Suspense fallback={null}>
+            <QuoteCurrencyIcon width={24} height={24} />
+          </Suspense>
+        }
         placeholder="-"
         step={stepSize}
         min={-1}
+        type={InputE.Outlined}
       />
     </Box>
   );

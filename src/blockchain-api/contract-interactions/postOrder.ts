@@ -35,13 +35,13 @@ export async function postOrder(
 
   const chain = walletClient.chain;
   const gasPrice = await getGasPrice(chain.id);
-  if (brokerData.OrderBookAddr !== traderAPI.getOrderBookAddress(orders[0].symbol)) {
-    console.log({
-      orderBook: orders[0].symbol,
-      bakend: brokerData.OrderBookAddr,
-      api: traderAPI.getOrderBookAddress(orders[0].symbol),
-    });
-  }
+  // if (brokerData.OrderBookAddr !== traderAPI.getOrderBookAddress(orders[0].symbol)) {
+  //   console.log({
+  //     orderBook: orders[0].symbol,
+  //     bakend: brokerData.OrderBookAddr,
+  //     api: traderAPI.getOrderBookAddress(orders[0].symbol),
+  //   });
+  // }
   const params: WriteContractParameters = {
     chain,
     address: traderAPI.getOrderBookAddress(orders[0].symbol) as Address,

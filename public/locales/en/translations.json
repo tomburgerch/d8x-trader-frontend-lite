@@ -67,6 +67,8 @@
             "remove": "Remove"
           },
           "close": "Close position",
+          "claim": "Claim funds",
+          "claim-details": "This market ended and is being settled. Claim your funds now.",
           "share": "Share position",
           "add": "Add collateral",
           "remove": "Remove collateral",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Submitting Closing Order"
+          },
+          "submit-claim": {
+            "title": "Claiming Funds"
           },
           "submitted": {
             "title": "Order Submitted",
@@ -188,6 +193,7 @@
       },
       "history-table": {
         "table-title": "Trade History",
+        "body": "",
         "table-header": {
           "time": "Time",
           "perpetual": "Perpetual",
@@ -199,7 +205,8 @@
         },
         "table-content": {
           "connect": "Please connect your wallet",
-          "no-open": "No trade history"
+          "no-open": "No Trading History Yet",
+          "no-open-note": "Start trading to view your history"
         },
         "history-block-mobile": {
           "symbol": "Symbol"
@@ -226,6 +233,8 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "Prediction Market",
+          "note": "Predict the outcome and start betting on it now!",
           "yes": "Yes",
           "no": "No",
           "bet": "Bet"
@@ -367,7 +376,9 @@
           "validity-checks": "Validity checks",
           "cancel": "Cancel",
           "confirm": "Confirm",
-          "estimated-price": "Estimated entry price"
+          "estimated-price": "Estimated entry price",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
@@ -751,7 +762,11 @@
     "deposit-gas": "Deposit gas",
     "swap-bridge": "Swap/Bridge",
     "offramp-button": "Deposit from CEX",
+    "learn-more": "Learn more...",
+    "view-all": "View all",
     "max": "Max:",
+    "yes": "Yes",
+    "no": "No",
     "copied": "Copied",
     "copy-error": "An error appeared with copy to clipboard",
     "page-reload": {
@@ -863,8 +878,8 @@
         "crypto": "Crypto",
         "fx": "FX",
         "all": "All",
-        "prediction": "Prediction",
-        "commodity": "Commodity",
+        "polymarket": "Prediction",
+        "metal": "Commodity",
         "closed": "Closed"
       },
       "search": "Search...",

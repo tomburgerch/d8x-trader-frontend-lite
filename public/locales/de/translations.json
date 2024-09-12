@@ -67,6 +67,8 @@
             "remove": "Entfernen"
           },
           "close": "Position schliessen",
+          "claim": "Geld abheben",
+          "claim-details": "Dieser Markt ist beendet und wird abgerechnet. Heben Sie jetzt Ihre Gelder ab.",
           "share": "Position teilen",
           "add": "Sicherheit hinzufügen",
           "remove": "Sicherheit entfernen",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Abschicken der Schliess Order"
+          },
+          "submit-claim": {
+            "title": "Einfordern von Geldern"
           },
           "submitted": {
             "title": "Order abgeschickt",
@@ -188,6 +193,7 @@
       },
       "history-table": {
         "table-title": "Handelshistorie",
+        "body": "",
         "table-header": {
           "time": "Zeit",
           "perpetual": "Perpetual",
@@ -199,7 +205,8 @@
         },
         "table-content": {
           "connect": "Verbinden Sie Ihre Wallet",
-          "no-open": "Keine Handelshistorie vorhanden"
+          "no-open": "Keine Handelshistorie vorhanden",
+          "no-open-note": "Beginnen Sie mit dem Handel, um Ihren Verlauf anzuzeigen"
         },
         "history-block-mobile": {
           "symbol": "Symbol"
@@ -226,6 +233,8 @@
           "short": "Short"
         },
         "prediction": {
+          "title": "Prognosemarkt",
+          "note": "Sagen Sie das Ergebnis voraus und fangen Sie jetzt an, darauf zu wetten!",
           "yes": "Ja",
           "no": "Nein",
           "bet": "Wette"
@@ -367,7 +376,9 @@
           "validity-checks": "Gültigkeitsprüfungen",
           "cancel": "Stornieren",
           "confirm": "Bestätigen",
-          "estimated-price": "Geschätzer Einstiegspreis"
+          "estimated-price": "Geschätzer Einstiegspreis",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
@@ -750,8 +761,12 @@
     "address-label": "Adresse",
     "deposit-gas": "Gas deponieren",
     "swap-bridge": "Swap/Bridge",
-    "offramp-button": "Deposit from CEX",
+    "offramp-button": "Anzahlung ab CEX",
+    "learn-more": "Mehr erfahren...",
+    "view-all": "Alle ansehen",
     "max": "Max:",
+    "yes": "Ja",
+    "no": "Nein",
     "copied": "Kopiert",
     "copy-error": "Beim Kopieren in die Zwischenablage ist ein Fehler aufgetreten",
     "page-reload": {
@@ -863,8 +878,8 @@
         "crypto": "Krypto",
         "fx": "Devisen",
         "all": "Alle",
-        "prediction": "Vorhersage",
-        "commodity": "Rohstoffe",
+        "polymarket": "Vorhersage",
+        "metal": "Rohstoffe",
         "closed": "Geschlossen"
       },
       "search": "Suchen...",

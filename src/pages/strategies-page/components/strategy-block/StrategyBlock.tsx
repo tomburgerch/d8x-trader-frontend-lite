@@ -48,6 +48,8 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
 
   const strategyPositionRequestSentRef = useRef(false);
   const openOrdersRequestSentRef = useRef(false);
+  const currentState = useRef(5);
+
   const strategyAddress = useMemo(() => {
     return strategyAddresses.find(({ userAddress }) => userAddress === address?.toLowerCase())?.strategyAddress;
   }, [address, strategyAddresses]);
@@ -161,6 +163,8 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
 
     return () => {
       clearInterval(intervalId);
+      strategyPositionRequestSentRef.current = false;
+      openOrdersRequestSentRef.current = false;
     };
   }, [fetchStrategyPosition, fetchStrategyOpenOrders, isFrequentUpdates]);
 
@@ -259,8 +263,6 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
       return 5; // F: in between states, has to wait in current screen
     }
   }, [hasPosition, hasSellOpenOrder, hasBuyOpenOrder, strategyAddressBalance]);
-
-  const currentState = useRef(5);
 
   useEffect(() => {
     // if entering and now funded, keep waiting

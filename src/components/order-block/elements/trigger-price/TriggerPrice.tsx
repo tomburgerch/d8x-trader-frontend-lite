@@ -1,17 +1,20 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
+import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
 import { orderBlockAtom, orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
+import type { TemporaryAnyT } from 'types/types';
+import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './TriggerPrice.module.scss';
 
@@ -30,8 +33,8 @@ export const TriggerPrice = memo(() => {
   const inputValueChangedRef = useRef(false);
 
   const stepSize = useMemo(
-    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.markPrice))}`,
-    [selectedPerpetual?.markPrice]
+    () => `${Math.min(1, +calculateStepSize(selectedPerpetual?.indexPrice))}`,
+    [selectedPerpetual?.indexPrice]
   );
 
   const handleTriggerPriceChange = useCallback(
@@ -42,7 +45,7 @@ export const TriggerPrice = memo(() => {
       } else {
         const initialTrigger = perpetualStatistics?.markPrice === undefined ? -1 : perpetualStatistics?.markPrice;
         const userTrigger =
-          perpetualStaticInfo && TraderInterface.isPredictionMarket(perpetualStaticInfo)
+          perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo)
             ? calculateProbability(initialTrigger, orderBlock === OrderBlockE.Short)
             : initialTrigger;
         setTriggerPrice(`${userTrigger}`);
@@ -64,13 +67,20 @@ export const TriggerPrice = memo(() => {
     setInputValue(`${triggerPrice}`);
   }, [triggerPrice]);
 
+  const QuoteCurrencyIcon = useMemo(() => {
+    if (!selectedPerpetual) {
+      return null;
+    }
+    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
+  }, [selectedPerpetual]);
+
   if (orderType !== OrderTypeE.Stop) {
     return null;
   }
 
   return (
     <Box className={styles.root}>
-      <Box className={styles.label}>
+      <Box className={styles.labelHolder}>
         <InfoLabelBlock
           title={t('pages.trade.order-block.trigger-price.title')}
           content={
@@ -84,12 +94,18 @@ export const TriggerPrice = memo(() => {
       </Box>
       <ResponsiveInput
         id="trigger-size"
+        className={styles.responsiveInput}
         inputValue={inputValue}
         setInputValue={handleTriggerPriceChange}
         handleInputBlur={handleInputBlur}
-        currency={selectedPerpetual?.quoteCurrency}
+        currency={
+          <Suspense fallback={null}>
+            <QuoteCurrencyIcon width={24} height={24} />
+          </Suspense>
+        }
         step={stepSize}
         min={0}
+        type={InputE.Outlined}
       />
     </Box>
   );
