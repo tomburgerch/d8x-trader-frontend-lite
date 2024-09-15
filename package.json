@@ -20,7 +20,7 @@
     "lint:ts:fix": "npm run lint:ts -- --fix",
     "lint:css": "npm run stylelint",
     "lint": "tsc && npm run lint:ts && npm run lint:css",
-    "prepare": "husky install",
+    "prepare": "husky",
     "postinstall": "patch-package"
   },
   "husky": {

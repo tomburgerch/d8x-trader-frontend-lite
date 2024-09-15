@@ -124,6 +124,7 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
           setLoggedIn(true);
         }
       } catch (error) {
+        console.log('error');
         console.error(error);
       }
     };
@@ -133,10 +134,6 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
       .finally(() => {
         isInitializingRef.current = false;
       });
-
-    return () => {
-      isInitializingRef.current = false;
-    };
   }, []);
 
   // TODO: VOV: Need to find a better way to send info about SocialVerify
