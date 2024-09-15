@@ -201,7 +201,7 @@ export const Header = memo(({ window }: HeaderPropsI) => {
   }, [traderAPI, chainId]);
 
   useEffect(() => {
-    if (!chainId || exchangeRequestRef.current) {
+    if (exchangeRequestRef.current) {
       return;
     }
 
@@ -238,6 +238,10 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       .finally(() => {
         exchangeRequestRef.current = false;
       });
+
+    return () => {
+      exchangeRequestRef.current = false;
+    };
   }, [chainId, setExchangeInfo]);
 
   const {
