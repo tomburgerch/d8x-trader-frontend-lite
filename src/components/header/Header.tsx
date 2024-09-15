@@ -167,7 +167,10 @@ export const Header = memo(({ window }: HeaderPropsI) => {
           })
         );
       });
-      setPerpetuals(perpetuals);
+      const filteredPerpetuals = perpetuals.filter(
+        (perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket
+      );
+      setPerpetuals(filteredPerpetuals);
       setOracleFactoryAddr(data.oracleFactoryAddr);
       setProxyAddr(data.proxyAddr);
     },

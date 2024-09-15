@@ -34,9 +34,9 @@ import {
   perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   positionsAtom,
-  selectedPoolAtom,
   traderAPIAtom,
   executeScrollToTablesAtom,
+  perpetualsAtom,
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { OrderBlockE, OrderBlockPositionE, TableTypeE } from 'types/enums';
@@ -74,7 +74,7 @@ export const TraderPage = () => {
   const orderBlockPosition = useAtomValue(orderBlockPositionAtom);
   const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
-  const selectedPool = useAtomValue(selectedPoolAtom);
+  const perpetuals = useAtomValue(perpetualsAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
   const isSDKConnected = useAtomValue(sdkConnectedAtom);
   const [executeScrollToTables, setExecuteScrollToTables] = useAtom(executeScrollToTablesAtom);
@@ -176,15 +176,19 @@ export const TraderPage = () => {
   );
 
   useEffect(() => {
-    if (location.hash || !selectedPool || selectedPool.perpetuals.length < 1 || isPageUrlAppliedRef.current) {
+    if (location.hash || perpetuals.length < 1 || isPageUrlAppliedRef.current) {
       return;
     }
 
+    const filteredPerpetuals = perpetuals
+      .filter((perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket)
+      .sort((p1) => (p1.isPredictionMarket ? 1 : -1));
+
     isPageUrlAppliedRef.current = true;
     navigate(
-      `${location.pathname}${location.search}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
+      `${location.pathname}${location.search}#${filteredPerpetuals[0].baseCurrency}-${filteredPerpetuals[0].quoteCurrency}-${filteredPerpetuals[0].poolName}`
     );
-  }, [selectedPool, location.hash, location.pathname, location.search, navigate]);
+  }, [perpetuals, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!address || !isEnabledChain(chainId)) {
