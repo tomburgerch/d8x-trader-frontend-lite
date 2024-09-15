@@ -124,7 +124,6 @@ export const Web3AuthProvider = memo(({ children }: PropsWithChildren) => {
           setLoggedIn(true);
         }
       } catch (error) {
-        console.log('error');
         console.error(error);
       }
     };
