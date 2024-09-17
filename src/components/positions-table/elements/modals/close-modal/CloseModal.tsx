@@ -156,9 +156,10 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       side: selectedPosition.side === OrderSideE.Buy ? OrderSideE.Sell : OrderSideE.Buy,
       type: OrderTypeE.Market.toUpperCase(),
       quantity: selectedPosition.positionNotionalBaseCCY,
-      executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
-      reduceOnly: true,
       leverage: 0,
+      reduceOnly: true,
+      executionTimestamp: Math.floor(Date.now() / 1000 - 10 - 200),
+      deadline: Math.floor(Date.now() / 1000 + 60 * 60 * 24),
     };
 
     orderDigest(chain.id, [closeOrder], address)
