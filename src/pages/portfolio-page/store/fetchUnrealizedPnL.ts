@@ -20,9 +20,6 @@ export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 
 export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: Address, chainId: number) => {
   const traderAPI = get(traderAPIAtom);
-  if (!traderAPI) {
-    return;
-  }
 
   const { data } = await getPositionRisk(chainId, traderAPI, userAddress, Date.now());
   if (!data) {

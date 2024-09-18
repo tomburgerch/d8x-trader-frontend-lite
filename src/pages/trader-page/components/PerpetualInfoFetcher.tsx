@@ -29,7 +29,7 @@ export const PerpetualInfoFetcher = () => {
   }, [selectedPool?.poolSymbol, selectedPerpetual?.baseCurrency, selectedPerpetual?.quoteCurrency]);
 
   useEffect(() => {
-    if (requestSentRef.current || !traderAPI) {
+    if (requestSentRef.current) {
       return;
     }
 

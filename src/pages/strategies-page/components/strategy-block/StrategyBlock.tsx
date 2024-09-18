@@ -90,13 +90,7 @@ export const StrategyBlock = ({ strategyClient }: { strategyClient: WalletClient
 
   const fetchStrategyPosition = useCallback(
     (frequentUpdatesEnabled: boolean) => {
-      if (
-        strategyPositionRequestSentRef.current ||
-        !traderAPI ||
-        !strategyAddress ||
-        !address ||
-        !isEnabledChain(chainId)
-      ) {
+      if (strategyPositionRequestSentRef.current || !strategyAddress || !address || !isEnabledChain(chainId)) {
         return;
       }
 
