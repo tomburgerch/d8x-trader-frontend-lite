@@ -295,7 +295,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   }, [modifyType, addCollateral, removeCollateral]);
 
   useEffect(() => {
-    if (!address || !traderAPI || !selectedPosition?.symbol || !isEnabledChain(chainId) || isAPIBusy) {
+    if (!address || !selectedPosition?.symbol || !isEnabledChain(chainId) || isAPIBusy) {
       return;
     }
 
