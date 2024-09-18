@@ -72,7 +72,7 @@ export const StrategiesPage = () => {
   }, [allPerpetualStatistics, setStrategyPerpetualStats]);
 
   useEffect(() => {
-    if (requestSentRef.current || !traderAPI) {
+    if (requestSentRef.current) {
       return;
     }
 
