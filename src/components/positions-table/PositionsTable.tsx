@@ -135,8 +135,8 @@ export const PositionsTable = () => {
   }, [pools, selectedPosition?.symbol]);
 
   const refreshPositions = useCallback(async () => {
-    if (address && traderAPI && isConnected && isEnabledChain(chainId) && isSDKConnected) {
-      if (isAPIBusyRef.current || chainId !== Number(traderAPI.chainId)) {
+    if (address && isConnected && isEnabledChain(chainId) && isSDKConnected) {
+      if (isAPIBusyRef.current) {
         return;
       }
 

@@ -87,8 +87,8 @@ export const OpenOrdersTable = memo(() => {
   };
 
   const refreshOpenOrders = useCallback(async () => {
-    if (address && traderAPI && isConnected && isEnabledChain(chainId) && isSDKConnected) {
-      if (isAPIBusyRef.current || Number(traderAPI.chainId) !== chainId) {
+    if (address && isConnected && isEnabledChain(chainId) && isSDKConnected) {
+      if (isAPIBusyRef.current) {
         return;
       }
 
@@ -207,7 +207,7 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
-    if (isDisconnected || !tradingClient || !traderAPI || !isEnabledChain(chainId)) {
+    if (isDisconnected || !tradingClient || !isEnabledChain(chainId)) {
       return;
     }
 
