@@ -207,7 +207,7 @@ export const OpenOrdersTable = memo(() => {
       return;
     }
 
-    if (isDisconnected || !tradingClient || !traderAPI || !isEnabledChain(chainId)) {
+    if (isDisconnected || !tradingClient || !isEnabledChain(chainId)) {
       return;
     }
 
