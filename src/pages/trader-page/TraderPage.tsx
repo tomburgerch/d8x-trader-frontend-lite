@@ -137,7 +137,7 @@ export const TraderPage = () => {
 
   const fetchPositions = useCallback(
     async (_chainId: number, _address: Address) => {
-      if (fetchPositionsRef.current || !isSDKConnected || !traderAPI || Number(traderAPI.chainId) !== _chainId) {
+      if (fetchPositionsRef.current || !isSDKConnected) {
         return;
       }
 

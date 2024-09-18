@@ -11,17 +11,14 @@ import { type StrategyAddressI } from 'types/types';
 export const syntheticPositionUSDAtom = atom<number | null>(null);
 
 export const fetchStrategySyntheticPosition = atom(null, async (get, set, userAddress: Address, chainId: number) => {
-  const traderAPI = get(traderAPIAtom);
-  if (!traderAPI) {
-    return;
-  }
-
   const strategyAddressesLS = localStorage.getItem(STRATEGY_ADDRESSES_LS_KEY);
   if (!strategyAddressesLS) {
     set(syntheticPositionUSDAtom, null);
     return null;
   }
   const strategyAddresses: StrategyAddressI[] = JSON.parse(strategyAddressesLS);
+
+  const traderAPI = get(traderAPIAtom);
 
   let syntheticPositionUSD = null;
   if (pagesConfig.enabledStrategiesPage) {
