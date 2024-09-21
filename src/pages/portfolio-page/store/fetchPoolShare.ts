@@ -22,8 +22,12 @@ export const fetchPoolShareAtom = atom(null, async (get, set, userAddress: Addre
     return;
   }
 
-  const pools = get(poolsAtom);
   const poolUsdPrice = get(poolUsdPriceAtom);
+  if (Object.keys(poolUsdPrice).length === 0) {
+    return;
+  }
+
+  const pools = get(poolsAtom);
 
   const dCurrencyPriceMap: Record<string, number> = {};
   const poolShareTokenBalances: PoolShareTokenBalanceI[] = [];

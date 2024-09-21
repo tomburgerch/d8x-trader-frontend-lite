@@ -46,47 +46,56 @@ export const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
 export const totalOpenRewardsAtom = atom(0);
 export const accountValueAtom = atom(0);
 
+const poolUsdPriceMapAtom = atom(null, async (get, set, openRewards: OpenTraderRebateI[]) => {
+  const traderAPI = get(traderAPIAtom);
+  if (!traderAPI) {
+    return;
+  }
+
+  const pools = get(poolsAtom).filter((pool) => pool.isRunning);
+
+  const poolUsdPriceMap: Record<string, PoolUsdPriceI> = {};
+  let totalReferralRewards = 0;
+
+  for (const pool of pools) {
+    const poolUSDPrice = await getPoolUsdPrice(traderAPI, pool);
+    const baseUSDPrice = await getBaseUSDPrice(traderAPI, pool);
+    poolUsdPriceMap[pool.poolSymbol] = {
+      collateral: poolUSDPrice.collateral,
+      quote: poolUSDPrice.quote,
+      bases: baseUSDPrice,
+    };
+
+    const openRewardsAmount = openRewards
+      .filter((volume) => volume.poolId === pool.poolId)
+      .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
+    totalReferralRewards += openRewardsAmount * poolUSDPrice.collateral;
+  }
+  set(poolUsdPriceAtom, poolUsdPriceMap);
+
+  return totalReferralRewards;
+});
+
 export const fetchPortfolioAtom = atom(
   null,
-  async (get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
-    const traderAPI = get(traderAPIAtom);
-    if (!traderAPI) {
-      return;
-    }
-
-    const pools = get(poolsAtom).filter((pool) => pool.isRunning);
-
-    let totalReferralRewards = 0;
-
-    const poolUsdPriceMap: Record<string, PoolUsdPriceI> = {};
-
-    for (const pool of pools) {
-      const poolUSDPrice = await getPoolUsdPrice(traderAPI, pool);
-      const baseUSDPrice = await getBaseUSDPrice(traderAPI, pool);
-      poolUsdPriceMap[pool.poolSymbol] = {
-        collateral: poolUSDPrice.collateral,
-        quote: poolUSDPrice.quote,
-        bases: baseUSDPrice,
-      };
-
-      const openRewardsAmount = openRewards
-        .filter((volume) => volume.poolId === pool.poolId)
-        .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
-      totalReferralRewards += openRewardsAmount * poolUSDPrice.collateral;
-    }
-    set(poolUsdPriceAtom, poolUsdPriceMap);
-
-    set(totalOpenRewardsAtom, totalReferralRewards);
-
-    const [unrealizedPnL, , strategySyntheticPositionUSD, poolTokensUSDBalance, , poolShareTokensUSDBalance] =
-      await Promise.all([
-        set(fetchUnrealizedPnLAtom, userAddress, chainId),
-        set(fetchRealizedPnLAtom, userAddress, chainId),
-        set(fetchStrategySyntheticPosition, userAddress, chainId),
-        set(fetchPoolTokensUSDBalanceAtom, userAddress),
-        set(fetchEarningsAtom, userAddress, chainId),
-        set(fetchPoolShareAtom, userAddress),
-      ]);
+  async (_get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
+    const [
+      totalReferralRewards,
+      unrealizedPnL,
+      ,
+      strategySyntheticPositionUSD,
+      poolTokensUSDBalance,
+      ,
+      poolShareTokensUSDBalance,
+    ] = await Promise.all([
+      set(poolUsdPriceMapAtom, openRewards),
+      set(fetchUnrealizedPnLAtom, userAddress, chainId),
+      set(fetchRealizedPnLAtom, userAddress, chainId),
+      set(fetchStrategySyntheticPosition, userAddress, chainId),
+      set(fetchPoolTokensUSDBalanceAtom, userAddress),
+      set(fetchEarningsAtom, userAddress, chainId),
+      set(fetchPoolShareAtom, userAddress),
+    ]);
 
     let totalCollateralCC = 0;
     let totalUnrealizedPnl = 0;
@@ -101,7 +110,7 @@ export const fetchPortfolioAtom = atom(
       totalUnrealizedPnl +
       (poolShareTokensUSDBalance || 0) +
       (strategySyntheticPositionUSD || 0) +
-      totalReferralRewards;
+      (totalReferralRewards || 0);
 
     set(accountValueAtom, accountValue);
   }

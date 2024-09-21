@@ -12,6 +12,10 @@ export const totalEstimatedEarningsAtom = atom(0);
 export const earningsListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 export const fetchEarningsAtom = atom(null, async (get, set, userAddress: Address, chainId: number) => {
   const poolUsdPrice = get(poolUsdPriceAtom);
+  if (Object.keys(poolUsdPrice).length === 0) {
+    return;
+  }
+
   const pools = get(poolsAtom);
 
   const earningsPromises = [];

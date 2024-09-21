@@ -9,8 +9,12 @@ import { wagmiConfig } from 'blockchain-api/wagmi/wagmiClient';
 
 export const poolTokensUSDBalanceAtom = atom(0);
 export const fetchPoolTokensUSDBalanceAtom = atom(null, async (get, set, userAddress: Address) => {
-  const pools = get(poolsAtom);
   const poolUsdPrice = get(poolUsdPriceAtom);
+  if (Object.keys(poolUsdPrice).length === 0) {
+    return 0;
+  }
+
+  const pools = get(poolsAtom);
   const c2s = get(collateralToSettleConversionAtom);
 
   const [poolTokensBalances, poolTokensDecimals] = await Promise.all([

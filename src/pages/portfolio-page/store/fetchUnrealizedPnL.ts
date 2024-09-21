@@ -19,15 +19,18 @@ export const totalUnrealizedPnLAtom = atom(0);
 export const unrealizedPnLListAtom = atom<UnrealizedPnLListAtomI[]>([]);
 
 export const fetchUnrealizedPnLAtom = atom(null, async (get, set, userAddress: Address, chainId: number) => {
-  const traderAPI = get(traderAPIAtom);
+  const poolUsdPrice = get(poolUsdPriceAtom);
+  if (Object.keys(poolUsdPrice).length === 0) {
+    return;
+  }
 
+  const traderAPI = get(traderAPIAtom);
   const { data } = await getPositionRisk(chainId, traderAPI, userAddress, Date.now());
   if (!data) {
     return;
   }
 
   const c2s = get(collateralToSettleConversionAtom);
-  const poolUsdPrice = get(poolUsdPriceAtom);
   const activePositions = data.filter(({ side }) => side !== 'CLOSED');
 
   const unrealizedPnLReduced: Record<string, PoolValueI> = {};
