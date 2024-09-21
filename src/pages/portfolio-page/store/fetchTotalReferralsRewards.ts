@@ -1,16 +1,8 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
-import { type Address } from 'viem';
 
 import { poolsAtom, traderAPIAtom } from 'store/pools.store';
 import type { OpenTraderRebateI, PoolWithIdI } from 'types/types';
-
-import { fetchEarningsAtom } from './fetchEarnings';
-import { fetchPoolShareAtom } from './fetchPoolShare';
-import { fetchPoolTokensUSDBalanceAtom } from './fetchPoolTokensUSDBalance';
-import { fetchRealizedPnLAtom } from './fetchRealizedPnL';
-import { fetchUnrealizedPnLAtom } from './fetchUnrealizedPnL';
-import { fetchStrategySyntheticPosition } from './fetchStrategySyntheticPosition';
 
 const getPoolUsdPrice = async (traderAPI: TraderInterface, pool: PoolWithIdI) => {
   const info = await traderAPI.getPriceInUSD(
@@ -43,12 +35,13 @@ interface PoolUsdPriceI {
 }
 
 export const poolUsdPriceAtom = atom<Record<string, PoolUsdPriceI>>({});
-export const totalOpenRewardsAtom = atom(0);
-export const accountValueAtom = atom(0);
+export const totalReferralRewardsAtom = atom(0);
 
-const poolUsdPriceMapAtom = atom(null, async (get, set, openRewards: OpenTraderRebateI[]) => {
+export const poolUsdPriceMapAtom = atom(null, async (get, set, openRewards: OpenTraderRebateI[]) => {
   const traderAPI = get(traderAPIAtom);
   if (!traderAPI) {
+    set(poolUsdPriceAtom, {});
+    set(totalReferralRewardsAtom, 0);
     return;
   }
 
@@ -71,47 +64,7 @@ const poolUsdPriceMapAtom = atom(null, async (get, set, openRewards: OpenTraderR
       .reduce((accumulator, currentValue) => accumulator + currentValue.earnings, 0);
     totalReferralRewards += openRewardsAmount * poolUSDPrice.collateral;
   }
+
   set(poolUsdPriceAtom, poolUsdPriceMap);
-
-  return totalReferralRewards;
+  set(totalReferralRewardsAtom, totalReferralRewards);
 });
-
-export const fetchPortfolioAtom = atom(
-  null,
-  async (_get, set, userAddress: Address, chainId: number, openRewards: OpenTraderRebateI[]) => {
-    const [
-      totalReferralRewards,
-      unrealizedPnL,
-      ,
-      strategySyntheticPositionUSD,
-      poolTokensUSDBalance,
-      ,
-      poolShareTokensUSDBalance,
-    ] = await Promise.all([
-      set(poolUsdPriceMapAtom, openRewards),
-      set(fetchUnrealizedPnLAtom, userAddress, chainId),
-      set(fetchRealizedPnLAtom, userAddress, chainId),
-      set(fetchStrategySyntheticPosition, userAddress, chainId),
-      set(fetchPoolTokensUSDBalanceAtom, userAddress),
-      set(fetchEarningsAtom, userAddress, chainId),
-      set(fetchPoolShareAtom, userAddress),
-    ]);
-
-    let totalCollateralCC = 0;
-    let totalUnrealizedPnl = 0;
-    if (unrealizedPnL) {
-      totalCollateralCC = unrealizedPnL.totalCollateralCC;
-      totalUnrealizedPnl = unrealizedPnL.totalUnrealizedPnl;
-    }
-
-    const accountValue =
-      poolTokensUSDBalance +
-      totalCollateralCC +
-      totalUnrealizedPnl +
-      (poolShareTokensUSDBalance || 0) +
-      (strategySyntheticPositionUSD || 0) +
-      (totalReferralRewards || 0);
-
-    set(accountValueAtom, accountValue);
-  }
-);
