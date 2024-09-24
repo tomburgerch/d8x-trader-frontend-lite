@@ -7,8 +7,9 @@ import { DownloadOutlined } from '@mui/icons-material';
 import { Button, Dialog as MuiDialog, DialogActions, DialogContent } from '@mui/material';
 
 import LogoWithText from 'assets/logoWithText.svg?react';
+import { calculateProbability } from 'helpers/calculateProbability';
 import { parseSymbol } from 'helpers/parseSymbol';
-import { collateralToSettleConversionAtom } from 'store/pools.store';
+import { collateralToSettleConversionAtom, traderAPIAtom } from 'store/pools.store';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
@@ -26,6 +27,9 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
   const { t } = useTranslation();
 
   const c2s = useAtomValue(collateralToSettleConversionAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+
+  const isPredictionMarket = selectedPosition ? traderAPI?.isPredictionMarket(selectedPosition.symbol) : false;
 
   const statsRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +64,26 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
   const percent =
     100 *
     (selectedPosition.unrealizedPnlQuoteCCY / (selectedPosition.collateralCC * selectedPosition.collToQuoteConversion));
+
+  const displayEntryPrice = selectedPosition
+    ? formatToCurrency(
+        isPredictionMarket
+          ? calculateProbability(selectedPosition.entryPrice, selectedPosition.side === 'Short')
+          : selectedPosition.entryPrice,
+        parsedSymbol?.quoteCurrency,
+        true
+      )
+    : '';
+
+  const displayMarkPrice = selectedPosition
+    ? formatToCurrency(
+        isPredictionMarket
+          ? calculateProbability(selectedPosition.markPrice, selectedPosition.side === 'Short')
+          : selectedPosition.markPrice,
+        parsedSymbol?.quoteCurrency,
+        true
+      )
+    : '';
 
   return (
     <MuiDialog open={isOpen} onClose={closeModal} className={styles.dialog}>
@@ -96,11 +120,11 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
           <div className={styles.pricesContainer}>
             <div className={styles.priceLine}>
               <div>{t('pages.trade.positions-table.table-header.entry-price')}</div>
-              <div>{formatToCurrency(selectedPosition.entryPrice, parsedSymbol?.quoteCurrency, true)}</div>
+              <div>{displayEntryPrice}</div>
             </div>
             <div className={styles.priceLine}>
               <div>{t('pages.trade.stats.mark-price')}</div>
-              <div>{formatToCurrency(selectedPosition.markPrice, parsedSymbol?.quoteCurrency, true)}</div>
+              <div>{displayMarkPrice}</div>
             </div>
           </div>
           <div className={styles.originLink}>{window?.location.origin}</div>
