@@ -897,7 +897,7 @@ export const ActionBlock = memo(() => {
                   leftSide={
                     <Typography variant="bodySmallPopup" className={styles.left}>
                       {' '}
-                      {'Cost of order'}{' '}
+                      {t('common.cost-of-order')}{' '}
                     </Typography>
                   }
                   rightSide={
