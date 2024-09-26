@@ -16,7 +16,6 @@ import {
 } from 'store/pools.store';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { OrderBlockE, OrderSideE } from 'types/enums';
-import { calculateProbability } from 'helpers/calculateProbability';
 
 import { orderSizeAtom } from '../order-size/store';
 import { leverageAtom } from '../leverage-selector/store';
@@ -52,21 +51,6 @@ export const InfoBlock = memo(() => {
       (orderSize * orderInfo.tradingFee * selectedPerpetual.indexPrice) / selectedPerpetual.collToQuoteIndexPrice / 1e4
     );
   }, [orderSize, orderInfo, selectedPerpetual]);
-
-  const feePct = useMemo(() => {
-    if (orderInfo?.isPredictionMarket && feeInCC !== undefined && selectedPerpetual?.midPrice) {
-      // no SL/TP for pred mkts
-      return (
-        (100 * feeInCC) /
-        calculateProbability(selectedPerpetual.midPrice, orderBlock != OrderBlockE.Long) /
-        orderInfo.size
-      );
-    } else if (orderInfo?.tradingFee) {
-      return (
-        (orderInfo.tradingFee * 0.01) / (1 + (orderInfo.stopLossPrice ? 1 : 0) + (orderInfo.takeProfitPrice ? 1 : 0))
-      );
-    }
-  }, [orderInfo, feeInCC, selectedPerpetual?.midPrice, orderBlock]);
 
   const feeReduction = useMemo(() => {
     if (orderInfo?.baseFee && orderInfo?.tradingFee !== undefined && orderInfo?.tradingFee !== null) {
@@ -139,7 +123,7 @@ export const InfoBlock = memo(() => {
     <div className={styles.root}>
       <div className={styles.row}>
         <Typography variant="bodySmallPopup" className={styles.infoText}>
-          {t('pages.trade.order-block.info.fees')}
+          {orderInfo?.isPredictionMarket ? t('common.cost-of-order') : t('pages.trade.order-block.info.fees')}
         </Typography>
         <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
           {feeReduction !== undefined && feeReduction > 0 && feeInCC !== undefined ? (
@@ -170,9 +154,6 @@ export const InfoBlock = memo(() => {
                     feeInCC * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                     selectedPool.settleSymbol
                   )}{' '}
-              {'('}
-              {formatToCurrency(feePct, '%', false, 3)}
-              {')'}
             </>
           )}
         </Typography>
@@ -213,6 +194,18 @@ export const InfoBlock = memo(() => {
                   approxDepositFromWallet * (c2s.get(selectedPool.poolSymbol)?.value ?? 1),
                   selectedPool.settleSymbol
                 )}
+          </Typography>
+        </div>
+      )}
+      {orderInfo?.isPredictionMarket === true && (
+        <div className={styles.row}>
+          <Typography variant="bodySmallPopup" className={styles.infoText}>
+            {t('common.potential-return')}
+          </Typography>
+          <Typography variant="bodySmallPopup" className={styles.infoTextNumber}>
+            {approxDepositFromWallet === undefined || !selectedPool
+              ? '-'
+              : formatToCurrency(orderSize, selectedPool.settleSymbol)}
           </Typography>
         </div>
       )}
