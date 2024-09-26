@@ -751,6 +751,8 @@
     "external-service-status": "Status externer Services"
   },
   "common": {
+    "cost-of-order": "Kosten",
+    "potential-return": "Möglicher Return",
     "change-language": "Sprache wechseln",
     "wallet-connect": "Verbinden",
     "account-button": "Konto",
