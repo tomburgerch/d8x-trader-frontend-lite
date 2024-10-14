@@ -16,7 +16,7 @@ import { ToastContent } from 'components/toast-content/ToastContent';
 
 import styles from './MockSwap.module.scss';
 import { MockSwapConfigI } from 'types/types';
-import { SWAP_ABI, TOKEN_SWAPS } from 'components/usdc-swap-widget/constants';
+import { SWAP_ABI, TOKEN_SWAPS } from '../../constants';
 
 export function MockSWAP() {
   // constants: could be made into states
@@ -65,12 +65,13 @@ export function MockSWAP() {
     }
     return '';
   }, [tokenAmountUnits, marginTokenDecimals]);
-  console.log({
-    depositAmountUnits,
-    tokenAmountUnits,
-    marginTokenDecimals,
-    enabled: wallet?.chain !== undefined && wallet?.account?.address !== undefined && depositAmountUnits !== undefined,
-  });
+  // console.log({
+  //   swapAddress,
+  //   depositAmountUnits,
+  //   tokenAmountUnits,
+  //   marginTokenDecimals,
+  //   enabled: wallet?.chain !== undefined && wallet?.account?.address !== undefined && depositAmountUnits !== undefined,
+  // });
 
   const { data: swapTxn, writeContract: write, isPending: isLoading } = useWriteContract();
 
