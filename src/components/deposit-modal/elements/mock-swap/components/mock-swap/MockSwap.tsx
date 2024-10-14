@@ -53,6 +53,7 @@ export function MockSWAP() {
     query: {
       enabled:
         wallet?.chain !== undefined && wallet?.account?.address !== undefined && depositAmountUnits !== undefined,
+      refetchInterval: 10_000,
     },
     functionName: 'getAmountToReceive',
     args: [wallet?.account?.address as `0x${string}`, depositAmountUnits as bigint],
@@ -64,6 +65,12 @@ export function MockSWAP() {
     }
     return '';
   }, [tokenAmountUnits, marginTokenDecimals]);
+  console.log({
+    depositAmountUnits,
+    tokenAmountUnits,
+    marginTokenDecimals,
+    enabled: wallet?.chain !== undefined && wallet?.account?.address !== undefined && depositAmountUnits !== undefined,
+  });
 
   const { data: swapTxn, writeContract: write, isPending: isLoading } = useWriteContract();
 
@@ -133,12 +140,11 @@ export function MockSWAP() {
             !nativeToken?.value ||
             !depositAmountUnits ||
             depositAmountUnits > nativeToken?.value ||
-            Number(tokenAmount) < 10_000 ||
             isLoading ||
             inAction
           }
         >
-          {Number(tokenAmount) < 10_000 && wallet ? 'Wait 24 hours' : 'Get tokens'}
+          {`Get test ${selectedPoolSymbol}`}
         </Button>
       </div>
       {Number(tokenAmount) >= 10_000 && (
@@ -155,13 +161,10 @@ export function MockSWAP() {
         nativeToken.value < depositAmountUnits && (
           <div className={`${styles.row} ${styles.applyMax}`}>
             <Typography className={styles.helperTextWarning} variant="bodyTiny">
-              Insufficient funds: {nativeToken?.formatted} {nativeToken?.symbol} - Get test {nativeToken?.symbol} from{' '}
+              Insufficient funds: {formatUnits(nativeToken.value, nativeToken.decimals)} {nativeToken.symbol} - Get test{' '}
+              {nativeToken.symbol} from{' '}
               <a
-                href={
-                  nativeToken?.symbol === 'OKB'
-                    ? 'https://www.okx.com/x1/faucet/x1faucet'
-                    : 'https://faucet.polygon.technology/'
-                }
+                href={'https://bartio.faucet.berachain.com/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'underline' }}
