@@ -531,3 +531,14 @@ export interface PredictionMarketMetaDataI {
   tokens: PredictionMarketTokenI[];
   tags: string[];
 }
+
+export interface MockSwapConfigI {
+  chainId: number;
+  pools: {
+    id: number;
+    marginToken: string;
+    decimals: number;
+    marginTokenAddress: string;
+    marginTokenSwap: string;
+  }[];
+}
