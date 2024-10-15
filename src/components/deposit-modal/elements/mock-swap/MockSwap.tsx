@@ -109,14 +109,13 @@ export function MockSwap() {
           bodyLines={[
             {
               label: '',
-              value: `You have successfully swapped 0.001 ${nativeToken?.symbol}
-             to ${tokenAmount} ${selectedPoolSymbol}`,
+              value: `You have successfully obtained ${selectedPoolSymbol}!`,
             },
           ]}
         />
       );
     }
-  }, [isSwapSuccess, tokenAmount, nativeToken, selectedPoolSymbol]);
+  }, [isSwapSuccess, nativeToken, selectedPoolSymbol]);
 
   useEffect(() => {
     if (isSwapError) {
