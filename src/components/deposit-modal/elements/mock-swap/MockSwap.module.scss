@@ -1,42 +1,61 @@
 @import '~styles/theme/theme.scss';
 
 .root {
-  width: 100%;
-  padding: 16px 32px;
-}
-
-.connectButton {
   display: flex;
+  flex-direction: column;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swapButton {
+  width: 100%;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+
+  + .row {
+    margin-top: 16px;
+  }
+}
+
+.applyMax {
   justify-content: flex-end;
-  margin-bottom: 16px;
+  padding-right: 8px;
+  margin-top: 8px !important;
 }
 
-.header {
-  font-size: 32px;
+.text {
+  width: 100%;
+  text-align: left;
   font-weight: 600;
-  line-height: 1;
-  align-self: flex-start;
-  color: var(--d8x-color-purple-dark);
-  margin-top: 24px;
-  margin-bottom: 40px;
+  font-size: 10px;
+  color: var(--d8x-color-text-highlight);
 
-  @include media-phone {
-    margin-bottom: 32px;
-    font-size: 1.5rem;
+  a {
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
-.subtitle {
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 1;
-  align-self: flex-start;
-  color: var(--d8x-color-purple-dark);
-  margin-top: 24px;
-  margin-bottom: 8px;
+.helperText {
+  color: var(--d8x-color-black);
+}
 
-  @include media-phone {
-    margin-bottom: 32px;
-    font-size: 1rem;
-  }
+.helperTextWarning {
+  color: red;
+}
+
+.addMaxLink {
+  cursor: pointer;
 }
