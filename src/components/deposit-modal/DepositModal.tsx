@@ -17,6 +17,7 @@ import { isCedeWidgetEnabled } from 'helpers/isCedeWidgetEnabled';
 import { isLifiWidgetEnabled } from 'helpers/isLifiWidgetEnabled';
 import { isOwltoButtonEnabled } from 'helpers/isOwltoButtonEnabled';
 import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
+import { isMockSwapEnabled } from 'helpers/isMockSwapEnabled';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom, modalSelectedCurrencyAtom } from 'store/global-modals.store';
 import { gasTokenSymbolAtom } from 'store/pools.store';
@@ -27,6 +28,7 @@ import { CedeWidgetButton } from './elements/cede-widget-button/CedeWidgetButton
 import { LiFiWidgetButton } from './elements/lifi-widget-button/LiFiWidgetButton';
 import { OKXConvertor } from './elements/okx-convertor/OKXConvertor';
 import { OwltoButton } from './elements/owlto-button/OwltoButton';
+import { MockSwap } from './elements/mock-swap/MockSwap';
 
 import styles from './DepositModal.module.scss';
 
@@ -45,6 +47,7 @@ export const DepositModal = () => {
   const isOwltoEnabled = isOwltoButtonEnabled(chainId);
   const isLiFiEnabled = isLifiWidgetEnabled(isOwltoEnabled, chainId);
   const isCedeEnabled = isCedeWidgetEnabled(chainId);
+  const isMockTokenSwapEnabled = isMockSwapEnabled(chainId);
 
   const targetAddress = useMemo(() => {
     if (activatedOneClickTrading && selectedCurrency?.isGasToken === false) {
@@ -116,6 +119,7 @@ export const DepositModal = () => {
           {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
         </div>
       )}
+      {isMockTokenSwapEnabled && <MockSwap />}
       <Separator />
       <div className={styles.section}>
         <WalletBalances />
