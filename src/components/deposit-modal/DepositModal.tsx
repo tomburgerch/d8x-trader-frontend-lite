@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
@@ -20,7 +20,7 @@ import { useBridgeShownOnPage } from 'helpers/useBridgeShownOnPage';
 import { isMockSwapEnabled } from 'helpers/isMockSwapEnabled';
 import { activatedOneClickTradingAtom, tradingClientAtom } from 'store/app.store';
 import { depositModalOpenAtom, modalSelectedCurrencyAtom } from 'store/global-modals.store';
-import { gasTokenSymbolAtom } from 'store/pools.store';
+import { gasTokenSymbolAtom, poolTokenBalanceAtom } from 'store/pools.store';
 import { cutAddress } from 'utils/cutAddress';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -31,6 +31,8 @@ import { OwltoButton } from './elements/owlto-button/OwltoButton';
 import { MockSwap } from './elements/mock-swap/MockSwap';
 
 import styles from './DepositModal.module.scss';
+import { useUserWallet } from 'context/user-wallet-context/UserWalletContext';
+import { MethodE } from 'types/enums';
 
 export const DepositModal = () => {
   const { t } = useTranslation();
@@ -42,12 +44,16 @@ export const DepositModal = () => {
   const gasTokenSymbol = useAtomValue(gasTokenSymbolAtom);
   const tradingClient = useAtomValue(tradingClientAtom);
   const activatedOneClickTrading = useAtomValue(activatedOneClickTradingAtom);
+  const poolTokenBalance = useAtomValue(poolTokenBalanceAtom);
 
   const isBridgeShownOnPage = useBridgeShownOnPage();
   const isOwltoEnabled = isOwltoButtonEnabled(chainId);
   const isLiFiEnabled = isLifiWidgetEnabled(isOwltoEnabled, chainId);
   const isCedeEnabled = isCedeWidgetEnabled(chainId);
   const isMockTokenSwapEnabled = isMockSwapEnabled(chainId);
+  const { gasTokenBalance, hasEnoughGasForFee } = useUserWallet();
+
+  const [title, setTitle] = useState('');
 
   const targetAddress = useMemo(() => {
     if (activatedOneClickTrading && selectedCurrency?.isGasToken === false) {
@@ -60,11 +66,23 @@ export const DepositModal = () => {
     setDepositModalOpen(false);
   }, [setDepositModalOpen]);
 
-  const poolAddress = selectedCurrency?.contractAddress || '';
+  useEffect(() => {
+    if (
+      isMockSwapEnabled(chainId) &&
+      (poolTokenBalance === 0 || (gasTokenBalance && !hasEnoughGasForFee(MethodE.Interact, 1n)))
+    ) {
+      setTitle('Get Test Tokens');
+      setDepositModalOpen(true);
+    } else {
+      setTitle(t('common.deposit-modal.title'));
+    }
+  }, [chainId, poolTokenBalance, gasTokenBalance, hasEnoughGasForFee, setDepositModalOpen, t]);
 
   if (!isEnabledChain(chainId)) {
     return null;
   }
+
+  const poolTokenAddress = selectedCurrency?.contractAddress || '';
 
   return (
     <Dialog
@@ -72,40 +90,53 @@ export const DepositModal = () => {
       onClose={handleOnClose}
       onCloseClick={handleOnClose}
       className={styles.dialog}
-      dialogTitle={t('common.deposit-modal.title')}
+      dialogTitle={title}
     >
       <div className={styles.section}>
         <CurrencySelect />
       </div>
       <Separator />
       <OKXConvertor />
-      <div className={styles.section}>
-        {activatedOneClickTrading ? (
-          <Typography variant="bodyMedium" className={styles.noteText}>
-            {t('common.deposit-modal.important-notice.0')}
-          </Typography>
-        ) : (
-          <div>{/* empty block */}</div>
-        )}
-        <Typography variant="bodySmall" className={styles.noteText}>
-          <Translate
-            i18nKey="common.deposit-modal.important-notice.1"
-            values={{ currencyName: selectedCurrency?.settleToken }}
-          />{' '}
-          {poolAddress && (
-            <>
-              {t('common.deposit-modal.important-notice.2')}
-              <CopyLink elementToShow={cutAddress(poolAddress)} textToCopy={poolAddress} classname={styles.copyText} />
-              {t('common.deposit-modal.important-notice.3')}{' '}
-            </>
+      {!isMockSwapEnabled(chainId) ? (
+        <div className={styles.section}>
+          {activatedOneClickTrading ? (
+            <Typography variant="bodyMedium" className={styles.noteText}>
+              {t('common.deposit-modal.important-notice.0')}
+            </Typography>
+          ) : (
+            <div>{/* empty block */}</div>
           )}
-          {t('common.deposit-modal.important-notice.4')}{' '}
-          <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
-        </Typography>
-      </div>
-      <div className={styles.section}>
-        <CopyInput id="address" textToCopy={targetAddress || ''} />
-      </div>
+          <Typography variant="bodySmall" className={styles.noteText}>
+            <Translate
+              i18nKey="common.deposit-modal.important-notice.1"
+              values={{ currencyName: selectedCurrency?.settleToken }}
+            />{' '}
+            {poolTokenAddress && (
+              <>
+                {t('common.deposit-modal.important-notice.2')}
+                <CopyLink
+                  elementToShow={cutAddress(poolTokenAddress)}
+                  textToCopy={poolTokenAddress}
+                  classname={styles.copyText}
+                />
+                {t('common.deposit-modal.important-notice.3')}{' '}
+              </>
+            )}
+            {t('common.deposit-modal.important-notice.4')}{' '}
+            <Translate i18nKey="common.deposit-modal.important-notice.5" values={{ chainName: chain?.name }} />
+          </Typography>
+          <div className={styles.section}>
+            <CopyInput id="address" textToCopy={targetAddress || ''} />
+          </div>
+        </div>
+      ) : (
+        <div className={styles.section}>
+          <Typography variant="bodyMedium" className={styles.noteText}>
+            {`You need test tokens to trade`}
+          </Typography>
+        </div>
+      )}
+
       {(isCedeEnabled || isLiFiEnabled || isOwltoEnabled) && (
         <div className={classnames(styles.section, styles.widgetButtons)}>
           {isBridgeShownOnPage && (isLiFiEnabled || isOwltoEnabled) ? (
@@ -119,7 +150,11 @@ export const DepositModal = () => {
           {isCedeEnabled ? <CedeWidgetButton /> : <div>{/* empty block */}</div>}
         </div>
       )}
-      {isMockTokenSwapEnabled && <MockSwap />}
+      {isMockTokenSwapEnabled && (
+        <div>
+          <MockSwap />
+        </div>
+      )}
       <Separator />
       <div className={styles.section}>
         <WalletBalances />
