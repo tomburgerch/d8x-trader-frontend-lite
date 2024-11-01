@@ -22,7 +22,7 @@ import {
 } from './pools.store';
 
 export const orderBlockAtom = atom<OrderBlockE>(OrderBlockE.Long);
-export const slippageSliderAtom = atom(2);
+export const slippageSliderAtom = atom(5);
 export const keepPositionLeverageAtom = atom(false);
 export const reduceOnlyAtom = atom(false);
 export const expireDaysAtom = atom(Number(ExpiryE['90D']));

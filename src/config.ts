@@ -31,6 +31,7 @@ const {
   VITE_FIREBASE_MESSAGINGSENDERID: firebaseMessengerId = '',
   VITE_FIREBASE_APPID: firebaseAppId = '',
   VITE_FIREBASE_MEASUREMENTID: firebaseMeasurementId = '',
+  VITE_DEFAULT_MARKETS: defaultMarkets = '',
 } = import.meta.env;
 
 const URLS_SEPARATOR = ';';
@@ -73,6 +74,7 @@ export const config = {
   enabledCedeByChains: splitNumbers(enabledCedeByChains),
   showChallengeModal: showChallengeModal === 'true',
   defaultTheme,
+  defaultMarket: parseUrls(defaultMarkets),
 };
 
 export const pagesConfig = {

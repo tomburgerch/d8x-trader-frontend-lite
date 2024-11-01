@@ -4,6 +4,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
@@ -35,12 +36,15 @@ import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
 
 import styles from './MarketSelect.module.scss';
+import { config } from 'config';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
 
   const location = useLocation();
 
+  const { chainId } = useAccount();
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
@@ -56,38 +60,69 @@ export const MarketSelect = memo(() => {
   const markets = useMarkets();
 
   useEffect(() => {
-    if (!location.hash || urlChangesAppliedRef.current || !pools.length) {
+    if (urlChangesAppliedRef.current || !pools.length) {
       return;
     }
 
-    let symbolHash = location.hash.slice(1);
-    // Handle `=` in the URL, which magically appears there...
-    if (symbolHash.indexOf('=')) {
-      symbolHash = symbolHash.replaceAll('=', '');
-    }
-    const result = parseSymbol(symbolHash);
+    if (location.hash) {
+      let symbolHash = location.hash.slice(1);
+      // Handle `=` in the URL, which magically appears there...
+      if (symbolHash.indexOf('=')) {
+        symbolHash = symbolHash.replaceAll('=', '');
+      }
+      const result = parseSymbol(symbolHash);
 
-    if (result) {
-      setSelectedPool(result.poolSymbol);
+      if (result) {
+        setSelectedPool(result.poolSymbol);
 
-      const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
-      if (!foundPool) {
-        if (pools.length > 0) {
-          urlChangesAppliedRef.current = true;
+        const foundPool = pools.find(({ poolSymbol }) => poolSymbol === result.poolSymbol);
+        if (!foundPool) {
+          if (pools.length > 0) {
+            urlChangesAppliedRef.current = true;
+          }
+          return;
         }
+
+        const foundPerpetual = foundPool.perpetuals.find(
+          ({ baseCurrency, quoteCurrency }) =>
+            baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
+        );
+        if (foundPerpetual) {
+          setSelectedPerpetual(foundPerpetual.id);
+        }
+        urlChangesAppliedRef.current = true;
         return;
       }
-
-      const foundPerpetual = foundPool.perpetuals.find(
-        ({ baseCurrency, quoteCurrency }) =>
-          baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
-      );
-      if (foundPerpetual) {
-        setSelectedPerpetual(foundPerpetual.id);
-      }
-      urlChangesAppliedRef.current = true;
     }
-  }, [location.hash, selectedPool, setSelectedPool, setSelectedPerpetual, pools]);
+
+    let chainIdForMarket: number;
+    if (!isEnabledChain(chainId)) {
+      chainIdForMarket = config.enabledChains[0];
+    } else {
+      chainIdForMarket = chainId;
+    }
+
+    if (config.defaultMarket[chainIdForMarket] && config.defaultMarket[chainIdForMarket] !== '') {
+      const result = parseSymbol(config.defaultMarket[chainIdForMarket]);
+      if (result) {
+        const foundPool = pools.find(({ poolSymbol: ps }) => ps === result.poolSymbol);
+        if (foundPool) {
+          setSelectedPool(result.poolSymbol);
+
+          const foundPerpetual = foundPool.perpetuals.find(
+            ({ baseCurrency, quoteCurrency }) =>
+              baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
+          );
+
+          if (foundPerpetual) {
+            setSelectedPerpetual(foundPerpetual.id);
+          }
+        }
+      }
+    }
+
+    urlChangesAppliedRef.current = true;
+  }, [location.hash, pools, setSelectedPool, setSelectedPerpetual, chainId]);
 
   useEffect(() => {
     if (selectedPool && selectedPerpetual) {
