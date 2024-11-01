@@ -66,6 +66,7 @@ export const MarketSelect = memo(() => {
 
     if (location.hash) {
       let symbolHash = location.hash.slice(1);
+      // Handle `=` in the URL, which magically appears there...
       if (symbolHash.indexOf('=')) {
         symbolHash = symbolHash.replaceAll('=', '');
       }
@@ -100,21 +101,17 @@ export const MarketSelect = memo(() => {
     } else {
       chainIdForMarket = chainId;
     }
-    console.log(chainIdForMarket);
-    console.log(config.defaultMarket[chainIdForMarket]);
 
     if (config.defaultMarket[chainIdForMarket] && config.defaultMarket[chainIdForMarket] !== '') {
-      const parts = config.defaultMarket[chainIdForMarket].split('-');
-      if (parts.length === 3) {
-        const [base, quote, pool] = parts;
-        const poolSymbol = `${pool}`;
-
-        const foundPool = pools.find(({ poolSymbol: ps }) => ps === poolSymbol);
+      const result = parseSymbol(config.defaultMarket[chainIdForMarket]);
+      if (result) {
+        const foundPool = pools.find(({ poolSymbol: ps }) => ps === result.poolSymbol);
         if (foundPool) {
-          setSelectedPool(poolSymbol);
+          setSelectedPool(result.poolSymbol);
 
           const foundPerpetual = foundPool.perpetuals.find(
-            ({ baseCurrency, quoteCurrency }) => baseCurrency === base && quoteCurrency === quote
+            ({ baseCurrency, quoteCurrency }) =>
+              baseCurrency === result.baseCurrency && quoteCurrency === result.quoteCurrency
           );
 
           if (foundPerpetual) {
