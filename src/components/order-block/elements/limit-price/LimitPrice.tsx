@@ -111,11 +111,8 @@ export const LimitPrice = memo(() => {
   }, [limitPrice]);
 
   const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
+    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.quoteCurrency]);
 
   if (orderType === OrderTypeE.Market) {
     return null;

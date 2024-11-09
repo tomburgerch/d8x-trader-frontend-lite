@@ -20,9 +20,6 @@ const OptionTitle = ({ option }: OptionTitlePropsI) => {
   const { t } = useTranslation();
 
   const IconComponent = useMemo(() => {
-    if (option === '') {
-      return () => null;
-    }
     return getDynamicLogo(option.toLowerCase()) as TemporaryAnyT;
   }, [option]);
 
@@ -58,10 +55,7 @@ export const CollateralSelect = () => {
   }, [collaterals]);
 
   const IconComponent = useMemo(() => {
-    if (!collateralFilter) {
-      return () => null;
-    }
-    return getDynamicLogo(collateralFilter.toLowerCase()) as TemporaryAnyT;
+    return getDynamicLogo(collateralFilter?.toLowerCase() ?? '') as TemporaryAnyT;
   }, [collateralFilter]);
 
   return (

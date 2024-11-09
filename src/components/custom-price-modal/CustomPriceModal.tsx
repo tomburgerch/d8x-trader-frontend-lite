@@ -40,11 +40,8 @@ export const CustomPriceModal = () => {
   const { handleTakeProfitPriceChange, handleTakeProfitChange, validateTakeProfitPrice } = useTakeProfit();
 
   const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
+    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.quoteCurrency]);
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
 
@@ -166,6 +163,7 @@ export const CustomPriceModal = () => {
             <ResponsiveInput
               id="take-profit-price"
               className={styles.responsiveInput}
+              inputClassName={styles.input}
               inputValue={takeProfitInputPrice != null ? takeProfitInputPrice : ''}
               placeholder="-"
               step={stepSize}

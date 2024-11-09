@@ -7,6 +7,7 @@ import { CircularProgress } from '@mui/material';
 
 import { AtomsGlobalUpdates } from 'components/atoms-global-updates/AtomsGlobalUpdates';
 import { CedeWidgetModal } from 'components/cede-widget-modal/CedeWidgetModal';
+import { ChainSwitchHandler } from 'components/chain-switch-handler/ChainSwitchHandler';
 import { ConnectModal } from 'components/connect-modal/ConnectModal';
 import { Footer } from 'components/footer/Footer';
 import { Header } from 'components/header/Header';
@@ -90,6 +91,7 @@ export const App = memo(() => {
         <ReferralConfirmModal />
         <MarketSelectModal />
         <CedeWidgetModal />
+        <ChainSwitchHandler />
         {!isSignedInSocially && isConnected && <OneClickTradingModal />}
         {web3AuthConfig.isEnabled && !isConnected && <ConnectModal />}
         <ToastContainerWrapper />

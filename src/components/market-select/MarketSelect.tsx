@@ -1,6 +1,6 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -48,11 +48,10 @@ export const MarketSelect = memo(() => {
   const pools = useAtomValue(poolsAtom);
   const orderBlock = useAtomValue(orderBlockAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
-  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
   const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
   const [selectedPerpetual, setSelectedPerpetual] = useAtom(selectedPerpetualAtom);
   const [selectedPool, setSelectedPool] = useAtom(selectedPoolAtom);
-  const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
+  const [perpetualStatistics, setPerpetualStatistics] = useAtom(perpetualStatisticsAtom);
   const [isMarketSelectModalOpen, setMarketSelectModalOpen] = useAtom(marketSelectModalOpenAtom);
 
   const urlChangesAppliedRef = useRef(false);
@@ -162,6 +161,7 @@ export const MarketSelect = memo(() => {
         // skip
       }
       const px = perpetualStatistics.midPrice;
+
       return isPredictionMarket
         ? [calculateProbability(px, orderBlock === OrderBlockE.Short), perpetualStatistics.quoteCurrency]
         : [px, perpetualStatistics.quoteCurrency];

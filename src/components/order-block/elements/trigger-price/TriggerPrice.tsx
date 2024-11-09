@@ -68,11 +68,8 @@ export const TriggerPrice = memo(() => {
   }, [triggerPrice]);
 
   const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
+    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
+  }, [selectedPerpetual?.quoteCurrency]);
 
   if (orderType !== OrderTypeE.Stop) {
     return null;
