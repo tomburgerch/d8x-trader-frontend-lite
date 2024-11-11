@@ -33,15 +33,15 @@
   .quoteIcon {
     @include flex-center;
 
-    width: 48px;
-    height: 48px;
+    width: 78px;
+    height: 78px;
     border: 1.5px solid var(--d8x-currency-icon-color);
     background-color: var(--d8x-currency-icon-background-color);
     border-radius: 50%;
 
     svg {
-      width: 30px;
-      height: 30px;
+      width: 60px;
+      height: 60px;
     }
 
     @include media-phone {
