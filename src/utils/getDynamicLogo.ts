@@ -95,13 +95,13 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
         case 'trmpukr':
           localLogo = (await import('assets/crypto-icons/trmpukr.svg')).default;
           break;
-        case 'btc90k':
+        case 'btcnov90':
           localLogo = (await import('assets/crypto-icons/btc90k.svg')).default;
           break;
-        case 'btc100k':
+        case 'btc24100':
           localLogo = (await import('assets/crypto-icons/btc100k.svg')).default;
           break;
-        case 'mclaren':
+        case 'mclaren24':
           localLogo = (await import('assets/crypto-icons/mclaren.svg')).default;
           break;
         case 'mancity':
