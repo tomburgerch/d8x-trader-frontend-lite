@@ -2,6 +2,7 @@ import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
+import { INVALID_PERPETUAL_STATES } from 'appConstants';
 import type {
   CollToSettleInfoI,
   FundingI,
@@ -106,12 +107,12 @@ export const selectedPerpetualAtom = atom(
     const foundPerpetual = perpetuals.find((perpetual) => perpetual.id === +savedPerpetualId);
 
     // Check if the found perpetual is valid
-    if (foundPerpetual && !['INVALID', 'INITIALIZING'].includes(foundPerpetual.state)) {
+    if (foundPerpetual && !INVALID_PERPETUAL_STATES.includes(foundPerpetual.state)) {
       return foundPerpetual;
     }
 
     // Return the first valid perpetual that is NOT INVALID or INITIALIZING
-    return perpetuals.find((perpetual) => !['INVALID', 'INITIALIZING'].includes(perpetual.state)) || null;
+    return perpetuals.find((perpetual) => !INVALID_PERPETUAL_STATES.includes(perpetual.state)) || null;
   },
   (_get, set, perpetualId: number) => {
     set(selectedPerpetualIdAtom, perpetualId);
