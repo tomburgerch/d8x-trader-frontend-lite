@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
+import { INVALID_PERPETUAL_STATES } from 'appConstants';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
 import { createSymbol } from 'helpers/createSymbol';
 import { calculateProbability } from 'helpers/calculateProbability';
@@ -24,7 +25,7 @@ export const useMarkets = () => {
       .forEach((pool) =>
         marketsList.push(
           ...pool.perpetuals
-            .filter((perpetual) => !['INVALID', 'INITIALIZING'].includes(perpetual.state))
+            .filter((perpetual) => !INVALID_PERPETUAL_STATES.includes(perpetual.state))
             .map((perpetual) => {
               const pairId = `${perpetual.baseCurrency}-${perpetual.quoteCurrency}`.toLowerCase();
               let marketData = marketsData.find((market) => market.symbol === pairId);
