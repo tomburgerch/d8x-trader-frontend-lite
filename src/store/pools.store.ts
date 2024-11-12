@@ -104,11 +104,14 @@ export const selectedPerpetualAtom = atom(
 
     const savedPerpetualId = get(selectedPerpetualIdAtom);
     const foundPerpetual = perpetuals.find((perpetual) => perpetual.id === +savedPerpetualId);
-    if (foundPerpetual) {
+
+    // Check if the found perpetual is valid
+    if (foundPerpetual && !['INVALID', 'INITIALIZING'].includes(foundPerpetual.state)) {
       return foundPerpetual;
     }
 
-    return perpetuals[0];
+    // Return the first valid perpetual that is NOT INVALID or INITIALIZING
+    return perpetuals.find((perpetual) => !['INVALID', 'INITIALIZING'].includes(perpetual.state)) || null;
   },
   (_get, set, perpetualId: number) => {
     set(selectedPerpetualIdAtom, perpetualId);
