@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { type Address, erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContracts } from 'wagmi';
+import { INVALID_PERPETUAL_STATES } from 'appConstants';
 
 import { Menu } from '@mui/icons-material';
 import { Button, Drawer, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -140,9 +141,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
       setCollaterals(pools.map((pool) => pool.settleSymbol));
 
       const perpetuals: PerpetualDataI[] = [];
+
       data.pools.forEach((pool) => {
-        perpetuals.push(
-          ...pool.perpetuals.map((perpetual) => {
+        // Map over the pool.perpetuals array and filter out INVALID and INITIALIZING perpetuals
+        const validPerpetuals = pool.perpetuals
+          .filter((perpetual) => !INVALID_PERPETUAL_STATES.includes(perpetual.state))
+          .map((perpetual) => {
             const symbol = createSymbol({
               poolSymbol: pool.poolSymbol,
               baseCurrency: perpetual.baseCurrency,
@@ -164,9 +168,12 @@ export const Header = memo(({ window }: HeaderPropsI) => {
               isPredictionMarket,
               state: perpetual.state,
             };
-          })
-        );
+          });
+
+        // Push the valid perpetuals into the perpetuals array
+        perpetuals.push(...validPerpetuals);
       });
+
       const filteredPerpetuals = perpetuals.filter(
         (perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket
       );
