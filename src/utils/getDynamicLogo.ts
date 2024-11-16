@@ -44,9 +44,6 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
         case 'xau':
           localLogo = (await import('assets/crypto-icons/gold.svg')).default;
           break;
-        case 'trump24':
-          localLogo = (await import('assets/crypto-icons/trump24.svg')).default;
-          break;
         case 'chf':
           localLogo = (await import('assets/crypto-icons/chf.svg')).default;
           break;
@@ -64,9 +61,6 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
           break;
         case 'ton':
           localLogo = (await import('assets/crypto-icons/ton.svg')).default;
-          break;
-        case 'walznom':
-          localLogo = (await import('assets/crypto-icons/walz.svg')).default;
           break;
         case 'harris24p':
           localLogo = (await import('assets/crypto-icons/harris.svg')).default;
@@ -97,6 +91,21 @@ export const getDynamicLogo = (symbol: string): LazyExoticComponent<ComponentTyp
           break;
         case 'ibgt':
           localLogo = (await import('assets/crypto-icons/ibgt.svg')).default;
+          break;
+        case 'trmpukr':
+          localLogo = (await import('assets/crypto-icons/trmpukr.svg')).default;
+          break;
+        case 'btcnov90':
+          localLogo = (await import('assets/crypto-icons/btc90k.svg')).default;
+          break;
+        case 'btc24100':
+          localLogo = (await import('assets/crypto-icons/btc100k.svg')).default;
+          break;
+        case 'mclaren24':
+          localLogo = (await import('assets/crypto-icons/mclaren.svg')).default;
+          break;
+        case 'mancity':
+          localLogo = (await import('assets/crypto-icons/mancity.svg')).default;
           break;
         default:
           localLogo = (await import('assets/crypto-icons/generic.svg')).default;
