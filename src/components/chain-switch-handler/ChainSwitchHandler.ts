@@ -3,13 +3,26 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
-import { perpetualStatisticsAtom, poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
+import {
+  clearOpenOrdersAtom,
+  clearPositionsAtom,
+  fundingListAtom,
+  perpetualStatisticsAtom,
+  poolsAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
+  tradesHistoryAtom,
+} from 'store/pools.store';
 
 export const ChainSwitchHandler = () => {
   const setSelectedPool = useSetAtom(selectedPoolAtom);
   const setSelectedPerpetual = useSetAtom(selectedPerpetualAtom);
   const setPerpetualStatistics = useSetAtom(perpetualStatisticsAtom);
   const setPools = useSetAtom(poolsAtom);
+  const clearPositions = useSetAtom(clearPositionsAtom);
+  const clearOpenOrders = useSetAtom(clearOpenOrdersAtom);
+  const setFundingList = useSetAtom(fundingListAtom);
+  const setTradesHistory = useSetAtom(tradesHistoryAtom);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -27,6 +40,10 @@ export const ChainSwitchHandler = () => {
     if (chainIdRef.current !== chainId) {
       if (chainIdRef.current !== null) {
         setPools([]);
+        clearPositions();
+        clearOpenOrders();
+        setFundingList([]);
+        setTradesHistory([]);
         setSelectedPool('');
         setSelectedPerpetual(0);
         setPerpetualStatistics(null);
@@ -42,6 +59,10 @@ export const ChainSwitchHandler = () => {
     isReconnecting,
     chainId,
     setPools,
+    clearPositions,
+    clearOpenOrders,
+    setFundingList,
+    setTradesHistory,
     setSelectedPool,
     setSelectedPerpetual,
     setPerpetualStatistics,
