@@ -1,7 +1,7 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useAccount } from 'wagmi';
@@ -11,7 +11,10 @@ import { Button, Typography } from '@mui/material';
 
 import ArrowDownIcon from 'assets/icons/new/arrowDown.svg?react';
 import ArrowUpIcon from 'assets/icons/new/arrowUp.svg?react';
+import { config } from 'config';
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
+import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
 import type { StatDataI } from 'components/stats-line/types';
 import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
 import { createSymbol } from 'helpers/createSymbol';
@@ -28,16 +31,11 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { OrderBlockE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
 import { cutBaseCurrency } from 'utils/cutBaseCurrency';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
-
-import { useMarkets } from 'components/market-select-modal/hooks/useMarkets';
+import { isEnabledChain } from 'utils/isEnabledChain';
 
 import styles from './MarketSelect.module.scss';
-import { config } from 'config';
-import { isEnabledChain } from 'utils/isEnabledChain';
 
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
@@ -139,14 +137,6 @@ export const MarketSelect = memo(() => {
     }
   }, [selectedPool, selectedPerpetual, setPerpetualStatistics]);
 
-  const BaseIconComponent = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.baseCurrency]);
-
-  const QuoteIconComponent = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.quoteCurrency]);
-
   let midPriceClass = styles.positive;
   if (perpetualStatistics?.midPriceDiff != null) {
     midPriceClass = perpetualStatistics?.midPriceDiff >= 0 ? styles.positive : styles.negative;
@@ -210,14 +200,10 @@ export const MarketSelect = memo(() => {
     <div className={styles.holderRoot} onClick={() => setMarketSelectModalOpen(true)}>
       <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
         <div className={styles.baseIcon}>
-          <Suspense fallback={null}>
-            <BaseIconComponent />
-          </Suspense>
+          <DynamicLogo logoName={selectedPerpetual?.baseCurrency.toLowerCase() || ''} />
         </div>
         <div className={styles.quoteIcon}>
-          <Suspense fallback={null}>
-            <QuoteIconComponent />
-          </Suspense>
+          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} />
         </div>
       </div>
       <Button className={styles.marketSelectButton} variant="outlined">

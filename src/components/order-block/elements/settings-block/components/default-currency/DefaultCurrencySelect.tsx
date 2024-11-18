@@ -1,14 +1,13 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ButtonMenuItem } from 'components/button-select/elements/ButtonMenuItem';
 import { ButtonSelect } from 'components/button-select/ButtonSelect';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { defaultCurrencyAtom } from 'store/app.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { DefaultCurrencyE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './DefaultCurrencySelect.module.scss';
 
@@ -20,12 +19,9 @@ interface OptionTitlePropsI {
 }
 
 const OptionTitle = ({ option, currency }: OptionTitlePropsI) => {
-  const IconComponent = useMemo(() => getDynamicLogo(currency.toLowerCase()) as TemporaryAnyT, [currency]);
   return (
     <span className={styles.currencyLabel}>
-      <Suspense fallback={null}>
-        <IconComponent width={16} height={16} />
-      </Suspense>
+      <DynamicLogo logoName={currency.toLowerCase()} width={16} height={16} />
       <span>{option}</span>
     </span>
   );
@@ -56,19 +52,12 @@ export const DefaultCurrencySelect = () => {
     };
   }, [selectedPool, selectedPerpetual]);
 
-  const IconComponent = useMemo(
-    () => getDynamicLogo(currenciesMap[defaultCurrency].toLowerCase()) as TemporaryAnyT,
-    [defaultCurrency, currenciesMap]
-  );
-
   return (
     <ButtonSelect
       id="default-currency-select"
       selectedValue={
         <span className={styles.currencyLabel}>
-          <Suspense fallback={null}>
-            <IconComponent width={16} height={16} />
-          </Suspense>
+          <DynamicLogo logoName={currenciesMap[defaultCurrency].toLowerCase()} width={16} height={16} />
           <span>{t(`common.settings.ui-settings.default-currency.${defaultCurrency}`)}</span>
         </span>
       }

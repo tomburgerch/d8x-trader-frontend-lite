@@ -1,19 +1,19 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { Button } from '@mui/material';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { getWeeklyAPY } from 'network/history';
 import { getAngleAPY, getEtherFiAPY } from 'network/network';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
 import { liquidityTypeAtom, triggerAddInputFocusAtom, triggerUserStatsUpdateAtom } from 'store/vault-pools.store';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { getEnabledChainId } from 'utils/getEnabledChainId';
-import type { PoolWithIdI, TemporaryAnyT } from 'types/types';
+import type { PoolWithIdI } from 'types/types';
 import { LiquidityTypeE } from 'types/enums';
 
 import { DataColumn } from '../data-column/DataColumn';
@@ -175,14 +175,11 @@ export const PoolCard = memo(({ pool }: PoolCardPropsI) => {
     clearInputsData();
   };
 
-  const IconComponent = getDynamicLogo(pool.settleSymbol.toLowerCase()) as TemporaryAnyT;
   return (
     <div className={styles.root}>
       <div className={styles.header}>
         <div className={styles.logo}>
-          <Suspense fallback={null}>
-            <IconComponent width={80} height={80} />
-          </Suspense>
+          <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={80} height={80} />
         </div>
         <div className={styles.symbol}>
           {pool.settleSymbol} {t('pages.vault.pool-card.vault')}

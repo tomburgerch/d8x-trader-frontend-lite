@@ -1,12 +1,13 @@
 import { roundToLotString } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type Address } from 'viem';
 import { useAccount } from 'wagmi';
 
 import { Typography } from '@mui/material';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
@@ -24,8 +25,6 @@ import {
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { DefaultCurrencyE, OrderBlockE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { formatToCurrency, valueToFractionDigits } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
@@ -254,32 +253,20 @@ export const OrderSize = memo(() => {
     };
   }, [refetchMaxOrderSize, address, triggerBalancesUpdate, setMaxOrderSize]);
 
-  const SelectedCurrencyIcon = useMemo(
-    () => getDynamicLogo(selectedCurrency.toLowerCase()) as TemporaryAnyT,
-    [selectedCurrency]
-  );
-
-  const QuoteCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.quoteCurrency]);
-
-  const BaseCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.baseCurrency]);
-
-  const SettleCurrencyIcon = useMemo(() => {
-    let settleSymbol = '';
-    if (selectedPool && selectedPerpetual) {
-      if (
-        selectedPool?.settleSymbol &&
-        selectedPool.settleSymbol === selectedPerpetual.quoteCurrency &&
-        selectedPool.settleSymbol === selectedPerpetual.baseCurrency
-      ) {
-        settleSymbol = selectedPool.settleSymbol;
-      }
+  const settleSymbol = useMemo(() => {
+    if (!selectedPool || !selectedPerpetual) {
+      return '';
     }
 
-    return getDynamicLogo(settleSymbol.toLowerCase()) as TemporaryAnyT;
+    if (
+      !selectedPool?.settleSymbol ||
+      selectedPool.settleSymbol === selectedPerpetual.quoteCurrency ||
+      selectedPool.settleSymbol === selectedPerpetual.baseCurrency
+    ) {
+      return '';
+    }
+
+    return selectedPool.settleSymbol;
   }, [selectedPool, selectedPerpetual]);
 
   return (
@@ -320,11 +307,7 @@ export const OrderSize = memo(() => {
           inputValue={inputValue}
           setInputValue={onInputChange}
           handleInputBlur={handleInputBlur}
-          currency={
-            <Suspense fallback={null}>
-              <SelectedCurrencyIcon width={24} height={24} />
-            </Suspense>
-          }
+          currency={<DynamicLogo logoName={selectedCurrency.toLowerCase()} width={24} height={24} />}
           step={orderSizeStep}
           min={0}
           max={maxOrderSizeCurrent !== undefined ? roundMaxOrderSize(maxOrderSizeCurrent) : undefined}
@@ -333,34 +316,31 @@ export const OrderSize = memo(() => {
         />
         <div className={styles.actionIconsHolder}>
           {selectedPerpetual && selectedCurrency !== selectedPerpetual.quoteCurrency && (
-            <Suspense fallback={null}>
-              <QuoteCurrencyIcon
-                width={24}
-                height={24}
-                className={styles.currencyIcon}
-                onClick={() => setSelectedCurrency(selectedPerpetual.quoteCurrency)}
-              />
-            </Suspense>
+            <DynamicLogo
+              logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+              width={24}
+              height={24}
+              className={styles.currencyIcon}
+              onClick={() => setSelectedCurrency(selectedPerpetual.quoteCurrency)}
+            />
           )}
           {selectedPerpetual && selectedCurrency !== selectedPerpetual.baseCurrency && (
-            <Suspense fallback={null}>
-              <BaseCurrencyIcon
-                width={24}
-                height={24}
-                className={styles.currencyIcon}
-                onClick={() => setSelectedCurrency(selectedPerpetual.baseCurrency)}
-              />
-            </Suspense>
+            <DynamicLogo
+              logoName={selectedPerpetual?.baseCurrency.toLowerCase() ?? ''}
+              width={24}
+              height={24}
+              className={styles.currencyIcon}
+              onClick={() => setSelectedCurrency(selectedPerpetual.baseCurrency)}
+            />
           )}
           {selectedPool && selectedCurrency !== selectedPool.settleSymbol && (
-            <Suspense fallback={null}>
-              <SettleCurrencyIcon
-                width={24}
-                height={24}
-                className={styles.currencyIcon}
-                onClick={() => setSelectedCurrency(selectedPool.settleSymbol)}
-              />
-            </Suspense>
+            <DynamicLogo
+              logoName={settleSymbol.toLowerCase()}
+              width={24}
+              height={24}
+              className={styles.currencyIcon}
+              onClick={() => setSelectedCurrency(selectedPool.settleSymbol)}
+            />
           )}
         </div>
       </div>

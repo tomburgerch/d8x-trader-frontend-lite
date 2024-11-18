@@ -1,11 +1,10 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { ButtonSelect } from 'components/button-select/ButtonSelect';
 import { ButtonMenuItem } from 'components/button-select/elements/ButtonMenuItem';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import { selectedCurrencyAtom } from '../../store';
 
@@ -16,13 +15,9 @@ interface OptionTitlePropsI {
 }
 
 const OptionTitle = ({ option }: OptionTitlePropsI) => {
-  const IconComponent = useMemo(() => getDynamicLogo(option.toLowerCase()) as TemporaryAnyT, [option]);
-
   return (
     <span className={styles.currencyLabel}>
-      <Suspense fallback={null}>
-        <IconComponent width={16} height={16} />
-      </Suspense>
+      <DynamicLogo logoName={option.toLowerCase()} width={16} height={16} />
       <span>{option}</span>
     </span>
   );
@@ -47,19 +42,12 @@ export const TokenSelect = () => {
     return currencies;
   }, [selectedPool, selectedPerpetual]);
 
-  const IconComponent = useMemo(
-    () => getDynamicLogo(selectedCurrency.toLowerCase()) as TemporaryAnyT,
-    [selectedCurrency]
-  );
-
   return (
     <ButtonSelect
       id="order-size-token-select"
       selectedValue={
         <span className={styles.currencyLabel}>
-          <Suspense fallback={null}>
-            <IconComponent width={16} height={16} />
-          </Suspense>
+          <DynamicLogo logoName={selectedCurrency.toLowerCase()} width={16} height={16} />
           <span>{selectedCurrency}</span>
         </span>
       }
