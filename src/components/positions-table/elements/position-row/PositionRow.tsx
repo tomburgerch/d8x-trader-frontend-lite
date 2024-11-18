@@ -41,9 +41,15 @@ export const PositionRow = memo(
     const perpetuals = useAtomValue(perpetualsAtom);
 
     const parsedSymbol = parseSymbol(position.symbol);
-    const isPredictionMarket = traderAPI?.isPredictionMarket(position.symbol);
     const collToSettleInfo = parsedSymbol?.poolSymbol ? c2s.get(parsedSymbol.poolSymbol) : undefined;
     const perpetualState = perpetuals.find(({ symbol }) => symbol === position.symbol);
+
+    let isPredictionMarket: boolean | undefined;
+    try {
+      isPredictionMarket = traderAPI?.isPredictionMarket(position.symbol);
+    } catch (error) {
+      // skip
+    }
 
     const [displayEntryPrice, displayLiqPrice, displayCcy] = useMemo(() => {
       return isPredictionMarket

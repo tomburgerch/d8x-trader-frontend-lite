@@ -29,7 +29,12 @@ export const ShareModal = memo(({ isOpen, selectedPosition, closeModal }: ShareM
   const c2s = useAtomValue(collateralToSettleConversionAtom);
   const traderAPI = useAtomValue(traderAPIAtom);
 
-  const isPredictionMarket = selectedPosition ? traderAPI?.isPredictionMarket(selectedPosition.symbol) : false;
+  let isPredictionMarket;
+  try {
+    isPredictionMarket = selectedPosition ? traderAPI?.isPredictionMarket(selectedPosition.symbol) : false;
+  } catch (error) {
+    // skip
+  }
 
   const statsRef = useRef<HTMLDivElement>(null);
 
