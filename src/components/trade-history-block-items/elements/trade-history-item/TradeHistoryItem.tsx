@@ -1,12 +1,11 @@
 import classnames from 'classnames';
 import { format } from 'date-fns';
-import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DATETIME_FORMAT } from 'appConstants';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { type TemporaryAnyT, type TradeHistoryWithSymbolDataI } from 'types/types';
+import type { TradeHistoryWithSymbolDataI } from 'types/types';
 
 import styles from './TradeHistoryItem.module.scss';
 
@@ -17,28 +16,16 @@ interface TradeHistoryItemPropsI {
 export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
   const { t } = useTranslation();
 
-  const BaseCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(tradeHistory.perpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [tradeHistory.perpetual?.baseCurrency]);
-
-  const QuoteCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(tradeHistory.perpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [tradeHistory.perpetual?.quoteCurrency]);
-
   const time = format(new Date(tradeHistory.timestamp), DATETIME_FORMAT);
 
   return (
     <div className={styles.root}>
       <div className={styles.iconsHolder}>
         <div className={styles.baseIcon}>
-          <Suspense fallback={null}>
-            <BaseCurrencyIcon />
-          </Suspense>
+          <DynamicLogo logoName={tradeHistory.perpetual?.baseCurrency.toLowerCase() ?? ''} width={18} height={18} />
         </div>
         <div className={styles.quoteIcon}>
-          <Suspense fallback={null}>
-            <QuoteCurrencyIcon />
-          </Suspense>
+          <DynamicLogo logoName={tradeHistory.perpetual?.quoteCurrency.toLowerCase() ?? ''} width={18} height={18} />
         </div>
       </div>
       <div className={styles.dataHolder}>

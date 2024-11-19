@@ -1,7 +1,7 @@
 import { BUY_SIDE, pmInitialMarginRate, TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { type Address } from 'viem';
@@ -16,6 +16,7 @@ import { HashZero, SECONDARY_DEADLINE_MULTIPLIER } from 'appConstants';
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
@@ -46,10 +47,9 @@ import {
   traderAPIAtom,
 } from 'store/pools.store';
 import { MethodE, OrderBlockE, OrderSideE, OrderTypeE, StopLossE, TakeProfitE } from 'types/enums';
-import type { OrderI, OrderInfoI, TemporaryAnyT } from 'types/types';
+import type { OrderI, OrderInfoI } from 'types/types';
 import { formatNumber } from 'utils/formatNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
 import { useMinPositionString } from '../../hooks/useMinPositionString';
@@ -676,11 +676,6 @@ export const ActionBlock = memo(() => {
       ? calculateProbability(newPositionRisk.liquidationPrice[0], orderInfo?.orderBlock === OrderBlockE.Short)
       : newPositionRisk?.liquidationPrice?.[0] ?? 0;
 
-  const SelectedCurrencyIcon = useMemo(
-    () => getDynamicLogo(selectedCurrency.toLowerCase()) as TemporaryAnyT,
-    [selectedCurrency]
-  );
-
   const isValiditySuccess = [ValidityCheckE.GoodToGo, ValidityCheckE.Closed].includes(validityCheckType);
 
   return (
@@ -734,9 +729,7 @@ export const ActionBlock = memo(() => {
               {isPredictionMarket && t(predictionOrderBlockMap[orderInfo.orderBlock])}
             </Typography>
             <Typography variant="bodyLargePopup" component="div" className={styles.positionPrice}>
-              <Suspense>
-                <SelectedCurrencyIcon />
-              </Suspense>
+              <DynamicLogo logoName={selectedCurrency.toLowerCase()} width={16} height={16} />
               <span>
                 {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
               </span>
@@ -931,9 +924,7 @@ export const ActionBlock = memo(() => {
                   <span>{t('pages.trade.action-block.review.details')}</span>
                 </Typography>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.positionSize}>
-                  <Suspense>
-                    <SelectedCurrencyIcon />
-                  </Suspense>
+                  <DynamicLogo logoName={selectedCurrency.toLowerCase()} width={16} height={16} />
                   <span>
                     {isOrderValid && newPositionRisk
                       ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)

@@ -1,12 +1,11 @@
 import { useAtom, useAtomValue } from 'jotai';
-import { Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { ButtonSelect } from 'components/button-select/ButtonSelect';
 import { ButtonMenuItem } from 'components/button-select/elements/ButtonMenuItem';
 import { collateralToSettleConversionAtom } from 'store/pools.store';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import { collateralFilterAtom, collateralsAtom } from '../../collaterals.store';
 
@@ -19,19 +18,10 @@ interface OptionTitlePropsI {
 const OptionTitle = ({ option }: OptionTitlePropsI) => {
   const { t } = useTranslation();
 
-  const IconComponent = useMemo(() => {
-    if (option === '') {
-      return () => null;
-    }
-    return getDynamicLogo(option.toLowerCase()) as TemporaryAnyT;
-  }, [option]);
-
   return (
     <span className={styles.currencyLabel}>
       <span className={styles.iconHolder}>
-        <Suspense fallback={null}>
-          <IconComponent width={16} height={16} />
-        </Suspense>
+        {option && <DynamicLogo logoName={option.toLowerCase()} width={16} height={16} />}
       </span>
       <span className={styles.label}>{option !== '' ? option : t('common.select.option-all')}</span>
     </span>
@@ -57,22 +47,13 @@ export const CollateralSelect = () => {
     return currencies;
   }, [collaterals]);
 
-  const IconComponent = useMemo(() => {
-    if (!collateralFilter) {
-      return () => null;
-    }
-    return getDynamicLogo(collateralFilter.toLowerCase()) as TemporaryAnyT;
-  }, [collateralFilter]);
-
   return (
     <ButtonSelect
       id="collateral-select"
       selectedValue={
         <span className={styles.currencyLabel}>
           <span className={styles.iconHolder}>
-            <Suspense fallback={null}>
-              <IconComponent width={16} height={16} />
-            </Suspense>
+            {collateralFilter && <DynamicLogo logoName={collateralFilter.toLowerCase()} width={16} height={16} />}
           </span>
           <span className={styles.label}>
             {collateralFilter !== null

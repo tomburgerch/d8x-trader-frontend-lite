@@ -53,6 +53,11 @@
   line-height: 16px;
   margin-bottom: $d8x-spacing * 6;
 
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
   > span {
     margin-bottom: -$d8x-spacing;
   }
@@ -116,6 +121,11 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 
   > span {
     margin-bottom: -$d8x-spacing;

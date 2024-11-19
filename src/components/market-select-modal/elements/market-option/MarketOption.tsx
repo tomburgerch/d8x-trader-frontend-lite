@@ -1,16 +1,15 @@
 import classnames from 'classnames';
-import { Suspense, memo, useMemo } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { MenuItem, Typography } from '@mui/material';
 
 import { CurrencyBadge } from 'components/currency-badge/CurrencyBadge';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import type { SelectItemI } from 'components/header/elements/header-select/types';
 import type { PerpetualWithPoolAndMarketI } from 'components/market-select-modal/types';
 import { AssetTypeE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './MarketOption.module.scss';
 
@@ -22,15 +21,6 @@ interface MarketOptionPropsI {
 
 export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionPropsI) => {
   const { t } = useTranslation();
-
-  const BaseCurrencyIcon = useMemo(
-    () => getDynamicLogo(option.item.baseCurrency.toLowerCase()) as TemporaryAnyT,
-    [option.item.baseCurrency]
-  );
-
-  const QuoteCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(option.item.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [option.item.quoteCurrency]);
 
   const marketData = option.item.marketData;
 
@@ -49,15 +39,11 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
             })}
           >
             <div className={styles.baseIcon}>
-              <Suspense fallback={null}>
-                <BaseCurrencyIcon />
-              </Suspense>
+              <DynamicLogo logoName={option.item.baseCurrency.toLowerCase()} width={24} height={24} />
             </div>
             {marketData?.assetType !== AssetTypeE.Prediction && (
               <div className={styles.quoteIcon}>
-                <Suspense fallback={null}>
-                  <QuoteCurrencyIcon />
-                </Suspense>
+                <DynamicLogo logoName={option.item.quoteCurrency.toLowerCase()} width={24} height={24} />
               </div>
             )}
           </div>

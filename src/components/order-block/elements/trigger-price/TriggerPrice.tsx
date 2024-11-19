@@ -1,10 +1,11 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, Typography } from '@mui/material';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
@@ -13,8 +14,6 @@ import { calculateStepSize } from 'helpers/calculateStepSize';
 import { orderBlockAtom, orderTypeAtom, triggerPriceAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './TriggerPrice.module.scss';
 
@@ -67,13 +66,6 @@ export const TriggerPrice = memo(() => {
     setInputValue(`${triggerPrice}`);
   }, [triggerPrice]);
 
-  const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
-
   if (orderType !== OrderTypeE.Stop) {
     return null;
   }
@@ -99,9 +91,12 @@ export const TriggerPrice = memo(() => {
         setInputValue={handleTriggerPriceChange}
         handleInputBlur={handleInputBlur}
         currency={
-          <Suspense fallback={null}>
-            <QuoteCurrencyIcon width={24} height={24} />
-          </Suspense>
+          <DynamicLogo
+            className={styles.dynamicLogo}
+            logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+            width={24}
+            height={24}
+          />
         }
         step={stepSize}
         min={0}
