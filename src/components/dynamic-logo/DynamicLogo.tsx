@@ -25,6 +25,7 @@ export const DynamicLogo = memo(({ logoName, className, ...props }: DynamicLogoP
 
     const fetchedLogo = fetchedLogos[logoName];
     if (fetchedLogo) {
+      setIsErrored(false);
       setSvgContent(fetchedLogo);
       return;
     } else if (fetchedLogo === null) {
@@ -34,7 +35,6 @@ export const DynamicLogo = memo(({ logoName, className, ...props }: DynamicLogoP
 
     fetch(`${IMAGES_URL}${logoName}.svg`)
       .then((res) => {
-        console.log(res);
         if (res.ok) {
           return res.text();
         }

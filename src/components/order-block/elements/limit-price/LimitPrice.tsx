@@ -133,7 +133,12 @@ export const LimitPrice = memo(() => {
         setInputValue={handleLimitPriceChange}
         handleInputBlur={handleInputBlur}
         currency={
-          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} width={24} height={24} />
+          <DynamicLogo
+            className={styles.dynamicLogo}
+            logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+            width={24}
+            height={24}
+          />
         }
         placeholder="-"
         step={stepSize}

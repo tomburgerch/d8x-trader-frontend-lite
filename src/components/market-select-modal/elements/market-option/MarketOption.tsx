@@ -39,11 +39,11 @@ export const MarketOption = memo(({ option, isSelected, onClick }: MarketOptionP
             })}
           >
             <div className={styles.baseIcon}>
-              <DynamicLogo logoName={option.item.baseCurrency.toLowerCase()} />
+              <DynamicLogo logoName={option.item.baseCurrency.toLowerCase()} width={24} height={24} />
             </div>
             {marketData?.assetType !== AssetTypeE.Prediction && (
               <div className={styles.quoteIcon}>
-                <DynamicLogo logoName={option.item.quoteCurrency.toLowerCase()} />
+                <DynamicLogo logoName={option.item.quoteCurrency.toLowerCase()} width={24} height={24} />
               </div>
             )}
           </div>

@@ -22,10 +22,10 @@ export const TradeHistoryItem = ({ tradeHistory }: TradeHistoryItemPropsI) => {
     <div className={styles.root}>
       <div className={styles.iconsHolder}>
         <div className={styles.baseIcon}>
-          <DynamicLogo logoName={tradeHistory.perpetual?.baseCurrency.toLowerCase() ?? ''} />
+          <DynamicLogo logoName={tradeHistory.perpetual?.baseCurrency.toLowerCase() ?? ''} width={18} height={18} />
         </div>
         <div className={styles.quoteIcon}>
-          <DynamicLogo logoName={tradeHistory.perpetual?.quoteCurrency.toLowerCase() ?? ''} />
+          <DynamicLogo logoName={tradeHistory.perpetual?.quoteCurrency.toLowerCase() ?? ''} width={18} height={18} />
         </div>
       </div>
       <div className={styles.dataHolder}>

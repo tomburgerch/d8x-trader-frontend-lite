@@ -92,7 +92,7 @@ export const CollateralsSelect = memo(() => {
   return (
     <Box className={styles.holderRoot}>
       <Box className={styles.iconsWrapper}>
-        <DynamicLogo logoName={selectedPool?.settleSymbol.toLowerCase() ?? ''} />
+        <DynamicLogo logoName={selectedPool?.settleSymbol.toLowerCase() ?? ''} width={52} height={52} />
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"

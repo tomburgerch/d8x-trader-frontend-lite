@@ -75,10 +75,22 @@
   }
 }
 
+.dynamicLogo {
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .actionIconsHolder {
   display: flex;
   gap: 2 * $d8x-spacing;
   flex-wrap: nowrap;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 
   .currencyIcon {
     @include transition(opacity);

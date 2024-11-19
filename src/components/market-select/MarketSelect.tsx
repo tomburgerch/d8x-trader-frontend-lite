@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
@@ -40,6 +40,7 @@ import styles from './MarketSelect.module.scss';
 export const MarketSelect = memo(() => {
   const { t } = useTranslation();
 
+  const navigate = useNavigate();
   const location = useLocation();
 
   const { chainId } = useAccount();
@@ -55,6 +56,12 @@ export const MarketSelect = memo(() => {
   const urlChangesAppliedRef = useRef(false);
 
   const markets = useMarkets();
+
+  useEffect(() => {
+    if (!location.hash) {
+      urlChangesAppliedRef.current = false;
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     if (urlChangesAppliedRef.current || !pools.length) {
@@ -113,13 +120,26 @@ export const MarketSelect = memo(() => {
 
           if (foundPerpetual) {
             setSelectedPerpetual(foundPerpetual.id);
+
+            navigate(
+              `${location.pathname}${location.search}#${foundPerpetual.baseCurrency}-${foundPerpetual.quoteCurrency}-${foundPool.poolSymbol}`
+            );
           }
         }
       }
     }
 
     urlChangesAppliedRef.current = true;
-  }, [location.hash, pools, setSelectedPool, setSelectedPerpetual, chainId]);
+  }, [
+    location.hash,
+    location.pathname,
+    location.search,
+    navigate,
+    pools,
+    setSelectedPool,
+    setSelectedPerpetual,
+    chainId,
+  ]);
 
   useEffect(() => {
     if (selectedPool && selectedPerpetual) {
@@ -200,10 +220,10 @@ export const MarketSelect = memo(() => {
     <div className={styles.holderRoot} onClick={() => setMarketSelectModalOpen(true)}>
       <div className={classnames(styles.iconsWrapper, { [styles.oneCurrency]: isPredictionMarket })}>
         <div className={styles.baseIcon}>
-          <DynamicLogo logoName={selectedPerpetual?.baseCurrency.toLowerCase() || ''} />
+          <DynamicLogo logoName={selectedPerpetual?.baseCurrency.toLowerCase() || ''} width={60} height={60} />
         </div>
         <div className={styles.quoteIcon}>
-          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} />
+          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} width={60} height={60} />
         </div>
       </div>
       <Button className={styles.marketSelectButton} variant="outlined">

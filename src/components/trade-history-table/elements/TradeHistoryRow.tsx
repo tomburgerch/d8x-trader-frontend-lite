@@ -40,10 +40,10 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
         <div className={styles.perpetualData}>
           <div className={styles.iconsHolder}>
             <div className={styles.baseIcon}>
-              <DynamicLogo logoName={perpetual?.baseCurrency.toLowerCase() ?? ''} />
+              <DynamicLogo logoName={perpetual?.baseCurrency.toLowerCase() ?? ''} width={25} height={25} />
             </div>
             <div className={styles.quoteIcon}>
-              <DynamicLogo logoName={perpetual?.quoteCurrency.toLowerCase() ?? ''} />
+              <DynamicLogo logoName={perpetual?.quoteCurrency.toLowerCase() ?? ''} width={25} height={25} />
             </div>
           </div>
           <div className={styles.dataHolder}>

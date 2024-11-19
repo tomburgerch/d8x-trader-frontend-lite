@@ -307,7 +307,14 @@ export const OrderSize = memo(() => {
           inputValue={inputValue}
           setInputValue={onInputChange}
           handleInputBlur={handleInputBlur}
-          currency={<DynamicLogo logoName={selectedCurrency.toLowerCase()} width={24} height={24} />}
+          currency={
+            <DynamicLogo
+              logoName={selectedCurrency.toLowerCase()}
+              className={styles.dynamicLogo}
+              width={24}
+              height={24}
+            />
+          }
           step={orderSizeStep}
           min={0}
           max={maxOrderSizeCurrent !== undefined ? roundMaxOrderSize(maxOrderSizeCurrent) : undefined}

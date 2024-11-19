@@ -56,18 +56,14 @@ const MIN_REQUIRED_USDC = 20;
 
 export const TraderPage = () => {
   const { t } = useTranslation();
+
   const theme = useTheme();
   const isUpToLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [activeAllIndex, setActiveAllIndex] = useState(0);
-  const [activePositionIndex, setActivePositionIndex] = useState(0);
-  const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
-
-  const fetchPositionsRef = useRef(false);
-  const fetchOrdersRef = useRef(false);
-  const isPageUrlAppliedRef = useRef(false);
-  const blockRef = useRef<HTMLDivElement>(null);
+  const { address, chainId, isConnected } = useAccount();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { dialogOpen, openDialog, closeDialog } = useDialog();
 
@@ -83,9 +79,14 @@ export const TraderPage = () => {
   const [positions, setPositions] = useAtom(positionsAtom);
   const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
 
-  const { address, chainId, isConnected } = useAccount();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [activeAllIndex, setActiveAllIndex] = useState(0);
+  const [activePositionIndex, setActivePositionIndex] = useState(0);
+  const [activeHistoryIndex, setActiveHistoryIndex] = useState(0);
+
+  const fetchPositionsRef = useRef(false);
+  const fetchOrdersRef = useRef(false);
+  const isPageUrlAppliedRef = useRef(false);
+  const blockRef = useRef<HTMLDivElement>(null);
 
   const { data: legacyTokenData } = useReadContracts({
     allowFailure: false,
@@ -176,12 +177,6 @@ export const TraderPage = () => {
     },
     [traderAPI, isSDKConnected, setOpenOrders]
   );
-
-  useEffect(() => {
-    if (!location.hash) {
-      isPageUrlAppliedRef.current = false;
-    }
-  }, [location.hash]);
 
   useEffect(() => {
     if (!selectedPool || !selectedPerpetual || location.hash || isPageUrlAppliedRef.current) {

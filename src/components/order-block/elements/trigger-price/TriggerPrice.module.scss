@@ -17,6 +17,13 @@
   }
 }
 
+.dynamicLogo {
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .responsiveInput {
   :global(.MuiInputBase-root) {
     width: 100%;

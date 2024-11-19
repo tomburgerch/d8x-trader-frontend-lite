@@ -91,7 +91,12 @@ export const TriggerPrice = memo(() => {
         setInputValue={handleTriggerPriceChange}
         handleInputBlur={handleInputBlur}
         currency={
-          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} width={24} height={24} />
+          <DynamicLogo
+            className={styles.dynamicLogo}
+            logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+            width={24}
+            height={24}
+          />
         }
         step={stepSize}
         min={0}

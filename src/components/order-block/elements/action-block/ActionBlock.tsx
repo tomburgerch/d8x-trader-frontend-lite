@@ -729,7 +729,7 @@ export const ActionBlock = memo(() => {
               {isPredictionMarket && t(predictionOrderBlockMap[orderInfo.orderBlock])}
             </Typography>
             <Typography variant="bodyLargePopup" component="div" className={styles.positionPrice}>
-              <DynamicLogo logoName={selectedCurrency.toLowerCase()} />
+              <DynamicLogo logoName={selectedCurrency.toLowerCase()} width={16} height={16} />
               <span>
                 {orderInfo.size} {orderInfo.baseCurrency} @ {atPrice}
               </span>
@@ -924,7 +924,7 @@ export const ActionBlock = memo(() => {
                   <span>{t('pages.trade.action-block.review.details')}</span>
                 </Typography>
                 <Typography variant="bodyMediumPopup" component="div" className={styles.positionSize}>
-                  <DynamicLogo logoName={selectedCurrency.toLowerCase()} />
+                  <DynamicLogo logoName={selectedCurrency.toLowerCase()} width={16} height={16} />
                   <span>
                     {isOrderValid && newPositionRisk
                       ? formatToCurrency(newPositionRisk.positionNotionalBaseCCY, orderInfo.baseCurrency)
