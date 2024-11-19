@@ -10,6 +10,7 @@ import { CopyInput } from 'components/copy-input/CopyInput';
 import { CopyLink } from 'components/copy-link/CopyLink';
 import { CurrencySelect } from 'components/currency-selector/CurrencySelect';
 import { Dialog } from 'components/dialog/Dialog';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { Translate } from 'components/translate/Translate';
 import { WalletBalances } from 'components/wallet-balances/WalletBalances';
@@ -95,7 +96,7 @@ export const DepositModal = () => {
       <div className={styles.section}>
         <CurrencySelect />
       </div>
-      <Separator />
+      <Separator separatorType={SeparatorTypeE.Modal} />
       <OKXConvertor />
       {!isMockSwapEnabled(chainId) ? (
         <div className={styles.section}>
@@ -155,7 +156,7 @@ export const DepositModal = () => {
           <MockSwap />
         </div>
       )}
-      <Separator />
+      <Separator separatorType={SeparatorTypeE.Modal} />
       <div className={styles.section}>
         <WalletBalances />
         <Typography variant="bodyTiny" className={styles.noteText}>

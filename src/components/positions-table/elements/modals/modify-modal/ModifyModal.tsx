@@ -12,6 +12,7 @@ import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
 import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -301,10 +302,17 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
-      getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
-        setAPIBusy(false);
-      });
+      getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address)
+        .then(({ data }) => {
+          setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
+        })
+        .catch((error) => {
+          console.error(error);
+          setAvailableMargin(undefined);
+        })
+        .finally(() => {
+          setAPIBusy(false);
+        });
     } else {
       setAvailableMargin(undefined);
     }
@@ -614,7 +622,7 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
           </>
         )}
       </div>
-      <Separator />
+      <Separator separatorType={SeparatorTypeE.Modal} />
       <div className={styles.newPositionHeader}>
         <Typography variant="bodyMedium" className={styles.centered}>
           {t('pages.trade.positions-table.modify-modal.pos-details.title')}

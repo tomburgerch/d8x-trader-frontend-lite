@@ -36,7 +36,8 @@ import {
   positionsAtom,
   traderAPIAtom,
   executeScrollToTablesAtom,
-  perpetualsAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
 import { OrderBlockE, OrderBlockPositionE, TableTypeE } from 'types/enums';
@@ -55,9 +56,28 @@ const MIN_REQUIRED_USDC = 20;
 
 export const TraderPage = () => {
   const { t } = useTranslation();
+
   const theme = useTheme();
   const isUpToLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { address, chainId, isConnected } = useAccount();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { dialogOpen, openDialog, closeDialog } = useDialog();
+
+  const orderBlock = useAtomValue(orderBlockAtom);
+  const orderBlockPosition = useAtomValue(orderBlockPositionAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const [executeScrollToTables, setExecuteScrollToTables] = useAtom(executeScrollToTablesAtom);
+  const [positions, setPositions] = useAtom(positionsAtom);
+  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
@@ -67,23 +87,6 @@ export const TraderPage = () => {
   const fetchOrdersRef = useRef(false);
   const isPageUrlAppliedRef = useRef(false);
   const blockRef = useRef<HTMLDivElement>(null);
-
-  const { dialogOpen, openDialog, closeDialog } = useDialog();
-
-  const orderBlock = useAtomValue(orderBlockAtom);
-  const orderBlockPosition = useAtomValue(orderBlockPositionAtom);
-  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
-  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
-  const perpetuals = useAtomValue(perpetualsAtom);
-  const traderAPI = useAtomValue(traderAPIAtom);
-  const isSDKConnected = useAtomValue(sdkConnectedAtom);
-  const [executeScrollToTables, setExecuteScrollToTables] = useAtom(executeScrollToTablesAtom);
-  const [positions, setPositions] = useAtom(positionsAtom);
-  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
-
-  const { address, chainId, isConnected } = useAccount();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const { data: legacyTokenData } = useReadContracts({
     allowFailure: false,
@@ -176,19 +179,15 @@ export const TraderPage = () => {
   );
 
   useEffect(() => {
-    if (location.hash || perpetuals.length < 1 || isPageUrlAppliedRef.current) {
+    if (!selectedPool || !selectedPerpetual || location.hash || isPageUrlAppliedRef.current) {
       return;
     }
 
-    const filteredPerpetuals = perpetuals
-      .filter((perpetual) => perpetual.state === 'NORMAL' || perpetual.isPredictionMarket)
-      .sort((p1) => (p1.isPredictionMarket ? 1 : -1));
-
     isPageUrlAppliedRef.current = true;
     navigate(
-      `${location.pathname}${location.search}#${filteredPerpetuals[0].baseCurrency}-${filteredPerpetuals[0].quoteCurrency}-${filteredPerpetuals[0].poolName}`
+      `${location.pathname}${location.search}#${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`
     );
-  }, [perpetuals, location.hash, location.pathname, location.search, navigate]);
+  }, [selectedPool, selectedPerpetual, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!address || !isEnabledChain(chainId)) {

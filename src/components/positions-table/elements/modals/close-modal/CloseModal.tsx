@@ -12,6 +12,7 @@ import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { postOrder } from 'blockchain-api/contract-interactions/postOrder';
 import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -325,7 +326,7 @@ export const CloseModal = memo(({ isOpen, selectedPosition, poolByPosition, clos
       </div>
       {hasTpSl && (
         <>
-          <Separator />
+          <Separator separatorType={SeparatorTypeE.Modal} />
           <div className={modalStyles.actionBlock} onClick={() => setCloseOpenOrders((prev) => !prev)}>
             <SidesRow
               leftSide={t('pages.trade.positions-table.modify-modal.pos-details.close-tp-sl')}

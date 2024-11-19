@@ -1,11 +1,12 @@
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
-import { Suspense, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@mui/material';
 
 import { Dialog } from 'components/dialog/Dialog';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { useStopLoss } from 'components/order-block/elements/stop-loss-selector/useStopLoss';
 import { useTakeProfit } from 'components/order-block/elements/take-profit-selector/useTakeProfit';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
@@ -20,8 +21,6 @@ import {
 } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
 import { StopLossE, TakeProfitE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './CustomPriceModal.module.scss';
 
@@ -38,13 +37,6 @@ export const CustomPriceModal = () => {
 
   const { handleStopLossPriceChange, handleStopLossChange, validateStopLossPrice } = useStopLoss();
   const { handleTakeProfitPriceChange, handleTakeProfitChange, validateTakeProfitPrice } = useTakeProfit();
-
-  const QuoteCurrencyIcon = useMemo(() => {
-    if (!selectedPerpetual) {
-      return null;
-    }
-    return getDynamicLogo(selectedPerpetual.quoteCurrency.toLowerCase()) as TemporaryAnyT;
-  }, [selectedPerpetual]);
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
 
@@ -93,9 +85,12 @@ export const CustomPriceModal = () => {
           onClick={handleStopLossClick}
         >
           <span className={styles.price}>
-            <Suspense fallback={null}>
-              <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
-            </Suspense>
+            <DynamicLogo
+              logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+              width={24}
+              height={24}
+              className={styles.currencyIcon}
+            />
             <span>{stopLossInputPrice || '--'}</span>
           </span>
           <span className={styles.label}>{t('pages.trade.order-block.stop-loss.title')}</span>
@@ -105,9 +100,12 @@ export const CustomPriceModal = () => {
           onClick={handleTakeProfitClick}
         >
           <span className={styles.price}>
-            <Suspense fallback={null}>
-              <QuoteCurrencyIcon width={24} height={24} className={styles.currencyIcon} />
-            </Suspense>
+            <DynamicLogo
+              logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''}
+              width={24}
+              height={24}
+              className={styles.currencyIcon}
+            />
             <span>{takeProfitInputPrice || '--'}</span>
           </span>
           <span className={styles.label}>{t('pages.trade.order-block.take-profit.title')}</span>
@@ -166,6 +164,7 @@ export const CustomPriceModal = () => {
             <ResponsiveInput
               id="take-profit-price"
               className={styles.responsiveInput}
+              inputClassName={styles.input}
               inputValue={takeProfitInputPrice != null ? takeProfitInputPrice : ''}
               placeholder="-"
               step={stepSize}

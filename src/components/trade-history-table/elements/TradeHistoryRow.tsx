@@ -1,17 +1,16 @@
 import classnames from 'classnames';
 import { format } from 'date-fns';
 import { useAtomValue } from 'jotai';
-import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TableCell, TableRow, Typography } from '@mui/material';
 
 import { DATETIME_FORMAT } from 'appConstants';
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { calculateProbability } from 'helpers/calculateProbability';
 import { collateralToSettleConversionAtom } from 'store/pools.store';
 import { OrderSideE } from 'types/enums';
-import type { TableHeaderI, TemporaryAnyT, TradeHistoryWithSymbolDataI } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
+import type { TableHeaderI, TradeHistoryWithSymbolDataI } from 'types/types';
 import { formatToCurrency } from 'utils/formatToCurrency';
 
 import styles from '../TradeHistoryTable.module.scss';
@@ -35,28 +34,16 @@ export const TradeHistoryRow = ({ headers, tradeHistory }: TradeHistoryRowPropsI
     : tradeHistory.price;
   const displayCcy = perpetual?.isPredictionMarket ? perpetual?.quoteCurrency : perpetual?.quoteCurrency;
 
-  const BaseCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(perpetual?.baseCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [perpetual?.baseCurrency]);
-
-  const QuoteCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(perpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [perpetual?.quoteCurrency]);
-
   return (
     <TableRow key={tradeHistory.transactionHash}>
       <TableCell align={headers[0].align}>
         <div className={styles.perpetualData}>
           <div className={styles.iconsHolder}>
             <div className={styles.baseIcon}>
-              <Suspense fallback={null}>
-                <BaseCurrencyIcon />
-              </Suspense>
+              <DynamicLogo logoName={perpetual?.baseCurrency.toLowerCase() ?? ''} width={25} height={25} />
             </div>
             <div className={styles.quoteIcon}>
-              <Suspense fallback={null}>
-                <QuoteCurrencyIcon />
-              </Suspense>
+              <DynamicLogo logoName={perpetual?.quoteCurrency.toLowerCase() ?? ''} width={25} height={25} />
             </div>
           </div>
           <div className={styles.dataHolder}>

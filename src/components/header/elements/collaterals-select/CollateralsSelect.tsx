@@ -1,16 +1,16 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { memo, Suspense, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccount } from 'wagmi';
 
 import { Box, MenuItem, useMediaQuery, useTheme } from '@mui/material';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { useWebSocketContext } from 'context/websocket-context/d8x/useWebSocketContext';
 import { createSymbol } from 'helpers/createSymbol';
 import { clearInputsDataAtom } from 'store/order-block.store';
 import { poolsAtom, selectedPerpetualAtom, selectedPoolAtom } from 'store/pools.store';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
-import type { PoolI, TemporaryAnyT } from 'types/types';
+import type { PoolI } from 'types/types';
 
 import { HeaderSelect } from '../header-select/HeaderSelect';
 import type { SelectItemI } from '../header-select/types';
@@ -33,14 +33,10 @@ interface MenuOptionPropsI {
 }
 
 const MenuOption = ({ pool }: MenuOptionPropsI) => {
-  const IconComponent = getDynamicLogo(pool.settleSymbol.toLowerCase()) as TemporaryAnyT;
-
   return (
     <Box className={styles.optionHolder}>
       <Box className={styles.label}>
-        <Suspense fallback={null}>
-          <IconComponent width={16} height={16} />
-        </Suspense>
+        <DynamicLogo logoName={pool.settleSymbol.toLowerCase()} width={16} height={16} />
         <span>{pool.settleSymbol}</span>
       </Box>
       <Box className={styles.value}>{pool.perpetuals.filter(({ state }) => state === 'NORMAL').length}</Box>
@@ -93,14 +89,10 @@ export const CollateralsSelect = memo(() => {
     return pools.filter((pool) => pool.isRunning).map((pool) => ({ value: pool.poolSymbol, item: pool }));
   }, [pools]);
 
-  const IconComponent = getDynamicLogo(selectedPool?.settleSymbol.toLowerCase() ?? '') as TemporaryAnyT;
-
   return (
     <Box className={styles.holderRoot}>
       <Box className={styles.iconsWrapper}>
-        <Suspense fallback={null}>
-          <IconComponent />
-        </Suspense>
+        <DynamicLogo logoName={selectedPool?.settleSymbol.toLowerCase() ?? ''} width={52} height={52} />
       </Box>
       <HeaderSelect<PoolI>
         id="collaterals-select"
