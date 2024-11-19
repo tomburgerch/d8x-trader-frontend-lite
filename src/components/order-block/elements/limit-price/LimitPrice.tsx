@@ -1,10 +1,11 @@
 import { TraderInterface } from '@d8x/perpetuals-sdk';
 import { useAtom, useAtomValue } from 'jotai';
-import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
+import { DynamicLogo } from 'components/dynamic-logo/DynamicLogo';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { InputE } from 'components/responsive-input/enums';
 import { ResponsiveInput } from 'components/responsive-input/ResponsiveInput';
@@ -13,8 +14,6 @@ import { calculateStepSize } from 'helpers/calculateStepSize';
 import { limitPriceAtom, orderBlockAtom, orderTypeAtom } from 'store/order-block.store';
 import { perpetualStaticInfoAtom, perpetualStatisticsAtom, selectedPerpetualAtom } from 'store/pools.store';
 import { OrderBlockE, OrderTypeE } from 'types/enums';
-import type { TemporaryAnyT } from 'types/types';
-import { getDynamicLogo } from 'utils/getDynamicLogo';
 
 import styles from './LimitPrice.module.scss';
 
@@ -110,17 +109,13 @@ export const LimitPrice = memo(() => {
     setInputValue(limitPrice != null ? `${limitPrice}` : '');
   }, [limitPrice]);
 
-  const QuoteCurrencyIcon = useMemo(() => {
-    return getDynamicLogo(selectedPerpetual?.quoteCurrency.toLowerCase() ?? '') as TemporaryAnyT;
-  }, [selectedPerpetual?.quoteCurrency]);
-
   if (orderType === OrderTypeE.Market) {
     return null;
   }
 
   return (
-    <Box className={styles.root}>
-      <Box className={styles.labelHolder}>
+    <div className={styles.root}>
+      <div className={styles.labelHolder}>
         <InfoLabelBlock
           title={t('pages.trade.order-block.limit-price.title')}
           content={
@@ -130,7 +125,7 @@ export const LimitPrice = memo(() => {
             </>
           }
         />
-      </Box>
+      </div>
       <ResponsiveInput
         id="limit-size"
         className={styles.responsiveInput}
@@ -138,15 +133,13 @@ export const LimitPrice = memo(() => {
         setInputValue={handleLimitPriceChange}
         handleInputBlur={handleInputBlur}
         currency={
-          <Suspense fallback={null}>
-            <QuoteCurrencyIcon width={24} height={24} />
-          </Suspense>
+          <DynamicLogo logoName={selectedPerpetual?.quoteCurrency.toLowerCase() ?? ''} width={24} height={24} />
         }
         placeholder="-"
         step={stepSize}
         min={-1}
         type={InputE.Outlined}
       />
-    </Box>
+    </div>
   );
 });
