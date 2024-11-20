@@ -193,6 +193,10 @@ This package is configured entirely via environment variables. You must specify:
   - Configure your Web3Auth Project with your Firebase configuration as
     described [here](https://web3auth.io/docs/auth-provider-setup/social-providers/twitter#set-up-twitter-via-firebase).
   - Take note of your Firebase configuration (Firebase Console > Your Project > Your App > SDK setup and configuration)
+- **VITE_DEFAULT_MARKET**: This is an optional variable that allows to set the first market shown on the frontned by chain.
+
+  - The optional variable should take the form:
+    `80004::BUDS-HONEY-USDC;1101::BTC-USDC-USDC;42161::ETH-BTC-THC`
 
 ---
 

@@ -1,16 +1,22 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { type ChangeEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Typography } from '@mui/material';
 
+import { CustomPriceModal } from 'components/custom-price-modal/CustomPriceModal';
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { orderInfoAtom, stopLossAtom, stopLossPriceAtom } from 'store/order-block.store';
+import { stopLossModalOpenAtom } from 'store/global-modals.store';
+import { orderInfoAtom, stopLossAtom, stopLossInputPriceAtom, stopLossPriceAtom } from 'store/order-block.store';
 import { selectedPerpetualAtom } from 'store/pools.store';
-import { OrderBlockE, OrderTypeE, StopLossE } from 'types/enums';
+import { OrderTypeE, StopLossE } from 'types/enums';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
+
+import { useStopLoss } from './useStopLoss';
+
+import styles from './StopLossSelector.module.scss';
 
 export const StopLossSelector = memo(() => {
   const { t } = useTranslation();
@@ -18,71 +24,18 @@ export const StopLossSelector = memo(() => {
   const orderInfo = useAtomValue(orderInfoAtom);
   const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
   const setStopLossPrice = useSetAtom(stopLossPriceAtom);
+  const setStopLossModalOpen = useSetAtom(stopLossModalOpenAtom);
   const [stopLoss, setStopLoss] = useAtom(stopLossAtom);
+  const [stopLossInputPrice, setStopLossInputPrice] = useAtom(stopLossInputPriceAtom);
 
-  const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null>(null);
   const [isDisabled, setDisabled] = useState(false);
 
   const currentOrderBlockRef = useRef(orderInfo?.orderBlock);
   const currentLeverageRef = useRef(orderInfo?.leverage);
 
-  const handleStopLossPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const stopLossPriceValue = event.target.value;
-    if (stopLossPriceValue !== '') {
-      setStopLossInputPrice(+stopLossPriceValue);
-      setStopLoss(null);
-    } else {
-      setStopLossInputPrice(null);
-    }
-  };
-
-  const handleStopLossChange = (stopLossValue: StopLossE) => {
-    setStopLossPrice(null);
-    setStopLossInputPrice(null);
-    setStopLoss(stopLossValue);
-  };
-
-  const minStopLossPrice = useMemo(() => {
-    if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Short) {
-      return orderInfo.midPrice;
-    } else if (orderInfo?.midPrice && orderInfo?.leverage) {
-      return Math.max(0.000000001, orderInfo.midPrice - orderInfo.midPrice / orderInfo.leverage);
-    }
-    return 0.000000001;
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock, orderInfo?.leverage]);
-
-  const maxStopLossPrice = useMemo(() => {
-    if (orderInfo?.midPrice && orderInfo.orderBlock === OrderBlockE.Long) {
-      return orderInfo.midPrice;
-    } else if (orderInfo?.midPrice && orderInfo?.leverage) {
-      return orderInfo.midPrice + orderInfo.midPrice / orderInfo.leverage;
-    }
-  }, [orderInfo?.midPrice, orderInfo?.orderBlock, orderInfo?.leverage]);
+  const { handleStopLossPriceChange, validateStopLossPrice, midPrice } = useStopLoss();
 
   const stepSize = useMemo(() => calculateStepSize(selectedPerpetual?.indexPrice), [selectedPerpetual?.indexPrice]);
-
-  const validateStopLossPrice = useCallback(() => {
-    if (stopLossInputPrice === null) {
-      setStopLossPrice(null);
-      setStopLoss(StopLossE.None);
-      return;
-    }
-
-    if (maxStopLossPrice && stopLossInputPrice > maxStopLossPrice) {
-      const maxStopLossPriceRounded = +maxStopLossPrice;
-      setStopLossPrice(maxStopLossPriceRounded);
-      setStopLossInputPrice(maxStopLossPriceRounded);
-      return;
-    }
-    if (stopLossInputPrice < minStopLossPrice) {
-      const minStopLossPriceRounded = +minStopLossPrice;
-      setStopLossPrice(minStopLossPriceRounded);
-      setStopLossInputPrice(minStopLossPriceRounded);
-      return;
-    }
-
-    setStopLossPrice(stopLossInputPrice);
-  }, [minStopLossPrice, maxStopLossPrice, stopLossInputPrice, setStopLoss, setStopLossPrice]);
 
   useEffect(() => {
     if (currentOrderBlockRef.current !== orderInfo?.orderBlock) {
@@ -95,7 +48,7 @@ export const StopLossSelector = memo(() => {
         setStopLoss(StopLossE.None);
       }
     }
-  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setStopLossPrice, setStopLoss]);
+  }, [orderInfo?.orderBlock, orderInfo?.stopLoss, setStopLoss, setStopLossPrice, setStopLossInputPrice]);
 
   useEffect(() => {
     if (currentLeverageRef.current !== orderInfo?.leverage) {
@@ -111,7 +64,7 @@ export const StopLossSelector = memo(() => {
     } else if (stopLoss && stopLoss === StopLossE.None) {
       setStopLossInputPrice(null);
     }
-  }, [stopLoss, orderInfo?.stopLossPrice]);
+  }, [stopLoss, orderInfo?.stopLossPrice, setStopLossInputPrice]);
 
   useEffect(() => {
     if (orderInfo && orderInfo.reduceOnly && orderInfo.orderType !== OrderTypeE.Market) {
@@ -124,39 +77,51 @@ export const StopLossSelector = memo(() => {
     }
   }, [setStopLossInputPrice, setStopLossPrice, setStopLoss, orderInfo]);
 
-  const translationMap: Record<StopLossE, string> = {
-    [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),
-    [StopLossE['1%']]: '1%',
-    [StopLossE['25%']]: '25%',
-    [StopLossE['50%']]: '50%',
-    [StopLossE['75%']]: '75%',
-  };
+  const handleModalOpen = useCallback(() => {
+    setStopLossModalOpen(true);
+  }, [setStopLossModalOpen]);
+
+  const calculatedPercent = useMemo(() => {
+    if (stopLossInputPrice === null || !midPrice || orderInfo?.leverage === undefined) {
+      return '--';
+    }
+    let percent = (stopLossInputPrice / midPrice - 1) * orderInfo?.leverage;
+    if (percent > -0.005) {
+      percent = 0;
+    }
+    return `${Math.round(100 * percent)}%`;
+  }, [midPrice, stopLossInputPrice, orderInfo?.leverage]);
 
   return (
-    <CustomPriceSelector<StopLossE>
-      id="custom-stop-loss-price"
-      label={
-        <InfoLabelBlock
-          title={t('pages.trade.order-block.stop-loss.title')}
-          content={
-            <>
-              <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
-            </>
-          }
-        />
-      }
-      options={Object.values(StopLossE)}
-      translationMap={translationMap}
-      handlePriceChange={handleStopLossChange}
-      handleInputPriceChange={handleStopLossPriceChange}
-      validateInputPrice={validateStopLossPrice}
-      selectedInputPrice={stopLossInputPrice}
-      selectedPrice={stopLoss}
-      currency={selectedPerpetual?.quoteCurrency}
-      stepSize={stepSize}
-      disabled={isDisabled}
-    />
+    <>
+      <CustomPriceSelector
+        id="custom-stop-loss-price"
+        label={
+          <InfoLabelBlock
+            title={t('pages.trade.order-block.stop-loss.title')}
+            content={
+              <>
+                <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
+              </>
+            }
+          />
+        }
+        handleInputPriceChange={handleStopLossPriceChange}
+        validateInputPrice={validateStopLossPrice}
+        selectedInputPrice={stopLossInputPrice}
+        stepSize={stepSize}
+        disabled={isDisabled}
+        percentComponent={
+          <div onClick={handleModalOpen} className={styles.percent}>
+            {calculatedPercent}
+          </div>
+        }
+        className={styles.customPriceSelector}
+      />
+
+      <CustomPriceModal />
+    </>
   );
 });

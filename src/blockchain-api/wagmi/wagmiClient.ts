@@ -7,6 +7,7 @@ import {
   rabbyWallet,
   rainbowWallet,
   walletConnectWallet,
+  bybitWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
   polygon,
@@ -121,7 +122,7 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [metaMaskWallet, rabbyWallet, walletConnectWallet],
+      wallets: [metaMaskWallet, rabbyWallet, walletConnectWallet, bybitWallet],
     },
     {
       groupName: 'Others',

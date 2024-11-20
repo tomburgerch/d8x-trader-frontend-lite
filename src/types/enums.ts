@@ -31,6 +31,11 @@ export enum OrderValueTypeE {
   None = 'none',
 }
 
+export enum YesNoE {
+  Yes = 'yes',
+  No = 'no',
+}
+
 export enum OrderBlockPositionE {
   Left = 'left',
   Right = 'right',
@@ -80,7 +85,7 @@ export enum ExpiryE {
 }
 
 export enum StopLossE {
-  '1%' = '-1%',
+  '5%' = '-5%',
   '25%' = '-25%',
   '50%' = '-50%',
   '75%' = '-75%',
@@ -88,7 +93,7 @@ export enum StopLossE {
 }
 
 export enum TakeProfitE {
-  '1%' = '1%',
+  '5%' = '5%',
   '50%' = '50%',
   '100%' = '100%',
   '500%' = '500%',
@@ -137,6 +142,7 @@ export enum ReferralDialogActionE {
 export enum AssetTypeE {
   All = 'all',
   Crypto = 'crypto',
+  Prediction = 'polymarket',
   Fx = 'fx',
   Metal = 'metal',
 }

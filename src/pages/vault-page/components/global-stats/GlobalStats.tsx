@@ -57,6 +57,10 @@ export const GlobalStats = () => {
       .finally(() => {
         weeklyApiRequestSentRef.current = false;
       });
+
+    return () => {
+      weeklyApiRequestSentRef.current = false;
+    };
   }, [chainId, selectedPool?.poolSymbol, triggerUserStatsUpdate]);
 
   useEffect(() => {

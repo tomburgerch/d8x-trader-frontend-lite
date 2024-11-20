@@ -1,55 +1,39 @@
-import classNames from 'classnames';
-import { useAtom } from 'jotai';
+import { TraderInterface } from '@d8x/perpetuals-sdk';
+import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Typography, useMediaQuery, useTheme } from '@mui/material';
-
-import ViewChartIcon from 'assets/icons/viewChart.svg?react';
-
 import type { StatDataI } from 'components/stats-line/types';
 import { StatsLine } from 'components/stats-line/StatsLine';
-import { TooltipMobile } from 'components/tooltip-mobile/TooltipMobile';
-import { perpetualStatisticsAtom, showChartForMobileAtom } from 'store/pools.store';
+import { calculateProbability } from 'helpers/calculateProbability';
+import { orderBlockAtom } from 'store/order-block.store';
+import { perpetualStaticInfoAtom, perpetualStatisticsAtom } from 'store/pools.store';
+import { OrderBlockE } from 'types/enums';
 import { abbreviateNumber } from 'utils/abbreviateNumber';
 import { formatToCurrency } from 'utils/formatToCurrency';
-
-import styles from './PerpetualStats.module.scss';
 
 export const PerpetualStats = () => {
   const { t } = useTranslation();
 
-  const theme = useTheme();
-  const isDesktopScreen = useMediaQuery(theme.breakpoints.down('xl'));
-  const isTabletScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMiddleScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const orderBlock = useAtomValue(orderBlockAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
 
-  const [perpetualStatistics] = useAtom(perpetualStatisticsAtom);
-  const [showChartForMobile, setShowChartForMobile] = useAtom(showChartForMobileAtom);
-
-  let midPriceClass = styles.statMainValuePositive;
-  if (perpetualStatistics?.midPriceDiff != null) {
-    midPriceClass =
-      perpetualStatistics?.midPriceDiff >= 0 ? styles.statMainValuePositive : styles.statMainValueNegative;
-  }
-
-  const midPrice: StatDataI = useMemo(
-    () => ({
-      id: 'midPrice',
-      label: t('pages.trade.stats.mid-price'),
-      tooltip: t('pages.trade.stats.mid-price-tooltip'),
-      value: perpetualStatistics
-        ? formatToCurrency(perpetualStatistics.midPrice, perpetualStatistics.quoteCurrency, true)
-        : '--',
-      numberOnly: perpetualStatistics
-        ? formatToCurrency(perpetualStatistics.midPrice, '', true, undefined, true)
-        : '--',
-      className: midPriceClass, // Add the custom class here
-      // currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
-    }),
-    [midPriceClass, t, perpetualStatistics]
-  );
+  const [[displayIndexPrice, displayMarkPrice], displayCcy] = useMemo(() => {
+    if (!!perpetualStatistics && !!perpetualStaticInfo) {
+      let isPredictionMarket = false;
+      try {
+        isPredictionMarket = TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
+      } catch {
+        // skip
+      }
+      const px = [perpetualStatistics.indexPrice, perpetualStatistics.markPrice];
+      return isPredictionMarket
+        ? [px.map((x) => calculateProbability(x, orderBlock === OrderBlockE.Short)), perpetualStatistics.quoteCurrency]
+        : [px, perpetualStatistics.quoteCurrency];
+    }
+    return [[undefined, undefined], undefined];
+  }, [perpetualStatistics, perpetualStaticInfo, orderBlock]);
 
   const items: StatDataI[] = useMemo(
     () => [
@@ -57,24 +41,16 @@ export const PerpetualStats = () => {
         id: 'markPrice',
         label: t('pages.trade.stats.mark-price'),
         tooltip: t('pages.trade.stats.mark-price-tooltip'),
-        value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.markPrice, perpetualStatistics.quoteCurrency, true)
-          : '--',
-        numberOnly: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.markPrice, '', true, undefined, true)
-          : '--',
+        value: displayCcy ? formatToCurrency(displayMarkPrice, displayCcy, true) : '--',
+        numberOnly: perpetualStatistics ? formatToCurrency(displayMarkPrice, '', true, undefined, true) : '--',
         // currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
       },
       {
         id: 'indexPrice',
         label: t('pages.trade.stats.index-price'),
         tooltip: t('pages.trade.stats.index-price-tooltip'),
-        value: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.indexPrice, perpetualStatistics.quoteCurrency, true)
-          : '--',
-        numberOnly: perpetualStatistics
-          ? formatToCurrency(perpetualStatistics.indexPrice, '', true, undefined, true)
-          : '--',
+        value: displayCcy ? formatToCurrency(displayIndexPrice, displayCcy, true) : '--',
+        numberOnly: displayCcy ? formatToCurrency(displayIndexPrice, '', true, undefined, true) : '--',
         // currencyOnly: perpetualStatistics ? perpetualStatistics.quoteCurrency : '--',
       },
       {
@@ -96,99 +72,8 @@ export const PerpetualStats = () => {
         currencyOnly: perpetualStatistics ? perpetualStatistics.baseCurrency : '',
       },
     ],
-    [t, perpetualStatistics]
+    [t, perpetualStatistics, displayIndexPrice, displayMarkPrice, displayCcy]
   );
 
-  if (isMobileScreen) {
-    return (
-      <div className={styles.statContainer}>
-        <div className={styles.mainMobileLine}>
-          <div>
-            {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
-              <TooltipMobile tooltip={midPrice.tooltip}>
-                <div
-                  className={
-                    perpetualStatistics?.midPriceDiff >= 0
-                      ? styles.statMainValuePositiveMobile
-                      : styles.statMainValueNegativeMobile
-                  }
-                >
-                  {midPrice.numberOnly}
-                </div>
-              </TooltipMobile>
-            ) : (
-              <div className={styles.statMainValuePositiveMobile}>{midPrice.numberOnly}</div>
-            )}
-          </div>
-          <div>
-            <div className={styles.viewChart} onClick={() => setShowChartForMobile(!showChartForMobile)}>
-              <ViewChartIcon className={styles.viewChartIcon} />
-              <Typography variant="bodyTiny">
-                {t(showChartForMobile ? 'pages.trade.stats.hide-graph' : 'pages.trade.stats.view-graph')}
-              </Typography>
-            </div>
-          </div>
-        </div>
-        <div className={styles.statsBlock}>
-          {items.map((item) => (
-            <div key={item.id}>
-              {item.tooltip ? (
-                <TooltipMobile tooltip={item.tooltip}>
-                  <div className={classNames(styles.statLabel, styles.tooltip)}>{item.label}</div>
-                </TooltipMobile>
-              ) : (
-                <div className={styles.statLabel}>{item.label}</div>
-              )}
-              <span className={styles.statValue}>{item.numberOnly}</span>{' '}
-              <span className={styles.statCurrency}>{item.currencyOnly}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-
-    // TODO: VOV: Make StatsLineMobile common
-    // return <StatsLineMobile items={items} />;
-  }
-
-  if ((isDesktopScreen && !isTabletScreen) || (isMiddleScreen && !isMobileScreen)) {
-    return (
-      <div className={styles.statContainer}>
-        <div className={styles.statsBlock}>
-          {midPrice.tooltip && perpetualStatistics?.midPriceDiff ? (
-            <TooltipMobile tooltip={midPrice.tooltip}>
-              <div
-                className={
-                  perpetualStatistics?.midPriceDiff >= 0
-                    ? styles.statMainValuePositiveTablet
-                    : styles.statMainValueNegativeTablet
-                }
-              >
-                {midPrice.numberOnly}
-              </div>
-            </TooltipMobile>
-          ) : (
-            <div className={`${styles.statMainValueContainer} ${styles.statMainValuePositiveTablet}`}>
-              {midPrice.numberOnly}
-            </div>
-          )}
-          {[...items].map((item) => (
-            <div key={item.id}>
-              {item.tooltip ? (
-                <TooltipMobile tooltip={item.tooltip}>
-                  <div className={classNames(styles.statLabel, styles.tooltip)}>{item.label}</div>
-                </TooltipMobile>
-              ) : (
-                <div className={styles.statLabel}>{item.label}</div>
-              )}
-              <span className={styles.statValue}>{item.numberOnly}</span>{' '}
-              <span className={styles.statCurrency}>{item.currencyOnly}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return <StatsLine items={[midPrice, ...items]} />;
+  return <StatsLine items={items} />;
 };
