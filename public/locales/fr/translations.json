@@ -67,6 +67,8 @@
             "remove": "Retirer"
           },
           "close": "Fermer la position",
+          "claim": "Retirer votre argent",
+          "claim-details": "Ce marché est terminé et est en cours de règlement. Réclamez vos fonds maintenant.",
           "share": "Partager la position",
           "add": "Ajouter du collatéral",
           "remove": "Retirer du collatéral",
@@ -91,6 +93,9 @@
         "toasts": {
           "submit-close": {
             "title": "Soumission de l'ordre de clôture"
+          },
+          "submit-claim": {
+            "title": "Réclamation des fonds"
           },
           "submitted": {
             "title": "Ordre soumis",
@@ -188,6 +193,7 @@
       },
       "history-table": {
         "table-title": "Historique des Trades",
+        "body": "",
         "table-header": {
           "time": "Temps",
           "perpetual": "Perpétuel",
@@ -199,7 +205,8 @@
         },
         "table-content": {
           "connect": "Veuillez connecter votre portefeuille",
-          "no-open": "Aucun historique des trades"
+          "no-open": "Pas encore d'historique de trading",
+          "no-open-note": "Commencez à trader pour consulter votre historique"
         },
         "history-block-mobile": {
           "symbol": "Symbole"
@@ -224,6 +231,13 @@
         "selector": {
           "long": "Long",
           "short": "Short"
+        },
+        "prediction": {
+          "title": "Marché de prédiction",
+          "note": "Prédisez le résultat et commencez à parier dessus dès maintenant!",
+          "yes": "Oui",
+          "no": "Non",
+          "bet": "Parie"
         },
         "order-type": {
           "market": "Marché",
@@ -361,7 +375,10 @@
           "liq-price": "Prix de liquidation",
           "validity-checks": "Vérifications",
           "cancel": "Annuler",
-          "confirm": "Confirmer"
+          "confirm": "Confirmer",
+          "estimated-price": "Prix d'entrée éstimé",
+          "prediction-header": "Comparison to Polymarket",
+          "prediction-content": "Your order costs {{predFeeInCC}}. In addition you deposit {{collateralDeposit}} as margin, which you get back if you bet correctly. On Polymarket the same order costs {{costs}}."
         }
       },
       "filter": {
@@ -661,8 +678,11 @@
         "exit-button": "Quitter",
         "confirm-modal": {
           "title": "Quitter la stratégie",
+          "title-claim": "Retirer votre argent?",
           "text": "Êtes-vous sûr de vouloir quitter la stratégie?",
-          "confirm-button": "Quitter"
+          "text-claim": "Vous souhaitez retirer votre argent?",
+          "confirm-button": "Quitter",
+          "confirm-button-claim": "Retirer"
         },
         "toasts": {
           "tx-submitted": {
@@ -680,6 +700,7 @@
         }
       },
       "claim-funds": {
+        "claim-button": "Retirer",
         "toasts": {
           "tx-submitted": {
             "title": "Vos fonds ont été réclamés avec succès",
@@ -730,6 +751,8 @@
     "external-service-status": "Status des services externes"
   },
   "common": {
+    "cost-of-order": "Coût",
+    "potential-return": "Rendement potentiel",
     "change-language": "Changer de langue",
     "wallet-connect": "Connecter",
     "account-button": "Compte",
@@ -740,8 +763,12 @@
     "address-label": "Adresse",
     "deposit-gas": "Déposer du gaz",
     "swap-bridge": "Swap/Bridge",
-    "offramp-button": "Deposit from CEX",
+    "offramp-button": "Dépôt de CEX",
+    "learn-more": "Apprendre encore plus...",
+    "view-all": "Tout voir",
     "max": "Max:",
+    "yes": "Oui",
+    "no": "Non",
     "copied": "Copié",
     "copy-error": "Une erreur est apparue lors de la copie dans le presse-papiers",
     "page-reload": {
@@ -853,7 +880,8 @@
         "crypto": "Crypto",
         "fx": "Devises",
         "all": "Tout",
-        "commodity": "Matières premières",
+        "polymarket": "prédiction",
+        "metal": "Matières premières",
         "closed": "Fermé"
       },
       "search": "Rechercher...",

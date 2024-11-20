@@ -1,3 +1,4 @@
+import { TraderInterface } from '@d8x/perpetuals-sdk';
 import classnames from 'classnames';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +11,6 @@ import { useMediaQuery, useTheme } from '@mui/material';
 
 import { Container } from 'components/container/Container';
 import { FundingTable } from 'components/funding-table/FundingTable';
-import { MarketSelect } from 'components/header/elements/market-select/MarketSelect';
 import { Helmet } from 'components/helmet/Helmet';
 import { MaintenanceWrapper } from 'components/maintenance-wrapper/MaintenanceWrapper';
 import { OpenOrdersTable } from 'components/open-orders-table/OpenOrdersTable';
@@ -18,29 +18,36 @@ import { OrderBlock } from 'components/order-block/OrderBlock';
 import { PositionsTable } from 'components/positions-table/PositionsTable';
 import { TableSelectorMobile } from 'components/table-selector-mobile/TableSelectorMobile';
 import { type SelectorItemI, TableSelector } from 'components/table-selector/TableSelector';
+import { TradeHistoryBlock } from 'components/trade-history-block/TradeHistoryBlock';
 import { TradeHistoryTable } from 'components/trade-history-table/TradeHistoryTable';
 import { UsdcSwapModal } from 'components/usdc-swap-modal/UsdcSwapModal';
 import { NEW_USDC_ADDRESS, OLD_USDC_ADDRESS } from 'components/usdc-swap-widget/constants';
+import { calculateProbability } from 'helpers/calculateProbability';
 import { useDialog } from 'hooks/useDialog';
 import { getOpenOrders, getPositionRisk } from 'network/network';
 import { ChartHolder } from 'pages/trader-page/components/chart-holder/ChartHolder';
 import { PerpetualStats } from 'pages/trader-page/components/perpetual-stats/PerpetualStats';
 import { orderBlockPositionAtom } from 'store/app.store';
+import { orderBlockAtom } from 'store/order-block.store';
 import {
   openOrdersAtom,
+  perpetualStaticInfoAtom,
   perpetualStatisticsAtom,
   positionsAtom,
-  selectedPoolAtom,
   traderAPIAtom,
+  executeScrollToTablesAtom,
+  selectedPerpetualAtom,
+  selectedPoolAtom,
 } from 'store/pools.store';
 import { sdkConnectedAtom } from 'store/vault-pools.store';
-import { OrderBlockPositionE, TableTypeE } from 'types/enums';
+import { OrderBlockE, OrderBlockPositionE, TableTypeE } from 'types/enums';
 import { formatToCurrency } from 'utils/formatToCurrency';
 import { isEnabledChain } from 'utils/isEnabledChain';
 
+import { CandlesWebSocketListener } from './components/candles-webSocket-listener/CandlesWebSocketListener';
+import { MobileMarketSelect } from './components/mobile-market-select/MobileMarketSelect';
 import { PerpetualInfoFetcher } from './components/PerpetualInfoFetcher';
 import { PoolSubscription } from './components/PoolSubscription';
-import { CandlesWebSocketListener } from './components/candles-webSocket-listener/CandlesWebSocketListener';
 import { TableDataFetcher } from './components/table-data-refetcher/TableDataFetcher';
 
 import styles from './TraderPage.module.scss';
@@ -49,9 +56,28 @@ const MIN_REQUIRED_USDC = 20;
 
 export const TraderPage = () => {
   const { t } = useTranslation();
+
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isUpToLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isUpToMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { address, chainId, isConnected } = useAccount();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { dialogOpen, openDialog, closeDialog } = useDialog();
+
+  const orderBlock = useAtomValue(orderBlockAtom);
+  const orderBlockPosition = useAtomValue(orderBlockPositionAtom);
+  const selectedPool = useAtomValue(selectedPoolAtom);
+  const selectedPerpetual = useAtomValue(selectedPerpetualAtom);
+  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
+  const perpetualStaticInfo = useAtomValue(perpetualStaticInfoAtom);
+  const traderAPI = useAtomValue(traderAPIAtom);
+  const isSDKConnected = useAtomValue(sdkConnectedAtom);
+  const [executeScrollToTables, setExecuteScrollToTables] = useAtom(executeScrollToTablesAtom);
+  const [positions, setPositions] = useAtom(positionsAtom);
+  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
 
   const [activeAllIndex, setActiveAllIndex] = useState(0);
   const [activePositionIndex, setActivePositionIndex] = useState(0);
@@ -60,20 +86,7 @@ export const TraderPage = () => {
   const fetchPositionsRef = useRef(false);
   const fetchOrdersRef = useRef(false);
   const isPageUrlAppliedRef = useRef(false);
-
-  const { dialogOpen, openDialog, closeDialog } = useDialog();
-
-  const orderBlockPosition = useAtomValue(orderBlockPositionAtom);
-  const perpetualStatistics = useAtomValue(perpetualStatisticsAtom);
-  const selectedPool = useAtomValue(selectedPoolAtom);
-  const traderAPI = useAtomValue(traderAPIAtom);
-  const isSDKConnected = useAtomValue(sdkConnectedAtom);
-  const [positions, setPositions] = useAtom(positionsAtom);
-  const [openOrders, setOpenOrders] = useAtom(openOrdersAtom);
-
-  const { address, chainId, isConnected } = useAccount();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const blockRef = useRef<HTMLDivElement>(null);
 
   const { data: legacyTokenData } = useReadContracts({
     allowFailure: false,
@@ -127,7 +140,7 @@ export const TraderPage = () => {
 
   const fetchPositions = useCallback(
     async (_chainId: number, _address: Address) => {
-      if (fetchPositionsRef.current || !isSDKConnected || !traderAPI || traderAPI.chainId !== _chainId) {
+      if (fetchPositionsRef.current || !isSDKConnected) {
         return;
       }
 
@@ -148,7 +161,7 @@ export const TraderPage = () => {
 
   const fetchOrders = useCallback(
     async (_chainId: number, _address: Address) => {
-      if (fetchOrdersRef.current || !isSDKConnected || !traderAPI || traderAPI.chainId !== _chainId) {
+      if (fetchOrdersRef.current || !isSDKConnected) {
         return;
       }
 
@@ -166,15 +179,15 @@ export const TraderPage = () => {
   );
 
   useEffect(() => {
-    if (location.hash || !selectedPool || selectedPool.perpetuals.length < 1 || isPageUrlAppliedRef.current) {
+    if (!selectedPool || !selectedPerpetual || location.hash || isPageUrlAppliedRef.current) {
       return;
     }
 
     isPageUrlAppliedRef.current = true;
     navigate(
-      `${location.pathname}${location.search}#${selectedPool.perpetuals[0].baseCurrency}-${selectedPool.perpetuals[0].quoteCurrency}-${selectedPool.poolSymbol}`
+      `${location.pathname}${location.search}#${selectedPerpetual.baseCurrency}-${selectedPerpetual.quoteCurrency}-${selectedPool.poolSymbol}`
     );
-  }, [selectedPool, location.hash, location.pathname, location.search, navigate]);
+  }, [selectedPool, selectedPerpetual, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!address || !isEnabledChain(chainId)) {
@@ -182,7 +195,25 @@ export const TraderPage = () => {
     }
     fetchPositions(chainId, address).then();
     fetchOrders(chainId, address).then();
+
+    return () => {
+      fetchPositionsRef.current = false;
+      fetchOrdersRef.current = false;
+    };
   }, [chainId, address, fetchPositions, fetchOrders]);
+
+  useEffect(() => {
+    if (!executeScrollToTables) {
+      return;
+    }
+
+    setActiveAllIndex(2);
+    setActiveHistoryIndex(0);
+    setExecuteScrollToTables(false);
+    blockRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, [executeScrollToTables, setExecuteScrollToTables]);
 
   const positionItems: SelectorItemI[] = useMemo(
     () => [
@@ -200,13 +231,19 @@ export const TraderPage = () => {
     [positions, openOrders, t]
   );
 
-  const historyItems: SelectorItemI[] = useMemo(
+  const tradeHistoryItems: SelectorItemI[] = useMemo(
     () => [
       {
         label: `${t('pages.trade.history-table.table-title')}`,
         item: <TradeHistoryTable />,
         tableType: TableTypeE.TRADE_HISTORY,
       },
+    ],
+    [t]
+  );
+
+  const fundingItems: SelectorItemI[] = useMemo(
+    () => [
       {
         label: `${t('pages.trade.funding-table.table-title')}`,
         item: <FundingTable />,
@@ -216,9 +253,19 @@ export const TraderPage = () => {
     [t]
   );
 
+  const historyItems: SelectorItemI[] = useMemo(
+    () => [...tradeHistoryItems, ...fundingItems],
+    [tradeHistoryItems, fundingItems]
+  );
+
   const selectorForAllItems: SelectorItemI[] = useMemo(
     () => [...positionItems, ...historyItems],
     [positionItems, historyItems]
+  );
+
+  const selectorForDesktopItems: SelectorItemI[] = useMemo(
+    () => [...positionItems, ...fundingItems],
+    [positionItems, fundingItems]
   );
 
   const handleActiveAllIndex = (index: number) => {
@@ -242,13 +289,22 @@ export const TraderPage = () => {
     setActiveHistoryIndex(index);
   };
 
+  let isPredictionMarket = false;
+  try {
+    isPredictionMarket = !!perpetualStaticInfo && TraderInterface.isPredictionMarketStatic(perpetualStaticInfo);
+  } catch {
+    // skip
+  }
+
   return (
     <>
       <Helmet
         title={`${
           perpetualStatistics
             ? formatToCurrency(
-                perpetualStatistics.midPrice,
+                isPredictionMarket
+                  ? calculateProbability(perpetualStatistics.midPrice, orderBlock === OrderBlockE.Short)
+                  : perpetualStatistics.midPrice,
                 `${perpetualStatistics.baseCurrency}-${perpetualStatistics.quoteCurrency}`,
                 true
               )
@@ -257,21 +313,19 @@ export const TraderPage = () => {
       />
       <div className={styles.root}>
         <MaintenanceWrapper>
-          {isSmallScreen && (
+          {isUpToLargeScreen && (
             <Container
               className={classnames(styles.headerContainer, {
-                [styles.swapSides]: !isSmallScreen && orderBlockPosition === OrderBlockPositionE.Left,
+                [styles.swapSides]: !isUpToLargeScreen && orderBlockPosition === OrderBlockPositionE.Left,
               })}
             >
               <div className={styles.leftBlock}>
                 <PerpetualStats />
               </div>
-              <div className={styles.rightBlock}>
-                <MarketSelect />
-              </div>
+              <div className={styles.rightBlock}>{isUpToMobileScreen && <MobileMarketSelect />}</div>
             </Container>
           )}
-          {!isSmallScreen && (
+          {!isUpToLargeScreen && (
             <Container
               className={classnames(styles.sidesContainer, {
                 [styles.swapSides]: orderBlockPosition === OrderBlockPositionE.Left,
@@ -279,27 +333,33 @@ export const TraderPage = () => {
             >
               <div className={styles.leftBlock}>
                 <div className={styles.marketAndStats}>
-                  <MarketSelect />
                   <PerpetualStats />
                 </div>
                 <ChartHolder />
                 <TableSelector
-                  selectorItems={selectorForAllItems}
+                  selectorItems={selectorForDesktopItems}
                   activeIndex={activeAllIndex}
                   setActiveIndex={handleActiveAllIndex}
                 />
               </div>
               <div className={styles.rightBlock}>
                 <OrderBlock />
+                <TradeHistoryBlock />
               </div>
             </Container>
           )}
-          {isSmallScreen && (
+          {isUpToLargeScreen && (
             <Container className={styles.columnContainer}>
               <ChartHolder />
               <OrderBlock />
-              {isMobile ? (
-                <TableSelectorMobile selectorItems={selectorForAllItems} />
+              {isUpToMobileScreen ? (
+                <div ref={blockRef}>
+                  <TableSelectorMobile
+                    selectorItems={selectorForAllItems}
+                    activeIndex={activeAllIndex}
+                    setActiveIndex={handleActiveAllIndex}
+                  />
+                </div>
               ) : (
                 <>
                   <TableSelector
@@ -307,11 +367,13 @@ export const TraderPage = () => {
                     activeIndex={activePositionIndex}
                     setActiveIndex={handlePositionsIndex}
                   />
-                  <TableSelector
-                    selectorItems={historyItems}
-                    activeIndex={activeHistoryIndex}
-                    setActiveIndex={handleHistoryIndex}
-                  />
+                  <div ref={blockRef}>
+                    <TableSelector
+                      selectorItems={historyItems}
+                      activeIndex={activeHistoryIndex}
+                      setActiveIndex={handleHistoryIndex}
+                    />
+                  </div>
                 </>
               )}
             </Container>

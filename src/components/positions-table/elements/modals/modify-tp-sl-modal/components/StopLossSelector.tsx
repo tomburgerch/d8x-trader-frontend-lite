@@ -1,25 +1,21 @@
-import {
-  type ChangeEvent,
-  type Dispatch,
-  memo,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import classnames from 'classnames';
+import { useAtomValue } from 'jotai';
+import { type Dispatch, memo, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 import { CustomPriceSelector } from 'components/custom-price-selector/CustomPriceSelector';
 import { InfoLabelBlock } from 'components/info-label-block/InfoLabelBlock';
+import { calculateProbability } from 'helpers/calculateProbability';
 import { calculateStepSize } from 'helpers/calculateStepSize';
-import { parseSymbol } from 'helpers/parseSymbol';
 import { OrderSideE, OrderValueTypeE, StopLossE } from 'types/enums';
 import { MarginAccountWithAdditionalDataI } from 'types/types';
 import { valueToFractionDigits } from 'utils/formatToCurrency';
 import { mapStopLossToNumber } from 'utils/mapStopLossToNumber';
+import { traderAPIAtom } from 'store/pools.store';
+
+import styles from './Selectors.module.scss';
 
 interface StopLossSelectorPropsI {
   setStopLossPrice: Dispatch<SetStateAction<number | null | undefined>>;
@@ -30,13 +26,12 @@ interface StopLossSelectorPropsI {
 export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: StopLossSelectorPropsI) => {
   const { t } = useTranslation();
 
+  const traderAPI = useAtomValue(traderAPIAtom);
+
   const [stopLoss, setStopLoss] = useState<StopLossE | null>(null);
   const [stopLossInputPrice, setStopLossInputPrice] = useState<number | null | undefined>(undefined);
 
-  const parsedSymbol = parseSymbol(position.symbol);
-
-  const handleStopLossPriceChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const stopLossPriceValue = event.target.value;
+  const handleStopLossPriceChange = (stopLossPriceValue: string) => {
     if (stopLossPriceValue !== '') {
       setStopLossInputPrice(+stopLossPriceValue);
     } else {
@@ -51,22 +46,39 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
     setStopLoss(stopLossValue);
   };
 
+  const [entryPrice, liqPrice, isPredictionMarket] = useMemo(() => {
+    if (!!traderAPI && !!position) {
+      try {
+        return traderAPI?.isPredictionMarket(position.symbol)
+          ? [
+              calculateProbability(position.entryPrice, position.side === OrderSideE.Sell),
+              calculateProbability(position.liqPrice, position.side === OrderSideE.Sell),
+              true,
+            ]
+          : [position.entryPrice, position.liqPrice, false];
+      } catch (error) {
+        // skip
+      }
+    }
+    return [position.entryPrice, position.liqPrice];
+  }, [position, traderAPI]);
+
   const minStopLossPrice = useMemo(() => {
-    if (position.entryPrice && position.side === OrderSideE.Sell) {
-      return position.entryPrice;
+    if (entryPrice && position.side === OrderSideE.Sell) {
+      return isPredictionMarket ? Math.max(0.000000001, liqPrice) : entryPrice;
     } else if (position.side === OrderSideE.Buy) {
-      return Math.max(0.000000001, position.liqPrice);
+      return Math.max(0.000000001, liqPrice);
     }
     return 0.000000001;
-  }, [position]);
+  }, [position, entryPrice, liqPrice, isPredictionMarket]);
 
   const maxStopLossPrice = useMemo(() => {
-    if (position.entryPrice && position.side === OrderSideE.Buy) {
-      return position.entryPrice;
+    if (entryPrice && position.side === OrderSideE.Buy) {
+      return entryPrice;
     } else if (position.side === OrderSideE.Sell) {
-      return position.liqPrice;
+      return isPredictionMarket ? entryPrice : liqPrice;
     }
-  }, [position]);
+  }, [position, entryPrice, liqPrice, isPredictionMarket]);
 
   const stepSize = useMemo(() => calculateStepSize(position.entryPrice), [position.entryPrice]);
 
@@ -101,20 +113,14 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
   useEffect(() => {
     if (stopLoss && stopLoss !== StopLossE.None) {
       let stopPrice;
-      if (position.side === OrderSideE.Buy) {
-        stopPrice = Math.max(
-          position.liqPrice,
-          position.entryPrice * (1 - Math.abs(mapStopLossToNumber(stopLoss) / position.leverage))
-        );
+      if (position.side === OrderSideE.Buy || (position.side === OrderSideE.Sell && isPredictionMarket)) {
+        stopPrice = Math.max(liqPrice, entryPrice * (1 - Math.abs(mapStopLossToNumber(stopLoss) / position.leverage)));
       } else {
-        stopPrice = Math.min(
-          position.liqPrice,
-          position.entryPrice * (1 + Math.abs(mapStopLossToNumber(stopLoss) / position.leverage))
-        );
+        stopPrice = Math.min(liqPrice, entryPrice * (1 + Math.abs(mapStopLossToNumber(stopLoss) / position.leverage)));
       }
       setStopLossInputPrice(Math.max(0.000000001, +stopPrice.toFixed(valueToFractionDigits(+stopPrice))));
     }
-  }, [stopLoss, position]);
+  }, [stopLoss, position, entryPrice, liqPrice, isPredictionMarket]);
 
   useEffect(() => {
     setStopLossPrice(stopLossInputPrice);
@@ -128,37 +134,48 @@ export const StopLossSelector = memo(({ setStopLossPrice, position, disabled }: 
 
   const translationMap: Record<StopLossE, string> = {
     [StopLossE.None]: t('pages.trade.order-block.stop-loss.none'),
-    [StopLossE['1%']]: '1%',
+    [StopLossE['5%']]: '5%',
     [StopLossE['25%']]: '25%',
     [StopLossE['50%']]: '50%',
     [StopLossE['75%']]: '75%',
   };
 
   return (
-    <CustomPriceSelector<StopLossE>
-      id="custom-stop-loss-price"
-      label={
-        <InfoLabelBlock
-          title={t('pages.trade.order-block.stop-loss.title')}
-          content={
-            <>
-              <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
-              <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
-            </>
-          }
-        />
-      }
-      options={Object.values(StopLossE)}
-      translationMap={translationMap}
-      handlePriceChange={handleStopLossChange}
-      handleInputPriceChange={handleStopLossPriceChange}
-      validateInputPrice={validateStopLossPrice}
-      selectedInputPrice={stopLoss !== StopLossE.None ? stopLossInputPrice : null}
-      selectedPrice={stopLoss}
-      currency={parsedSymbol?.quoteCurrency}
-      stepSize={stepSize}
-      disabled={disabled}
-    />
+    <div className={styles.root}>
+      <CustomPriceSelector
+        id="custom-stop-loss-price"
+        label={
+          <InfoLabelBlock
+            title={t('pages.trade.order-block.stop-loss.title')}
+            content={
+              <>
+                <Typography>{t('pages.trade.order-block.stop-loss.body1')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body2')}</Typography>
+                <Typography>{t('pages.trade.order-block.stop-loss.body3')}</Typography>
+              </>
+            }
+          />
+        }
+        handleInputPriceChange={handleStopLossPriceChange}
+        validateInputPrice={validateStopLossPrice}
+        selectedInputPrice={stopLoss !== StopLossE.None ? stopLossInputPrice : null}
+        stepSize={stepSize}
+        disabled={disabled}
+        inline={true}
+      />
+      <div className={styles.priceOptions}>
+        {Object.values(StopLossE).map((key) => (
+          <Button
+            key={key}
+            variant="outlined"
+            className={classnames({ [styles.selected]: key === stopLoss })}
+            onClick={() => handleStopLossChange(key)}
+            disabled={disabled}
+          >
+            {translationMap[key]}
+          </Button>
+        ))}
+      </div>
+    </div>
   );
 });

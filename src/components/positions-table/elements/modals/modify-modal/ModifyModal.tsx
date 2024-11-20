@@ -5,24 +5,14 @@ import { toast } from 'react-toastify';
 import { type Address } from 'viem';
 import { useAccount, useWaitForTransactionReceipt, useWalletClient } from 'wagmi';
 
-import {
-  Button,
-  CircularProgress,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputAdornment,
-  Link,
-  OutlinedInput,
-  Typography,
-} from '@mui/material';
+import { Button, CircularProgress, FormControl, InputAdornment, Link, OutlinedInput, Typography } from '@mui/material';
 
 import { approveMarginToken } from 'blockchain-api/approveMarginToken';
 import { deposit } from 'blockchain-api/contract-interactions/deposit';
 import { withdraw } from 'blockchain-api/contract-interactions/withdraw';
 import { Dialog } from 'components/dialog/Dialog';
 import { GasDepositChecker } from 'components/gas-deposit-checker/GasDepositChecker';
+import { SeparatorTypeE } from 'components/separator/enums';
 import { Separator } from 'components/separator/Separator';
 import { SidesRow } from 'components/sides-row/SidesRow';
 import { ToastContent } from 'components/toast-content/ToastContent';
@@ -31,12 +21,7 @@ import { getTxnLink } from 'helpers/getTxnLink';
 import { parseSymbol } from 'helpers/parseSymbol';
 import { useDebounce } from 'helpers/useDebounce';
 import { useDebouncedEffect } from 'helpers/useDebouncedEffect';
-import {
-  getAddCollateral,
-  getAvailableMargin,
-  getRemoveCollateral,
-  positionRiskOnCollateralAction,
-} from 'network/network';
+import { getAvailableMargin, positionRiskOnCollateralAction } from 'network/network';
 import { tradingClientAtom } from 'store/app.store';
 import {
   collateralToSettleConversionAtom,
@@ -236,6 +221,10 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
 
   const debouncedRemoveCollateral = useDebounce(removeCollateral, 500);
 
+  useEffect(() => {
+    isAPIBusyRef.current = isAPIBusy;
+  }, [isAPIBusy]);
+
   const handleRefreshPositionRisk = useCallback(() => {
     if (isAPIBusyRef.current || !selectedPosition || !address || !isEnabledChain(chainId)) {
       return;
@@ -307,16 +296,23 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   }, [modifyType, addCollateral, removeCollateral]);
 
   useEffect(() => {
-    if (!address || !traderAPI || !selectedPosition?.symbol || !isEnabledChain(chainId) || isAPIBusy) {
+    if (!address || !selectedPosition?.symbol || !isEnabledChain(chainId) || isAPIBusy) {
       return;
     }
 
     if (modifyType === ModifyTypeE.Remove) {
       setAPIBusy(true);
-      getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address).then(({ data }) => {
-        setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
-        setAPIBusy(false);
-      });
+      getAvailableMargin(chainId, traderAPI, selectedPosition.symbol, address)
+        .then(({ data }) => {
+          setAvailableMargin(data.amount < 0 ? 0 : data.amount * 0.99);
+        })
+        .catch((error) => {
+          console.error(error);
+          setAvailableMargin(undefined);
+        })
+        .finally(() => {
+          setAPIBusy(false);
+        });
     } else {
       setAvailableMargin(undefined);
     }
@@ -429,82 +425,27 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
       requestSentRef.current = true;
       setRequestSent(true);
       setLoading(true);
-      getAddCollateral(chainId, traderAPI, selectedPosition.symbol, +addCollateral / px)
-        .then(({ data }) => {
-          approveMarginToken({
-            walletClient,
-            settleTokenAddr: poolByPosition.settleTokenAddr,
-            isMultisigAddress,
-            proxyAddr,
-            minAmount: +addCollateral,
-            decimals: settleTokenDecimals,
+      approveMarginToken({
+        walletClient,
+        settleTokenAddr: poolByPosition.settleTokenAddr,
+        isMultisigAddress,
+        proxyAddr,
+        minAmount: +addCollateral / px,
+        decimals: settleTokenDecimals,
+      })
+        .then(() => {
+          deposit(tradingClient, traderAPI, {
+            traderAddr: address,
+            amount: +addCollateral / px,
+            symbol: selectedPosition.symbol,
           })
-            .then(() => {
-              deposit(tradingClient, address, data)
-                .then((tx) => {
-                  setTxHashForAdd(tx.hash);
-                  setAmountForAdd(+addCollateral);
-                  setSymbolForTx(selectedPosition.symbol);
-                  setTriggerBalancesUpdate((prevValue) => !prevValue);
-                  toast.success(
-                    <ToastContent
-                      title={t('pages.trade.positions-table.toasts.adding-collateral.title')}
-                      bodyLines={[]}
-                    />
-                  );
-                })
-                .catch((error) => {
-                  let msg = (error?.message ?? error) as string;
-                  msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
-                  toast.error(
-                    <ToastContent
-                      title={t('pages.trade.positions-table.toasts.error-processing.title')}
-                      bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
-                    />
-                  );
-                  console.error(error);
-                  setLoading(false);
-                })
-                .finally(() => {
-                  requestSentRef.current = false;
-                  setRequestSent(false);
-                  closeModal();
-                });
-            })
-            .catch((error) => {
-              console.error(error);
-              setLoading(false);
-              requestSentRef.current = false;
-              setRequestSent(false);
-            });
-        })
-        .catch((error) => {
-          console.error(error);
-          setRequestSent(false);
-          requestSentRef.current = false;
-          setLoading(false);
-        });
-    } else if (modifyType === ModifyTypeE.Remove) {
-      if (!maxCollateral || maxCollateral < +removeCollateral) {
-        return;
-      }
-
-      requestSentRef.current = true;
-      setRequestSent(true);
-      setLoading(true);
-      getRemoveCollateral(chainId, traderAPI, selectedPosition.symbol, +removeCollateral / px)
-        .then(({ data }) => {
-          withdraw(tradingClient, address, data)
-            .then(({ hash }) => {
-              setTxHashForRemove(hash);
-              setAmountForRemove(+removeCollateral);
+            .then((tx) => {
+              setTxHashForAdd(tx.hash);
+              setAmountForAdd(+addCollateral);
               setSymbolForTx(selectedPosition.symbol);
               setTriggerBalancesUpdate((prevValue) => !prevValue);
               toast.success(
-                <ToastContent
-                  title={t('pages.trade.positions-table.toasts.removing-collateral.title')}
-                  bodyLines={[]}
-                />
+                <ToastContent title={t('pages.trade.positions-table.toasts.adding-collateral.title')} bodyLines={[]} />
               );
             })
             .catch((error) => {
@@ -520,16 +461,55 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
               setLoading(false);
             })
             .finally(() => {
-              setRequestSent(false);
               requestSentRef.current = false;
+              setRequestSent(false);
               closeModal();
             });
         })
         .catch((error) => {
           console.error(error);
+          setLoading(false);
           requestSentRef.current = false;
           setRequestSent(false);
+        });
+    } else if (modifyType === ModifyTypeE.Remove) {
+      if (!maxCollateral || maxCollateral < +removeCollateral) {
+        return;
+      }
+
+      requestSentRef.current = true;
+      setRequestSent(true);
+      setLoading(true);
+      withdraw(tradingClient, traderAPI, {
+        traderAddr: address,
+        amount: +removeCollateral,
+        symbol: selectedPosition.symbol,
+      })
+        .then(({ hash }) => {
+          setTxHashForRemove(hash);
+          setAmountForRemove(+removeCollateral);
+          setSymbolForTx(selectedPosition.symbol);
+          setTriggerBalancesUpdate((prevValue) => !prevValue);
+          toast.success(
+            <ToastContent title={t('pages.trade.positions-table.toasts.removing-collateral.title')} bodyLines={[]} />
+          );
+        })
+        .catch((error) => {
+          let msg = (error?.message ?? error) as string;
+          msg = msg.length > 30 ? `${msg.slice(0, 25)}...` : msg;
+          toast.error(
+            <ToastContent
+              title={t('pages.trade.positions-table.toasts.error-processing.title')}
+              bodyLines={[{ label: t('pages.trade.positions-table.toasts.error-processing.body'), value: msg }]}
+            />
+          );
+          console.error(error);
           setLoading(false);
+        })
+        .finally(() => {
+          setRequestSent(false);
+          requestSentRef.current = false;
+          closeModal();
         });
     }
   };
@@ -544,126 +524,128 @@ export const ModifyModal = memo(({ isOpen, selectedPosition, poolByPosition, clo
   const digitsForMaxRemove = valueToFractionDigits(unroundedMaxRemoveValue);
 
   return (
-    <Dialog open={isOpen} className={styles.root}>
-      <DialogTitle>{t('pages.trade.positions-table.modify-modal.title')}</DialogTitle>
-      <DialogContent>
-        <ModifyTypeSelector modifyType={modifyType} setModifyType={setModifyType} />
-        <div className={styles.inputBlock}>
-          {modifyType === ModifyTypeE.Add && (
-            <>
+    <Dialog
+      open={isOpen}
+      onClose={closeModal}
+      onCloseClick={closeModal}
+      className={styles.root}
+      dialogTitle={t('pages.trade.positions-table.modify-modal.title')}
+      footerActions={
+        <>
+          <Button onClick={closeModal} variant="secondary" size="small">
+            {t('pages.trade.positions-table.modify-modal.cancel')}
+          </Button>
+          <GasDepositChecker>
+            <Button
+              onClick={handleModifyPositionConfirm}
+              variant="primary"
+              size="small"
+              disabled={isConfirmButtonDisabled}
+            >
+              {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
+              {t('pages.trade.positions-table.modify-modal.confirm')}
+            </Button>
+          </GasDepositChecker>
+        </>
+      }
+    >
+      <ModifyTypeSelector modifyType={modifyType} setModifyType={setModifyType} />
+      <div className={styles.inputBlock}>
+        {modifyType === ModifyTypeE.Add && (
+          <>
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.add')}
+              rightSide={
+                <OutlinedInput
+                  id="add-collateral"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
+                    </InputAdornment>
+                  }
+                  type="number"
+                  inputProps={{ step: 0.01, min: 0, max: settleTokenBalance }}
+                  value={addCollateral}
+                  onChange={(event) => setAddCollateral(event.target.value)}
+                />
+              }
+            />
+            {settleTokenBalance !== undefined && settleTokenBalance > 0 && (
               <SidesRow
-                leftSide={t('pages.trade.positions-table.modify-modal.add')}
+                leftSide=" "
                 rightSide={
+                  <Typography className={styles.helperText} variant="bodyTiny">
+                    {t('common.max')}{' '}
+                    <Link onClick={() => setAddCollateral(settleTokenBalance.toFixed(digitsForMaxAdd))}>
+                      {settleTokenBalance.toFixed(digitsForMaxAdd)}
+                    </Link>
+                  </Typography>
+                }
+              />
+            )}
+          </>
+        )}
+        {modifyType === ModifyTypeE.Remove && (
+          <>
+            <SidesRow
+              leftSide={t('pages.trade.positions-table.modify-modal.remove')}
+              rightSide={
+                <FormControl variant="outlined">
                   <OutlinedInput
-                    id="add-collateral"
+                    id="remove-collateral"
                     endAdornment={
                       <InputAdornment position="end">
                         <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
                       </InputAdornment>
                     }
                     type="number"
-                    inputProps={{ step: 0.01, min: 0, max: settleTokenBalance }}
-                    value={addCollateral}
-                    onChange={(event) => setAddCollateral(event.target.value)}
+                    inputProps={{ step: 0.01, min: 0, max: maxCollateral }}
+                    value={removeCollateral}
+                    onChange={(event) => setRemoveCollateral(event.target.value)}
                   />
-                }
-              />
-              {settleTokenBalance !== undefined && settleTokenBalance > 0 && (
-                <SidesRow
-                  leftSide=" "
-                  rightSide={
-                    <Typography className={styles.helperText} variant="bodyTiny">
-                      {t('common.max')}{' '}
-                      <Link onClick={() => setAddCollateral(settleTokenBalance.toFixed(digitsForMaxAdd))}>
-                        {settleTokenBalance.toFixed(digitsForMaxAdd)}
-                      </Link>
-                    </Typography>
-                  }
-                />
-              )}
-            </>
-          )}
-          {modifyType === ModifyTypeE.Remove && (
-            <>
+                </FormControl>
+              }
+            />
+            {maxCollateral !== null && maxCollateral !== undefined && (
               <SidesRow
-                leftSide={t('pages.trade.positions-table.modify-modal.remove')}
+                leftSide=" "
                 rightSide={
-                  <FormControl variant="outlined">
-                    <OutlinedInput
-                      id="remove-collateral"
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <Typography variant="adornment">{poolByPosition?.settleSymbol}</Typography>
-                        </InputAdornment>
-                      }
-                      type="number"
-                      inputProps={{ step: 0.01, min: 0, max: maxCollateral }}
-                      value={removeCollateral}
-                      onChange={(event) => setRemoveCollateral(event.target.value)}
-                    />
-                  </FormControl>
+                  <Typography className={styles.helperText} variant="bodyTiny">
+                    {t('common.max')}{' '}
+                    <Link onClick={() => setRemoveCollateral(maxCollateral.toFixed(digitsForMaxRemove))}>
+                      {maxCollateral.toFixed(digitsForMaxRemove)}
+                    </Link>
+                  </Typography>
                 }
               />
-              {maxCollateral !== null && maxCollateral !== undefined && (
-                <SidesRow
-                  leftSide=" "
-                  rightSide={
-                    <Typography className={styles.helperText} variant="bodyTiny">
-                      {t('common.max')}{' '}
-                      <Link onClick={() => setRemoveCollateral(maxCollateral.toFixed(digitsForMaxRemove))}>
-                        {maxCollateral.toFixed(digitsForMaxRemove)}
-                      </Link>
-                    </Typography>
-                  }
-                />
-              )}
-            </>
-          )}
-        </div>
-      </DialogContent>
-      <Separator />
-      <DialogContent>
-        <div className={styles.newPositionHeader}>
-          <Typography variant="bodyMedium" className={styles.centered}>
-            {t('pages.trade.positions-table.modify-modal.pos-details.title')}
-          </Typography>
-        </div>
-        <div className={styles.newPositionDetails}>
-          <SidesRow
-            leftSide={t('pages.trade.positions-table.modify-modal.pos-details.size')}
-            rightSide={calculatedPositionSize}
-          />
-          <SidesRow
-            leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
-            rightSide={calculatedMargin}
-          />
-          <SidesRow
-            leftSide={t('pages.trade.positions-table.modify-modal.pos-details.leverage')}
-            rightSide={calculatedLeverage}
-          />
-          <SidesRow
-            leftSide={t('pages.trade.positions-table.modify-modal.pos-details.liq-price')}
-            rightSide={calculatedLiqPrice}
-          />
-        </div>
-      </DialogContent>
-      <Separator />
-      <DialogActions>
-        <Button onClick={closeModal} variant="secondary" size="small">
-          {t('pages.trade.positions-table.modify-modal.cancel')}
-        </Button>
-        <GasDepositChecker>
-          <Button
-            onClick={handleModifyPositionConfirm}
-            variant="primary"
-            size="small"
-            disabled={isConfirmButtonDisabled}
-          >
-            {loading && <CircularProgress size="24px" sx={{ mr: 2 }} />}
-            {t('pages.trade.positions-table.modify-modal.confirm')}
-          </Button>
-        </GasDepositChecker>
-      </DialogActions>
+            )}
+          </>
+        )}
+      </div>
+      <Separator separatorType={SeparatorTypeE.Modal} />
+      <div className={styles.newPositionHeader}>
+        <Typography variant="bodyMedium" className={styles.centered}>
+          {t('pages.trade.positions-table.modify-modal.pos-details.title')}
+        </Typography>
+      </div>
+      <div className={styles.newPositionDetails}>
+        <SidesRow
+          leftSide={t('pages.trade.positions-table.modify-modal.pos-details.size')}
+          rightSide={calculatedPositionSize}
+        />
+        <SidesRow
+          leftSide={t('pages.trade.positions-table.modify-modal.pos-details.margin')}
+          rightSide={calculatedMargin}
+        />
+        <SidesRow
+          leftSide={t('pages.trade.positions-table.modify-modal.pos-details.leverage')}
+          rightSide={calculatedLeverage}
+        />
+        <SidesRow
+          leftSide={t('pages.trade.positions-table.modify-modal.pos-details.liq-price')}
+          rightSide={calculatedLiqPrice}
+        />
+      </div>
     </Dialog>
   );
 });

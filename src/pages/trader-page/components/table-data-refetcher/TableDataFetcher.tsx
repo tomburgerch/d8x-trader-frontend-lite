@@ -119,7 +119,7 @@ export const TableDataFetcher = memo(() => {
     if (Date.now() - lastFetch < INTERVAL_FOR_TICKER_FAST) {
       return;
     }
-    if ((fastTicker > 0 || slowTicker > 0) && traderAPI && isEnabledChain(chainId) && address) {
+    if ((fastTicker > 0 || slowTicker > 0) && isEnabledChain(chainId) && address) {
       setLastFetch(Date.now());
       setTriggerBalancesUpdate((prevValue) => !prevValue);
       getOpenOrders(chainId, traderAPI, address)

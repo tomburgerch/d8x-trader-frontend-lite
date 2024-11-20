@@ -44,7 +44,8 @@ export const UserWalletProvider = memo(({ children }: PropsWithChildren) => {
   } = useBalance({
     address: tradingAddress,
     query: {
-      enabled: tradingAddress && traderAPI?.chainId === chain?.id && isConnected && !isReconnecting && !isConnecting,
+      enabled:
+        tradingAddress && Number(traderAPI?.chainId) === chain?.id && isConnected && !isReconnecting && !isConnecting,
     },
   });
 
@@ -61,6 +62,9 @@ export const UserWalletProvider = memo(({ children }: PropsWithChildren) => {
     refetch().finally(() => {
       isMultisigRefetchRef.current = false;
     });
+    return () => {
+      isMultisigRefetchRef.current = false;
+    };
   }, [address, refetch]);
 
   useEffect(() => {
